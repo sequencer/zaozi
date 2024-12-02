@@ -4,9 +4,9 @@ package me.jiuyang.zaozi
 
 import me.jiuyang.zaozi.internal.Context
 
-trait MonoConnect[D <: Data, R <: Referable[D]]:
-  extension (ref: R)
-    def :=(that: R)(using ctx: Context): Unit
+trait MonoConnect[D <: Data, SRC <: Referable[D], SINK <: Referable[D]]:
+  extension (ref: SINK)
+    def :=(that: SRC)(using ctx: Context): Unit
 trait BiConnect[D <: Data, R <: Referable[D]]:
   extension (ref: R)
     def <>(that: R)(using ctx: Context): Unit
@@ -135,11 +135,16 @@ trait Subindex[E <: Data, D <: Vec[E], R <: Referable[D]]:
   extension (ref: R)
     def field(that: Int)(using ctx: Context): Ref[E]
 
+trait ToConstUInt[T]:
+  extension (ref: T)
+    def U(using ctx: Context): Const[UInt] = U(-1.W)
+    def U(width: Width)(using ctx: Context): Const[UInt]
 
+trait ToConstSInt[T]:
+  extension (ref: T)
+    def S(using ctx: Context): Const[SInt] = S(-1.W)
+    def S(width: Width)(using ctx: Context): Const[SInt]
 
-
-
-
-
-
-
+trait ToConstBool[T]:
+  extension (ref: T)
+    def B(using ctx: Context): Const[Bool]

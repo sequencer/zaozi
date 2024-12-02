@@ -2,29 +2,27 @@
 
 package me.jiuyang.zaozi
 
-import me.jiuyang.zaozi.circtlib.CirctHandler
-import me.jiuyang.zaozi.internal.{Context, NameKind, firrtl}
+import me.jiuyang.zaozi.internal.{firrtl, Context}
 
-trait Data {
+trait Data:
   // only accessed by Builder.
   def firrtlType: firrtl.FirrtlType
-}
 
 object Clock:
-  def apply: Clock = new Clock
+  def apply(): Clock = new Clock
 class Clock extends Data:
   def firrtlType = new firrtl.Clock(false)
+// Don't support abstract Reset type, that's cancer
 object Reset:
-  def apply: Reset = new Reset
-class Reset extends Data:
-  def firrtlType = new firrtl.Reset(false)
+  def apply(): Reset = new Reset
+type Reset = Bool
 object AsyncReset:
-  def apply: AsyncReset = new AsyncReset
+  def apply(): AsyncReset = new AsyncReset
 class AsyncReset extends Data:
   def firrtlType = new firrtl.AsyncReset(false)
 
 object Bool:
-  def apply: Bool = new Bool
+  def apply(): Bool = new Bool
 class Bool extends Data:
   def firrtlType = new firrtl.UInt(1.W, false)
 object UInt:
@@ -55,34 +53,69 @@ class Vec[E <: Data](element: E, count: Int) extends Data:
 
 trait SourceInfo
 
-given [D <: Data, R <: Referable[D]]: MonoConnect[D, R] with
-  extension (ref: R)
+given [D <: Data, SRC <: Referable[D], SINK <: Referable[D]]: MonoConnect[D, SRC, SINK] with
+  extension (ref: SINK)
     def :=(
-            that: R
-          )(
-            using ctx: Context
-          ): Unit =
+      that:      SRC
+    )(
+      using ctx: Context
+    ): Unit =
       ctx.handler
         .OpBuilder("firrtl.connect", ctx.currentBlock, ctx.handler.unkLoc)
-        .withOperand(/* dest */ ref.refer)
-        .withOperand(/* src */ that.refer)
+        .withOperand( /* dest */ ref.refer)
+        .withOperand( /* src */ that.refer)
         .build()
 
 given [T <: Bundle, R <: Referable[T]]: Subaccess[T, R] with
   extension (ref: R)
     def field(
-               that: String
-             )(
-               using ctx: Context
-             ): Ref[Data] =
-      val idx = ref.tpe.elements.indexWhere(_.name == that)
-      val tpe = ref.tpe.elements(idx).tpe
+      that:      String
+    )(
+      using ctx: Context
+    ): Ref[Data] =
+      val idx       = ctx.handler.firrtlTypeGetBundleFieldIndex(ref.tpe.firrtlType.toMLIR(ctx.handler), that)
+      val tpe       = ref.tpe.elements(idx).tpe
       val subaccess = ctx.handler
         .OpBuilder("firrtl.subfield", ctx.currentBlock, ctx.handler.unkLoc)
         .withNamedAttr("fieldIndex", ctx.handler.mlirIntegerAttrGet(ctx.handler.mlirIntegerTypeGet(32), idx))
         .withOperand(ref.refer)
-        .withResult(tpe.firrtlType.toMLIR(ctx.handler))
+        .withResultInference(1)
         .build()
         .results
         .head
       new Ref[Data](subaccess, tpe)
+
+given ToConstUInt[BigInt] with
+  extension (ref: BigInt)
+    def U(
+      width:     Width
+    )(
+      using ctx: Context
+    ): Const[UInt] =
+      val tpe     = UInt(width)
+      val mlirTpe = tpe.firrtlType.toMLIR(ctx.handler)
+      val const   = ctx.handler
+        .OpBuilder("firrtl.constant", ctx.currentBlock, ctx.handler.unkLoc)
+        .withNamedAttr(
+          "value",
+          ctx.handler.firrtlAttrGetIntegerFromString(
+            mlirTpe,
+            if (width.unknown) math.max(ref.bitLength, 1) else width.get,
+            ref.toString,
+            10
+          )
+        )
+        // TODO: circt should support type infer for firrtl.constant
+        .withResult(mlirTpe)
+        .build()
+        .results
+        .head
+      new Const(const, UInt(width))
+
+given ToConstUInt[Int] with
+  extension (ref: Int)
+    def U(
+      width:     Width
+    )(
+      using ctx: Context
+    ): Const[UInt] = BigInt(ref).U(width)

@@ -5,9 +5,9 @@ package me.jiuyang.zaozi.internal.firrtl
 import me.jiuyang.zaozi.*
 import me.jiuyang.zaozi.circtlib.{CirctHandler, FIRRTLBundleField, MlirType}
 
-// Native data type match to firrtl
 case class BundleField(name: String, isFlip: Boolean, tpe: FirrtlType)
 
+/** It maintains the data structure match to firrtl dialect.  */
 sealed case class FirrtlType(
   tpeName: String,
   const:   Boolean,
