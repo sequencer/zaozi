@@ -2,10 +2,11 @@
 
 package me.jiuyang.zaozi
 
-import me.jiuyang.zaozi.circtlib.{FIRRTLConvention, FIRRTLDirection, MlirLocation, MlirType, MlirValue, Ports}
-import me.jiuyang.zaozi.internal.NameKind.{Droppable, Interesting}
+import me.jiuyang.zaozi.circtlib.*
+import me.jiuyang.zaozi.internal.NameKind.Interesting
 import me.jiuyang.zaozi.internal.{Context, NameKind, Named}
 
+/** Referable is used to contain an AST node that exist in the MLIR. */
 trait Referable[T <: Data]:
   val tpe:   T
   val refer: MlirValue
@@ -17,7 +18,6 @@ class Ref[T <: Data](
   val tpe:   T)
     extends Referable[T]
 
-// Node is the result of other PrimOp, so input is assigned here.
 class Node[T <: Data](
   val name:     String,
   val nameKind: NameKind,
@@ -77,22 +77,23 @@ object Instance:
         .withNamedAttr("portLocations", ports.locAttrs(ctx.handler))
         .build()
 
-      Seq.tabulate(p.size)(ctx.handler.mlirBlockGetArgument(dummyModule.region(0).block(0), _)).map: p =>
-        ctx.handler
-          .OpBuilder("firrtl.connect", dummyModule.region(0).block(0), ctx.handler.unkLoc)
-          .withOperand(/* dest */ p)
-          .withOperand(
-            /* src */ ctx.handler
-              .OpBuilder("firrtl.invalidvalue", dummyModule.region(0).block(0), ctx.handler.unkLoc)
-              .withResult(ctx.handler.mlirValueGetType(p))
-              .build()
-              .results
-              .head
-          )
-          .build()
+      Seq
+        .tabulate(p.size)(ctx.handler.mlirBlockGetArgument(dummyModule.region(0).block(0), _))
+        .map: p =>
+          ctx.handler
+            .OpBuilder("firrtl.connect", dummyModule.region(0).block(0), ctx.handler.unkLoc)
+            .withOperand( /* dest */ p)
+            .withOperand(
+              /* src */ ctx.handler
+                .OpBuilder("firrtl.invalidvalue", dummyModule.region(0).block(0), ctx.handler.unkLoc)
+                .withResult(ctx.handler.mlirValueGetType(p))
+                .build()
+                .results
+                .head
+            )
+            .build()
 
       // for each ports of the dummy module, invalidate it.
-
 
       ctx.elaboratedModule += moduleName
 

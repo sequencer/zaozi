@@ -161,6 +161,7 @@ class CirctHandler:
   def mlirModuleCreateParse(module: String):           MlirModule = MlirModule(
     CAPI.mlirModuleCreateParse(arena, mlirCtx, newString(module).get)
   )
+
   def mlirModuleCreateParseBytes(module: Array[Byte]): MlirModule = MlirModule(
     CAPI.mlirModuleCreateParse(arena, mlirCtx, stringRefFromBytes(module).get)
   )
