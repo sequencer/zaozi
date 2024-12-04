@@ -52,6 +52,29 @@ given ToConstUInt[Int] with
       valName:   sourcecode.Name
     ): Const[UInt] = BigInt(ref).U(width)
 
+given [R <: Referable[UInt]]: AsBits[UInt, R] with
+  extension (ref: R)
+    override def asBits(
+                         using ctx: Context,
+                         file: sourcecode.File,
+                         line: sourcecode.Line,
+                         valName: sourcecode.Name
+                       ): Node[Bits] =
+      val mlirValue: MlirValue = ctx.handler
+        .OpBuilder(s"firrtl.asUInt", ctx.currentBlock, SourceLocator(file, line).toMLIR)
+        .withOperands(Seq(ref.refer))
+        .withResultInference(1)
+        .build()
+        .results
+        .head
+      new Node[Bits](
+        s"${valName.value}_asBits",
+        Droppable,
+        // todo: from MLIR.
+        Bits(ref.tpe.width),
+        mlirValue
+      )
+
 given [R <: Referable[UInt]]: AsUInt[UInt, R] with
   extension (ref: R)
     override def asUInt(
@@ -84,7 +107,7 @@ given [R <: Referable[UInt]]: AsSInt[UInt, R] with
       valName:   sourcecode.Name
     ): Node[SInt] =
       val mlirValue: MlirValue = ctx.handler
-        .OpBuilder(s"firrtl.asUInt", ctx.currentBlock, SourceLocator(file, line).toMLIR)
+        .OpBuilder(s"firrtl.asSInt", ctx.currentBlock, SourceLocator(file, line).toMLIR)
         .withOperands(Seq(ref.refer))
         .withResultInference(1)
         .build()
@@ -120,72 +143,6 @@ given [R <: Referable[UInt]]: Cvt[UInt, R] with
         // todo: from MLIR.
         // todo: what if width = -1, 0, 1?
         if (ref.tpe.width.unknown) SInt(-1.W) else SInt((ref.tpe.width.toInt + 1).W),
-        mlirValue
-      )
-
-given [R <: Referable[UInt]]: Not[UInt, R] with
-  extension (ref: R)
-    override def unary_~(
-      using ctx: Context,
-      file:      sourcecode.File,
-      line:      sourcecode.Line,
-      valName:   sourcecode.Name
-    ): Node[UInt] =
-      val mlirValue: MlirValue = ctx.handler
-        .OpBuilder(s"firrtl.not", ctx.currentBlock, SourceLocator(file, line).toMLIR)
-        .withOperands(Seq(ref.refer))
-        .withResultInference(1)
-        .build()
-        .results
-        .head
-      new Node[UInt](
-        s"${valName.value}_not",
-        Droppable,
-        ref.tpe,
-        mlirValue
-      )
-
-given [R <: Referable[UInt]]: AndR[UInt, R] with
-  extension (ref: R)
-    override def andR(
-      using ctx: Context,
-      file:      sourcecode.File,
-      line:      sourcecode.Line,
-      valName:   sourcecode.Name
-    ): Node[Bool] =
-      val mlirValue: MlirValue = ctx.handler
-        .OpBuilder(s"firrtl.andr", ctx.currentBlock, SourceLocator(file, line).toMLIR)
-        .withOperands(Seq(ref.refer))
-        .withResultInference(1)
-        .build()
-        .results
-        .head
-      new Node[Bool](
-        s"${valName.value}_andR",
-        Droppable,
-        Bool(),
-        mlirValue
-      )
-
-given [R <: Referable[UInt]]: OrR[UInt, R] with
-  extension (ref: R)
-    override def orR(
-      using ctx: Context,
-      file:      sourcecode.File,
-      line:      sourcecode.Line,
-      valName:   sourcecode.Name
-    ): Node[Bool] =
-      val mlirValue: MlirValue = ctx.handler
-        .OpBuilder(s"firrtl.orr", ctx.currentBlock, SourceLocator(file, line).toMLIR)
-        .withOperands(Seq(ref.refer))
-        .withResultInference(1)
-        .build()
-        .results
-        .head
-      new Node[Bool](
-        s"${valName.value}_orR",
-        Droppable,
-        Bool(),
         mlirValue
       )
 
@@ -501,102 +458,6 @@ given [R <: Referable[UInt]]: Dshr[UInt, R] with
           .head
       )
 
-given [R <: Referable[UInt]]: And[UInt, R] with
-  extension (ref: R)
-    def &(
-      that:      R
-    )(
-      using ctx: Context,
-      file:      sourcecode.File,
-      line:      sourcecode.Line,
-      valName:   sourcecode.Name
-    ): Node[UInt] =
-      new Node[UInt](
-        s"${valName.value}_and",
-        Droppable,
-        // todo: from MLIR.
-        ref.tpe,
-        ctx.handler
-          .OpBuilder(s"firrtl.and", ctx.currentBlock, SourceLocator(file, line).toMLIR)
-          .withOperands(Seq(ref.refer, that.refer))
-          .withResultInference(1)
-          .build()
-          .results
-          .head
-      )
-
-given [R <: Referable[UInt]]: Or[UInt, R] with
-  extension (ref: R)
-    def |(
-      that:      R
-    )(
-      using ctx: Context,
-      file:      sourcecode.File,
-      line:      sourcecode.Line,
-      valName:   sourcecode.Name
-    ): Node[UInt] =
-      new Node[UInt](
-        s"${valName.value}_or",
-        Droppable,
-        // todo: from MLIR.
-        ref.tpe,
-        ctx.handler
-          .OpBuilder(s"firrtl.or", ctx.currentBlock, SourceLocator(file, line).toMLIR)
-          .withOperands(Seq(ref.refer, that.refer))
-          .withResultInference(1)
-          .build()
-          .results
-          .head
-      )
-
-given [R <: Referable[UInt]]: Xor[UInt, R] with
-  extension (ref: R)
-    def ^(
-      that:      R
-    )(
-      using ctx: Context,
-      file:      sourcecode.File,
-      line:      sourcecode.Line,
-      valName:   sourcecode.Name
-    ): Node[UInt] =
-      new Node[UInt](
-        s"${valName.value}_xor",
-        Droppable,
-        // todo: from MLIR.
-        ref.tpe,
-        ctx.handler
-          .OpBuilder(s"firrtl.xor", ctx.currentBlock, SourceLocator(file, line).toMLIR)
-          .withOperands(Seq(ref.refer, that.refer))
-          .withResultInference(1)
-          .build()
-          .results
-          .head
-      )
-
-given [R <: Referable[UInt]]: Cat[UInt, R] with
-  extension (ref: R)
-    def ##(
-      that:      R
-    )(
-      using ctx: Context,
-      file:      sourcecode.File,
-      line:      sourcecode.Line,
-      valName:   sourcecode.Name
-    ): Node[UInt] =
-      new Node[UInt](
-        s"${valName.value}_cat",
-        Droppable,
-        // todo: from MLIR.
-        UInt((ref.tpe.width.toInt + that.tpe.width.toInt).W),
-        ctx.handler
-          .OpBuilder(s"firrtl.cat", ctx.currentBlock, SourceLocator(file, line).toMLIR)
-          .withOperands(Seq(ref.refer, that.refer))
-          .withResultInference(1)
-          .build()
-          .results
-          .head
-      )
-
 given [R <: Referable[UInt]]: Shl[UInt, R] with
   extension (ref: R)
     def <<(
@@ -725,37 +586,6 @@ given [R <: Referable[UInt]]: Pad[UInt, R] with
           .withOperands(Seq(ref.refer))
           .withNamedAttrs(
             Seq(("amount", ctx.handler.mlirIntegerAttrGet(ctx.handler.mlirIntegerTypeGet(32), that.toLong)))
-          )
-          .withResultInference(1)
-          .build()
-          .results
-          .head
-      )
-
-given [R <: Referable[UInt]]: Bits[UInt, R] with
-  extension (ref: R)
-    def extract(
-      hi:        Int,
-      lo:        Int
-    )(
-      using ctx: Context,
-      file:      sourcecode.File,
-      line:      sourcecode.Line,
-      valName:   sourcecode.Name
-    ): Node[UInt] =
-      new Node[UInt](
-        s"${valName.value}_bits",
-        Droppable,
-        // todo: from MLIR.
-        UInt((hi - lo + 1).W),
-        ctx.handler
-          .OpBuilder(s"firrtl.bits", ctx.currentBlock, SourceLocator(file, line).toMLIR)
-          .withOperands(Seq(ref.refer))
-          .withNamedAttrs(
-            Seq(
-              ("hi", ctx.handler.mlirIntegerAttrGet(ctx.handler.mlirIntegerTypeGet(32), hi.toLong)),
-              ("lo", ctx.handler.mlirIntegerAttrGet(ctx.handler.mlirIntegerTypeGet(32), lo.toLong))
-            )
           )
           .withResultInference(1)
           .build()

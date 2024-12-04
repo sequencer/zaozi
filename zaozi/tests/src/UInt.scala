@@ -11,6 +11,7 @@ class UIntSpecInterface(parameter: SimpleParameter) extends Interface[SimplePara
   val c          = Flipped(UInt(parameter.width.W))
   val uint       = Aligned(UInt(parameter.width.W))
   val sint       = Aligned(SInt(parameter.width.W))
+  val bits       = Aligned(Bits(parameter.width.W))
   val bool       = Aligned(Bool())
   val clock      = Aligned(Clock())
   val asyncReset = Aligned(AsyncReset())
@@ -21,6 +22,14 @@ object UIntSpec extends TestSuite:
     val parameter = SimpleParameter(8)
     val out       = new StringBuilder
     test("UInt"):
+      test("AsBits"):
+        firrtlTest(parameter, new UIntSpecInterface(parameter))(
+          // just type cast in zaozi, not actually firrtl type.
+          "connect io.bits, asUInt(io.a)"
+        ): (p, io) =>
+          io.field("bits")
+            .asInstanceOf[Ref[Bits]] :=
+            io.field("a").asInstanceOf[Ref[UInt]].asBits
       test("AsUInt"):
         firrtlTest(parameter, new UIntSpecInterface(parameter))(
           "connect io.uint, asUInt(io.a)"
@@ -30,7 +39,7 @@ object UIntSpec extends TestSuite:
             io.field("a").asInstanceOf[Ref[UInt]].asUInt
       test("AsSInt"):
         firrtlTest(parameter, new UIntSpecInterface(parameter))(
-          "connect io.sint, asUInt(io.a)"
+          "connect io.sint, asSInt(io.a)"
         ): (p, io) =>
           io.field("sint").asInstanceOf[Ref[SInt]] :=
             io.field("a").asInstanceOf[Ref[UInt]].asSInt
@@ -40,24 +49,6 @@ object UIntSpec extends TestSuite:
         ): (p, io) =>
           io.field("sint").asInstanceOf[Ref[SInt]] :=
             io.field("a").asInstanceOf[Ref[UInt]].zext
-      test("Not"):
-        firrtlTest(parameter, new UIntSpecInterface(parameter))(
-          "connect io.uint, not(io.a)"
-        ): (p, io) =>
-          io.field("uint").asInstanceOf[Ref[UInt]] :=
-            ~io.field("a").asInstanceOf[Ref[UInt]]
-      test("AndR"):
-        firrtlTest(parameter, new UIntSpecInterface(parameter))(
-          "connect io.bool, andr(io.a)"
-        ): (p, io) =>
-          io.field("bool").asInstanceOf[Ref[Bool]] :=
-            io.field("a").asInstanceOf[Ref[UInt]].andR
-      test("OrR"):
-        firrtlTest(parameter, new UIntSpecInterface(parameter))(
-          "connect io.bool, orr(io.a)"
-        ): (p, io) =>
-          io.field("bool").asInstanceOf[Ref[Bool]] :=
-            io.field("a").asInstanceOf[Ref[UInt]].orR
       test("Add"):
         firrtlTest(parameter, new UIntSpecInterface(parameter))(
           "connect io.uint, add(io.a, io.b)"
@@ -141,30 +132,6 @@ object UIntSpec extends TestSuite:
         ): (p, io) =>
           io.field("uint").asInstanceOf[Ref[UInt]] :=
             io.field("a").asInstanceOf[Ref[UInt]] >>> io.field("b").asInstanceOf[Ref[UInt]]
-      test("And"):
-        firrtlTest(parameter, new UIntSpecInterface(parameter))(
-          "connect io.uint, and(io.a, io.b)"
-        ): (p, io) =>
-          io.field("uint").asInstanceOf[Ref[UInt]] :=
-            io.field("a").asInstanceOf[Ref[UInt]] & io.field("b").asInstanceOf[Ref[UInt]]
-      test("Or"):
-        firrtlTest(parameter, new UIntSpecInterface(parameter))(
-          "connect io.uint, or(io.a, io.b)"
-        ): (p, io) =>
-          io.field("uint").asInstanceOf[Ref[UInt]] :=
-            io.field("a").asInstanceOf[Ref[UInt]] | io.field("b").asInstanceOf[Ref[UInt]]
-      test("Xor"):
-        firrtlTest(parameter, new UIntSpecInterface(parameter))(
-          "connect io.uint, xor(io.a, io.b)"
-        ): (p, io) =>
-          io.field("uint").asInstanceOf[Ref[UInt]] :=
-            io.field("a").asInstanceOf[Ref[UInt]] ^ io.field("b").asInstanceOf[Ref[UInt]]
-      test("Cat"):
-        firrtlTest(parameter, new UIntSpecInterface(parameter))(
-          "connect io.uint, cat(io.a, io.b)"
-        ): (p, io) =>
-          io.field("uint").asInstanceOf[Ref[UInt]] :=
-            io.field("a").asInstanceOf[Ref[UInt]] ## io.field("b").asInstanceOf[Ref[UInt]]
       test("Shl"):
         firrtlTest(parameter, new UIntSpecInterface(parameter))(
           "connect io.uint, shl(io.a, 2)"
@@ -195,9 +162,3 @@ object UIntSpec extends TestSuite:
         ): (p, io) =>
           io.field("uint").asInstanceOf[Ref[UInt]] :=
             io.field("a").asInstanceOf[Ref[UInt]].pad(32)
-      test("Bits"):
-        firrtlTest(parameter, new UIntSpecInterface(parameter))(
-          "connect io.uint, bits(io.a, 4, 2)"
-        ): (p, io) =>
-          io.field("uint").asInstanceOf[Ref[UInt]] :=
-            io.field("a").asInstanceOf[Ref[UInt]].extract(4, 2)

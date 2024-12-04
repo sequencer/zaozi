@@ -29,6 +29,14 @@ trait BiConnect[D <: Data, R <: Referable[D]]:
 //    "asUInt" | "asSInt" | "asClock" | "asAsyncReset" | "cvt"
 //  | "neg"    | "not"
 //  | "andr"   | "orr"    | "xorr" ;
+trait AsBits[D <: Data, R <: Referable[D]]:
+  extension (ref: R)
+    def asBits(
+                using ctx: Context,
+                file: sourcecode.File,
+                line: sourcecode.Line,
+                valName: sourcecode.Name
+              ): Node[Bits]
 trait AsUInt[D <: Data, R <: Referable[D]]:
   extension (ref: R)
     def asUInt(
@@ -349,7 +357,7 @@ trait Pad[D <: Data, R <: Referable[D]]:
     ): Node[D]
 
 // primop_1expr2int_keyword = "bits" ;
-trait Bits[D <: Data, R <: Referable[D]]:
+trait BitsExtract[D <: Data, R <: Referable[D]]:
   extension (ref: R)
     def extract(
       hi:        Int,
@@ -359,7 +367,7 @@ trait Bits[D <: Data, R <: Referable[D]]:
       file:      sourcecode.File,
       line:      sourcecode.Line,
       valName:   sourcecode.Name
-    ): Node[UInt]
+    ): Node[D]
 
 /** TODO: should have a trans def or dynamic method to summon element is D
   * {{{
