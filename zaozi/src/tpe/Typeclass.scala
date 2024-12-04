@@ -9,14 +9,20 @@ trait MonoConnect[D <: Data, SRC <: Referable[D], SINK <: Referable[D]]:
     def :=(
       that:      SRC
     )(
-      using ctx: Context
+      using ctx: Context,
+      file:      sourcecode.File,
+      line:      sourcecode.Line,
+      valName:   sourcecode.Name
     ): Unit
 trait BiConnect[D <: Data, R <: Referable[D]]:
   extension (ref: R)
     def <>(
       that:      R
     )(
-      using ctx: Context
+      using ctx: Context,
+      file:      sourcecode.File,
+      line:      sourcecode.Line,
+      valName:   sourcecode.Name
     ): Unit
 
 // primop_1expr_keyword =
@@ -26,52 +32,82 @@ trait BiConnect[D <: Data, R <: Referable[D]]:
 trait AsUInt[D <: Data, R <: Referable[D]]:
   extension (ref: R)
     def asUInt(
-      using ctx: Context
+      using ctx: Context,
+      file:      sourcecode.File,
+      line:      sourcecode.Line,
+      valName:   sourcecode.Name
     ): Node[UInt]
 trait AsSInt[D <: Data, R <: Referable[D]]:
   extension (ref: R)
     def asSInt(
-      using ctx: Context
+      using ctx: Context,
+      file:      sourcecode.File,
+      line:      sourcecode.Line,
+      valName:   sourcecode.Name
     ): Node[SInt]
 trait AsClock[D <: Data, R <: Referable[D]]:
   extension (ref: R)
     def asClock(
-      using ctx: Context
+      using ctx: Context,
+      file:      sourcecode.File,
+      line:      sourcecode.Line,
+      valName:   sourcecode.Name
     ): Node[Clock]
 trait AsAsyncReset[D <: Data, R <: Referable[D]]:
   extension (ref: R)
     def asAsyncReset(
-      using ctx: Context
+      using ctx: Context,
+      file:      sourcecode.File,
+      line:      sourcecode.Line,
+      valName:   sourcecode.Name
     ): Node[AsyncReset]
 trait Cvt[D <: Data, R <: Referable[D]]:
   extension (ref: R)
     def zext(
-      using ctx: Context
+      using ctx: Context,
+      file:      sourcecode.File,
+      line:      sourcecode.Line,
+      valName:   sourcecode.Name
     ): Node[SInt]
 trait Neg[D <: Data, R <: Referable[D]]:
   extension (ref: R)
     def unary_!(
-      using ctx: Context
+      using ctx: Context,
+      file:      sourcecode.File,
+      line:      sourcecode.Line,
+      valName:   sourcecode.Name
     ): Node[D]
 trait Not[D <: Data, R <: Referable[D]]:
   extension (ref: R)
     def unary_~(
-      using ctx: Context
+      using ctx: Context,
+      file:      sourcecode.File,
+      line:      sourcecode.Line,
+      valName:   sourcecode.Name
     ): Node[D]
 trait AndR[D <: Data, R <: Referable[D]]:
   extension (ref: R)
     def andR(
-      using ctx: Context
+      using ctx: Context,
+      file:      sourcecode.File,
+      line:      sourcecode.Line,
+      valName:   sourcecode.Name
     ): Node[Bool]
 trait OrR[D <: Data, R <: Referable[D]]:
   extension (ref: R)
     def orR(
-      using ctx: Context
+      using ctx: Context,
+      file:      sourcecode.File,
+      line:      sourcecode.Line,
+      valName:   sourcecode.Name
     ): Node[Bool]
 trait XorR[D <: Data, R <: Referable[D]]:
   extension (ref: R)
     def xorR(
-      using ctx: Context
+      using ctx: Context,
+      file:      sourcecode.File,
+      line:      sourcecode.Line,
+      valName:   sourcecode.Name
     ): Node[D]
 
 //  primop_2expr_keyword =
@@ -84,82 +120,118 @@ trait Add[D <: Data, R <: Referable[D]]:
     def +(
       that:      R
     )(
-      using ctx: Context
+      using ctx: Context,
+      file:      sourcecode.File,
+      line:      sourcecode.Line,
+      valName:   sourcecode.Name
     ): Node[D]
 trait Sub[D <: Data, R <: Referable[D]]:
   extension (ref: R)
     def -(
       that:      R
     )(
-      using ctx: Context
+      using ctx: Context,
+      file:      sourcecode.File,
+      line:      sourcecode.Line,
+      valName:   sourcecode.Name
     ): Node[D]
 trait Mul[D <: Data, R <: Referable[D]]:
   extension (ref: R)
     def *(
       that:      R
     )(
-      using ctx: Context
+      using ctx: Context,
+      file:      sourcecode.File,
+      line:      sourcecode.Line,
+      valName:   sourcecode.Name
     ): Node[D]
 trait Div[D <: Data, R <: Referable[D]]:
   extension (ref: R)
     def /(
       that:      R
     )(
-      using ctx: Context
+      using ctx: Context,
+      file:      sourcecode.File,
+      line:      sourcecode.Line,
+      valName:   sourcecode.Name
     ): Node[D]
 trait Rem[D <: Data, R <: Referable[D]]:
   extension (ref: R)
     def %(
       that:      R
     )(
-      using ctx: Context
+      using ctx: Context,
+      file:      sourcecode.File,
+      line:      sourcecode.Line,
+      valName:   sourcecode.Name
     ): Node[D]
 trait Lt[D <: Data, R <: Referable[D]]:
   extension (ref: R)
     def <(
       that:      R
     )(
-      using ctx: Context
+      using ctx: Context,
+      file:      sourcecode.File,
+      line:      sourcecode.Line,
+      valName:   sourcecode.Name
     ): Node[Bool]
 trait Leq[D <: Data, R <: Referable[D]]:
   extension (ref: R)
     def <=(
       that:      R
     )(
-      using ctx: Context
+      using ctx: Context,
+      file:      sourcecode.File,
+      line:      sourcecode.Line,
+      valName:   sourcecode.Name
     ): Node[Bool]
 trait Gt[D <: Data, R <: Referable[D]]:
   extension (ref: R)
     def >(
       that:      R
     )(
-      using ctx: Context
+      using ctx: Context,
+      file:      sourcecode.File,
+      line:      sourcecode.Line,
+      valName:   sourcecode.Name
     ): Node[Bool]
 trait Geq[D <: Data, R <: Referable[D]]:
   extension (ref: R)
     def >=(
       that:      R
     )(
-      using ctx: Context
+      using ctx: Context,
+      file:      sourcecode.File,
+      line:      sourcecode.Line,
+      valName:   sourcecode.Name
     ): Node[Bool]
 trait Eq[D <: Data, R <: Referable[D]]:
   extension (ref: R)
     def ===(
       that:      R
     )(
-      using ctx: Context
+      using ctx: Context,
+      file:      sourcecode.File,
+      line:      sourcecode.Line,
+      valName:   sourcecode.Name
     ): Node[Bool]
 trait Neq[D <: Data, R <: Referable[D]]:
   extension (ref: R)
     def !==(
       that:      R
     )(
-      using ctx: Context
+      using ctx: Context,
+      file:      sourcecode.File,
+      line:      sourcecode.Line,
+      valName:   sourcecode.Name
     ): Node[Bool]
     def =/=(
       that:      R
     )(
-      using ctx: Context
+      using ctx: Context,
+      file:      sourcecode.File,
+      line:      sourcecode.Line,
+      valName:   sourcecode.Name
     ): Node[Bool] = ref !== that
 
 trait Dshl[D <: Data, R <: Referable[D]]:
@@ -167,42 +239,60 @@ trait Dshl[D <: Data, R <: Referable[D]]:
     def <<<(
       that:      Referable[UInt]
     )(
-      using ctx: Context
+      using ctx: Context,
+      file:      sourcecode.File,
+      line:      sourcecode.Line,
+      valName:   sourcecode.Name
     ): Node[D]
 trait Dshr[D <: Data, R <: Referable[D]]:
   extension (ref: R)
     def >>>(
       that:      Referable[UInt]
     )(
-      using ctx: Context
+      using ctx: Context,
+      file:      sourcecode.File,
+      line:      sourcecode.Line,
+      valName:   sourcecode.Name
     ): Node[D]
 trait And[D <: Data, R <: Referable[D]]:
   extension (ref: R)
     def &(
       that:      R
     )(
-      using ctx: Context
+      using ctx: Context,
+      file:      sourcecode.File,
+      line:      sourcecode.Line,
+      valName:   sourcecode.Name
     ): Node[D]
 trait Or[D <: Data, R <: Referable[D]]:
   extension (ref: R)
     def |(
       that:      R
     )(
-      using ctx: Context
+      using ctx: Context,
+      file:      sourcecode.File,
+      line:      sourcecode.Line,
+      valName:   sourcecode.Name
     ): Node[D]
 trait Xor[D <: Data, R <: Referable[D]]:
   extension (ref: R)
     def ^(
       that:      R
     )(
-      using ctx: Context
+      using ctx: Context,
+      file:      sourcecode.File,
+      line:      sourcecode.Line,
+      valName:   sourcecode.Name
     ): Node[D]
 trait Cat[D <: Data, R <: Referable[D]]:
   extension (ref: R)
     def ##(
       that:      R
     )(
-      using ctx: Context
+      using ctx: Context,
+      file:      sourcecode.File,
+      line:      sourcecode.Line,
+      valName:   sourcecode.Name
     ): Node[D]
 
 //  primop_1expr1int_keyword =
@@ -212,35 +302,50 @@ trait Shl[D <: Data, R <: Referable[D]]:
     def <<(
       that:      Int
     )(
-      using ctx: Context
+      using ctx: Context,
+      file:      sourcecode.File,
+      line:      sourcecode.Line,
+      valName:   sourcecode.Name
     ): Node[D]
 trait Shr[D <: Data, R <: Referable[D]]:
   extension (ref: R)
     def >>(
       that:      Int
     )(
-      using ctx: Context
+      using ctx: Context,
+      file:      sourcecode.File,
+      line:      sourcecode.Line,
+      valName:   sourcecode.Name
     ): Node[D]
 trait Head[D <: Data, R <: Referable[D]]:
   extension (ref: R)
     def head(
       that:      Int
     )(
-      using ctx: Context
+      using ctx: Context,
+      file:      sourcecode.File,
+      line:      sourcecode.Line,
+      valName:   sourcecode.Name
     ): Node[D]
 trait Tail[D <: Data, R <: Referable[D]]:
   extension (ref: R)
     def tail(
       that:      Int
     )(
-      using ctx: Context
+      using ctx: Context,
+      file:      sourcecode.File,
+      line:      sourcecode.Line,
+      valName:   sourcecode.Name
     ): Node[D]
 trait Pad[D <: Data, R <: Referable[D]]:
   extension (ref: R)
     def pad(
       that:      Int
     )(
-      using ctx: Context
+      using ctx: Context,
+      file:      sourcecode.File,
+      line:      sourcecode.Line,
+      valName:   sourcecode.Name
     ): Node[D]
 
 // primop_1expr2int_keyword = "bits" ;
@@ -250,7 +355,10 @@ trait Bits[D <: Data, R <: Referable[D]]:
       hi:        Int,
       lo:        Int
     )(
-      using ctx: Context
+      using ctx: Context,
+      file:      sourcecode.File,
+      line:      sourcecode.Line,
+      valName:   sourcecode.Name
     ): Node[UInt]
 
 /** TODO: should have a trans def or dynamic method to summon element is D
@@ -275,40 +383,61 @@ trait Subaccess[D <: Bundle, R <: Referable[D]]:
     def field(
       that:      String
     )(
-      using ctx: Context
+      using ctx: Context,
+      file:      sourcecode.File,
+      line:      sourcecode.Line,
+      valName:   sourcecode.Name
     ): Ref[Data]
 trait Subindex[E <: Data, D <: Vec[E], R <: Referable[D]]:
   extension (ref: R)
     def field(
       that:      Int
     )(
-      using ctx: Context
+      using ctx: Context,
+      file:      sourcecode.File,
+      line:      sourcecode.Line,
+      valName:   sourcecode.Name
     ): Ref[E]
 
 trait ToConstUInt[T]:
   extension (ref: T)
     def U(
-      using ctx: Context
+      using ctx: Context,
+      file:      sourcecode.File,
+      line:      sourcecode.Line,
+      valName:   sourcecode.Name
     ): Const[UInt] = U(-1.W)
     def U(
       width:     Width
     )(
-      using ctx: Context
+      using ctx: Context,
+      file:      sourcecode.File,
+      line:      sourcecode.Line,
+      valName:   sourcecode.Name
     ): Const[UInt]
 
 trait ToConstSInt[T]:
   extension (ref: T)
     def S(
-      using ctx: Context
+      using ctx: Context,
+      file:      sourcecode.File,
+      line:      sourcecode.Line,
+      valName:   sourcecode.Name
     ): Const[SInt] = S(-1.W)
     def S(
       width:     Width
     )(
-      using ctx: Context
+      using ctx: Context,
+      file:      sourcecode.File,
+      line:      sourcecode.Line,
+      valName:   sourcecode.Name
     ): Const[SInt]
 
 trait ToConstBool[T]:
   extension (ref: T)
     def B(
-      using ctx: Context
+      using ctx: Context,
+      file:      sourcecode.File,
+      line:      sourcecode.Line,
+      valName:   sourcecode.Name
     ): Const[Bool]

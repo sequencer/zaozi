@@ -6,11 +6,19 @@ import me.jiuyang.zaozi.internal.{firrtl, Context}
 
 case class BundleField(name: String, isFlip: Boolean, tpe: Data)
 abstract class Bundle extends Data:
-  def Aligned[T <: Data](name: String, data: T): T =
-    elements += BundleField(name, false, data)
+  def Aligned[T <: Data](
+    data:          T
+  )(
+    using valName: sourcecode.Name
+  ): T =
+    elements += BundleField(valName.value, false, data)
     data
-  def Flipped[T <: Data](name: String, data: T): T =
-    elements += BundleField(name, true, data)
+  def Flipped[T <: Data](
+    data:          T
+  )(
+    using valName: sourcecode.Name
+  ): T =
+    elements += BundleField(valName.value, true, data)
     data
 
   val elements:   collection.mutable.ArrayBuffer[BundleField] = collection.mutable.ArrayBuffer[BundleField]()
@@ -22,7 +30,10 @@ given [T <: Bundle, R <: Referable[T]]: Subaccess[T, R] with
     def field(
       that:      String
     )(
-      using ctx: Context
+      using ctx: Context,
+      file:      sourcecode.File,
+      line:      sourcecode.Line,
+      valName:   sourcecode.Name
     ): Ref[Data] =
       val idx       = ctx.handler.firrtlTypeGetBundleFieldIndex(ref.tpe.firrtlType.toMLIR(ctx.handler), that)
       val tpe       = ref.tpe.elements(idx).tpe

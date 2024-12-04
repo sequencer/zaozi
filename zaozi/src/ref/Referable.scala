@@ -28,34 +28,35 @@ class Node[T <: Data](
 
 object Instance:
   def apply[T <: Bundle](
-    name:       String,
     moduleName: String,
     tpe:        T
   )(
-    using ctx:  Context
+    using ctx:  Context,
+    file:       sourcecode.File,
+    line:       sourcecode.Line,
+    valName:    sourcecode.Name
   ) =
     val p: Seq[(String, MlirType, FIRRTLDirection, MlirLocation)] = tpe.firrtlType.fields.get.map(bf =>
       (
         bf.name,
         bf.tpe.toMLIR(ctx.handler),
         if (bf.isFlip) FIRRTLDirection.In else FIRRTLDirection.Out,
-        ctx.handler.unkLoc
+        SourceLocator(file, line).toMLIR
       )
     )
     val ports = Ports(p.map(_._1), p.map(_._2), p.map(_._3), p.map(_._4))
 
     // create an instance.
     val instance = ctx.handler
-      .OpBuilder("firrtl.instance", ctx.moduleBlock, ctx.handler.unkLoc)
+      .OpBuilder("firrtl.instance", ctx.moduleBlock, SourceLocator(file, line).toMLIR)
       .withNamedAttr("moduleName", ctx.handler.mlirFlatSymbolRefAttrGet(moduleName))
-      .withNamedAttr("name", ctx.handler.mlirStringAttrGet(name))
+      .withNamedAttr("name", ctx.handler.mlirStringAttrGet(valName.value))
       .withNamedAttr("nameKind", ctx.handler.firrtlAttrGetNameKind(me.jiuyang.zaozi.internal.toMLIR(Interesting)))
       .withNamedAttr("portDirections", ports.dirAttrs(ctx.handler))
       .withNamedAttr("portNames", ports.nameAttrs(ctx.handler))
       .withNamedAttr("portAnnotations", ports.annotationAttrs(ctx.handler))
       .withNamedAttr("annotations", ctx.handler.emptyArrayAttr)
       .withNamedAttr("layers", ctx.handler.emptyArrayAttr)
-      // TODO: infer?
       .withResults(ports.types)
       .build()
       .results
@@ -63,7 +64,7 @@ object Instance:
     // create a private module for the instance which will be replaced at the linking procedure.
     if (!ctx.elaboratedModule.contains(moduleName))
       val dummyModule = ctx.handler
-        .OpBuilder("firrtl.module", ctx.circuitBlock, ctx.handler.unkLoc)
+        .OpBuilder("firrtl.module", ctx.circuitBlock, SourceLocator(file, line).toMLIR)
         .withRegion(Seq((ports.types, ports.locs)))
         .withNamedAttr("sym_name", ctx.handler.mlirStringAttrGet(moduleName))
         .withNamedAttr("sym_visibility", ctx.handler.mlirStringAttrGet("private"))
@@ -81,11 +82,11 @@ object Instance:
         .tabulate(p.size)(ctx.handler.mlirBlockGetArgument(dummyModule.region(0).block(0), _))
         .map: p =>
           ctx.handler
-            .OpBuilder("firrtl.connect", dummyModule.region(0).block(0), ctx.handler.unkLoc)
+            .OpBuilder("firrtl.connect", dummyModule.region(0).block(0), SourceLocator(file, line).toMLIR)
             .withOperand( /* dest */ p)
             .withOperand(
               /* src */ ctx.handler
-                .OpBuilder("firrtl.invalidvalue", dummyModule.region(0).block(0), ctx.handler.unkLoc)
+                .OpBuilder("firrtl.invalidvalue", dummyModule.region(0).block(0), SourceLocator(file, line).toMLIR)
                 .withResult(ctx.handler.mlirValueGetType(p))
                 .build()
                 .results
@@ -103,8 +104,8 @@ object Instance:
       NameKind.Droppable,
       tpe,
       ctx.handler
-        .OpBuilder("firrtl.wire", ctx.currentBlock, ctx.handler.unkLoc)
-        .withNamedAttr("name", ctx.handler.mlirStringAttrGet(s"${name}_io"))
+        .OpBuilder("firrtl.wire", ctx.currentBlock, SourceLocator(file, line).toMLIR)
+        .withNamedAttr("name", ctx.handler.mlirStringAttrGet(s"${valName.value}_io"))
         .withNamedAttr(
           "nameKind",
           ctx.handler.firrtlAttrGetNameKind(me.jiuyang.zaozi.internal.toMLIR(NameKind.Droppable))
@@ -119,7 +120,7 @@ object Instance:
       case (ele, idx) =>
         val io   = instance(idx)
         val wire = ctx.handler
-          .OpBuilder("firrtl.subfield", ctx.currentBlock, ctx.handler.unkLoc)
+          .OpBuilder("firrtl.subfield", ctx.currentBlock, SourceLocator(file, line).toMLIR)
           .withNamedAttr("fieldIndex", ctx.handler.mlirIntegerAttrGet(ctx.handler.mlirIntegerTypeGet(32), idx))
           .withOperand( /* input */ interfaceWire.refer)
           .withResultInference(1)
@@ -128,18 +129,18 @@ object Instance:
           .head
         if (ele.isFlip)
           ctx.handler
-            .OpBuilder("firrtl.connect", ctx.currentBlock, ctx.handler.unkLoc)
+            .OpBuilder("firrtl.connect", ctx.currentBlock, SourceLocator(file, line).toMLIR)
             .withOperand( /* dest */ io)
             .withOperand( /* src */ wire)
             .build()
         else
           ctx.handler
-            .OpBuilder("firrtl.connect", ctx.currentBlock, ctx.handler.unkLoc)
+            .OpBuilder("firrtl.connect", ctx.currentBlock, SourceLocator(file, line).toMLIR)
             .withOperand( /* dest */ wire)
             .withOperand( /* src */ io)
             .build()
     new Instance[T](
-      name,
+      valName.value,
       NameKind.Interesting,
       moduleName,
       tpe,
@@ -157,17 +158,19 @@ class Instance[T <: Bundle](
 
 object Wire:
   def apply[T <: Data](
-    name:      String,
     tpe:       T
   )(
-    using ctx: Context
+    using ctx: Context,
+    file:      sourcecode.File,
+    line:      sourcecode.Line,
+    valName:   sourcecode.Name
   ) = new Wire(
-    name,
+    valName.value,
     NameKind.Interesting,
     tpe,
     ctx.handler
-      .OpBuilder("firrtl.wire", ctx.currentBlock, ctx.handler.unkLoc)
-      .withNamedAttr("name", ctx.handler.mlirStringAttrGet(name))
+      .OpBuilder("firrtl.wire", ctx.currentBlock, SourceLocator(file, line).toMLIR)
+      .withNamedAttr("name", ctx.handler.mlirStringAttrGet(valName.value))
       .withNamedAttr("nameKind", ctx.handler.firrtlAttrGetNameKind(me.jiuyang.zaozi.internal.toMLIR(Interesting)))
       .withNamedAttr("annotations", ctx.handler.emptyArrayAttr)
       .withResult(tpe.firrtlType.toMLIR(ctx.handler))
@@ -185,20 +188,22 @@ class Wire[T <: Data](
 
 object Reg:
   def apply[C <: Referable[Clock], T <: Data](
-    name:      String,
     tpe:       T,
     clock:     C
   )(
-    using ctx: Context
+    using ctx: Context,
+    file:      sourcecode.File,
+    line:      sourcecode.Line,
+    valName:   sourcecode.Name
   ) =
     new Reg(
-      name,
+      valName.value,
       NameKind.Interesting,
       tpe,
       clock,
       ctx.handler
-        .OpBuilder("firrtl.reg", ctx.currentBlock, ctx.handler.unkLoc)
-        .withNamedAttr("name", ctx.handler.mlirStringAttrGet(name))
+        .OpBuilder("firrtl.reg", ctx.currentBlock, SourceLocator(file, line).toMLIR)
+        .withNamedAttr("name", ctx.handler.mlirStringAttrGet(valName.value))
         .withNamedAttr("nameKind", ctx.handler.firrtlAttrGetNameKind(me.jiuyang.zaozi.internal.toMLIR(Interesting)))
         .withNamedAttr("annotations", ctx.handler.emptyArrayAttr)
         .withOperand( /* clockVal */ clock.refer)
@@ -218,24 +223,26 @@ class Reg[C <: Referable[Clock], T <: Data](
 
 object RegInit:
   def apply[C <: Referable[Clock], RT <: Reset | AsyncReset, R <: Referable[RT], I <: Const[T], T <: Data](
-    name:      String,
     tpe:       T,
     clock:     C,
     reset:     R,
     init:      I
   )(
-    using ctx: Context
+    using ctx: Context,
+    file:      sourcecode.File,
+    line:      sourcecode.Line,
+    valName:   sourcecode.Name
   ) =
     new RegInit(
-      name,
+      valName.value,
       NameKind.Interesting,
       tpe,
       clock,
       reset,
       init,
       ctx.handler
-        .OpBuilder("firrtl.regreset", ctx.currentBlock, ctx.handler.unkLoc)
-        .withNamedAttr("name", ctx.handler.mlirStringAttrGet(name))
+        .OpBuilder("firrtl.regreset", ctx.currentBlock, SourceLocator(file, line).toMLIR)
+        .withNamedAttr("name", ctx.handler.mlirStringAttrGet(valName.value))
         .withNamedAttr("nameKind", ctx.handler.firrtlAttrGetNameKind(me.jiuyang.zaozi.internal.toMLIR(Interesting)))
         .withNamedAttr("annotations", ctx.handler.emptyArrayAttr)
         .withOperand( /* clockVal */ clock.refer)

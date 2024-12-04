@@ -6,14 +6,14 @@ import me.jiuyang.zaozi.{*, given}
 import utest.*
 
 class UIntSpecInterface(parameter: SimpleParameter) extends Interface[SimpleParameter](parameter) {
-  val a          = Flipped("a", UInt(parameter.width.W))
-  val b          = Flipped("b", UInt(parameter.width.W))
-  val c          = Flipped("c", UInt(parameter.width.W))
-  val uint       = Aligned("uint", UInt(parameter.width.W))
-  val sint       = Aligned("sint", SInt(parameter.width.W))
-  val bool       = Aligned("bool", Bool())
-  val clock      = Aligned("clock", Clock())
-  val asyncReset = Aligned("asyncReset", AsyncReset())
+  val a          = Flipped(UInt(parameter.width.W))
+  val b          = Flipped(UInt(parameter.width.W))
+  val c          = Flipped(UInt(parameter.width.W))
+  val uint       = Aligned(UInt(parameter.width.W))
+  val sint       = Aligned(SInt(parameter.width.W))
+  val bool       = Aligned(Bool())
+  val clock      = Aligned(Clock())
+  val asyncReset = Aligned(AsyncReset())
 }
 
 object UIntSpec extends TestSuite:
