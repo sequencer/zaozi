@@ -26,99 +26,99 @@ object BitsSpec extends TestSuite:
         firrtlTest(parameter, new BitsSpecInterface(parameter))(
           "connect io.bits, asUInt(io.a)"
         ): (p, io) =>
-          io.field[Bits]("bits") := io.field[Bits]("a").asBits
+          io.bits := io.a.asBits
       test("AsUInt"):
         firrtlTest(parameter, new BitsSpecInterface(parameter))(
           "connect io.uint, asUInt(io.a)"
         ): (p, io) =>
-          io.field[UInt]("uint") := io.field[Bits]("a").asUInt
+          io.uint := io.a.asUInt
       test("AsSInt"):
         firrtlTest(parameter, new BitsSpecInterface(parameter))(
           "connect io.sint, asSInt(io.a)"
         ): (p, io) =>
-          io.field[SInt]("sint") := io.field[Bits]("a").asSInt
+          io.sint := io.a.asSInt
       test("Not"):
         firrtlTest(parameter, new BitsSpecInterface(parameter))(
           "connect io.bits, not(io.a)"
         ): (p, io) =>
-          io.field[Bits]("bits") := ~io.field[Bits]("a")
+          io.bits := ~io.a
       test("AndR"):
         firrtlTest(parameter, new BitsSpecInterface(parameter))(
           "connect io.bool, andr(io.a)"
         ): (p, io) =>
-          io.field[Bool]("bool") := io.field[Bits]("a").andR
+          io.bool := io.a.andR
       test("OrR"):
         firrtlTest(parameter, new BitsSpecInterface(parameter))(
           "connect io.bool, orr(io.a)"
         ): (p, io) =>
-          io.field[Bool]("bool") := io.field[Bits]("a").orR
+          io.bool := io.a.orR
       test("Eq"):
         firrtlTest(parameter, new BitsSpecInterface(parameter))(
           "connect io.bool, eq(io.a, io.b)"
         ): (p, io) =>
-          io.field[Bool]("bool") := io.field[Bits]("a") === io.field[Bits]("b")
+          io.bool := io.a === io.b
       test("Neq"):
         firrtlTest(parameter, new BitsSpecInterface(parameter))(
           "connect io.bool, neq(io.a, io.b)"
         ): (p, io) =>
-          io.field[Bool]("bool") := io.field[Bits]("a") =/= io.field[Bits]("b")
+          io.bool := io.a =/= io.b
       test("Dshl"):
         firrtlTest(parameter, new BitsSpecInterface(parameter))(
           "connect io.bits, dshl(io.a, io.c)"
         ): (p, io) =>
-          io.field[Bits]("bits") := io.field[Bits]("a") <<< io.field[UInt]("c")
+          io.bits := io.a <<< io.c
       test("Dshr"):
         firrtlTest(parameter, new BitsSpecInterface(parameter))(
           "connect io.bits, dshr(io.a, io.c)"
         ): (p, io) =>
-          io.field[Bits]("bits") := io.field[Bits]("a") >>> io.field[UInt]("c")
+          io.bits := io.a >>> io.c
       test("And"):
         firrtlTest(parameter, new BitsSpecInterface(parameter))(
           "connect io.bits, and(io.a, io.b)"
         ): (p, io) =>
-          io.field[Bits]("bits") := io.field[Bits]("a") & io.field[Bits]("b")
+          io.bits := io.a & io.b
       test("Or"):
         firrtlTest(parameter, new BitsSpecInterface(parameter))(
           "connect io.bits, or(io.a, io.b)"
         ): (p, io) =>
-          io.field[Bits]("bits") := io.field[Bits]("a") | io.field[Bits]("b")
+          io.bits := io.a | io.b
       test("Xor"):
         firrtlTest(parameter, new BitsSpecInterface(parameter))(
           "connect io.bits, xor(io.a, io.b)"
         ): (p, io) =>
-          io.field[Bits]("bits") := io.field[Bits]("a") ^ io.field[Bits]("b")
+          io.bits := io.a ^ io.b
       test("Cat"):
         firrtlTest(parameter, new BitsSpecInterface(parameter))(
           "connect io.bits, cat(io.a, io.b)"
         ): (p, io) =>
-          io.field[Bits]("bits") := io.field[Bits]("a") ## io.field[Bits]("b")
+          io.bits := io.a ## io.b
       test("Shl"):
         firrtlTest(parameter, new BitsSpecInterface(parameter))(
           "connect io.bits, shl(io.a, 2)"
         ): (p, io) =>
-          io.field[Bits]("bits") := io.field[Bits]("a") << 2
+          io.bits := io.a << 2
       test("Shr"):
         firrtlTest(parameter, new BitsSpecInterface(parameter))(
           "connect io.bits, shr(io.a, 2)"
         ): (p, io) =>
-          io.field[Bits]("bits") := io.field[Bits]("a") >> 2
+          io.bits := io.a >> 2
       test("Head"):
         firrtlTest(parameter, new BitsSpecInterface(parameter))(
           "connect io.bits, head(io.a, 2)"
         ): (p, io) =>
-          io.field[Bits]("bits") := io.field[Bits]("a").head(2)
+          io.bits := io.a.head(2)
       test("Tail"):
         firrtlTest(parameter, new BitsSpecInterface(parameter))(
           "connect io.bits, tail(io.a, 2)"
         ): (p, io) =>
-          io.field[Bits]("bits") := io.field[Bits]("a").tail(2)
+          io.bits := io.a.tail(2)
       test("Pad"):
         firrtlTest(parameter, new BitsSpecInterface(parameter))(
           "connect io.bits, pad(io.a, 32)"
         ): (p, io) =>
-          io.field[Bits]("bits") := io.field[Bits]("a").pad(32)
+          io.bits := io.a.pad(32)
       test("Bits"):
         firrtlTest(parameter, new BitsSpecInterface(parameter))(
           "connect io.bits, bits(io.a, 4, 2)"
         ): (p, io) =>
-          io.field[Bits]("bits") := io.field[Bits]("a").extract(4, 2)
+          io.bits := io.a.extract(4, 2)

@@ -32,7 +32,7 @@ object Smoke extends TestSuite:
     val out       = new StringBuilder
     test("Passthrough"):
       firrtlTest(parameter, PassthroughInterface(parameter))("wire io : { i : UInt<32>, flip o : UInt<32> }"):
-        (p, io) => io.field("o") := io.field("i")
+        (p, io) => io.o := io.i
     test("Referable"):
       test("Register"):
         val interface = new RegisterInterface(parameter)
@@ -44,26 +44,26 @@ object Smoke extends TestSuite:
           val regWithoutInit:   Referable[UInt] =
             Reg(
               tpe = UInt(32.W),
-              clock = io.field[SyncDomain]("syncDomain").field[Clock]("clock")
+              clock = io.syncDomain.clock
             )
           val asyncRegWithInit: Referable[UInt] =
             RegInit(
               tpe = UInt(32.W),
-              clock = io.field[AsyncDomain]("asyncDomain").field[Clock]("clock"),
-              reset = io.field[AsyncDomain]("asyncDomain").field[AsyncReset]("reset"),
+              clock = io.asyncDomain.clock,
+              reset = io.asyncDomain.reset,
               init = 0.U(32.W)
             )
           val syncRegWithInit:  Referable[UInt] =
             RegInit(
               tpe = UInt(32.W),
-              clock = io.field[SyncDomain]("syncDomain").field[Clock]("clock"),
-              reset = io.field[SyncDomain]("syncDomain").field[Reset]("reset"),
+              clock = io.syncDomain.clock,
+              reset = io.syncDomain.reset,
               init = 0.U(32.W)
             )
-          io.field[PassthroughInterface]("passthrough").field[UInt]("o") := regWithoutInit
-          regWithoutInit                                                 := asyncRegWithInit
-          asyncRegWithInit                                               := syncRegWithInit
-          syncRegWithInit                                                := io.field[PassthroughInterface]("passthrough").field[UInt]("i")
+          io.passthrough.o := regWithoutInit
+          regWithoutInit   := asyncRegWithInit
+          asyncRegWithInit := syncRegWithInit
+          syncRegWithInit  := io.passthrough.i
       test("Instance"):
         firrtlTest(parameter, new PassthroughInterface(parameter))(
           "inst passthroughInstance0 of Passthrough",
@@ -77,6 +77,6 @@ object Smoke extends TestSuite:
           val interface = new PassthroughInterface(parameter)
           val passthroughInstance0: Instance[PassthroughInterface] = Instance("Passthrough", interface)
           val passthroughInstance1: Instance[PassthroughInterface] = Instance("Passthrough", interface)
-          io.field[UInt]("o")                   := passthroughInstance0.field[UInt]("o")
-          passthroughInstance0.field[UInt]("i") := passthroughInstance1.field[UInt]("o")
-          passthroughInstance1.field[UInt]("i") := io.field[UInt]("i")
+          io.o                   := passthroughInstance0.o
+          passthroughInstance0.i := passthroughInstance1.o
+          passthroughInstance1.i := io.i

@@ -6,10 +6,36 @@ import me.jiuyang.zaozi.circtlib.*
 import me.jiuyang.zaozi.internal.NameKind.Interesting
 import me.jiuyang.zaozi.internal.{Context, NameKind, Named}
 
+import scala.language.dynamics
+
 /** Referable is used to contain an AST node that exist in the MLIR. */
-trait Referable[T <: Data]:
+trait Referable[T <: Data]
+  extends Dynamic:
   val tpe:   T
   val refer: MlirValue
+  def _field[E <: Data](that: String)(
+                        using ctx: Context,
+                        file: sourcecode.File,
+                        line: sourcecode.Line,
+                        valName: sourcecode.Name
+                      ): Ref[E] =
+    tpe match
+      case bundle: Bundle =>
+        require(bundle.elements.map(_.name).contains(that), s"$that not found in ${bundle.elements.map(_.name).mkString(",")}, did you forget to add Aligned and Flipped?")
+        val idx       = ctx.handler.firrtlTypeGetBundleFieldIndex(tpe.firrtlType.toMLIR(ctx.handler), that)
+        val subaccess = ctx.handler
+          .OpBuilder("firrtl.subfield", ctx.currentBlock, ctx.handler.unkLoc)
+          .withNamedAttr("fieldIndex", ctx.handler.mlirIntegerAttrGet(ctx.handler.mlirIntegerTypeGet(32), idx))
+          .withOperand(refer)
+          .withResultInference(1)
+          .build()
+          .results
+          .head
+        new Ref[E](subaccess, bundle.elements(idx).tpe.asInstanceOf[E])
+      case _ => throw new Exception("Unreachable, macro should have guarded it.")
+  // Due to https://github.com/scala/scala3/issues/22158#issuecomment-2524660241
+  // we must put selectDynamic here.
+  transparent inline def selectDynamic[R <: Data](name: String): Any = ${ dynamicSubaccess('this, 'name) }
 
 type Const[T <: Data] = Ref[T]
 

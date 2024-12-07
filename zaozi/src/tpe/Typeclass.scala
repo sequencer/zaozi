@@ -369,34 +369,6 @@ trait BitsExtract[D <: Data, R <: Referable[D]]:
       valName:   sourcecode.Name
     ): Node[D]
 
-/** TODO: should have a trans def or dynamic method to summon element is D
-  * {{{
-  *   class B extends Bundle {
-  *     val b = Aligned(Bool())
-  *   }
-  *   class A extends Bundle {
-  *     val a = Flipped(new Bundle {
-  *       val b = Aligned(Bool())
-  *       val c = Aligned(new B)
-  *     })
-  *   }
-  *   val reg: Reg[A]
-  *   reg.a : Reg[Bundle]
-  *   reg.a.b : Reg[Bool]
-  *   reg.a.c : Reg[B]
-  * }}}
-  */
-trait Subaccess[B <: Bundle, RB <: Referable[B]]:
-  extension (ref: RB)
-    def field[E <: Data](
-      that:      String
-    )(
-      using ctx: Context,
-      file:      sourcecode.File,
-      line:      sourcecode.Line,
-      valName:   sourcecode.Name
-    ): Ref[E]
-
 trait Subindex[E <: Data, D <: Vec[E], R <: Referable[D]]:
   extension (ref: R)
     def field(

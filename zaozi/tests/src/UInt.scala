@@ -27,110 +27,110 @@ object UIntSpec extends TestSuite:
           // just type cast in zaozi, not actually firrtl type.
           "connect io.bits, asUInt(io.a)"
         ): (p, io) =>
-          io.field[Bits]("bits") := io.field[UInt]("a").asBits
+          io.bits := io.a.asBits
       test("AsUInt"):
         firrtlTest(parameter, new UIntSpecInterface(parameter))(
           "connect io.uint, asUInt(io.a)"
         ): (p, io) =>
-          io.field[UInt]("uint") := io.field[UInt]("a").asUInt
+          io.uint := io.a.asUInt
       test("AsSInt"):
         firrtlTest(parameter, new UIntSpecInterface(parameter))(
           "connect io.sint, asSInt(io.a)"
         ): (p, io) =>
-          io.field[SInt]("sint") :=
-            io.field[UInt]("a").asSInt
+          io.sint :=
+            io.a.asSInt
       test("Cvt"):
         firrtlTest(parameter, new UIntSpecInterface(parameter))(
           "connect io.sint, cvt(io.a)"
         ): (p, io) =>
-          io.field[SInt]("sint") := io.field[UInt]("a").zext
+          io.sint := io.a.zext
       test("Add"):
         firrtlTest(parameter, new UIntSpecInterface(parameter))(
           "connect io.uint, add(io.a, io.b)"
         ): (p, io) =>
-          io.field[UInt]("uint") := io.field[UInt]("a") + io.field[UInt]("b")
+          io.uint := io.a + io.b
       test("Sub"):
         firrtlTest(parameter, new UIntSpecInterface(parameter))(
           "connect io.uint, sub(io.a, io.b)"
         ): (p, io) =>
-          io.field[UInt]("uint") := io.field[UInt]("a") - io.field[UInt]("b")
+          io.uint := io.a - io.b
       test("Mul"):
         firrtlTest(parameter, new UIntSpecInterface(parameter))(
           "connect io.uint, mul(io.a, io.b)"
         ): (p, io) =>
-          io.field[UInt]("uint") := io.field[UInt]("a") * io.field[UInt]("b")
+          io.uint := io.a * io.b
       test("Div"):
         firrtlTest(parameter, new UIntSpecInterface(parameter))(
           "connect io.uint, div(io.a, io.b)"
         ): (p, io) =>
-          io.field[UInt]("uint") := io.field[UInt]("a") / io.field[UInt]("b")
+          io.uint := io.a / io.b
       test("Mod"):
         firrtlTest(parameter, new UIntSpecInterface(parameter))(
           "connect io.uint, rem(io.a, io.b)"
         ): (p, io) =>
-          io.field[UInt]("uint") := io.field[UInt]("a") % io.field[UInt]("b")
+          io.uint := io.a % io.b
       test("Lt"):
         firrtlTest(parameter, new UIntSpecInterface(parameter))(
           "connect io.bool, lt(io.a, io.b)"
         ): (p, io) =>
-          io.field[Bool]("bool") := io.field[UInt]("a") < io.field[UInt]("b")
+          io.bool := io.a < io.b
       test("Leq"):
         firrtlTest(parameter, new UIntSpecInterface(parameter))(
           "connect io.bool, leq(io.a, io.b)"
         ): (p, io) =>
-          io.field[Bool]("bool") := io.field[UInt]("a") <= io.field[UInt]("b")
+          io.bool := io.a <= io.b
       test("Gt"):
         firrtlTest(parameter, new UIntSpecInterface(parameter))(
           "connect io.bool, gt(io.a, io.b)"
         ): (p, io) =>
-          io.field[Bool]("bool") := io.field[UInt]("a") > io.field[UInt]("b")
+          io.bool := io.a > io.b
       test("Geq"):
         firrtlTest(parameter, new UIntSpecInterface(parameter))(
           "connect io.bool, geq(io.a, io.b)"
         ): (p, io) =>
-          io.field[Bool]("bool") := io.field[UInt]("a") >= io.field[UInt]("b")
+          io.bool := io.a >= io.b
       test("Eq"):
         firrtlTest(parameter, new UIntSpecInterface(parameter))(
           "connect io.bool, eq(io.a, io.b)"
         ): (p, io) =>
-          io.field[Bool]("bool") := io.field[UInt]("a") === io.field[UInt]("b")
+          io.bool := io.a === io.b
       test("Neq"):
         firrtlTest(parameter, new UIntSpecInterface(parameter))(
           "connect io.bool, neq(io.a, io.b)"
         ): (p, io) =>
-          io.field[Bool]("bool") := io.field[UInt]("a") =/= io.field[UInt]("b")
+          io.bool := io.a =/= io.b
       test("Dshl"):
         firrtlTest(parameter, new UIntSpecInterface(parameter))(
           "connect io.uint, dshl(io.a, io.b)"
         ): (p, io) =>
-          io.field[UInt]("uint") := io.field[UInt]("a") <<< io.field[UInt]("b")
+          io.uint := io.a <<< io.b
       test("Dshr"):
         firrtlTest(parameter, new UIntSpecInterface(parameter))(
           "connect io.uint, dshr(io.a, io.b)"
         ): (p, io) =>
-          io.field[UInt]("uint") := io.field[UInt]("a") >>> io.field[UInt]("b")
+          io.uint := io.a >>> io.b
       test("Shl"):
         firrtlTest(parameter, new UIntSpecInterface(parameter))(
           "connect io.uint, shl(io.a, 2)"
         ): (p, io) =>
-          io.field[UInt]("uint") := io.field[UInt]("a") << 2
+          io.uint := io.a << 2
       test("Shr"):
         firrtlTest(parameter, new UIntSpecInterface(parameter))(
           "connect io.uint, shr(io.a, 2)"
         ): (p, io) =>
-          io.field[UInt]("uint") := io.field[UInt]("a") >> 2
+          io.uint := io.a >> 2
       test("Head"):
         firrtlTest(parameter, new UIntSpecInterface(parameter))(
           "connect io.uint, head(io.a, 2)"
         ): (p, io) =>
-          io.field[UInt]("uint") := io.field[UInt]("a").head(2)
+          io.uint := io.a.head(2)
       test("Tail"):
         firrtlTest(parameter, new UIntSpecInterface(parameter))(
           "connect io.uint, tail(io.a, 2)"
         ): (p, io) =>
-          io.field[UInt]("uint") := io.field[UInt]("a").tail(2)
+          io.uint := io.a.tail(2)
       test("Pad"):
         firrtlTest(parameter, new UIntSpecInterface(parameter))(
           "connect io.uint, pad(io.a, 32)"
         ): (p, io) =>
-          io.field[UInt]("uint") := io.field[UInt]("a").pad(32)
+          io.uint := io.a.pad(32)
