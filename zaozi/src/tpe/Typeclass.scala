@@ -32,11 +32,11 @@ trait BiConnect[D <: Data, R <: Referable[D]]:
 trait AsBits[D <: Data, R <: Referable[D]]:
   extension (ref: R)
     def asBits(
-                using ctx: Context,
-                file: sourcecode.File,
-                line: sourcecode.Line,
-                valName: sourcecode.Name
-              ): Node[Bits]
+      using ctx: Context,
+      file:      sourcecode.File,
+      line:      sourcecode.Line,
+      valName:   sourcecode.Name
+    ): Node[Bits]
 trait AsUInt[D <: Data, R <: Referable[D]]:
   extension (ref: R)
     def asUInt(
@@ -386,16 +386,17 @@ trait BitsExtract[D <: Data, R <: Referable[D]]:
   *   reg.a.c : Reg[B]
   * }}}
   */
-trait Subaccess[D <: Bundle, R <: Referable[D]]:
-  extension (ref: R)
-    def field(
+trait Subaccess[B <: Bundle, RB <: Referable[B]]:
+  extension (ref: RB)
+    def field[E <: Data](
       that:      String
     )(
       using ctx: Context,
       file:      sourcecode.File,
       line:      sourcecode.Line,
       valName:   sourcecode.Name
-    ): Ref[Data]
+    ): Ref[E]
+
 trait Subindex[E <: Data, D <: Vec[E], R <: Referable[D]]:
   extension (ref: R)
     def field(

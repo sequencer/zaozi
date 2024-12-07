@@ -5,21 +5,6 @@ package me.jiuyang.zaozi.tests
 import me.jiuyang.zaozi.{*, given}
 import utest.*
 
-def firrtlTest[P <: Parameter](
-  parameter:  P,
-  interface:  Interface[P],
-  moduleName: Option[String] = None
-)(checkLines: String*
-)(body:       me.jiuyang.zaozi.internal.Context ?=> (P, Wire[Interface[P]]) => Unit
-): Unit =
-  val out = new StringBuilder
-  val ctx = Module(moduleName.getOrElse("NoName"), parameter, interface)(body)
-  ctx.handler.mlirExportFIRRTL(ctx.root, out ++= _)
-  if (checkLines.isEmpty)
-    println(s"please add lines to check for:\n$out")
-    assert(false)
-  else checkLines.foreach(l => assert(out.toString.contains(l)))
-
 case class SimpleParameter(width: Int) extends Parameter
 
 class PassthroughInterface(parameter: SimpleParameter) extends Interface[SimpleParameter](parameter) {
@@ -27,20 +12,18 @@ class PassthroughInterface(parameter: SimpleParameter) extends Interface[SimpleP
   val o = Aligned(UInt(parameter.width.W))
 }
 
+class AsyncDomain extends Bundle:
+  val clock = Aligned(Clock())
+  val reset = Aligned(AsyncReset())
+
+class SyncDomain extends Bundle:
+  val clock = Aligned(Clock())
+  val reset = Aligned(AsyncReset())
+
 class RegisterInterface(parameter: SimpleParameter) extends Interface[SimpleParameter](parameter) {
-  val asyncDomain = Flipped(
-    new Bundle {
-      val clock = Aligned(Clock())
-      val reset = Aligned(AsyncReset())
-    }
-  )
-  val syncDomain  = Flipped(
-    new Bundle {
-      val clock = Aligned(Clock())
-      val reset = Aligned(Reset())
-    }
-  )
-  val passthrough  = Aligned(new PassthroughInterface(parameter))
+  val asyncDomain = Flipped(new AsyncDomain)
+  val syncDomain  = Flipped(new SyncDomain)
+  val passthrough = Aligned(new PassthroughInterface(parameter))
 }
 
 object Smoke extends TestSuite:
@@ -61,26 +44,26 @@ object Smoke extends TestSuite:
           val regWithoutInit:   Referable[UInt] =
             Reg(
               tpe = UInt(32.W),
-              clock = io.field("syncDomain").asInstanceOf[Ref[Bundle]].field("clock").asInstanceOf[Ref[Clock]]
+              clock = io.field[SyncDomain]("syncDomain").field[Clock]("clock")
             )
           val asyncRegWithInit: Referable[UInt] =
             RegInit(
               tpe = UInt(32.W),
-              clock = io.field("asyncDomain").asInstanceOf[Ref[Bundle]].field("clock").asInstanceOf[Ref[Clock]],
-              reset = io.field("asyncDomain").asInstanceOf[Ref[Bundle]].field("reset").asInstanceOf[Ref[AsyncReset]],
+              clock = io.field[AsyncDomain]("asyncDomain").field[Clock]("clock"),
+              reset = io.field[AsyncDomain]("asyncDomain").field[AsyncReset]("reset"),
               init = 0.U(32.W)
             )
           val syncRegWithInit:  Referable[UInt] =
             RegInit(
               tpe = UInt(32.W),
-              clock = io.field("syncDomain").asInstanceOf[Ref[Bundle]].field("clock").asInstanceOf[Ref[Clock]],
-              reset = io.field("syncDomain").asInstanceOf[Ref[Bundle]].field("reset").asInstanceOf[Ref[Reset]],
+              clock = io.field[SyncDomain]("syncDomain").field[Clock]("clock"),
+              reset = io.field[SyncDomain]("syncDomain").field[Reset]("reset"),
               init = 0.U(32.W)
             )
-          io.field("passthrough").asInstanceOf[Ref[Bundle]].field("o").asInstanceOf[Ref[UInt]] := regWithoutInit
-          regWithoutInit                                                                       := asyncRegWithInit
-          asyncRegWithInit                                                                     := syncRegWithInit
-          syncRegWithInit                                                                      := io.field("passthrough").asInstanceOf[Ref[Bundle]].field("i").asInstanceOf[Ref[UInt]]
+          io.field[PassthroughInterface]("passthrough").field[UInt]("o") := regWithoutInit
+          regWithoutInit                                                 := asyncRegWithInit
+          asyncRegWithInit                                               := syncRegWithInit
+          syncRegWithInit                                                := io.field[PassthroughInterface]("passthrough").field[UInt]("i")
       test("Instance"):
         firrtlTest(parameter, new PassthroughInterface(parameter))(
           "inst passthroughInstance0 of Passthrough",
@@ -94,6 +77,6 @@ object Smoke extends TestSuite:
           val interface = new PassthroughInterface(parameter)
           val passthroughInstance0: Instance[PassthroughInterface] = Instance("Passthrough", interface)
           val passthroughInstance1: Instance[PassthroughInterface] = Instance("Passthrough", interface)
-          io.field("o")                   := passthroughInstance0.field("o")
-          passthroughInstance0.field("i") := passthroughInstance1.field("o")
-          passthroughInstance1.field("i") := io.field("i")
+          io.field[UInt]("o")                   := passthroughInstance0.field[UInt]("o")
+          passthroughInstance0.field[UInt]("i") := passthroughInstance1.field[UInt]("o")
+          passthroughInstance1.field[UInt]("i") := io.field[UInt]("i")
