@@ -7,6 +7,7 @@
 
 let
   mill-rt-version = lib.head (lib.splitString "+" mill.jre.version);
+  cachePrefix = if stdenvNoCC.isDarwin then "Library/Caches/coursier" else ".cache/coursier";
   self = stdenvNoCC.mkDerivation ({
     name = "${name}-mill-deps";
     inherit src;
@@ -30,11 +31,11 @@ let
     '';
 
     installPhase = ''
-      runHook preInstall
-      mkdir -p $out/.cache
-      mv $TMPDIR/.cache/coursier $out/.cache/coursier
-      runHook postInstall
-    '';
+        runHook preInstall
+        mkdir -p $out/${cachePrefix}
+        mv $TMPDIR/${cachePrefix} $out/${cachePrefix}
+        runHook postInstall
+      '';
 
     outputHashAlgo = "sha256";
     outputHashMode = "recursive";
@@ -55,7 +56,7 @@ let
 
           mkdir -p "$tmpdir"/.cache "$tmpdir/.mill/ammonite"
 
-          cp -r "${self}"/.cache/coursier "$tmpdir"/.cache/
+          cp -r "${self}"/${cachePrefix} -T "$tmpdir"/${cachePrefix}
           touch "$tmpdir/.mill/ammonite/rt-${mill-rt-version}.jar"
 
           echo "JAVA HOME dir set to $tmpdir"

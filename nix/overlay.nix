@@ -15,7 +15,14 @@ final: prev: {
   mill =
     let jre = final.jdk21;
     in (prev.mill.override { inherit jre; }).overrideAttrs
-      (_: { passthru = { inherit jre; }; });
+      (_: rec {
+        version = "0.11.12";
+        src = final.fetchurl {
+          url = "https://github.com/com-lihaoyi/mill/releases/download/${version}/${version}-assembly";
+          hash = "sha256-k4/oMHvtq5YXY8hRlX4gWN16ClfjXEAn6mRIoEBHNJo=";
+        };
+        passthru = { inherit jre; };
+      });
 
   fetchMillDeps = final.callPackage ./pkgs/mill-builder.nix { };
 

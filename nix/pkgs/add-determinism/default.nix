@@ -7,6 +7,7 @@
 , pkg-config
 , zlib
 , python3
+, stdenv
 , cargoLockFile ? ./Cargo.lock
 , ...
 }@args:
@@ -17,13 +18,13 @@ let
 in
 rustPlatform.buildRustPackage {
   pname = "add-determinism";
-  version = "unstable-2024-10-17";
+  version = "unstable-2024-11-12";
 
   src = fetchFromGitHub {
     owner = "keszybz";
     repo = "add-determinism";
-    rev = "d3748ff2ee13d61aa913d7c1160e9e2274742bad";
-    hash = "sha256-IiIxUDYtq4Qcd9hTHsSqZEeETu5Vw3Gh6GxfArxBPG0=";
+    rev = "aadcc2fc4648ce8c485fdd9c861eb11adb40c344";
+    hash = "sha256-AanKDeFLBeLV5oHWiuPWNJirxDqQwKdZ9Szo5A7fVU8=";
   };
 
   # this project has no Cargo.lock now
@@ -31,9 +32,15 @@ rustPlatform.buildRustPackage {
     lockFile = cargoLockFile;
   };
 
+  patches = [
+    ./fix-darwin-build.patch
+  ];
+
   postPatch = ''
-    ln -s ${cargoLockFile} Cargo.lock
+    ln -s ${./Cargo.lock} Cargo.lock
   '';
+
+  doCheck = ! stdenv.isDarwin;  # it seems to be running forever
 
   passthru = { inherit pyEnv marshalparser; };
 

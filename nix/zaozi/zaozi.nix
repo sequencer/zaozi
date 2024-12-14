@@ -1,8 +1,15 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: 2024 Jiuyang Liu <liu@jiuyang.me>
 
-{ lib, stdenv, fetchMillDeps, makeWrapper, jdk21
-, mill, circt-full, jextract-21, add-determinism
+{ lib
+, stdenv
+, fetchMillDeps
+, makeWrapper
+, jdk21
+, mill
+, circt-full
+, jextract-21
+, add-determinism
 , projectDependencies
 }:
 
@@ -27,7 +34,11 @@ let
           root = ./../..;
           fileset = unions [ ./../../build.sc ];
         };
-      millDepsHash = "sha256-E4wLjrrg/SB3R3Fd5zXnenIyY1kjX1wPZ4214ZwMmqg=";
+      millDepsHash =
+        if stdenv.isDarwin then
+          "sha256-5wHqKYd4Gn/FKhKLHrqeGmfa8OSQO+l/cuE4BMHiKpM="
+        else
+          "sha256-E4wLjrrg/SB3R3Fd5zXnenIyY1kjX1wPZ4214ZwMmqg=";
       nativeBuildInputs = [ projectDependencies.setupHook ];
     };
 
@@ -69,4 +80,5 @@ let
       mv out/elaborator/assembly.dest/out.jar $out/share/java/elaborator.jar
     '';
   };
-in self
+in
+self
