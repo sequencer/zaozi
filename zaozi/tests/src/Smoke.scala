@@ -18,7 +18,7 @@ class AsyncDomain extends Bundle:
 
 class SyncDomain extends Bundle:
   val clock = Aligned(Clock())
-  val reset = Aligned(AsyncReset())
+  val reset = Aligned(Reset())
 
 class RegisterInterface(parameter: SimpleParameter) extends Interface[SimpleParameter](parameter) {
   val asyncDomain = Flipped(new AsyncDomain)
