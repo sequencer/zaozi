@@ -172,7 +172,7 @@ given [R <: Referable[Bits]]: Eq[Bits, R] with
 
 given [R <: Referable[Bits]]: Neq[Bits, R] with
   extension (ref: R)
-    def !==(
+    def =/=(
              that:      R
            )(
              using ctx: Context,

@@ -388,7 +388,7 @@ given [R <: Referable[UInt]]: Eq[UInt, R] with
 
 given [R <: Referable[UInt]]: Neq[UInt, R] with
   extension (ref: R)
-    def !==(
+    def =/=(
       that:      R
     )(
       using ctx: Context,

@@ -225,14 +225,6 @@ trait Eq[D <: Data, R <: Referable[D]]:
     ): Node[Bool]
 trait Neq[D <: Data, R <: Referable[D]]:
   extension (ref: R)
-    def !==(
-      that:      R
-    )(
-      using ctx: Context,
-      file:      sourcecode.File,
-      line:      sourcecode.Line,
-      valName:   sourcecode.Name
-    ): Node[Bool]
     def =/=(
       that:      R
     )(
@@ -240,7 +232,7 @@ trait Neq[D <: Data, R <: Referable[D]]:
       file:      sourcecode.File,
       line:      sourcecode.Line,
       valName:   sourcecode.Name
-    ): Node[Bool] = ref !== that
+    ): Node[Bool]
 
 trait Dshl[D <: Data, R <: Referable[D]]:
   extension (ref: R)
