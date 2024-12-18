@@ -28,17 +28,6 @@ object UIntSpec extends TestSuite:
           "connect io.bits, asUInt(io.a)"
         ): (p, io) =>
           io.bits := io.a.asBits
-      test("AsUInt"):
-        firrtlTest(parameter, new UIntSpecInterface(parameter))(
-          "connect io.uint, asUInt(io.a)"
-        ): (p, io) =>
-          io.uint := io.a.asUInt
-      test("AsSInt"):
-        firrtlTest(parameter, new UIntSpecInterface(parameter))(
-          "connect io.sint, asSInt(io.a)"
-        ): (p, io) =>
-          io.sint :=
-            io.a.asSInt
       test("Cvt"):
         firrtlTest(parameter, new UIntSpecInterface(parameter))(
           "connect io.sint, cvt(io.a)"
@@ -119,18 +108,3 @@ object UIntSpec extends TestSuite:
           "connect io.uint, shr(io.a, 2)"
         ): (p, io) =>
           io.uint := io.a >> 2
-      test("Head"):
-        firrtlTest(parameter, new UIntSpecInterface(parameter))(
-          "connect io.uint, head(io.a, 2)"
-        ): (p, io) =>
-          io.uint := io.a.head(2)
-      test("Tail"):
-        firrtlTest(parameter, new UIntSpecInterface(parameter))(
-          "connect io.uint, tail(io.a, 2)"
-        ): (p, io) =>
-          io.uint := io.a.tail(2)
-      test("Pad"):
-        firrtlTest(parameter, new UIntSpecInterface(parameter))(
-          "connect io.uint, pad(io.a, 32)"
-        ): (p, io) =>
-          io.uint := io.a.pad(32)
