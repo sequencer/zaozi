@@ -9,33 +9,43 @@ import me.jiuyang.zaozi.internal.{Context, NameKind, Named}
 import scala.language.dynamics
 
 /** Referable is used to contain an AST node that exist in the MLIR. */
-trait Referable[T <: Data]
-  extends Dynamic:
+trait Referable[T <: Data] extends Dynamic:
   val tpe:   T
   val refer: MlirValue
-  def _field[E <: Data](that: String)(
-                        using ctx: Context,
-                        file: sourcecode.File,
-                        line: sourcecode.Line,
-                        valName: sourcecode.Name
-                      ): Ref[E] =
+
+  /** if [[T]] implements [[DynamicSubfield]], it should return the subfield based on the [[fieldValName]], as well as
+    * its type.
+    */
+  def runtimeSelectDynamic[E <: Data](
+    fieldValName: String
+  )(
+    using ctx:    Context,
+    file:         sourcecode.File,
+    line:         sourcecode.Line,
+    valName:      sourcecode.Name
+  ): Ref[E] =
     tpe match
-      case bundle: Bundle =>
-        require(bundle.elements.map(_.name).contains(that), s"$that not found in ${bundle.elements.map(_.name).mkString(",")}, did you forget to add Aligned and Flipped?")
-        val idx       = ctx.handler.firrtlTypeGetBundleFieldIndex(tpe.firrtlType.toMLIR(ctx.handler), that)
-        val subaccess = ctx.handler
-          .OpBuilder("firrtl.subfield", ctx.currentBlock, ctx.handler.unkLoc)
-          .withNamedAttr("fieldIndex", ctx.handler.mlirIntegerAttrGet(ctx.handler.mlirIntegerTypeGet(32), idx))
-          .withOperand(refer)
-          .withResultInference(1)
-          .build()
-          .results
-          .head
-        new Ref[E](subaccess, bundle.elements(idx).tpe.asInstanceOf[E])
+      // current only apply to Bundle
+      case dynamicSubfield: DynamicSubfield => dynamicSubfield.getRef[E](refer, fieldValName, ctx, file, line, valName)
       case _ => throw new Exception("Unreachable, macro should have guarded it.")
-  // Due to https://github.com/scala/scala3/issues/22158#issuecomment-2524660241
-  // we must put selectDynamic here.
+
+  /** macro to call [[runtimeSelectDynamic]] */
   transparent inline def selectDynamic[R <: Data](name: String): Any = ${ dynamicSubaccess('this, 'name) }
+
+/** Due to Scala not allowing deferred macro call(calling user defined macro from outer macro). Any implementation to
+  * [[DynamicSubfield]] should make sure the dynamic access is to a val that has a return type of [[BundleField]]. For
+  * now jiuyang cannot come up with better solution to let user define their own macro, however they can still implement
+  * their own [[Bundle]].
+  */
+trait DynamicSubfield:
+  def getRef[E <: Data](
+    refer:        MlirValue,
+    fieldValName: String,
+    ctx:          Context,
+    file:         sourcecode.File,
+    line:         sourcecode.Line,
+    valName:      sourcecode.Name
+  ): Ref[E]
 
 type Const[T <: Data] = Ref[T]
 

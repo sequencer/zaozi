@@ -2,6 +2,9 @@ package me.jiuyang.zaozi
 
 import scala.quoted.*
 
+/** This macro takes [[fieldName]] from dynamic access, retrieve type at compile time and call runtimeSelectDynamic to
+  * do subaccess
+  */
 def dynamicSubaccess[T <: Data: Type](
   ref:       Expr[Referable[T]],
   fieldName: Expr[String]
@@ -11,12 +14,12 @@ def dynamicSubaccess[T <: Data: Type](
   import quotes.reflect.*
 
   // Get the type of `tpe` field from `Referable`
-  val referableType = TypeRepr.of[T]
-  val bundleType    = TypeRepr.of[Bundle]
+  val referableType       = TypeRepr.of[T]
+  val dynamicSubfieldType = TypeRepr.of[DynamicSubfield]
 
   // Ensure T is a subtype of Bundle
-  if (!(referableType <:< bundleType)) {
-    report.errorAndAbort(s"Type parameter T must be a subtype of Bundle, but got ${referableType.show}.")
+  if (!(referableType <:< dynamicSubfieldType)) {
+    report.errorAndAbort(s"Type parameter T must be a subtype of DynamicSubfield, but got ${referableType.show}.")
   }
 
   // Check if the field exists in the Bundle type
@@ -33,9 +36,9 @@ def dynamicSubaccess[T <: Data: Type](
   }
 
   // Ensure the field type conforms to Data
-  val dataType = TypeRepr.of[Data]
-  if (!(fieldType <:< dataType)) {
-    report.errorAndAbort(s"Field type '${fieldType.show}' does not conform to the upper bound Data.")
+  val bundleFieldType = TypeRepr.of[BundleField[?]]
+  if (!(fieldType <:< bundleFieldType)) {
+    report.errorAndAbort(s"Field type '${fieldType.show}' does not conform to the upper bound BundleField.")
   }
 
   // Summon implicit parameters
@@ -55,18 +58,20 @@ def dynamicSubaccess[T <: Data: Type](
     report.errorAndAbort("No implicit value found for sourcecode.Name.")
   }
 
+  val fieldDataType = fieldType.typeArgs.head
+
   // Construct and return the expression ref.field(fieldName)
-  fieldType.asType match {
-    case tpe @ '[fieldType] if TypeRepr.of[fieldType] <:< TypeRepr.of[Data] =>
+  fieldDataType.asType match {
+    case tpe @ '[fieldDataType] =>
       '{
         // Hack with union type
-        $ref._field[fieldType & Data]($fieldName)(
+        $ref.runtimeSelectDynamic[fieldDataType & Data]($fieldName)(
           using $ctx,
           $file,
           $line,
           $valName
         )
       }
-    case _                                                                  =>
+    case _                      =>
       report.errorAndAbort(s"Field type '${fieldType.show}' does not conform to the upper bound Data.")
   }
