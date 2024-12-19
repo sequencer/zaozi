@@ -234,20 +234,20 @@ trait Neq[D <: Data, R <: Referable[D]]:
       valName:   sourcecode.Name
     ): Node[Bool]
 
-trait Dshl[D <: Data, R <: Referable[D]]:
+trait Dshl[UINT <: Data, D <: Data, R <: Referable[D]]:
   extension (ref: R)
     def <<<(
-      that:      Referable[UInt]
+      that:      Referable[UINT]
     )(
       using ctx: Context,
       file:      sourcecode.File,
       line:      sourcecode.Line,
       valName:   sourcecode.Name
     ): Node[D]
-trait Dshr[D <: Data, R <: Referable[D]]:
+trait Dshr[UINT <: Data, D <: Data, R <: Referable[D]]:
   extension (ref: R)
     def >>>(
-      that:      Referable[UInt]
+      that:      Referable[UINT]
     )(
       using ctx: Context,
       file:      sourcecode.File,

@@ -363,7 +363,7 @@ given [R <: Referable[UInt]]: Neq[UInt, R] with
           .head
       )
 
-given [R <: Referable[UInt]]: Dshl[UInt, R] with
+given [R <: Referable[UInt]]: Dshl[UInt, UInt, R] with
   extension (ref: R)
     def <<<(
       that:      Referable[UInt]
@@ -387,7 +387,7 @@ given [R <: Referable[UInt]]: Dshl[UInt, R] with
           .head
       )
 
-given [R <: Referable[UInt]]: Dshr[UInt, R] with
+given [R <: Referable[UInt]]: Dshr[UInt, UInt, R] with
   extension (ref: R)
     def >>>(
       that:      Referable[UInt]

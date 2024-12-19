@@ -194,7 +194,7 @@ given [R <: Referable[Bits]]: Neq[Bits, R] with
           .head
       )
 
-given [R <: Referable[Bits]]: Dshl[Bits, R] with
+given [R <: Referable[Bits]]: Dshl[UInt, Bits, R] with
   extension (ref: R)
     def <<<(
              that:      Referable[UInt]
@@ -218,7 +218,7 @@ given [R <: Referable[Bits]]: Dshl[Bits, R] with
           .head
       )
 
-given [R <: Referable[Bits]]: Dshr[Bits, R] with
+given [R <: Referable[Bits]]: Dshr[UInt, Bits, R] with
   extension (ref: R)
     def >>>(
              that:      Referable[UInt]
