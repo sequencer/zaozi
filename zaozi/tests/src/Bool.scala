@@ -8,6 +8,7 @@ import utest.*
 class BoolSpecInterface(parameter: SimpleParameter) extends Interface[SimpleParameter](parameter) {
   val a          = Flipped(Bool())
   val b          = Flipped(Bool())
+  val c          = Flipped(Bool())
   val bool       = Aligned(Bool())
   val bits       = Aligned(Bits(1.W))
   val clock      = Aligned(Clock())
@@ -55,3 +56,8 @@ object BoolSpec extends TestSuite:
         "connect io.bool, xor(io.a, io.b)"
       ): (p, io) =>
         io.bool := io.a ^ io.b
+    test("Mux"):
+      firrtlTest(parameter, new BoolSpecInterface(parameter))(
+        "connect io.bool, mux(io.c, io.a, io.b)"
+      ): (p, io) =>
+        io.bool := io.c ? (io.a, io.b)

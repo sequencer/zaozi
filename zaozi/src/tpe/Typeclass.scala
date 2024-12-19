@@ -414,3 +414,15 @@ trait ToConstBool[T]:
       line:      sourcecode.Line,
       valName:   sourcecode.Name
     ): Const[Bool]
+
+trait Mux[Cond <: Data, CondR <: Referable[Cond]]:
+  extension (ref: CondR)
+    def ?[Ret <: Data](
+      con:       Referable[Ret],
+      alt:       Referable[Ret]
+    )(
+      using ctx: Context,
+      file:      sourcecode.File,
+      line:      sourcecode.Line,
+      valName:   sourcecode.Name
+    ): Node[Ret]

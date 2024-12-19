@@ -9,6 +9,7 @@ class BitsSpecInterface(parameter: SimpleParameter) extends Interface[SimplePara
   val a          = Flipped(Bits(parameter.width.W))
   val b          = Flipped(Bits(parameter.width.W))
   val c          = Flipped(UInt(parameter.width.W))
+  val d          = Flipped(Bool())
   val uint       = Aligned(UInt(parameter.width.W))
   val sint       = Aligned(SInt(parameter.width.W))
   val bits       = Aligned(Bits(parameter.width.W))
@@ -122,3 +123,8 @@ object BitsSpec extends TestSuite:
           "connect io.bits, bits(io.a, 4, 2)"
         ): (p, io) =>
           io.bits := io.a.extract(4, 2)
+      test("Mux"):
+        firrtlTest(parameter, new BitsSpecInterface(parameter))(
+          "connect io.bits, mux(io.d, io.a, io.b)"
+        ): (p, io) =>
+          io.bits := io.d ? (io.a, io.b)

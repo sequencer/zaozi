@@ -175,3 +175,30 @@ given [R <: Referable[Bool]]: Xor[Bool, R] with
           .results
           .head
       )
+
+given [CondR <: Referable[Bool]]: Mux[Bool, CondR] with
+  extension (ref: CondR)
+    def ?[Ret <: Data](
+      con:       Referable[Ret],
+      alt:       Referable[Ret]
+    )(
+      using ctx: Context,
+      file:      sourcecode.File,
+      line:      sourcecode.Line,
+      valName:   sourcecode.Name
+    ): Node[Ret] =
+      // TODO: checking con and alt type equivalence
+      val retType = alt.tpe
+      new Node[Ret](
+        s"${valName.value}_mux",
+        Droppable,
+        // todo: from MLIR.
+        retType,
+        ctx.handler
+          .OpBuilder(s"firrtl.mux", ctx.currentBlock, SourceLocator(file, line).toMLIR)
+          .withOperands(Seq(ref.refer, con.refer, alt.refer))
+          .withResultInference(1)
+          .build()
+          .results
+          .head
+      )

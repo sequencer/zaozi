@@ -9,6 +9,7 @@ class SIntSpecInterface(parameter: SimpleParameter) extends Interface[SimplePara
   val a          = Flipped(SInt(parameter.width.W))
   val b          = Flipped(SInt(parameter.width.W))
   val c          = Flipped(UInt(parameter.width.W))
+  val d          = Flipped(Bool())
   val sint       = Aligned(SInt(parameter.width.W))
   val bits       = Aligned(Bits(parameter.width.W))
   val bool       = Aligned(Bool())
@@ -106,3 +107,8 @@ object SIntSpec extends TestSuite:
           "connect io.sint, shr(io.a, 2)"
         ): (p, io) =>
           io.sint := io.a >> 2
+      test("Mux"):
+        firrtlTest(parameter, new SIntSpecInterface(parameter))(
+          "connect io.sint, mux(io.d, io.a, io.b)"
+        ): (p, io) =>
+          io.sint := io.d ? (io.a, io.b)
