@@ -72,3 +72,45 @@ def refSubAccess[T <: Data: Type](
     case _                      =>
       report.errorAndAbort(s"Field type '${fieldType.show}' does not conform to the upper bound Data.")
   }
+
+def refSubIdx[T <: Data: Type, IDX: Type](
+  ref: Expr[Referable[T]],
+  idx: Expr[IDX]
+)(
+  using Quotes
+): Expr[Any] =
+  import quotes.reflect.*
+
+  // Summon implicit parameters
+  val ctx = Expr.summon[me.jiuyang.zaozi.internal.Context].getOrElse {
+    report.errorAndAbort("No implicit value found for Context.")
+  }
+
+  val file = Expr.summon[sourcecode.File].getOrElse {
+    report.errorAndAbort("No implicit value found for sourcecode.File.")
+  }
+
+  val line = Expr.summon[sourcecode.Line].getOrElse {
+    report.errorAndAbort("No implicit value found for sourcecode.Line.")
+  }
+
+  val valName    = Expr.summon[sourcecode.Name].getOrElse {
+    report.errorAndAbort("No implicit value found for sourcecode.Name.")
+  }
+  // Get the type of `tpe` field from `Referable`
+  val tTypeRepr  = TypeRepr.of[T]
+  val subIdxSym  = TypeRepr.of[SubIdx[?, IDX]].typeSymbol
+  val subIdxBase = tTypeRepr.baseType(subIdxSym)
+
+  subIdxBase match {
+    case AppliedType(_, List(ele, _)) =>
+      ele.asType match
+        case '[elementType] =>
+          '{
+            $ref.tpe
+              .asInstanceOf[SubIdx[elementType & Data, IDX]]
+              .getRefViaIdx($ref.refer, $idx, $ctx, $file, $line, $valName)
+          }
+    case _                            =>
+      report.errorAndAbort(s"Type ${tTypeRepr.show} does not extend SubIdx[T] as expected.")
+  }

@@ -361,17 +361,6 @@ trait BitsExtract[D <: Data, R <: Referable[D]]:
       valName:   sourcecode.Name
     ): Node[D]
 
-trait Subindex[E <: Data, D <: Vec[E], R <: Referable[D]]:
-  extension (ref: R)
-    def field(
-      that:      Int
-    )(
-      using ctx: Context,
-      file:      sourcecode.File,
-      line:      sourcecode.Line,
-      valName:   sourcecode.Name
-    ): Ref[E]
-
 trait ToConstUInt[T]:
   extension (ref: T)
     def U(
