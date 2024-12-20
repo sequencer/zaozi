@@ -85,7 +85,7 @@ trait Bundle extends Data with BundleLike with DynamicSubfield:
     instantiating = false
     ele
 
-  def getRef[E <: Data](
+  def getRefViaFieldValName[E <: Data](
     refer:        MlirValue,
     fieldValName: String,
     ctx:          Context,

@@ -13,24 +13,8 @@ trait Referable[T <: Data] extends Dynamic:
   val tpe:   T
   val refer: MlirValue
 
-  /** if [[T]] implements [[DynamicSubfield]], it should return the subfield based on the [[fieldValName]], as well as
-    * its type.
-    */
-  def runtimeSelectDynamic[E <: Data](
-    fieldValName: String
-  )(
-    using ctx:    Context,
-    file:         sourcecode.File,
-    line:         sourcecode.Line,
-    valName:      sourcecode.Name
-  ): Ref[E] =
-    tpe match
-      // current only apply to Bundle
-      case dynamicSubfield: DynamicSubfield => dynamicSubfield.getRef[E](refer, fieldValName, ctx, file, line, valName)
-      case _ => throw new Exception("Unreachable, macro should have guarded it.")
-
-  /** macro to call [[runtimeSelectDynamic]] */
-  transparent inline def selectDynamic[R <: Data](name: String): Any = ${ dynamicSubaccess('this, 'name) }
+  /** macro to call [[DynamicSubfield.getRefViaFieldValName]] */
+  transparent inline def selectDynamic(name: String): Any = ${ refSubAccess('this, 'name) }
 
 /** Due to Scala not allowing deferred macro call(calling user defined macro from outer macro). Any implementation to
   * [[DynamicSubfield]] should make sure the dynamic access is to a val that has a return type of [[BundleField]]. For
@@ -38,7 +22,7 @@ trait Referable[T <: Data] extends Dynamic:
   * their own [[Bundle]].
   */
 trait DynamicSubfield:
-  def getRef[E <: Data](
+  def getRefViaFieldValName[E <: Data](
     refer:        MlirValue,
     fieldValName: String,
     ctx:          Context,

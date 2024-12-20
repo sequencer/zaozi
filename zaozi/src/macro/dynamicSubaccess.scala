@@ -5,7 +5,7 @@ import scala.quoted.*
 /** This macro takes [[fieldName]] from dynamic access, retrieve type at compile time and call runtimeSelectDynamic to
   * do subaccess
   */
-def dynamicSubaccess[T <: Data: Type](
+def refSubAccess[T <: Data: Type](
   ref:       Expr[Referable[T]],
   fieldName: Expr[String]
 )(
@@ -64,13 +64,10 @@ def dynamicSubaccess[T <: Data: Type](
   fieldDataType.asType match {
     case tpe @ '[fieldDataType] =>
       '{
-        // Hack with union type
-        $ref.runtimeSelectDynamic[fieldDataType & Data]($fieldName)(
-          using $ctx,
-          $file,
-          $line,
-          $valName
-        )
+        $ref.tpe
+          .asInstanceOf[DynamicSubfield]
+          // Hack with union type
+          .getRefViaFieldValName[fieldDataType & Data]($ref.refer, $fieldName, $ctx, $file, $line, $valName)
       }
     case _                      =>
       report.errorAndAbort(s"Field type '${fieldType.show}' does not conform to the upper bound Data.")
