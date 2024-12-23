@@ -16,9 +16,6 @@ trait Referable[T <: Data] extends Dynamic:
   /** macro to call [[DynamicSubfield.getRefViaFieldValName]] */
   transparent inline def selectDynamic(name: String): Any = ${ refSubAccess('this, 'name) }
 
-  /** macro to call [[SubIdx.getRefViaIdx]], we don't use apply here is because it is conflict with applyDynamic. */
-  transparent inline def idx[IDX](idx: IDX): Any = ${ refSubIdx[T, IDX]('this, 'idx) }
-
 /** Due to Scala not allowing deferred macro call(calling user defined macro from outer macro). Any implementation to
   * [[DynamicSubfield]] should make sure the dynamic access is to a val that has a return type of [[BundleField]]. For
   * now jiuyang cannot come up with better solution to let user define their own macro, however they can still implement
@@ -32,16 +29,6 @@ trait DynamicSubfield:
     file:         sourcecode.File,
     line:         sourcecode.Line,
     valName:      sourcecode.Name
-  ): Ref[E]
-
-trait SubIdx[E <: Data, T]:
-  def getRefViaIdx(
-    refer:   MlirValue,
-    idx:     T,
-    ctx:     Context,
-    file:    sourcecode.File,
-    line:    sourcecode.Line,
-    valName: sourcecode.Name
   ): Ref[E]
 
 type Const[T <: Data] = Ref[T]
