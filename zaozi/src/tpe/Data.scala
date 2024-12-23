@@ -2,7 +2,7 @@
 
 package me.jiuyang.zaozi
 
-import me.jiuyang.zaozi.internal.{firrtl, Context}
+import me.jiuyang.zaozi.internal.{Context, firrtl}
 
 trait Data:
   // only accessed by Builder.

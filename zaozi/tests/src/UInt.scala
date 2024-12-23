@@ -93,12 +93,12 @@ object UIntSpec extends TestSuite:
         firrtlTest(parameter, new UIntSpecInterface(parameter))(
           "connect io.uint, dshl(io.a, io.b)"
         ): (p, io) =>
-          io.uint := io.a <<< io.b
+          io.uint := io.a << io.b
       test("Dshr"):
         firrtlTest(parameter, new UIntSpecInterface(parameter))(
           "connect io.uint, dshr(io.a, io.b)"
         ): (p, io) =>
-          io.uint := io.a >>> io.b
+          io.uint := io.a >> io.b
       test("Shl"):
         firrtlTest(parameter, new UIntSpecInterface(parameter))(
           "connect io.uint, shl(io.a, 2)"

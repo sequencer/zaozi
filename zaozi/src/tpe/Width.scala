@@ -5,8 +5,7 @@ object Width:
 
 opaque type Width = Int
 
-extension (w: Width)
-  def toInt: Int = w.asInstanceOf[Int]
+extension (w: Width) def toInt: Int = w.asInstanceOf[Int]
 
 extension (x: Int)
   def W: Width =

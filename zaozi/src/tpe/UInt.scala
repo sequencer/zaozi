@@ -2,13 +2,39 @@ package me.jiuyang.zaozi
 
 import me.jiuyang.zaozi.circtlib.MlirValue
 import me.jiuyang.zaozi.internal.NameKind.Droppable
-import me.jiuyang.zaozi.internal.{firrtl, Context}
+import me.jiuyang.zaozi.internal.{Context, firrtl}
 
 object UInt:
   def apply(width: Width): UInt = new UInt(width)
 
 class UInt(val width: Width) extends Data:
   def firrtlType = new firrtl.UInt(width.toInt, false)
+
+trait AsUInt[D <: Data, R <: Referable[D]]:
+  extension (ref: R)
+    def asUInt(
+      using ctx: Context,
+      file:      sourcecode.File,
+      line:      sourcecode.Line,
+      valName:   sourcecode.Name
+    ): Node[UInt]
+
+trait ToConstUInt[T]:
+  extension (ref: T)
+    def U(
+      using ctx: Context,
+      file:      sourcecode.File,
+      line:      sourcecode.Line,
+      valName:   sourcecode.Name
+    ): Const[UInt] = U(-1.W)
+    def U(
+      width:     Width
+    )(
+      using ctx: Context,
+      file:      sourcecode.File,
+      line:      sourcecode.Line,
+      valName:   sourcecode.Name
+    ): Const[UInt]
 
 // Type Class Implementations
 given ToConstUInt[BigInt] with
@@ -55,11 +81,11 @@ given ToConstUInt[Int] with
 given [R <: Referable[UInt]]: AsBits[UInt, R] with
   extension (ref: R)
     override def asBits(
-                         using ctx: Context,
-                         file: sourcecode.File,
-                         line: sourcecode.Line,
-                         valName: sourcecode.Name
-                       ): Node[Bits] =
+      using ctx: Context,
+      file:      sourcecode.File,
+      line:      sourcecode.Line,
+      valName:   sourcecode.Name
+    ): Node[Bits] =
       val mlirValue: MlirValue = ctx.handler
         .OpBuilder(s"firrtl.asUInt", ctx.currentBlock, SourceLocator(file, line).toMLIR)
         .withOperands(Seq(ref.refer))
@@ -75,7 +101,7 @@ given [R <: Referable[UInt]]: AsBits[UInt, R] with
         mlirValue
       )
 
-given [R <: Referable[UInt]]: Cvt[UInt, R] with
+given [R <: Referable[UInt]]: Cvt[UInt, SInt, R] with
   extension (ref: R)
     override def zext(
       using ctx: Context,
@@ -99,7 +125,7 @@ given [R <: Referable[UInt]]: Cvt[UInt, R] with
         mlirValue
       )
 
-given [R <: Referable[UInt]]: Add[UInt, R] with
+given [R <: Referable[UInt]]: Add[UInt, UInt, R] with
   extension (ref: R)
     def +(
       that:      R
@@ -123,7 +149,7 @@ given [R <: Referable[UInt]]: Add[UInt, R] with
           .head
       )
 
-given [R <: Referable[UInt]]: Sub[UInt, R] with
+given [R <: Referable[UInt]]: Sub[UInt, UInt, R] with
   extension (ref: R)
     def -(
       that:      R
@@ -147,7 +173,7 @@ given [R <: Referable[UInt]]: Sub[UInt, R] with
           .head
       )
 
-given [R <: Referable[UInt]]: Mul[UInt, R] with
+given [R <: Referable[UInt]]: Mul[UInt, UInt, R] with
   extension (ref: R)
     def *(
       that:      R
@@ -171,7 +197,7 @@ given [R <: Referable[UInt]]: Mul[UInt, R] with
           .head
       )
 
-given [R <: Referable[UInt]]: Div[UInt, R] with
+given [R <: Referable[UInt]]: Div[UInt, UInt, R] with
   extension (ref: R)
     def /(
       that:      R
@@ -195,7 +221,7 @@ given [R <: Referable[UInt]]: Div[UInt, R] with
           .head
       )
 
-given [R <: Referable[UInt]]: Rem[UInt, R] with
+given [R <: Referable[UInt]]: Rem[UInt, UInt, R] with
   extension (ref: R)
     def %(
       that:      R
@@ -219,7 +245,7 @@ given [R <: Referable[UInt]]: Rem[UInt, R] with
           .head
       )
 
-given [R <: Referable[UInt]]: Lt[UInt, R] with
+given [R <: Referable[UInt]]: Lt[UInt, Bool, R] with
   extension (ref: R)
     def <(
       that:      R
@@ -243,7 +269,7 @@ given [R <: Referable[UInt]]: Lt[UInt, R] with
           .head
       )
 
-given [R <: Referable[UInt]]: Leq[UInt, R] with
+given [R <: Referable[UInt]]: Leq[UInt, Bool, R] with
   extension (ref: R)
     def <=(
       that:      R
@@ -267,7 +293,7 @@ given [R <: Referable[UInt]]: Leq[UInt, R] with
           .head
       )
 
-given [R <: Referable[UInt]]: Gt[UInt, R] with
+given [R <: Referable[UInt]]: Gt[UInt, Bool, R] with
   extension (ref: R)
     def >(
       that:      R
@@ -291,7 +317,7 @@ given [R <: Referable[UInt]]: Gt[UInt, R] with
           .head
       )
 
-given [R <: Referable[UInt]]: Geq[UInt, R] with
+given [R <: Referable[UInt]]: Geq[UInt, Bool, R] with
   extension (ref: R)
     def >=(
       that:      R
@@ -315,7 +341,7 @@ given [R <: Referable[UInt]]: Geq[UInt, R] with
           .head
       )
 
-given [R <: Referable[UInt]]: Eq[UInt, R] with
+given [R <: Referable[UInt]]: Eq[UInt, Bool, R] with
   extension (ref: R)
     def ===(
       that:      R
@@ -339,7 +365,7 @@ given [R <: Referable[UInt]]: Eq[UInt, R] with
           .head
       )
 
-given [R <: Referable[UInt]]: Neq[UInt, R] with
+given [R <: Referable[UInt]]: Neq[UInt, Bool, R] with
   extension (ref: R)
     def =/=(
       that:      R
@@ -363,104 +389,88 @@ given [R <: Referable[UInt]]: Neq[UInt, R] with
           .head
       )
 
-given [R <: Referable[UInt]]: Dshl[UInt, UInt, R] with
-  extension (ref: R)
-    def <<<(
-      that:      Referable[UInt]
-    )(
-      using ctx: Context,
-      file:      sourcecode.File,
-      line:      sourcecode.Line,
-      valName:   sourcecode.Name
-    ): Node[UInt] =
-      new Node[UInt](
-        s"${valName.value}_dshl",
-        Droppable,
-        // todo: from MLIR.
-        UInt((ref.tpe.firrtlType.width.get.toInt + 2 << that.tpe.firrtlType.width.get.toInt - 1).W),
-        ctx.handler
-          .OpBuilder(s"firrtl.dshl", ctx.currentBlock, SourceLocator(file, line).toMLIR)
-          .withOperands(Seq(ref.refer, that.refer))
-          .withResultInference(1)
-          .build()
-          .results
-          .head
-      )
-
-given [R <: Referable[UInt]]: Dshr[UInt, UInt, R] with
-  extension (ref: R)
-    def >>>(
-      that:      Referable[UInt]
-    )(
-      using ctx: Context,
-      file:      sourcecode.File,
-      line:      sourcecode.Line,
-      valName:   sourcecode.Name
-    ): Node[UInt] =
-      new Node[UInt](
-        s"${valName.value}_dshr",
-        Droppable,
-        // todo: from MLIR.
-        ref.tpe,
-        ctx.handler
-          .OpBuilder(s"firrtl.dshr", ctx.currentBlock, SourceLocator(file, line).toMLIR)
-          .withOperands(Seq(ref.refer, that.refer))
-          .withResultInference(1)
-          .build()
-          .results
-          .head
-      )
-
-given [R <: Referable[UInt]]: Shl[UInt, R] with
+given [R <: Referable[UInt], THAT <: Int | Referable[UInt]]: Shl[UInt, THAT, UInt, R] with
   extension (ref: R)
     def <<(
-      that:      Int
+      that:      THAT
     )(
       using ctx: Context,
       file:      sourcecode.File,
       line:      sourcecode.Line,
       valName:   sourcecode.Name
     ): Node[UInt] =
-      new Node[UInt](
-        s"${valName.value}_shl",
-        Droppable,
-        // todo: from MLIR.
-        UInt((ref.tpe.width.toInt + that).W),
-        ctx.handler
-          .OpBuilder(s"firrtl.shl", ctx.currentBlock, SourceLocator(file, line).toMLIR)
-          .withOperands(Seq(ref.refer))
-          .withNamedAttrs(
-            Seq(("amount", ctx.handler.mlirIntegerAttrGet(ctx.handler.mlirIntegerTypeGet(32), that.toLong)))
+      that match
+        case that: Int             =>
+          new Node[UInt](
+            s"${valName.value}_shl",
+            Droppable,
+            // todo: from MLIR.
+            UInt((ref.tpe.width.toInt + that).W),
+            ctx.handler
+              .OpBuilder(s"firrtl.shl", ctx.currentBlock, SourceLocator(file, line).toMLIR)
+              .withOperands(Seq(ref.refer))
+              .withNamedAttrs(
+                Seq(("amount", ctx.handler.mlirIntegerAttrGet(ctx.handler.mlirIntegerTypeGet(32), that.toLong)))
+              )
+              .withResultInference(1)
+              .build()
+              .results
+              .head
           )
-          .withResultInference(1)
-          .build()
-          .results
-          .head
-      )
+        case that: Referable[UInt] =>
+          new Node[UInt](
+            s"${valName.value}_dshl",
+            Droppable,
+            // todo: from MLIR.
+            UInt((ref.tpe.firrtlType.width.get.toInt + 2 << that.tpe.firrtlType.width.get.toInt - 1).W),
+            ctx.handler
+              .OpBuilder(s"firrtl.dshl", ctx.currentBlock, SourceLocator(file, line).toMLIR)
+              .withOperands(Seq(ref.refer, that.refer))
+              .withResultInference(1)
+              .build()
+              .results
+              .head
+          )
 
-given [R <: Referable[UInt]]: Shr[UInt, R] with
+given [R <: Referable[UInt], THAT <: Int | Referable[UInt]]: Shr[UInt, THAT, UInt, R] with
   extension (ref: R)
     def >>(
-      that:      Int
+      that:      THAT
     )(
       using ctx: Context,
       file:      sourcecode.File,
       line:      sourcecode.Line,
       valName:   sourcecode.Name
     ): Node[UInt] =
-      new Node[UInt](
-        s"${valName.value}_shr",
-        Droppable,
-        // todo: from MLIR.
-        UInt(math.max(ref.tpe.width.toInt - that, 0).W),
-        ctx.handler
-          .OpBuilder(s"firrtl.shr", ctx.currentBlock, SourceLocator(file, line).toMLIR)
-          .withOperands(Seq(ref.refer))
-          .withNamedAttrs(
-            Seq(("amount", ctx.handler.mlirIntegerAttrGet(ctx.handler.mlirIntegerTypeGet(32), that.toLong)))
+      that match
+        case that: Int             =>
+          new Node[UInt](
+            s"${valName.value}_shr",
+            Droppable,
+            // todo: from MLIR.
+            UInt(math.max(ref.tpe.width.toInt - that, 0).W),
+            ctx.handler
+              .OpBuilder(s"firrtl.shr", ctx.currentBlock, SourceLocator(file, line).toMLIR)
+              .withOperands(Seq(ref.refer))
+              .withNamedAttrs(
+                Seq(("amount", ctx.handler.mlirIntegerAttrGet(ctx.handler.mlirIntegerTypeGet(32), that.toLong)))
+              )
+              .withResultInference(1)
+              .build()
+              .results
+              .head
           )
-          .withResultInference(1)
-          .build()
-          .results
-          .head
-      )
+        case that: Referable[UInt] =>
+          new Node[UInt](
+            s"${valName.value}_dshr",
+            Droppable,
+            // todo: from MLIR.
+            ref.tpe,
+            ctx.handler
+              .OpBuilder(s"firrtl.dshr", ctx.currentBlock, SourceLocator(file, line).toMLIR)
+              .withOperands(Seq(ref.refer, that.refer))
+              .withResultInference(1)
+              .build()
+              .results
+              .head
+          )

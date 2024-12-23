@@ -4,12 +4,30 @@ package me.jiuyang.zaozi
 
 import me.jiuyang.zaozi.circtlib.MlirValue
 import me.jiuyang.zaozi.internal.NameKind.Droppable
-import me.jiuyang.zaozi.internal.{firrtl, Context}
+import me.jiuyang.zaozi.internal.{Context, firrtl}
 
 object Bool:
   def apply(): Bool = new Bool
 class Bool extends Data:
   def firrtlType = new firrtl.UInt(1.W, false)
+
+trait AsBool[D <: Data, R <: Referable[D]]:
+  extension (ref: R)
+    def asBool(
+      using ctx: Context,
+      file:      sourcecode.File,
+      line:      sourcecode.Line,
+      valName:   sourcecode.Name
+    ): Node[Bool]
+
+trait ToConstBool[T]:
+  extension (ref: T)
+    def B(
+      using ctx: Context,
+      file:      sourcecode.File,
+      line:      sourcecode.Line,
+      valName:   sourcecode.Name
+    ): Const[Bool]
 
 given [R <: Referable[Bool]]: AsBits[Bool, R] with
   extension (ref: R)
@@ -34,7 +52,7 @@ given [R <: Referable[Bool]]: AsBits[Bool, R] with
         mlirValue
       )
 
-given [R <: Referable[Bool]]: Neg[Bool, R] with
+given [R <: Referable[Bool]]: Neg[Bool, Bool, R] with
   extension (ref: R)
     override def unary_!(
       using ctx: Context,
@@ -56,7 +74,7 @@ given [R <: Referable[Bool]]: Neg[Bool, R] with
         mlirValue
       )
 
-given [R <: Referable[Bool]]: Eq[Bool, R] with
+given [R <: Referable[Bool]]: Eq[Bool, Bool, R] with
   extension (ref: R)
     def ===(
       that:      R
@@ -80,7 +98,7 @@ given [R <: Referable[Bool]]: Eq[Bool, R] with
           .head
       )
 
-given [R <: Referable[Bool]]: Neq[Bool, R] with
+given [R <: Referable[Bool]]: Neq[Bool, Bool, R] with
   extension (ref: R)
     def =/=(
       that:      R
@@ -104,7 +122,7 @@ given [R <: Referable[Bool]]: Neq[Bool, R] with
           .head
       )
 
-given [R <: Referable[Bool]]: And[Bool, R] with
+given [R <: Referable[Bool]]: And[Bool, Bool, R] with
   extension (ref: R)
     def &(
       that:      R
@@ -128,7 +146,7 @@ given [R <: Referable[Bool]]: And[Bool, R] with
           .head
       )
 
-given [R <: Referable[Bool]]: Or[Bool, R] with
+given [R <: Referable[Bool]]: Or[Bool, Bool, R] with
   extension (ref: R)
     def |(
       that:      R
@@ -152,7 +170,7 @@ given [R <: Referable[Bool]]: Or[Bool, R] with
           .head
       )
 
-given [R <: Referable[Bool]]: Xor[Bool, R] with
+given [R <: Referable[Bool]]: Xor[Bool, Bool, R] with
   extension (ref: R)
     def ^(
       that:      R

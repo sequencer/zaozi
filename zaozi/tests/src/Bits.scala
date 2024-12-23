@@ -67,12 +67,12 @@ object BitsSpec extends TestSuite:
         firrtlTest(parameter, new BitsSpecInterface(parameter))(
           "connect io.bits, dshl(io.a, io.c)"
         ): (p, io) =>
-          io.bits := io.a <<< io.c
+          io.bits := io.a << io.c
       test("Dshr"):
         firrtlTest(parameter, new BitsSpecInterface(parameter))(
           "connect io.bits, dshr(io.a, io.c)"
         ): (p, io) =>
-          io.bits := io.a >>> io.c
+          io.bits := io.a >> io.c
       test("And"):
         firrtlTest(parameter, new BitsSpecInterface(parameter))(
           "connect io.bits, and(io.a, io.b)"
@@ -122,7 +122,7 @@ object BitsSpec extends TestSuite:
         firrtlTest(parameter, new BitsSpecInterface(parameter))(
           "connect io.bits, bits(io.a, 4, 2)"
         ): (p, io) =>
-          io.bits := io.a.extract(4, 2)
+          io.bits := io.a.extractRange(4, 2)
       test("Mux"):
         firrtlTest(parameter, new BitsSpecInterface(parameter))(
           "connect io.bits, mux(io.d, io.a, io.b)"

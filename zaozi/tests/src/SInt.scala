@@ -27,11 +27,6 @@ object SIntSpec extends TestSuite:
           "connect io.bits, asUInt(io.a)"
         ): (p, io) =>
           io.bits := io.a.asBits
-      test("Cvt"):
-        firrtlTest(parameter, new SIntSpecInterface(parameter))(
-          "connect io.sint, cvt(io.a)"
-        ): (p, io) =>
-          io.sint := io.a.zext
       test("Add"):
         firrtlTest(parameter, new SIntSpecInterface(parameter))(
           "connect io.sint, add(io.a, io.b)"
@@ -91,12 +86,12 @@ object SIntSpec extends TestSuite:
         firrtlTest(parameter, new SIntSpecInterface(parameter))(
           "connect io.sint, dshl(io.a, io.c)"
         ): (p, io) =>
-          io.sint := io.a <<< io.c
+          io.sint := io.a << io.c
       test("Dshr"):
         firrtlTest(parameter, new SIntSpecInterface(parameter))(
           "connect io.sint, dshr(io.a, io.c)"
         ): (p, io) =>
-          io.sint := io.a >>> io.c
+          io.sint := io.a >> io.c
       test("Shl"):
         firrtlTest(parameter, new SIntSpecInterface(parameter))(
           "connect io.sint, shl(io.a, 2)"

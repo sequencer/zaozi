@@ -3,7 +3,7 @@
 package me.jiuyang.zaozi
 
 import me.jiuyang.zaozi.circtlib.MlirValue
-import me.jiuyang.zaozi.internal.{firrtl, Context}
+import me.jiuyang.zaozi.internal.{Context, firrtl}
 import sourcecode.{File, Line, Name}
 
 case class BundleField[T <: Data](name: String, isFlip: Boolean, tpe: T)
