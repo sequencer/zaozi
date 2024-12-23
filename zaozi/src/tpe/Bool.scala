@@ -29,6 +29,35 @@ trait ToConstBool[T]:
       valName:   sourcecode.Name
     ): Const[Bool]
 
+given ToConstBool[Boolean] with
+  extension (ref: Boolean)
+    def B(
+           using ctx: Context,
+           file: sourcecode.File,
+           line: sourcecode.Line,
+           valName: sourcecode.Name
+         ): Const[Bool] =
+      val tpe = Bool()
+      val mlirTpe = tpe.firrtlType.toMLIR(ctx.handler)
+      val const = ctx.handler
+        .OpBuilder("firrtl.constant", ctx.currentBlock, SourceLocator(file, line).toMLIR)
+        .withNamedAttr(
+          "value",
+          ctx.handler.firrtlAttrGetIntegerFromString(
+            mlirTpe,
+            2, // why 2 here
+            if(ref) "1" else "0",
+            10
+          )
+        )
+        // TODO: circt should support type infer for firrtl.constant
+        .withResult(mlirTpe)
+        .build()
+        .results
+        .head
+      new Const(const, Bool())
+
+
 given [R <: Referable[Bool]]: AsBits[Bool, R] with
   extension (ref: R)
     override def asBits(
@@ -61,14 +90,14 @@ given [R <: Referable[Bool]]: Neg[Bool, Bool, R] with
       valName:   sourcecode.Name
     ): Node[Bool] =
       val mlirValue: MlirValue = ctx.handler
-        .OpBuilder(s"firrtl.neg", ctx.currentBlock, SourceLocator(file, line).toMLIR)
+        .OpBuilder(s"firrtl.not", ctx.currentBlock, SourceLocator(file, line).toMLIR)
         .withOperands(Seq(ref.refer))
         .withResultInference(1)
         .build()
         .results
         .head
       new Node[Bool](
-        s"${valName.value}_neg",
+        s"${valName.value}_not",
         Droppable,
         Bool(),
         mlirValue

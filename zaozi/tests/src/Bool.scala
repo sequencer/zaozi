@@ -28,7 +28,7 @@ object BoolSpec extends TestSuite:
           io.bits := io.a.asBits
       test("Neg"):
         firrtlTest(parameter, new BoolSpecInterface(parameter))(
-          "connect io.bool, neg(io.a)"
+          "connect io.bool, not(io.a)"
         ): (p, io) =>
           io.bool := !io.a
       test("Eq"):
