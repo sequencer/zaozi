@@ -4,6 +4,22 @@ import scala.quoted.*
 
 /** This macro takes [[fieldName]] from dynamic access, retrieve type at compile time and call runtimeSelectDynamic to
   * do subaccess
+  *
+  * TODO: think about:
+  * {{{
+  *   trait RefElementViaValName[D <: Data, R <: Referable[D]]:
+  *     extension (ref: R)
+  *     def refViaValName[E <: Data](
+  *       fieldName: String,
+  *       ctx:       Context,
+  *       file:      sourcecode.File,
+  *       line:      sourcecode.Line,
+  *       valName:   sourcecode.Name
+  *     ): Ref[E]
+  *   given [D <: Bundle, R <: Referable[D]]: RefElementViaValName[D, R]
+  * }}}
+  * macro here can use Implicits.search to find the implicit instance from given.
+  * another issue is I don't have a good idea to deal with valName on BundleField.
   */
 def refSubAccess[T <: Data: Type](
   ref:       Expr[Referable[T]],
