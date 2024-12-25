@@ -5,8 +5,18 @@ package me.jiuyang.zaozi.tests
 import me.jiuyang.zaozi.{*, given}
 import utest.*
 
+class TypeParamIO[A <: Bundle, B <: Bundle](_a: A, _b: B) extends Bundle:
+  val a = Flipped(_a)
+  val b = Flipped(_b)
+
 class SimpleBundle extends Bundle:
   val g = Aligned(UInt(32.W))
+
+class SimpleBundleA extends Bundle:
+  val a = Aligned(UInt(32.W))
+
+class SimpleBundleB extends Bundle:
+  val b = Aligned(UInt(32.W))
 
 class DynamicBundleInterface(parameter: SimpleParameter) extends Interface[SimpleParameter](parameter):
   val a = Aligned(UInt(32.W))
@@ -18,6 +28,7 @@ class DynamicBundleInterface(parameter: SimpleParameter) extends Interface[Simpl
   val h = Flipped("hhh", UInt(32.W))
   val e = UInt(32.W)
   val i = 32
+  val j = Aligned(new TypeParamIO(new SimpleBundleA, new SimpleBundleB))
 
 object BundleSpec extends TestSuite:
   val tests = Tests:
@@ -60,6 +71,12 @@ object BundleSpec extends TestSuite:
             "connect io.a, io.f.g"
           ): (p, io) =>
             io.a := io.f.g
+        test("Bundle with type parameter should work"):
+          firrtlTest(parameter, new DynamicBundleInterface(parameter))(
+            "connect io.a, io.j.a.a"
+          ): (p, io) =>
+            io.a := io.j.a.a
+
       test("Custom val name"):
         firrtlTest(parameter, new DynamicBundleInterface(parameter))(
           "connect io.a, io.hhh"

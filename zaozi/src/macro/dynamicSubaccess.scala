@@ -45,9 +45,18 @@ def refSubAccess[T <: Data: Type](
     report.errorAndAbort(s"Field '$fieldNameStr' does not exist in type ${referableType.show}.")
   }
 
-  // Get the type of the field
   val fieldType = fieldSymbol.tree match {
-    case ValDef(_, tpt, _) => tpt.tpe
+    case ValDef(_, fieldTypeRepr, _) =>
+      // Find the Path-dependent type:
+      if(fieldTypeRepr.tpe.typeArgs.headOption.map(_.typeSymbol.maybeOwner == referableType.typeSymbol).getOrElse(false))
+        val dataTypeRepr = fieldTypeRepr.tpe.typeArgs.head
+        // Maintain a map to recovery this.T to concrete type from parameters.
+        val localTypes = referableType.classSymbol.get.declaredTypes
+        val typeArgs = referableType.typeArgs
+        // substitute from local type to parameters
+        fieldTypeRepr.tpe.substituteTypes(from = localTypes, to = typeArgs)
+      else
+        fieldTypeRepr.tpe
     case _                 => report.errorAndAbort(s"Unable to determine the type of field '$fieldNameStr'.")
   }
 
