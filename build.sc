@@ -5,7 +5,6 @@ import mill._
 import mill.scalalib.TestModule.Utest
 import mill.scalalib._
 import mill.scalalib.scalafmt._
-import $file.dependencies.chisel.build
 
 object v {
   val scala = "3.5.2"
@@ -14,16 +13,6 @@ object v {
   val upickle = ivy"com.lihaoyi::upickle:4.0.2"
   val utest = ivy"com.lihaoyi::utest:0.8.4"
   val sourcecode = ivy"com.lihaoyi::sourcecode:0.4.2"
-}
-
-object chisel extends millbuild.dependencies.chisel.build.Chisel {
-  def crossValue              = "2.13.15"
-  override def millSourcePath = os.pwd / "dependencies" / "chisel"
-}
-
-object chiselpanamalib extends millbuild.dependencies.chisel.build.PanamaLib {
-  def crossValue              = "2.13.15"
-  override def millSourcePath = os.pwd / "dependencies" / "chisel" / "panamalib"
 }
 
 object zaozi extends ScalaModule with ScalafmtModule {
