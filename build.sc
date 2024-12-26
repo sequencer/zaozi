@@ -108,3 +108,58 @@ object circtpanamabinding extends JavaModule {
   def includePaths = T(Seq(PathRef(circtInstallPath() / "include")))
   def libraryPaths = T(Seq(PathRef(circtInstallPath() / "lib")))
 }
+
+object mlirlib extends ScalaModule with ScalafmtModule {
+  def scalaVersion = T(v.scala)
+  override def generatedSources: T[Seq[PathRef]] = T {
+    super.generatedSources() ++ {
+      // @formatter:off
+      os.proc(
+        Seq(jextractBinary().toString, header().path.toString)
+          ++ includePaths().flatMap(p => Seq("-I", p.path.toString))
+          ++ Seq(
+          "-t", target(),
+          "--header-class-name", headerClassName(),
+          "--source",
+          "--output", T.dest.toString
+        ) ++ includeFunctions().flatMap(f => Seq("--include-function", f)) ++
+          includeConstants().flatMap(f => Seq("--include-constant", f)) ++
+          includeStructs().flatMap(f => Seq("--include-struct", f)) ++
+          includeTypedefs().flatMap(f => Seq("--include-typedef", f)) ++
+          includeUnions().flatMap(f => Seq("--include-union", f)) ++
+          includeVars().flatMap(f => Seq("--include-var", f)) ++
+          linkLibraries().flatMap(l => Seq("-l", l))
+      ).call(T.dest)
+      // @formatter:on
+      Seq(PathRef(T.dest))
+    }
+  }
+  override def javacOptions = T(super.javacOptions() ++ Seq("--enable-preview", "--release", "21"))
+
+  def includeConstants = T.input(os.read.lines(millSourcePath / "capi" / "includeConstants.txt").filter(s => s.nonEmpty && !s.startsWith("#")))
+  def includeFunctions = T.input(os.read.lines(millSourcePath / "capi" / "includeFunctions.txt").filter(s => s.nonEmpty && !s.startsWith("#")))
+  def includeStructs = T.input(os.read.lines(millSourcePath / "capi" / "includeStructs.txt").filter(s => s.nonEmpty && !s.startsWith("#")))
+  def includeTypedefs = T.input(os.read.lines(millSourcePath / "capi" / "includeTypedefs.txt").filter(s => s.nonEmpty && !s.startsWith("#")))
+  def includeUnions = T.input(os.read.lines(millSourcePath / "capi" / "includeUnions.txt").filter(s => s.nonEmpty && !s.startsWith("#")))
+  def includeVars = T.input(os.read.lines(millSourcePath / "capi" / "includeVars.txt").filter(s => s.nonEmpty && !s.startsWith("#")))
+  def linkLibraries = T.input(os.read.lines(millSourcePath / "capi" / "linkLibraries.txt").filter(s => s.nonEmpty && !s.startsWith("#")))
+
+  def target = T("org.llvm.mlir")
+  def headerClassName = T("CAPI")
+  def header = T(PathRef(millSourcePath / "capi" / "jextract-headers.h"))
+  def circtInstallPath = T(os.Path(T.ctx().env.getOrElse("CIRCT_INSTALL_PATH", "CIRCT_INSTALL_PATH not found, you are not in the nix env?")))
+  def jextractBinary = T(os.Path(T.ctx().env.getOrElse("JEXTRACT_INSTALL_PATH", "JEXTRACT_INSTALL_PATH not found, you are not in the nix env?")) / "bin" / "jextract")
+  def includePaths = T(Seq(PathRef(circtInstallPath() / "include")))
+  def libraryPaths = T(Seq(PathRef(circtInstallPath() / "lib")))
+
+  object tests extends ScalaTests with Utest {
+    def ivyDeps = Agg(v.utest)
+
+    override def forkArgs: T[Seq[String]] = T(
+      super.forkArgs() ++ Seq("--enable-native-access=ALL-UNNAMED", "--enable-preview")
+        ++ circtpanamabinding
+        .libraryPaths()
+        .map(p => s"-Djava.library.path=${p.path}")
+    )
+  }
+}

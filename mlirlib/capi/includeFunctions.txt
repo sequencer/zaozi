@@ -1,0 +1,98 @@
+# Attr
+mlirArrayAttrGet
+mlirArrayAttrGet
+mlirArrayAttrGetElement
+mlirArrayAttrGetNumElements
+mlirAttributeDump
+mlirAttributeIsAInteger
+mlirAttributeIsAString
+## mlirAttributeParseGet: We should not parse anything
+mlirBoolAttrGet
+mlirFlatSymbolRefAttrGet
+mlirFloatAttrDoubleGet
+mlirIntegerAttrGet
+mlirIntegerAttrGetValueInt
+mlirIntegerAttrGetValueSInt
+mlirIntegerAttrGetValueUInt
+mlirStringAttrGet
+mlirStringAttrGetValue
+
+# Block
+mlirBlockAppendOwnedOperation
+mlirBlockCreate
+mlirBlockGetArgument
+mlirBlockGetFirstOperation
+mlirBlockInsertOwnedOperationAfter
+mlirBlockInsertOwnedOperationBefore
+
+# Context
+mlirContextCreate
+mlirContextDestroy
+
+# DialectHandle
+mlirDialectHandleLoadDialect
+
+# Type
+mlirF64TypeGet
+mlirIntegerTypeGet
+mlirIntegerTypeSignedGet
+mlirIntegerTypeUnsignedGet
+mlirNoneTypeGet
+
+# Identifier
+mlirIdentifierGet
+
+# Location
+mlirLocationFileLineColGet
+mlirLocationGetAttribute
+mlirLocationUnknownGet
+
+# Module
+mlirModuleCreateEmpty
+mlirModuleCreateParse
+mlirModuleDestroy
+mlirModuleFromOperation
+mlirModuleGetBody
+mlirModuleGetOperation
+
+# NamedAttribute
+mlirNamedAttributeGet
+
+# OpPassManager
+mlirOpPassManagerAddOwnedPass
+mlirOpPassManagerGetNestedUnder
+
+# Operation
+mlirOperationCreate
+mlirOperationGetAttributeByName
+mlirOperationGetResult
+mlirOperationPrint
+mlirOperationSetInherentAttributeByName
+mlirOperationWriteBytecode
+
+# OperationState
+mlirOperationStateAddAttributes
+mlirOperationStateAddOperands
+mlirOperationStateAddOwnedRegions
+mlirOperationStateAddResults
+mlirOperationStateEnableResultTypeInference
+mlirOperationStateGet
+
+# PassManager
+mlirPassManagerAddOwnedPass
+mlirPassManagerCreate
+mlirPassManagerCreateOnOperation
+mlirPassManagerDestroy
+mlirPassManagerGetNestedUnder
+mlirPassManagerRunOnOp
+
+# Region
+mlirRegionAppendOwnedBlock
+mlirRegionCreate
+
+# StringRef
+## mlirStringRefCreate inline function cannot be generated
+mlirStringRefCreateFromCString
+mlirTypeAttrGet
+mlirUnitAttrGet
+mlirValueGetType
