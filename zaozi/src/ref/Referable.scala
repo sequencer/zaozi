@@ -96,7 +96,7 @@ object Instance:
         .withNamedAttr("portNames", ports.nameAttrs(ctx.handler))
         .withNamedAttr("portTypes", ports.typeAttrs(ctx.handler))
         .withNamedAttr("portAnnotations", ports.annotationAttrs(ctx.handler))
-        .withNamedAttr("portSyms", ports.symAttrs(ctx.handler))
+        .withNamedAttr("portSymbols", ports.symAttrs(ctx.handler))
         .withNamedAttr("portLocations", ports.locAttrs(ctx.handler))
         .build()
 

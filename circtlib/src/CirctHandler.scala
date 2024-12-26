@@ -397,10 +397,6 @@ class CirctHandler:
   def circtFirtoolOptionsSetDisableAggressiveMergeConnections(options: CirctFirtoolFirtoolOptions, value: Boolean)
     : Any =
     CAPI.circtFirtoolOptionsSetDisableAggressiveMergeConnections(options.get, value)
-  def circtFirtoolOptionsSetEmitOmir(options: CirctFirtoolFirtoolOptions, value: Boolean):                        Any                        =
-    CAPI.circtFirtoolOptionsSetEmitOmir(options.get, value)
-  def circtFirtoolOptionsSetOmirOutFile(options: CirctFirtoolFirtoolOptions, value: String):                      Any                        =
-    CAPI.circtFirtoolOptionsSetOmirOutFile(options.get, newString(value).get)
   def circtFirtoolOptionsSetLowerMemories(options: CirctFirtoolFirtoolOptions, value: Boolean):                   Any                        =
     CAPI.circtFirtoolOptionsSetLowerMemories(options.get, value)
   def circtFirtoolOptionsSetBlackBoxRootPath(options: CirctFirtoolFirtoolOptions, value: String):                 Any                        =

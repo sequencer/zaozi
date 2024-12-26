@@ -66,7 +66,7 @@ object Module:
         .withNamedAttr("portNames", ports.nameAttrs(handler))
         .withNamedAttr("portTypes", ports.typeAttrs(handler))
         .withNamedAttr("portAnnotations", ports.annotationAttrs(handler))
-        .withNamedAttr("portSyms", ports.symAttrs(handler))
+        .withNamedAttr("portSymbols", ports.symAttrs(handler))
         .withNamedAttr("portLocations", ports.locAttrs(handler))
         .build()
       val moduleBlock:   MlirBlock = mlirModule.region(0).block(0)
