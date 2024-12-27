@@ -5,19 +5,23 @@ import org.llvm.mlir.*
 import org.llvm.mlir.CAPI.*
 
 import java.lang.foreign.{Arena, MemorySegment}
+import scala.compiletime.summonFrom
 
 given [E]: ToMlirArray[E] with
   extension (xs: Seq[E])
-    def toMlirArray(
+    inline def toMlirArray(
       using arena: Arena,
-      api:         HasSizeOf[E] & HasSegment[E]
+      api:         HasSizeOf[E] & (HasSegment[E] | EnumHasToNative[E])
     ): (MemorySegment, Int) =
       if (xs.nonEmpty)
         val sizeOfT: Int = xs.head.sizeOf
         val buffer = arena.allocate(sizeOfT * xs.length)
-        xs.zipWithIndex.foreach:
-          case (x, i) =>
-            buffer.asSlice(sizeOfT * i, sizeOfT).copyFrom(x.segment)
+        xs.zipWithIndex.foreach: (x, i) =>
+          summonFrom:
+            case hasSeg:    HasSegment[E]      =>
+              buffer.asSlice(sizeOfT * i, sizeOfT).copyFrom(x.segment)
+            case hasNative: EnumHasToNative[E] =>
+              buffer.setAtIndex(CAPI.C_INT, i, x.toNative)
         (buffer, xs.length)
       else (MemorySegment.NULL, 0)
 end given
@@ -292,26 +296,26 @@ given AttributeApi with
     using arena: Arena
   ): Attribute = Attribute(MlirAttribute.allocate(arena))
   extension (array:  Seq[Attribute])
-    def toAttribute(
+    def toAttributeArrayAttribute(
       using arena: Arena,
       context:     Context
     ): Attribute =
       val (ptr, length) = array.toMlirArray
       Attribute(mlirArrayAttrGet(arena, context.segment, length, ptr))
   extension (tpe:    Type)
-    def toAttribute(
+    def toTypeAttribute(
       using arena: Arena,
       context:     Context
     ): Attribute =
       Attribute(mlirTypeAttrGet(arena, tpe.segment))
   extension (bool:   Boolean)
-    def toAttribute(
+    def toBooleanAttribute(
       using arena: Arena,
       context:     Context
     ): Attribute =
       Attribute(mlirBoolAttrGet(arena, context.segment, if (bool) 1 else 0))
   extension (string: String)
-    def toAttribute(
+    def toStringAttribute(
       using arena: Arena,
       context:     Context
     ): Attribute = Attribute(mlirStringAttrGet(arena, context.segment, string.toStringRef.segment))
@@ -321,14 +325,14 @@ given AttributeApi with
     ): Attribute = Attribute(mlirFlatSymbolRefAttrGet(arena, context.segment, string.toStringRef.segment))
 
   extension (double: Double)
-    def toAttribute(
+    def toDoubleAttribute(
       tpe:         Type
     )(
       using arena: Arena,
       context:     Context
     ): Attribute = Attribute(mlirFloatAttrDoubleGet(arena, context.segment, tpe.segment, double))
   extension (int:    Long)
-    def integerGet(
+    def toIntegerAttribute(
       tpe:         Type
     )(
       using arena: Arena,
@@ -405,7 +409,10 @@ given RegionApi with
   extension (region: Region)
     def segment: MemorySegment = region._segment
     def sizeOf:  Int           = MlirRegion.sizeof().toInt
+    def block(idx: Int): Block = region._blocks(idx)
     def appendOwnedBlock(
       block: Block
-    ): Unit = mlirRegionAppendOwnedBlock(region.segment, block.segment)
+    ): Unit =
+      region._blocks ++ Some(block)
+      mlirRegionAppendOwnedBlock(region.segment, block.segment)
 end given

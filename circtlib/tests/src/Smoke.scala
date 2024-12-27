@@ -2,7 +2,12 @@
 package me.jiuyang.zaozi.circtlib.tests
 
 import me.jiuyang.zaozi.circtlib.*
+import org.llvm.circt.scalalib.{Circuit, given}
+import org.llvm.mlir.scalalib
+import org.llvm.mlir.scalalib.{Context, ContextApi, LocationApi, ModuleApi, given}
 import utest.*
+
+import java.lang.foreign.Arena
 
 object Smoke extends TestSuite:
   val tests = Tests:
@@ -63,3 +68,24 @@ object Smoke extends TestSuite:
                                      |
                                      |    connect o, i
                                      |""".stripMargin))
+    test("New C-API"):
+      val name: String = "Passthrough"
+      // Setup Codes
+      // Construct the Arena for Panama linked libraries.
+      val arena   = Arena.ofConfined()
+      given Arena = arena
+
+      // Load Dialects.
+      val context   = summon[ContextApi].createContext
+      context.loadFirrtlDialect()
+      context.loadChirrtlDialect()
+      context.loadSvDialect()
+      context.loadSeqDialect()
+      context.loadEmitDialect()
+      given Context = context
+
+      val unknownLocation = summon[LocationApi].unknownLocation
+      // This is the MLIR Module not the firrtl module.
+      val root            = summon[ModuleApi].createModule(unknownLocation)
+      val circuit: Circuit = org.llvm.circt.scalalib.firrtl.circuit(root, name, "[]")
+      val module = org.llvm.circt.scalalib.firrtl.module()

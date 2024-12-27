@@ -243,8 +243,7 @@ sealed class CirctFirtoolPreserveAggregateMode(val value: Int) extends ForeignTy
 
 object CirctFirtoolPreserveAggregateMode:
   case object None extends CirctFirtoolPreserveAggregateMode(value = CAPI.CIRCT_FIRTOOL_PRESERVE_AGGREGATE_MODE_NONE())
-  case object OneDimVec
-      extends CirctFirtoolPreserveAggregateMode(value = CAPI.CIRCT_FIRTOOL_PRESERVE_AGGREGATE_MODE_ONE_DIM_VEC())
+  case object OneDimVec extends CirctFirtoolPreserveAggregateMode(value = CAPI.CIRCT_FIRTOOL_PRESERVE_AGGREGATE_MODE_ONE_DIM_VEC())
   case object Vec  extends CirctFirtoolPreserveAggregateMode(value = CAPI.CIRCT_FIRTOOL_PRESERVE_AGGREGATE_MODE_VEC())
   case object All  extends CirctFirtoolPreserveAggregateMode(value = CAPI.CIRCT_FIRTOOL_PRESERVE_AGGREGATE_MODE_ALL())
 
@@ -292,8 +291,6 @@ sealed class CirctFirtoolVerificationFlavor(val value: Int) extends ForeignType[
 
 object CirctFirtoolVerificationFlavor:
   case object None extends CirctFirtoolVerificationFlavor(value = CAPI.CIRCT_FIRTOOL_VERIFICATION_FLAVOR_NONE())
-  case object IfElseFatal
-      extends CirctFirtoolVerificationFlavor(value = CAPI.CIRCT_FIRTOOL_VERIFICATION_FLAVOR_IF_ELSE_FATAL())
-  case object Immediate
-      extends CirctFirtoolVerificationFlavor(value = CAPI.CIRCT_FIRTOOL_VERIFICATION_FLAVOR_IMMEDIATE())
+  case object IfElseFatal extends CirctFirtoolVerificationFlavor(value = CAPI.CIRCT_FIRTOOL_VERIFICATION_FLAVOR_IF_ELSE_FATAL())
+  case object Immediate     extends CirctFirtoolVerificationFlavor(value = CAPI.CIRCT_FIRTOOL_VERIFICATION_FLAVOR_IMMEDIATE())
   case object Sva  extends CirctFirtoolVerificationFlavor(value = CAPI.CIRCT_FIRTOOL_VERIFICATION_FLAVOR_SVA())

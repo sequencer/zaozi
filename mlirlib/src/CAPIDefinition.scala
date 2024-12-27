@@ -2,6 +2,7 @@
 package org.llvm.mlir.scalalib
 
 import java.lang.foreign.{Arena, MemorySegment}
+import scala.collection.mutable.ArrayBuffer
 
 class Context(
   val _segment: MemorySegment)
@@ -10,7 +11,10 @@ class Module(
   val _segment: MemorySegment)
 
 class Region(
-  val _segment: MemorySegment)
+  val _segment: MemorySegment):
+  // No C-API to get the index i of Region.
+  val _blocks: ArrayBuffer[Block] = scala.collection.mutable.ArrayBuffer[Block]()
+end Region
 
 class Block(
   val _segment: MemorySegment)
@@ -50,9 +54,9 @@ class StringCallBack(
 
 trait ToMlirArray[E]:
   extension (xs: Seq[E])
-    def toMlirArray(
+    inline def toMlirArray(
       using arena: Arena,
-      api:         HasSizeOf[E] & HasSegment[E]
+      api:         HasSizeOf[E] & (HasSegment[E] | EnumHasToNative[E])
     ): (MemorySegment, Int)
 
 trait HasSegment[T]:
@@ -62,6 +66,10 @@ end HasSegment
 trait HasSizeOf[T]:
   extension (ref: T) def sizeOf: Int
 end HasSizeOf
+
+trait EnumHasToNative[T]:
+  extension (ref: T) def toNative: Int
+end EnumHasToNative
 
 // C-API Definitions
 trait DialectHandleApi extends HasSegment[DialectHandle] with HasSizeOf[DialectHandle]:
@@ -108,6 +116,7 @@ trait RegionApi extends HasSegment[Region] with HasSizeOf[Region]:
     using arena: Arena
   ): Region
   extension (op: Region)
+    def block(idx: Int): Block
     def appendOwnedBlock(
       block: Block
     ): Unit
@@ -276,24 +285,26 @@ trait AttributeApi extends HasSegment[Attribute] with HasSizeOf[Attribute]:
     using arena: Arena,
     context:     Context
   ): Attribute
-  def allocateAttribute(using arena: Arena): Attribute
+  def allocateAttribute(
+    using arena: Arena
+  ): Attribute
   extension (array:     Seq[Attribute])
-    def toAttribute(
+    def toAttributeArrayAttribute(
       using arena: Arena,
       context:     Context
     ): Attribute
   extension (tpe:       Type)
-    def toAttribute(
+    def toTypeAttribute(
       using arena: Arena,
       context:     Context
     ): Attribute
   extension (bool:      Boolean)
-    def toAttribute(
+    def toBooleanAttribute(
       using arena: Arena,
       context:     Context
     ): Attribute
   extension (string:    String)
-    def toAttribute(
+    def toStringAttribute(
       using arena: Arena,
       context:     Context
     ): Attribute
@@ -302,14 +313,14 @@ trait AttributeApi extends HasSegment[Attribute] with HasSizeOf[Attribute]:
       context:     Context
     ): Attribute
   extension (double:    Double)
-    def toAttribute(
+    def toDoubleAttribute(
       tpe:         Type
     )(
       using arena: Arena,
       context:     Context
     ): Attribute
   extension (int:       Long)
-    def integerGet(
+    def toIntegerAttribute(
       tpe:         Type
     )(
       using arena: Arena,
