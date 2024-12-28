@@ -14,7 +14,9 @@ trait Referable[T <: Data] extends Dynamic:
   val refer: MlirValue
 
   /** macro to call [[DynamicSubfield.getRefViaFieldValName]] */
-  transparent inline def selectDynamic(name: String): Any = ${ refSubAccess('this, 'name) }
+  transparent inline def selectDynamic(name: String): Any = ${ referableSelectDynamic('this, 'name) }
+  /** macro to eliminate applyDynamic for DSL */
+  transparent inline def applyDynamic(name: String)(args: Any*): Any = ${ referableApplyDynamic('this, 'name, 'args) }
 
 /** Due to Scala not allowing deferred macro call(calling user defined macro from outer macro). Any implementation to
   * [[DynamicSubfield]] should make sure the dynamic access is to a val that has a return type of [[BundleField]]. For

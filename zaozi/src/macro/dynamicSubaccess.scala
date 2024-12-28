@@ -21,7 +21,7 @@ import scala.quoted.*
   * macro here can use Implicits.search to find the implicit instance from given.
   * another issue is I don't have a good idea to deal with valName on BundleField.
   */
-def refSubAccess[T <: Data: Type](
+def referableSelectDynamic[T <: Data: Type](
   ref:       Expr[Referable[T]],
   fieldName: Expr[String]
 )(
@@ -97,3 +97,13 @@ def refSubAccess[T <: Data: Type](
     case _                      =>
       report.errorAndAbort(s"Field type '${fieldType.show}' does not conform to the upper bound Data.")
   }
+
+// cast applyDynamic still using selectDynamic
+def referableApplyDynamic[T <: Data: Type](
+                                ref:       Expr[Referable[T]],
+                                fieldName: Expr[String],
+                                args:      Expr[Seq[Any]]
+                              )(
+                                using Quotes
+                              ): Expr[Any] =
+  '{ ${ referableSelectDynamic(ref, fieldName) }.asInstanceOf[Any => Any].apply(${ args }) }
