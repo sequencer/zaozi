@@ -1,0 +1,56 @@
+// SPDX-License-Identifier: Apache-2.0
+package org.llvm.mlir.scalalib
+
+import org.llvm.mlir.*
+import org.llvm.mlir.CAPI.*
+
+import java.lang.foreign.{Arena, MemorySegment}
+
+given StringRefApi with
+  extension (stringRef: StringRef)
+    inline def segment:       MemorySegment = stringRef._segment
+    inline def sizeOf:        Int           = MlirStringRef.sizeof().toInt
+    inline def toBytes:       Array[Byte]   =
+      MlirStringRef
+        .data$get(stringRef.segment)
+        .asSlice(0, MlirStringRef.length$get(stringRef.segment))
+        .toArray(java.lang.foreign.ValueLayout.JAVA_BYTE)
+    inline def toScalaString: String        = String(toBytes)
+  extension (string:    String)
+    inline def toStringRef(
+      using arena: Arena
+    ): StringRef =
+      val bytes  = string.getBytes()
+      val buffer = arena.allocate(bytes.length + 1)
+      buffer.copyFrom(MemorySegment.ofArray(bytes))
+      StringRef(mlirStringRefCreateFromCString(arena, buffer))
+end given
+
+given LogicalResultApi with
+  extension (logicalResult: LogicalResult)
+    inline def segment: MemorySegment = logicalResult._segment
+    inline def sizeOf:  Int           = MlirLogicalResult.sizeof().toInt
+end given
+
+given LlvmThreadPoolApi with
+  inline def llvmThreadPoolCreate(
+  )(
+    using arena: Arena
+  ): LlvmThreadPool = LlvmThreadPool(mlirLlvmThreadPoolCreate(arena))
+  extension (llvmThreadPool: LlvmThreadPool)
+    inline def destroy(): Unit          = mlirLlvmThreadPoolDestroy(llvmThreadPool.segment)
+    inline def segment:   MemorySegment = llvmThreadPool._segment
+    inline def sizeOf:    Int           = MlirLlvmThreadPool.sizeof().toInt
+end given
+
+given TypeIDApi with
+  extension (typeID: TypeID)
+    inline def segment: MemorySegment = typeID._segment
+    inline def sizeOf:  Int           = MlirTypeID.sizeof().toInt
+end given
+
+given TypeIDAllocatorApi with
+  extension (typeIDAllocator: TypeIDAllocator)
+    inline def segment: MemorySegment = typeIDAllocator._segment
+    inline def sizeOf:  Int           = MlirTypeIDAllocator.sizeof().toInt
+end given
