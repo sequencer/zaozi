@@ -95,7 +95,7 @@ firrtlTypeGetAnalog
 firrtlTypeIsAVector
 firrtlTypeGetVector
 firrtlTypeGetVectorElement
-firrtlTypeGetVectorNumElement
+firrtlTypeGetVectorNumElements
 firrtlTypeIsABundle
 firrtlTypeGetBundle
 firrtlTypeGetBundleNumFields

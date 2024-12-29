@@ -94,7 +94,6 @@ given LocationApi with
     attribute: Attribute
   )(arena:     Arena
   ): Location = Location(mlirLocationFromAttribute(arena, attribute.segment))
-
   inline def locationFileLineColGet(
     filename:    String,
     line:        Int,
@@ -104,7 +103,6 @@ given LocationApi with
     context:     Context
   ): Location =
     Location(mlirLocationFileLineColGet(arena, context.segment, filename.toStringRef.segment, line, col))
-
   inline def locationCallSiteGet(
     callee:      Location,
     caller:      Location
@@ -112,7 +110,6 @@ given LocationApi with
     using arena: Arena,
     context:     Context
   ): Location = Location(mlirLocationCallSiteGet(arena, callee.segment, caller.segment))
-
   inline def locationFusedGet(
     locations:   Seq[Location],
     metadata:    Attribute
@@ -121,7 +118,6 @@ given LocationApi with
     context:     Context
   ): Location =
     Location(mlirLocationFusedGet(arena, context.segment, locations.size, locations.toMlirArray, metadata.segment))
-
   inline def locationNameGet(
     name:        String,
     childLoc:    Location
@@ -129,12 +125,10 @@ given LocationApi with
     using arena: Arena,
     context:     Context
   ): Location = Location(mlirLocationNameGet(arena, context.segment, name.toStringRef.segment, childLoc.segment))
-
   inline def locationUnknownGet(
     using arena: Arena,
     context:     Context
   ): Location = Location(mlirLocationUnknownGet(arena, context.segment))
-
   extension (location: Location)
     inline def getAttribute(
       using arena: Arena
@@ -398,7 +392,7 @@ given OperationApi with
     inline def getFirstRegion(
     )(
       using arena: Arena
-    ): LogicalResult = LogicalResult(mlirOperationGetFirstRegion(arena, operation.segment))
+    ): Region = Region(mlirOperationGetFirstRegion(arena, operation.segment))
 
     inline def destroy():                              Unit = mlirOperationDestroy(operation.segment)
     inline def removeFromParent():                     Unit = mlirOperationRemoveFromParent(operation.segment)
@@ -669,13 +663,13 @@ given AttributeApi with
   ): Attribute = Attribute(MlirAttribute.allocate(arena))
 
   extension (array:  Seq[Attribute])
-    inline def toAttributeArrayAttribute(
+    inline def arrayAttrGet(
       using arena: Arena,
       context:     Context
     ): Attribute =
       Attribute(mlirArrayAttrGet(arena, context.segment, array.size, array.toMlirArray))
   extension (tpe:    Type)
-    inline def toTypeAttribute(
+    inline def typeAttrGet(
       using arena: Arena,
       context:     Context
     ): Attribute =
@@ -687,7 +681,7 @@ given AttributeApi with
     ): Attribute =
       Attribute(mlirBoolAttrGet(arena, context.segment, if (bool) 1 else 0))
   extension (string: String)
-    inline def toStringAttribute(
+    inline def stringAttrGet(
       using arena: Arena,
       context:     Context
     ): Attribute = Attribute(mlirStringAttrGet(arena, context.segment, string.toStringRef.segment))

@@ -35,12 +35,12 @@ trait AttributeApi extends HasSegment[Attribute] with HasSizeOf[Attribute]:
   ): Attribute
 
   extension (array:     Seq[Attribute])
-    inline def toAttributeArrayAttribute(
+    inline def arrayAttrGet(
       using arena: Arena,
       context:     Context
     ): Attribute
   extension (tpe:       Type)
-    inline def toTypeAttribute(
+    inline def typeAttrGet(
       using arena: Arena,
       context:     Context
     ): Attribute
@@ -50,7 +50,7 @@ trait AttributeApi extends HasSegment[Attribute] with HasSizeOf[Attribute]:
       context:     Context
     ): Attribute
   extension (string:    String)
-    inline def toStringAttribute(
+    inline def stringAttrGet(
       using arena: Arena,
       context:     Context
     ): Attribute
@@ -445,7 +445,7 @@ trait OperationApi extends HasSegment[Operation] with HasSizeOf[Operation]:
     inline def getFirstRegion(
     )(
       using arena: Arena
-    ):                             LogicalResult
+    ):                             Region
     inline def destroy():          Unit
     inline def removeFromParent(): Unit
     inline def setOperand(pos:   Long, newValue: Value): Unit
