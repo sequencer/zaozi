@@ -1,0 +1,5 @@
+CirctESIServiceGeneratorFunc            # header: /nix/store/y6bmy646nd1lggvsm8fldvkfzc9flfpn-circt-full/include/circt-c/Dialect/ESI.h
+HWInstanceGraphNodeCallback      # header: /nix/store/y6bmy646nd1lggvsm8fldvkfzc9flfpn-circt-full/include/circt-c/Dialect/HW.h
+CirctMSFTPlacementCallback                    # header: /nix/store/y6bmy646nd1lggvsm8fldvkfzc9flfpn-circt-full/include/circt-c/Dialect/MSFT.h
+CirctMSFTPrimitiveType                        # header: /nix/store/y6bmy646nd1lggvsm8fldvkfzc9flfpn-circt-full/include/circt-c/Dialect/MSFT.h
+CirctRtgToolOutputFormat                           # header: /nix/store/y6bmy646nd1lggvsm8fldvkfzc9flfpn-circt-full/include/circt-c/RtgTool.h
