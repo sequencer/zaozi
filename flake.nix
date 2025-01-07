@@ -29,6 +29,7 @@
           nativeBuildInputs = [  ];
           env = {
             CIRCT_INSTALL_PATH = pkgs.circt-full;
+            MLIR_INSTALL_PATH = pkgs.circt-full;
             JEXTRACT_INSTALL_PATH = pkgs.jextract-21;
             LIT_INSTALL_PATH = pkgs.lit;
             SCALA_CLI_INSTALL_PATH = pkgs.scala-cli;

@@ -5,7 +5,6 @@ import mill._
 import mill.scalalib.TestModule.Utest
 import mill.scalalib._
 import mill.scalalib.scalafmt._
-import mlirlib.circtInstallPath
 import os.Path
 
 object v {
@@ -35,7 +34,7 @@ object zaozi extends ScalaModule with ScalafmtModule { m =>
       def scalaVersion:    T[String]       = T(m.scalaVersion())
       def runClasspath:    T[Seq[os.Path]] = T(lit.runClasspath().map(_.path))
       def javaLibraryPath: T[Seq[os.Path]] = T(
-        circtlib.libraryPaths().map(_.path)
+        (circtlib.libraryPaths()).map(_.path)
       )
       def javaHome:        T[os.Path]      = T(os.Path(sys.props("java.home")))
       def litDir:          T[os.Path]      = T(millSourcePath)
@@ -88,7 +87,7 @@ object circtlib extends ScalaModule with ScalafmtModule with PanamaModule { oute
 
   def includePaths = T(Seq(PathRef(circtInstallPath() / "include")))
 
-  def libraryPaths = T(Seq(PathRef(circtInstallPath() / "lib")))
+  def libraryPaths = T(Seq(mlirlib.mlirInstallPath() / "lib", circtInstallPath() / "lib").map(PathRef(_)))
 
   override def moduleDeps = Seq(mlirlib)
 
@@ -128,8 +127,8 @@ object mlirlib extends ScalaModule with ScalafmtModule with PanamaModule {
 
   def header = T(PathRef(millSourcePath / "capi" / "jextract-headers.h"))
 
-  def circtInstallPath = T(
-    os.Path(T.ctx().env.getOrElse("CIRCT_INSTALL_PATH", "CIRCT_INSTALL_PATH not found, you are not in the nix env?"))
+  def mlirInstallPath = T(
+    os.Path(T.ctx().env.getOrElse("MLIR_INSTALL_PATH", "MLIR_INSTALL_PATH not found, you are not in the nix env?"))
   )
 
   def jextractBinary = T(
@@ -138,9 +137,9 @@ object mlirlib extends ScalaModule with ScalafmtModule with PanamaModule {
     ) / "bin" / "jextract"
   )
 
-  def includePaths = T(Seq(PathRef(circtInstallPath() / "include")))
+  def includePaths = T(Seq(PathRef(mlirInstallPath() / "include")))
 
-  def libraryPaths = T(Seq(PathRef(circtInstallPath() / "lib")))
+  def libraryPaths = T(Seq(PathRef(mlirInstallPath() / "lib")))
 
   object tests extends ScalaTests with Utest {
     def ivyDeps = Agg(v.utest)
@@ -247,7 +246,7 @@ trait PanamaModule extends JavaModule {
 
   override def forkArgs: T[Seq[String]] = T(
     super.forkArgs() ++ Seq("--enable-native-access=ALL-UNNAMED", "--enable-preview")
-      ++ libraryPaths().map(p => s"-Djava.library.path=${p.path}")
+      ++ Some(s"-Djava.library.path=${libraryPaths().map(_.path).distinct.mkString(":")}")
   )
 
   def includeConstantsFile: Target[Path]

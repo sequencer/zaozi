@@ -69,6 +69,7 @@ let
     ];
 
     env.CIRCT_INSTALL_PATH = circt-full;
+    env.MLIR_INSTALL_PATH = circt-full;
     env.JEXTRACT_INSTALL_PATH = jextract-21;
     env.LIT_INSTALL_PATH = lit;
 

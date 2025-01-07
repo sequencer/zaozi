@@ -17,6 +17,8 @@ want to use nix for development. You need to prepare such dependencies:
   zaozi only support the latest stable JDK version.
 - [jextract](https://github.com/openjdk/jextract) provided by `JEXTRACT_INSTALL_PATH`
 - [CIRCT](https://github.com/llvm/circt/) provided by `CIRCT_INSTALL_PATH`
+- [MLIR](https://github.com/llvm/circt/) provided by `MLIR_INSTALL_PATH`,
+  version of MLIR should match to CIRCT.
 - [Lit](https://llvm.org/docs/CommandGuide/lit.html) provided by 
   `LIT_INSTALL_PATH` for running lit tests under zaozi.
 
