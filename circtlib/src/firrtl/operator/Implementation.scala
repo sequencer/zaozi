@@ -64,6 +64,96 @@ given CircuitApi with
       module.getBody.appendOwnedOperation(c.operation)
   extension (ref: Circuit) def operation: Operation = ref._operation
 end given
+given ExtModuleApi with
+  inline def op(
+    name:             String,
+    location:         Location,
+    firrtlConvention: FirrtlConvention,
+    interface:        Seq[(FirrtlBundleField, Location)]
+  )(
+    using Arena,
+    Context
+  ): ExtModule =
+    new ExtModule(
+      summon[OperationApi].operationCreate(
+        name = "firrtl.extmodule",
+        location = location,
+        regionBlockTypeLocations = Seq(
+          Seq(
+            (interface.map(_._1.getType()), interface.map(_._2))
+          )
+        ),
+        namedAttributes =
+          val namedAttributeApi = summon[NamedAttributeApi]
+          Seq(
+            // ::mlir::StringAttr
+            namedAttributeApi.namedAttributeGet(
+              "sym_name".identifierGet,
+              name.stringAttrGet
+            ),
+            // ::mlir::StringAttr
+            namedAttributeApi.namedAttributeGet(
+              "defname".identifierGet,
+              name.stringAttrGet
+            ),
+            // ::circt::firrtl::ConventionAttr
+            namedAttributeApi.namedAttributeGet(
+              "convention".identifierGet,
+              firrtlConvention.toAttribute
+            ),
+            // ::mlir::DenseBoolArrayAttr
+            namedAttributeApi.namedAttributeGet(
+              "portDirections".identifierGet,
+              interface
+                .map:
+                  case (bf, _) =>
+                    if (bf.getIsFlip()) FirrtlDirection.In else FirrtlDirection.Out
+                .attrGetPortDirs
+            ),
+            // ::mlir::ArrayAttr
+            namedAttributeApi.namedAttributeGet(
+              "portLocations".identifierGet,
+              interface.map(_._2.getAttribute).arrayAttrGet
+            ),
+            // ::mlir::ArrayAttr
+            namedAttributeApi.namedAttributeGet(
+              "portAnnotations".identifierGet,
+              Seq.empty.arrayAttrGet
+            ),
+            // ::mlir::ArrayAttr
+            namedAttributeApi.namedAttributeGet(
+              "portSymbols".identifierGet,
+              Seq.empty.arrayAttrGet
+            ),
+            // ::mlir::ArrayAttr
+            namedAttributeApi.namedAttributeGet(
+              "portNames".identifierGet,
+              interface.map(_._1.getName().stringAttrGet).arrayAttrGet
+            ),
+            // ::mlir::ArrayAttr
+            namedAttributeApi.namedAttributeGet(
+              "portTypes".identifierGet,
+              interface.map(_._1.getType().typeAttrGet).arrayAttrGet
+            ),
+            // ::mlir::ArrayAttr
+            namedAttributeApi.namedAttributeGet(
+              "annotations".identifierGet,
+              Seq.empty.arrayAttrGet
+            )
+            // ::mlir::ArrayAttr
+            // namedAttributeApi.namedAttributeGet(
+            //   "layers".identifierGet, ???
+            // ),
+            // ::mlir::ArrayAttr
+            // namedAttributeApi.namedAttributeGet(
+            //   "internalPaths".identifierGet, ???
+            // )
+          )
+      )
+    )
+  extension (ref: ExtModule) def operation: Operation = ref._operation
+end given
+
 given ModuleApi with
   inline def op(
     name:             String,
@@ -564,11 +654,11 @@ given BitsPrimApi with
             // ::mlir::IntegerAttr
             namedAttributeApi.namedAttributeGet(
               "hi".identifierGet,
-              hi.toLong.toIntegerAttribute(32.integerTypeGet)
+              hi.toLong.integerAttrGet(32.integerTypeGet)
             ),
             // ::mlir::IntegerAttr
             namedAttributeApi
-              .namedAttributeGet("lo".identifierGet, lo.toLong.toIntegerAttribute(32.integerTypeGet))
+              .namedAttributeGet("lo".identifierGet, lo.toLong.integerAttrGet(32.integerTypeGet))
           )
         ,
         operands = Seq(input),

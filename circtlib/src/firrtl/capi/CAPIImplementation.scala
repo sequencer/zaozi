@@ -249,7 +249,7 @@ given AttributeApi with
         value match
           case string: String => string.stringAttrGet.segment
           case bigInt: BigInt => bigInt.attrGetIntegerFromString(bigInt.bitLength.integerTypeGet).segment
-          case double: Double => double.toDoubleAttribute(summon[org.llvm.mlir.scalalib.TypeApi].f64TypeGet).segment
+          case double: Double => double.floatAttrDoubleGet(summon[org.llvm.mlir.scalalib.TypeApi].f64TypeGet).segment
       )
     )
   extension (string:           String)

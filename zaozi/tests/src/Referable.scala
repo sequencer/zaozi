@@ -29,6 +29,15 @@ class ReferableSpecInterface(parameter: SimpleParameter) extends Interface[Simpl
 object ReferableSpec extends TestSuite:
   val tests = Tests:
     val parameter = SimpleParameter(8, "PassthroughModule")
+    test("Instance API"):
+      verilogTest(parameter, ReferableSpecInterface(parameter))(
+        """%8:3 = "firrtl.instance"() <{moduleName = @M0, name = "inst0", nameKind = #firrtl<name_kind interesting_name>, portDirections = array<i1: false, false, true>, portNames = ["asyncDomain", "syncDomain", "passthrough"]}> : () -> (!firrtl.bundle<reset: asyncreset, clock: clock>, !firrtl.bundle<reset: uint<1>, clock: clock>, !firrtl.bundle<i flip: uint<8>, o: uint<8>>)"""
+      ): (p: SimpleParameter, io: Wire[ReferableSpecInterface]) =>
+        given Ref[Clock] = io.asyncDomain.clock
+        given Ref[Reset] = io.asyncDomain.reset
+        val inst0 = Instance(ReferableSpecInterface(p.copy(moduleName = "M0")))
+        io.passthrough.o := inst0.io.passthrough.o
+        inst0.io.passthrough.i := io.passthrough.i
     test("Wire"):
       mlirTest(parameter, ReferableSpecInterface(parameter))(
         "%wire = firrtl.wire interesting_name : !firrtl.uint<8>"
@@ -69,13 +78,3 @@ object ReferableSpec extends TestSuite:
         val reg = RegInit(0.U(8.W))
         io.passthrough.o := reg
         reg              := io.passthrough.i
-    test("Instance API"):
-      // TODO: it doesn't compile to Verilog for now, see [[https://github.com/llvm/circt/issues/8030]]
-      mlirTest(parameter, ReferableSpecInterface(parameter))(
-        """%8:3 = "firrtl.instance"() <{moduleName = @M0, name = "inst0", nameKind = #firrtl<name_kind interesting_name>, portDirections = array<i1: false, false, true>, portNames = ["asyncDomain", "syncDomain", "passthrough"]}> : () -> (!firrtl.bundle<reset: asyncreset, clock: clock>, !firrtl.bundle<reset: uint<1>, clock: clock>, !firrtl.bundle<i flip: uint<8>, o: uint<8>>)"""
-      ): (p: SimpleParameter, io: Wire[ReferableSpecInterface]) =>
-        given Ref[Clock] = io.asyncDomain.clock
-        given Ref[Reset] = io.asyncDomain.reset
-        val inst0 = Instance(ReferableSpecInterface(p.copy(moduleName = "M0")))
-        io.passthrough.o := inst0.io.passthrough.o
-        inst0.io.passthrough.i := io.passthrough.i

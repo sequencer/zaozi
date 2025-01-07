@@ -25,69 +25,239 @@ trait AsmStateApi extends HasSegment[AsmState] with HasSizeOf[AsmState]
 
 class Attribute(val _segment: MemorySegment)
 trait AttributeApi extends HasSegment[Attribute] with HasSizeOf[Attribute]:
-  inline def createUnitAttribute(
-    using arena: Arena,
-    context:     Context
-  ): Attribute
-
   inline def allocateAttribute(
     using arena: Arena
   ): Attribute
-
+  inline def getNull(
+    using arena: Arena,
+    context:     Context
+  ): Attribute
+  // Location
+  extension (attribute: Attribute) inline def isLocation: Boolean
+  // Array
+  inline def arrayAttrGetTypeID(
+    using arena: Arena
+  ): TypeID
   extension (array:     Seq[Attribute])
     inline def arrayAttrGet(
       using arena: Arena,
       context:     Context
     ): Attribute
-  extension (tpe:       Type)
-    inline def typeAttrGet(
+  extension (attribute: Attribute)
+    inline def isArray:                 Boolean
+    inline def arrayAttrGetNumElements: Int
+    inline def arrayAttrGetElement(
+      idx:         Int
+    )(
+      using arena: Arena
+    ):                                  Attribute
+  // Dictionary
+  inline def dictionaryAttrGetTypeID(
+    using arena: Arena
+  ): TypeID
+  extension (map:       Map[String, Attribute])
+    inline def directoryAttrGet(
       using arena: Arena,
       context:     Context
     ): Attribute
-  extension (bool:      Boolean)
-    inline def toBooleanAttribute(
-      using arena: Arena,
-      context:     Context
-    ): Attribute
-  extension (string:    String)
-    inline def stringAttrGet(
-      using arena: Arena,
-      context:     Context
-    ): Attribute
-    inline def flatSymbolRefAttrGet(
-      using arena: Arena,
-      context:     Context
-    ): Attribute
+  extension (attribute: Attribute)
+    inline def isDictionary:                 Boolean
+    inline def dictionaryAttrGetNumElements: Int
+    inline def dictionaryAttrGetElement(
+      idx:         Int
+    )(
+      using arena: Arena
+    ):                                       Attribute
+  // Floating point
+  inline def floatAttrGetTypeID(
+    using arena: Arena
+  ): TypeID
   extension (double:    Double)
-    inline def toDoubleAttribute(
+    inline def floatAttrDoubleGet(
       tpe:         Type
     )(
       using arena: Arena,
       context:     Context
     ): Attribute
-  extension (int:       Long)
-    inline def toIntegerAttribute(
+    inline def floatAttrDoubleGetChecked(
       tpe:         Type
     )(
       using arena: Arena,
       context:     Context
     ): Attribute
   extension (attribute: Attribute)
-    inline def dump():      Unit
-    inline def numElements: Int
-    inline def element(
-      idx:         Int
+    inline def isFloat:                 Boolean
+    inline def floatAttrGetValueDouble: Double
+  // Integer
+  inline def integerAttrGetTypeID(
+    using arena: Arena
+  ): TypeID
+  extension (int:       Long)
+    inline def integerAttrGet(
+      tpe:         Type
+    )(
+      using arena: Arena,
+      context:     Context
+    ): Attribute
+  extension (attribute: Attribute)
+    inline def isInteger:               Boolean
+    inline def integerAttrGetValueInt:  Long
+    inline def integerAttrGetValueSInt: Long
+    inline def integerAttrGetValueUInt: Long
+  // Bool
+  extension (bool:      Boolean)
+    inline def boolAttrGet(
+      tpe:         Type
+    )(
+      using arena: Arena,
+      context:     Context
+    ): Attribute
+  extension (attribute: Attribute)
+    inline def isBool:           Boolean
+    inline def boolAttrGetValue: Boolean
+
+  // String
+  def stringAttrGetTypeID(
+    using arena: Arena
+  ): TypeID
+
+  extension (string:    String)
+    inline def stringAttrGet(
+      using arena: Arena,
+      context:     Context
+    ): Attribute
+    inline def stringAttrTypedGet(
+      tpe:         Type
     )(
       using arena: Arena
-    ):                      Attribute
-    inline def getString(
+    ): Attribute
+  extension (attribute: Attribute)
+    inline def isString: Boolean
+    inline def stringAttrGetValue(
       using arena: Arena
-    ):                      String
-    inline def getInt:      Long
-    inline def getSInt:     Long
-    inline def getUInt:     Long
-    inline def isInteger:   Boolean
-    inline def isString:    Boolean
+    ):                   String
+  // SymbolRef
+  inline def symbolRefAttrGetTypeID(
+    using arena: Arena
+  ): TypeID
+
+  extension (symbol:    String)
+    inline def symbolRefAttrGet(
+      references:  Seq[Attribute]
+    )(
+      using arena: Arena,
+      context:     Context
+    ): Attribute
+  extension (attribute: Attribute)
+    inline def isSymbolRef:                         Boolean
+    inline def symbolRefAttrGetRootReference(
+      using arena: Arena
+    ):                                              Attribute
+    inline def symbolRefAttrGetLeafReference(
+      using arena: Arena
+    ):                                              Attribute
+    inline def symbolRefAttrGetNumNestedReferences: Long
+    inline def symbolRefAttrGetNestedReference(
+      pos:         Long
+    )(
+      using arena: Arena
+    ):                                              Attribute
+    inline def disctinctAttrCreate(
+      using arena: Arena
+    ):                                              Attribute
+  // Flat SymbolRef
+  extension (string:    String)
+    inline def flatSymbolRefAttrGet(
+      using arena: Arena,
+      context:     Context
+    ): Attribute
+  extension (attribute: Attribute)
+    inline def isFlatSymbolRef: Boolean
+    inline def flatSymbolRefAttrGetValue(
+      using arena: Arena
+    ):                          String
+
+  // Type
+  inline def typeAttrGetTypeID(
+    using arena: Arena
+  ): TypeID
+
+  extension (tpe:       Type)
+    inline def typeAttrGet(
+      using arena: Arena,
+      context:     Context
+    ): Attribute
+  extension (attribute: Attribute)
+    inline def isType: Boolean
+    inline def typeAttrGetValue(
+      using arena: Arena
+    ):                 Type
+
+  // Unit
+  inline def unitAttrGetTypeID(
+    using arena: Arena
+  ): TypeID
+
+  inline def unitAttrGet(
+    using arena: Arena,
+    context:     Context
+  ): Attribute
+
+  extension (attribute: Attribute) inline def isUnit: Boolean
+
+  inline def denseArrayAttrGetTypeID(
+    using arena: Arena
+  ): TypeID
+
+  extension (bools:     Seq[Boolean])
+    inline def denseBoolArrayGet(
+      using arena: Arena,
+      context:     Context
+    ): Attribute
+  extension (ints:      Seq[Int])
+    inline def denseI8ArrayGet(
+      using arena: Arena,
+      context:     Context
+    ): Attribute
+    inline def denseI16ArrayGet(
+      using arena: Arena,
+      context:     Context
+    ): Attribute
+    inline def denseI32ArrayGet(
+      using arena: Arena,
+      context:     Context
+    ): Attribute
+  extension (longs:     Seq[Long])
+    inline def denseI64ArrayGet(
+      using arena: Arena,
+      context:     Context
+    ): Attribute
+  extension (floats:    Seq[Float])
+    inline def denseF32ArrayGet(
+      using arena: Arena,
+      context:     Context
+    ): Attribute
+  extension (doubles:   Seq[Double])
+    inline def denseF64ArrayGet(
+      using arena: Arena,
+      context:     Context
+    ): Attribute
+  extension (attribute: Attribute)
+    inline def isDenseBoolArray:         Boolean
+    inline def isDenseI8Array:           Boolean
+    inline def isDenseI16Array:          Boolean
+    inline def isDenseI32Array:          Boolean
+    inline def isDenseI64Array:          Boolean
+    inline def isDenseF32Array:          Boolean
+    inline def isDenseF64Array:          Boolean
+    inline def denseArrayGetNumElements: Long
+    inline def denseBoolArrayGetElement(pos: Long): Boolean
+    inline def denseI8ArrayGetElement(pos:   Long): Int
+    inline def denseI16ArrayGetElement(pos:  Long): Int
+    inline def denseI32ArrayGetElement(pos:  Long): Int
+    inline def denseI64ArrayGetElement(pos:  Long): Long
+    inline def denseF32ArrayGetElement(pos:  Long): Float
+    inline def denseF64ArrayGetElement(pos:  Long): Double
 end AttributeApi
 
 class Block(val _segment: MemorySegment)
@@ -418,6 +588,7 @@ trait OperationApi extends HasSegment[Operation] with HasSizeOf[Operation]:
     )(
       using arena: Arena
     ):                             Value
+    inline def getNumResults:      Long
     inline def getSuccessor(
       pos:         Long
     )(
@@ -849,6 +1020,12 @@ end WalkResultEnum
 trait WalkResultEnumApi extends HasSizeOf[WalkResultEnum] with EnumHasToNative[WalkResultEnum]
 
 // Scala Support Traits
+trait ScalaTpeToMlirArray[T <: Int | Long | Float | Double]:
+  extension (xs: Seq[T])
+    inline def toMlirArray(
+      using arena: Arena
+    ): MemorySegment
+
 trait ToMlirArray[E]:
   extension (xs: Seq[E])
     inline def toMlirArray(

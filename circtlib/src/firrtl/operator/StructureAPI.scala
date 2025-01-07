@@ -29,6 +29,9 @@ end CircuitApi
 class Class(val _operation: Operation)
 class ExtClass(val _operation: Operation)
 class ExtModule(val _operation: Operation)
+trait ExtModuleApi extends HasOperation[ExtModule]:
+end ExtModuleApi
+
 class IntModule(val _operation: Operation)
 class MemModule(val _operation: Operation)
 class Module(val _operation: Operation)

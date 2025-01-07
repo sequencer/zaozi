@@ -369,6 +369,8 @@ given OperationApi with
     )(
       using arena: Arena
     ): Value = Value(mlirOperationGetResult(arena, operation.segment, pos))
+    inline def getNumResults: Long =
+      mlirOperationGetNumResults(operation.segment)
     inline def getSuccessor(
       pos:         Long
     )(
@@ -402,7 +404,7 @@ given OperationApi with
       name:        String
     )(
       using arena: Arena
-    ): Attribute = Attribute(mlirOperationGetAttributeByName(arena, name.toStringRef.segment, operation.segment))
+    ): Attribute = Attribute(mlirOperationGetAttributeByName(arena, operation.segment, name.toStringRef.segment))
     inline def writeBytecodeWithConfig(
       config:      BytecodeWriterConfig,
       callback:    Array[Byte] => Unit
@@ -703,83 +705,257 @@ given TypeApi with
 end given
 
 given AttributeApi with
-  inline def createUnitAttribute(
-    using arena: Arena,
-    context:     Context
-  ): Attribute = Attribute(mlirUnitAttrGet(arena, context.segment))
-
   inline def allocateAttribute(
     using arena: Arena
   ): Attribute = Attribute(MlirAttribute.allocate(arena))
-
-  extension (array:  Seq[Attribute])
+  inline def getNull(
+    using arena: Arena,
+    context:     Context
+  ): Attribute = Attribute(mlirAttributeGetNull(arena))
+  // Location
+  extension (attribute: Attribute) inline def isLocation: Boolean = mlirAttributeIsALocation(attribute.segment)
+  // Array
+  inline def arrayAttrGetTypeID(
+    using arena: Arena
+  ): TypeID = TypeID(mlirArrayAttrGetTypeID(arena))
+  extension (array:     Seq[Attribute])
     inline def arrayAttrGet(
       using arena: Arena,
       context:     Context
     ): Attribute =
       Attribute(mlirArrayAttrGet(arena, context.segment, array.size, array.toMlirArray))
-  extension (tpe:    Type)
-    inline def typeAttrGet(
+  extension (attribute: Attribute)
+    inline def isArray:                 Boolean = mlirAttributeIsAArray(attribute.segment)
+    inline def arrayAttrGetNumElements: Int     = mlirArrayAttrGetNumElements(attribute.segment).toInt
+    inline def arrayAttrGetElement(
+      idx:         Int
+    )(
+      using arena: Arena
+    ): Attribute = Attribute(mlirArrayAttrGetElement(arena, attribute.segment, idx.toLong))
+  // Dictionary
+  inline def dictionaryAttrGetTypeID(
+    using arena: Arena
+  ) = TypeID(mlirDictionaryAttrGetTypeID(arena))
+  extension (map:       Map[String, Attribute])
+    inline def directoryAttrGet(
       using arena: Arena,
       context:     Context
     ): Attribute =
-      Attribute(mlirTypeAttrGet(arena, tpe.segment))
-  extension (bool:   Boolean)
-    inline def toBooleanAttribute(
-      using arena: Arena,
-      context:     Context
-    ): Attribute =
-      Attribute(mlirBoolAttrGet(arena, context.segment, if (bool) 1 else 0))
-  extension (string: String)
-    inline def stringAttrGet(
-      using arena: Arena,
-      context:     Context
-    ): Attribute = Attribute(mlirStringAttrGet(arena, context.segment, string.toStringRef.segment))
-    inline def flatSymbolRefAttrGet(
-      using arena: Arena,
-      context:     Context
-    ): Attribute = Attribute(mlirFlatSymbolRefAttrGet(arena, context.segment, string.toStringRef.segment))
-
-  extension (double: Double)
-    inline def toDoubleAttribute(
+      Attribute(
+        mlirDictionaryAttrGet(
+          arena,
+          context.segment,
+          map.size,
+          map
+            .map:
+              case (str, attr) =>
+                summon[NamedAttributeApi].namedAttributeGet(str.identifierGet, attr)
+            .toSeq
+            .toMlirArray
+        )
+      )
+  extension (attribute: Attribute)
+    inline def isDictionary:                 Boolean = mlirAttributeIsADictionary(attribute.segment)
+    inline def dictionaryAttrGetNumElements: Int     = mlirDictionaryAttrGetNumElements(attribute.segment).toInt
+    inline def dictionaryAttrGetElement(
+      idx:         Int
+    )(
+      using arena: Arena
+    ): Attribute = Attribute(mlirDictionaryAttrGetElement(arena, attribute.segment, idx.toLong))
+  // Floating point
+  inline def floatAttrGetTypeID(
+    using arena: Arena
+  ): TypeID = TypeID(mlirFloatAttrGetTypeID(arena))
+  extension (double:    Double)
+    inline def floatAttrDoubleGet(
       tpe:         Type
     )(
       using arena: Arena,
       context:     Context
     ): Attribute = Attribute(mlirFloatAttrDoubleGet(arena, context.segment, tpe.segment, double))
-  extension (int:    Long)
-    inline def toIntegerAttribute(
+    inline def floatAttrDoubleGetChecked(
+      tpe:         Type
+    )(
+      using arena: Arena,
+      context:     Context
+    ): Attribute = Attribute(mlirFloatAttrDoubleGetChecked(arena, context.segment, tpe.segment, double))
+
+  extension (attribute: Attribute)
+    inline def isFloat:                 Boolean = mlirAttributeIsAFloat(attribute.segment)
+    inline def floatAttrGetValueDouble: Double  = mlirFloatAttrGetValueDouble(attribute.segment)
+  // Integer
+  inline def integerAttrGetTypeID(
+    using arena: Arena
+  ): TypeID = TypeID(mlirIntegerAttrGetTypeID(arena))
+  extension (int:       Long)
+    inline def integerAttrGet(
       tpe:         Type
     )(
       using arena: Arena,
       context:     Context
     ): Attribute = Attribute(mlirIntegerAttrGet(arena, tpe.segment, int))
-
   extension (attribute: Attribute)
-    inline def dump():      Unit          = mlirAttributeDump(attribute.segment)
-    inline def numElements: Int           = mlirArrayAttrGetNumElements(attribute.segment).toInt
-    inline def element(
-      idx:         Int
+    inline def isInteger:               Boolean = mlirAttributeIsAInteger(attribute.segment)
+    inline def integerAttrGetValueInt:  Long    = mlirIntegerAttrGetValueInt(attribute.segment)
+    inline def integerAttrGetValueSInt: Long    = mlirIntegerAttrGetValueSInt(attribute.segment)
+    inline def integerAttrGetValueUInt: Long    = mlirIntegerAttrGetValueUInt(attribute.segment)
+  // Bool
+  extension (bool:      Boolean)
+    inline def boolAttrGet(
+      tpe:         Type
+    )(
+      using arena: Arena,
+      context:     Context
+    ): Attribute = Attribute(mlirBoolAttrGet(arena, tpe.segment, if (bool) 1 else 0))
+  extension (attribute: Attribute)
+    inline def isBool:           Boolean = mlirAttributeIsAInteger(attribute.segment)
+    inline def boolAttrGetValue: Boolean = mlirBoolAttrGetValue(attribute.segment)
+  // String
+  def stringAttrGetTypeID(
+    using arena: Arena
+  ): TypeID = TypeID(mlirStringAttrGetTypeID(arena))
+  extension (string:    String)
+    inline def stringAttrGet(
+      using arena: Arena,
+      context:     Context
+    ): Attribute = Attribute(mlirStringAttrGet(arena, context.segment, string.toStringRef.segment))
+    inline def stringAttrTypedGet(
+      tpe:         Type
     )(
       using arena: Arena
-    ): Attribute = Attribute(mlirArrayAttrGetElement(arena, attribute.segment, idx.toLong))
-    inline def getString(
+    ): Attribute = Attribute(mlirStringAttrTypedGet(arena, tpe.segment, string.toStringRef.segment))
+  extension (attribute: Attribute)
+    inline def isString: Boolean =
+      mlirAttributeIsAString(attribute.segment)
+    inline def stringAttrGetValue(
       using arena: Arena
     ): String =
       StringRef(mlirStringAttrGetValue(arena, attribute.segment)).toScalaString
-    inline def getInt:      Long          =
-      mlirIntegerAttrGetValueInt(attribute.segment)
-    inline def getSInt:     Long          =
-      mlirIntegerAttrGetValueSInt(attribute.segment)
-    inline def getUInt:     Long          =
-      mlirIntegerAttrGetValueUInt(attribute.segment)
-    inline def isInteger:   Boolean       =
-      mlirAttributeIsAInteger(attribute.segment)
-    inline def isString:    Boolean       =
-      mlirAttributeIsAString(attribute.segment)
-    inline def segment:     MemorySegment = attribute._segment
-    inline def sizeOf:      Int           = MlirAttribute.sizeof().toInt
+  // SymbolRef
+  inline def symbolRefAttrGetTypeID(
+    using arena: Arena
+  ): TypeID = TypeID(mlirSymbolRefAttrGetTypeID(arena))
+  extension (symbol:    String)
+    inline def symbolRefAttrGet(
+      references:  Seq[Attribute]
+    )(
+      using arena: Arena,
+      context:     Context
+    ): Attribute = Attribute(
+      mlirSymbolRefAttrGet(arena, context.segment, symbol.toStringRef.segment, references.size, references.toMlirArray)
+    )
+  extension (attribute: Attribute)
+    inline def isSymbolRef = mlirAttributeIsASymbolRef(attribute.segment)
+    inline def symbolRefAttrGetRootReference(
+      using arena: Arena
+    ) = Attribute(mlirSymbolRefAttrGetRootReference(arena, attribute.segment))
+    inline def symbolRefAttrGetLeafReference(
+      using arena: Arena
+    ) = Attribute(mlirSymbolRefAttrGetLeafReference(arena, attribute.segment))
+    inline def symbolRefAttrGetNumNestedReferences: Long = mlirSymbolRefAttrGetNumNestedReferences(attribute.segment)
+    inline def symbolRefAttrGetNestedReference(
+      pos:         Long
+    )(
+      using arena: Arena
+    ) = Attribute(mlirSymbolRefAttrGetNestedReference(arena, attribute.segment, pos))
+    inline def disctinctAttrCreate(
+      using arena: Arena
+    ) = Attribute(mlirDisctinctAttrCreate(arena, attribute.segment))
+  // Flat SymbolRef
+  extension (string:    String)
+    inline def flatSymbolRefAttrGet(
+      using arena: Arena,
+      context:     Context
+    ): Attribute = Attribute(mlirFlatSymbolRefAttrGet(arena, context.segment, string.toStringRef.segment))
+  extension (attribute: Attribute)
+    inline def isFlatSymbolRef: Boolean = mlirAttributeIsAFlatSymbolRef(attribute.segment)
+    inline def flatSymbolRefAttrGetValue(
+      using arena: Arena
+    ): String = StringRef(mlirFlatSymbolRefAttrGetValue(arena, attribute.segment)).toScalaString
+  // Type
+  inline def typeAttrGetTypeID(
+    using arena: Arena
+  ) = TypeID(mlirTypeAttrGetTypeID(arena))
+  extension (tpe:       Type)
+    inline def typeAttrGet(
+      using arena: Arena,
+      context:     Context
+    ): Attribute =
+      Attribute(mlirTypeAttrGet(arena, tpe.segment))
+  extension (attribute: Attribute)
+    inline def isType: Boolean = mlirAttributeIsAType(attribute.segment)
+    inline def typeAttrGetValue(
+      using arena: Arena
+    ): Type = Type(mlirTypeAttrGetValue(arena, attribute.segment))
+  // Unit
+  inline def unitAttrGetTypeID(
+    using arena: Arena
+  ) = TypeID(mlirUnitAttrGetTypeID(arena))
+  inline def unitAttrGet(
+    using arena: Arena,
+    context:     Context
+  ): Attribute = Attribute(mlirUnitAttrGet(arena, context.segment))
+  extension (attribute: Attribute) inline def isUnit: Boolean = mlirAttributeIsAUnit(attribute.segment)
 
+  // Dense array
+  inline def denseArrayAttrGetTypeID(
+    using arena: Arena
+  ): TypeID = TypeID(mlirDenseArrayAttrGetTypeID(arena))
+  extension (bools:     Seq[Boolean])
+    inline def denseBoolArrayGet(
+      using arena: Arena,
+      context:     Context
+    ): Attribute = Attribute(
+      mlirDenseBoolArrayGet(arena, context.segment, bools.size, bools.map(i => if (i) 1 else 0).toMlirArray)
+    )
+  extension (ints:      Seq[Int])
+    inline def denseI8ArrayGet(
+      using arena: Arena,
+      context:     Context
+    ): Attribute = Attribute(mlirDenseI8ArrayGet(arena, context.segment, ints.size, ints.toMlirArray))
+    inline def denseI16ArrayGet(
+      using arena: Arena,
+      context:     Context
+    ): Attribute = Attribute(mlirDenseI16ArrayGet(arena, context.segment, ints.size, ints.toMlirArray))
+    inline def denseI32ArrayGet(
+      using arena: Arena,
+      context:     Context
+    ): Attribute = Attribute(mlirDenseI32ArrayGet(arena, context.segment, ints.size, ints.toMlirArray))
+  extension (longs:     Seq[Long])
+    inline def denseI64ArrayGet(
+      using arena: Arena,
+      context:     Context
+    ): Attribute = Attribute(mlirDenseI64ArrayGet(arena, context.segment, longs.size, longs.toMlirArray))
+  extension (floats:    Seq[Float])
+    inline def denseF32ArrayGet(
+      using arena: Arena,
+      context:     Context
+    ): Attribute = Attribute(mlirDenseF32ArrayGet(arena, context.segment, floats.size, floats.toMlirArray))
+  extension (doubles:   Seq[Double])
+    inline def denseF64ArrayGet(
+      using arena: Arena,
+      context:     Context
+    ): Attribute = Attribute(mlirDenseF64ArrayGet(arena, context.segment, doubles.size, doubles.toMlirArray))
+  extension (attribute: Attribute)
+    inline def isDenseBoolArray:         Boolean = mlirAttributeIsADenseBoolArray(attribute.segment)
+    inline def isDenseI8Array:           Boolean = mlirAttributeIsADenseI8Array(attribute.segment)
+    inline def isDenseI16Array:          Boolean = mlirAttributeIsADenseI16Array(attribute.segment)
+    inline def isDenseI32Array:          Boolean = mlirAttributeIsADenseI32Array(attribute.segment)
+    inline def isDenseI64Array:          Boolean = mlirAttributeIsADenseI64Array(attribute.segment)
+    inline def isDenseF32Array:          Boolean = mlirAttributeIsADenseF32Array(attribute.segment)
+    inline def isDenseF64Array:          Boolean = mlirAttributeIsADenseF64Array(attribute.segment)
+    inline def denseArrayGetNumElements: Long    = mlirDenseArrayGetNumElements(attribute.segment)
+    inline def denseBoolArrayGetElement(pos: Long): Boolean = mlirDenseBoolArrayGetElement(attribute.segment, pos)
+    inline def denseI8ArrayGetElement(pos:   Long): Int     = mlirDenseI8ArrayGetElement(attribute.segment, pos)
+    inline def denseI16ArrayGetElement(pos:  Long): Int     = mlirDenseI16ArrayGetElement(attribute.segment, pos)
+    inline def denseI32ArrayGetElement(pos:  Long): Int     = mlirDenseI32ArrayGetElement(attribute.segment, pos)
+    inline def denseI64ArrayGetElement(pos:  Long): Long    = mlirDenseI64ArrayGetElement(attribute.segment, pos)
+    inline def denseF32ArrayGetElement(pos:  Long): Float   = mlirDenseF32ArrayGetElement(attribute.segment, pos)
+    inline def denseF64ArrayGetElement(pos:  Long): Double  = mlirDenseF64ArrayGetElement(attribute.segment, pos)
+
+  extension (attribute: Attribute)
+    inline def segment: MemorySegment = attribute._segment
+    inline def sizeOf:  Int           = MlirAttribute.sizeof().toInt
 end given
 
 given NamedAttributeApi with
