@@ -34,27 +34,57 @@ after you installed the dependencies and set the env. You can use
 Zaozi always follows the latest version of CIRCT. To use the specific version
 of CIRCT for development, you override the circt version in nix script. You can
 also compile CIRCT:
-- software prerequisite: `cmake`, `clang`, `ninja`, `python3`, `ccache`
+software prerequisite: `cmake`, `clang`, `ninja`, `python3`, `ccache`
+Suggest to use two steps flow(compiling MLIR and CIRCT in separate) to speed up
+development.
+- Firstly compile the MLIR library
 ```shell
-git clone git@github.com:llvm/circt $CIRCT_SOURCE
-cmake -G Ninja \
+pushd circt/llvm
+cmake -G Ninja ../llvm \
   -B build \
-  -DBUILD_SHARED_LIBS=ON \
-  -DCMAKE_BUILD_TYPE=Debug \
-  -DLLVM_ENABLE_PROJECTS=mlir \
+  -DCMAKE_BUILD_TYPE=DEBUG \
   -DLLVM_ENABLE_ASSERTIONS=ON \
-  -DLLVM_BUILD_EXAMPLES=OFF \
-  -DLLVM_ENABLE_OCAMLDOC=OFF \
+  -DBUILD_SHARED_LIBS=ON \
   -DLLVM_ENABLE_BINDINGS=OFF \
-  -DLLVM_BUILD_TOOLS=ON \
+  -DLLVM_ENABLE_OCAMLDOC=OFF \
+  -DLLVM_BUILD_EXAMPLES=OFF \
   -DLLVM_OPTIMIZED_TABLEGEN=ON \
-  -DLLVM_INCLUDE_TOOLS=ON \
-  -DLLVM_USE_SPLIT_DWARF=ON \
-  -DLLVM_BUILD_LLVM_DYLIB=ON \
-  -DLLVM_LINK_LLVM_DYLIB=OFF \
-  -DLLVM_CCACHE_BUILD=ON \
-  -DLLVM_EXTERNAL_PROJECTS=circt \
-  -DLLVM_EXTERNAL_CIRCT_SOURCE_DIR=$CIRCT_SOURCE
+  -DLLVM_ENABLE_PROJECTS=mlir \
+  -DLLVM_TARGETS_TO_BUILD=Native
+ninja
+```
+You can skip this if using Nix:
+```shell
+nix build --no-link --print-out-paths .#mlir-install
+```
+The output should be configured as `MLIR_INSTALL_PATH`
+
+```shell
+cd circt
+cmake -G Ninja \
+  -B build/debug \
+  -DBUILD_SHARED_LIBS=ON \
+  -DLLVM_ENABLE_ASSERTIONS=ON \
+  -DMLIR_DIR=$MLIR_INSTALL_PATH
 ninja -C build
 ```
 configure the `CIRCT_INSTALL_PATH` to `build`, and run tests.
+
+### Debug Flow
+
+It requires using lldb or gdb to attach to the jvm subprocess for debugging
+
+- Firstly add
+```C
+#include <csignal>
+#include <iostream>
+#include <bits/signum-arch.h>
+#include <unistd.h>
+
+...
+  std::cerr << "Current PID: " << getpid() << std::endl;
+  raise(SIGSTOP);
+```
+to the entrance of your library, for example `populatePreprocessTransforms`,
+then run test which will stack. Now you can attach gdb/lldb to this PID and send
+`SIGCONT` to start debug.
