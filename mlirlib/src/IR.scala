@@ -700,8 +700,10 @@ given TypeApi with
       context:     Context
     ): Type = Type(mlirIntegerTypeGet(arena, context.segment, width))
   extension (tpe:   Type)
-    inline def segment: MemorySegment = tpe._segment
-    inline def sizeOf:  Int           = MlirType.sizeof().toInt
+    inline def integerTypeGetWidth: Int           =
+      mlirIntegerTypeGetWidth(tpe.segment)
+    inline def segment:             MemorySegment = tpe._segment
+    inline def sizeOf:              Int           = MlirType.sizeof().toInt
 end given
 
 given AttributeApi with

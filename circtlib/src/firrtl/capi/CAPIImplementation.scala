@@ -4,6 +4,7 @@ package org.llvm.circt.scalalib.firrtl.capi
 import org.llvm.circt.*
 import org.llvm.circt.CAPI.*
 import org.llvm.mlir.scalalib.{
+  given_AttributeApi,
   Attribute,
   Context,
   DialectHandle,
@@ -267,7 +268,6 @@ given AttributeApi with
   extension (bigInt:           BigInt)
     inline def attrGetIntegerFromString(
       tpe:         Type,
-      // Why here need width, I think tpe should encode the width, and accessed via getBitWidth
       width:       Option[Int] = None
     )(
       using arena: Arena
@@ -276,7 +276,7 @@ given AttributeApi with
         firrtlAttrGetIntegerFromString(
           arena,
           tpe.segment,
-          width.getOrElse(tpe.getBitWidth(true).toInt),
+          width.getOrElse(tpe.integerTypeGetWidth.toInt),
           bigInt.toString(10).toStringRef.segment,
           10
         )
