@@ -40,7 +40,7 @@ let
         };
       millDepsHash =
         if stdenv.isDarwin then
-          "sha256-5wHqKYd4Gn/FKhKLHrqeGmfa8OSQO+l/cuE4BMHiKpM="
+          "sha256-Kdxg075PfS1pKmhLUVHX3E9GEDMa7GehOLPqbVBba2o="
         else
           "sha256-1oZ/MFsvA+Og+BjCYSWW51FodF6zZJisLJHzOsFDL7Y=";
       nativeBuildInputs = [ projectDependencies.setupHook ];
