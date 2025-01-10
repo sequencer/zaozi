@@ -40,9 +40,9 @@ let
         };
       millDepsHash =
         if stdenv.isDarwin then
-          "sha256-5wHqKYd4Gn/FKhKLHrqeGmfa8OSQO+l/cuE4BMHiKpM="
+          "sha256-Kdxg075PfS1pKmhLUVHX3E9GEDMa7GehOLPqbVBba2o="
         else
-          "sha256-NZBT+JQjfac3l9Dw73fQ7VgwfC6JH20ZcIZ5YFempj4=";
+          "sha256-1oZ/MFsvA+Og+BjCYSWW51FodF6zZJisLJHzOsFDL7Y=";
       nativeBuildInputs = [ projectDependencies.setupHook ];
     };
 
@@ -84,9 +84,9 @@ let
     installPhase = ''
       mkdir -p $out/share/java
 
-      add-determinism -j $NIX_BUILD_CORES out/elaborator/assembly.dest/out.jar
+      add-determinism -j $NIX_BUILD_CORES out/zaozi/assembly.dest/out.jar
 
-      mv out/elaborator/assembly.dest/out.jar $out/share/java/elaborator.jar
+      mv out/zaozi/assembly.dest/out.jar $out/share/java/elaborator.jar
     '';
   };
 in
