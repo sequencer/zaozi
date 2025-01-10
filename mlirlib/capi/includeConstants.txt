@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2025 Jiuyang Liu <liu@jiuyang.me>
 MlirDiagnosticError                # header: /nix/store/y6bmy646nd1lggvsm8fldvkfzc9flfpn-circt-full/include/mlir-c/Diagnostics.h
 MlirDiagnosticNote                 # header: /nix/store/y6bmy646nd1lggvsm8fldvkfzc9flfpn-circt-full/include/mlir-c/Diagnostics.h
 MlirDiagnosticRemark               # header: /nix/store/y6bmy646nd1lggvsm8fldvkfzc9flfpn-circt-full/include/mlir-c/Diagnostics.h

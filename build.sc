@@ -1,6 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
-// SPDX-FileCopyrightText: 2024 Jiuyang Liu <liu@jiuyang.me>
-
+// SPDX-FileCopyrightText: 2025 Jiuyang Liu <liu@jiuyang.me>
 import mill._
 import mill.scalalib.TestModule.Utest
 import mill.scalalib._

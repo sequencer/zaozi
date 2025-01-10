@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0
+// SPDX-FileCopyrightText: 2025 Jiuyang Liu <liu@jiuyang.me>
 #ifndef JEXTRACT_HEADERS_H
 #define JEXTRACT_HEADERS_H
 

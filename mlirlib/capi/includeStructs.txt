@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2025 Jiuyang Liu <liu@jiuyang.me>
 MlirAffineExpr                         # header: /nix/store/y6bmy646nd1lggvsm8fldvkfzc9flfpn-circt-full/include/mlir-c/AffineExpr.h
 MlirAffineMap                          # header: /nix/store/y6bmy646nd1lggvsm8fldvkfzc9flfpn-circt-full/include/mlir-c/AffineMap.h
 MlirDiagnostic                       # header: /nix/store/y6bmy646nd1lggvsm8fldvkfzc9flfpn-circt-full/include/mlir-c/Diagnostics.h

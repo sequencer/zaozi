@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2025 Jiuyang Liu <liu@jiuyang.me>
 CirctESIAppIDIndex                       # header: /nix/store/y6bmy646nd1lggvsm8fldvkfzc9flfpn-circt-full/include/circt-c/Dialect/ESI.h
 CirctESIBundleTypeBundleChannel          # header: /nix/store/y6bmy646nd1lggvsm8fldvkfzc9flfpn-circt-full/include/circt-c/Dialect/ESI.h
 FIRRTLBundleField                    # header: /nix/store/y6bmy646nd1lggvsm8fldvkfzc9flfpn-circt-full/include/circt-c/Dialect/FIRRTL.h

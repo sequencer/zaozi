@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2025 Jiuyang Liu <liu@jiuyang.me>
 MlirDiagnosticHandler               # header: /nix/store/y6bmy646nd1lggvsm8fldvkfzc9flfpn-circt-full/include/mlir-c/Diagnostics.h
 MlirDiagnosticHandlerID             # header: /nix/store/y6bmy646nd1lggvsm8fldvkfzc9flfpn-circt-full/include/mlir-c/Diagnostics.h
 MlirSparseTensorLevelType                   # header: /nix/store/y6bmy646nd1lggvsm8fldvkfzc9flfpn-circt-full/include/mlir-c/Dialect/SparseTensor.h

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
-// This file inline defines all Scala API exposed to end users, their implementations are split into different given files.
+// SPDX-FileCopyrightText: 2025 Jiuyang Liu <liu@jiuyang.me>
 package org.llvm.mlir.scalalib
 
 import java.lang.foreign.{Arena, MemorySegment}
