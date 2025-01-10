@@ -65,18 +65,20 @@ def mlirTest[P <: Parameter, I <: Interface[P]](
   given Arena = Arena.ofConfined()
   given Context = summon[ContextApi].contextCreate
   summon[Context].loadFirrtlDialect()
+  given MlirModule = summon[MlirModuleApi].moduleCreateEmpty(summon[LocationApi].locationUnknownGet)
 
   // Then based on the module to construct the circuit.
   given Circuit = summon[CircuitApi].op(interface.moduleName)
+  summon[Circuit].appendToModule()
   summon[ConstructorApi].Module(parameter, interface)(body).appendToCircuit()
+  fixupInstance()
 
   val out = new StringBuilder
-  summon[Circuit].operation.print(out ++= _)
+  summon[MlirModule].getOperation.print(out ++= _)
   summon[Context].destroy()
   summon[Arena].close()
   if (checkLines.isEmpty)
-    println(s"please add lines to check for:\n$out")
-    assert(false)
+    assert(out.toString == "Nothing To Check")
   else checkLines.foreach(l => assert(out.toString.contains(l)))
 
 
@@ -102,8 +104,7 @@ def firrtlTest[P <: Parameter, I <: Interface[P]](
   summon[Context].destroy()
   summon[Arena].close()
   if (checkLines.isEmpty)
-    println(s"please add lines to check for:\n$out")
-    assert(false)
+    assert(out.toString == "Nothing To Check")
   else checkLines.foreach(l => assert(out.toString.contains(l)))
 
 def verilogTest[P <: Parameter, I <: Interface[P]](
@@ -140,8 +141,7 @@ def verilogTest[P <: Parameter, I <: Interface[P]](
   summon[Context].destroy()
   summon[Arena].close()
   if (checkLines.isEmpty)
-    println(s"please add lines to check for:\n${out.toString}")
-    assert(false)
+    assert(out.toString == "Nothing To Check")
   else checkLines.foreach(l => assert(out.toString.contains(l)))
 
 case class SimpleParameter(width: Int, moduleName: String) extends Parameter
