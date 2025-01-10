@@ -7,7 +7,7 @@ import me.jiuyang.zaozi.default.{*, given}
 import me.jiuyang.zaozi.reftpe.*
 import me.jiuyang.zaozi.valuetpe.*
 import org.llvm.circt.scalalib.firrtl.capi.given_DialectHandleApi
-import org.llvm.mlir.scalalib.{Context, ContextApi, given_ContextApi}
+import org.llvm.mlir.scalalib.{given_ContextApi, Context, ContextApi}
 import utest.*
 
 import java.lang.foreign.Arena
@@ -31,35 +31,37 @@ object ReferableSpec extends TestSuite:
     val parameter = SimpleParameter(8, "PassthroughModule")
     test("Instance API"):
       verilogTest(parameter, ReferableSpecInterface(parameter))(
-        """%8:3 = "firrtl.instance"() <{moduleName = @M0, name = "inst0", nameKind = #firrtl<name_kind interesting_name>, portDirections = array<i1: false, false, true>, portNames = ["asyncDomain", "syncDomain", "passthrough"]}> : () -> (!firrtl.bundle<reset: asyncreset, clock: clock>, !firrtl.bundle<reset: uint<1>, clock: clock>, !firrtl.bundle<i flip: uint<8>, o: uint<8>>)"""
+        "M0 inst0 ("
       ): (p: SimpleParameter, io: Wire[ReferableSpecInterface]) =>
         given Ref[Clock] = io.asyncDomain.clock
         given Ref[Reset] = io.asyncDomain.reset
-        val inst0 = Instance(ReferableSpecInterface(p.copy(moduleName = "M0")))
-        io.passthrough.o := inst0.io.passthrough.o
-        inst0.io.passthrough.i := io.passthrough.i
+        val inst0        = Instance(ReferableSpecInterface(p.copy(moduleName = "M0")))
+        inst0.io.asyncDomain.clock := io.asyncDomain.clock
+        inst0.io.asyncDomain.reset := io.asyncDomain.reset
+        inst0.io.syncDomain.clock  := io.syncDomain.clock
+        inst0.io.syncDomain.reset  := io.syncDomain.reset
+        io.passthrough.o           := inst0.io.passthrough.o
+        inst0.io.passthrough.i     := io.passthrough.i
     test("Wire"):
-      mlirTest(parameter, ReferableSpecInterface(parameter))(
-        "%wire = firrtl.wire interesting_name : !firrtl.uint<8>"
+      verilogTest(parameter, ReferableSpecInterface(parameter))(
+        "assign passthrough_o = passthrough_i;"
       ): (p: SimpleParameter, io: Wire[ReferableSpecInterface]) =>
-        val wire         = Wire(UInt(parameter.width.W))
+        val wire = Wire(UInt(parameter.width.W))
         io.passthrough.o := wire
         wire             := io.passthrough.i
     test("Register without reset"):
-      mlirTest(parameter, ReferableSpecInterface(parameter))(
-        "%4 = firrtl.subfield %3[clock] : !firrtl.bundle<reset: uint<1>, clock: clock>",
-        "%reg = firrtl.reg interesting_name %4 : !firrtl.clock, !firrtl.uint<8>"
+      verilogTest(parameter, ReferableSpecInterface(parameter))(
+        "always @(posedge syncDomain_clock)",
+        "reg_0 <= passthrough_i;"
       ): (p: SimpleParameter, io: Wire[ReferableSpecInterface]) =>
         given Ref[Clock] = io.syncDomain.clock
         val reg          = Reg(UInt(parameter.width.W))
         io.passthrough.o := reg
         reg              := io.passthrough.i
     test("Register with SyncReset"):
-      mlirTest(parameter, ReferableSpecInterface(parameter))(
-        "%4 = firrtl.subfield %3[clock] : !firrtl.bundle<reset: uint<1>, clock: clock>",
-        "%6 = firrtl.subfield %5[reset] : !firrtl.bundle<reset: uint<1>, clock: clock>",
-        "%c0_ui8 = firrtl.constant 0 : !firrtl.uint<8>",
-        "%reg = firrtl.regreset interesting_name %4, %6, %c0_ui8 : !firrtl.clock, !firrtl.uint<1>, !firrtl.uint<8>, !firrtl.uint<8>"
+      verilogTest(parameter, ReferableSpecInterface(parameter))(
+        "always @(posedge syncDomain_clock) begin",
+        "if (syncDomain_reset)"
       ): (p: SimpleParameter, io: Wire[ReferableSpecInterface]) =>
         given Ref[Clock] = io.syncDomain.clock
         given Ref[Reset] = io.syncDomain.reset
@@ -67,14 +69,11 @@ object ReferableSpec extends TestSuite:
         io.passthrough.o := reg
         reg              := io.passthrough.i
     test("Register with ASyncReset"):
-      mlirTest(parameter, ReferableSpecInterface(parameter))(
-        "%4 = firrtl.subfield %3[clock] : !firrtl.bundle<reset: asyncreset, clock: clock>",
-        "%6 = firrtl.subfield %5[reset] : !firrtl.bundle<reset: asyncreset, clock: clock>",
-        "%c0_ui8 = firrtl.constant 0 : !firrtl.uint<8>",
-        "%reg = firrtl.regreset interesting_name %4, %6, %c0_ui8 : !firrtl.clock, !firrtl.asyncreset, !firrtl.uint<8>, !firrtl.uint<8>\n    "
+      verilogTest(parameter, ReferableSpecInterface(parameter))(
+        "always @(posedge asyncDomain_clock or posedge asyncDomain_reset) begin"
       ): (p: SimpleParameter, io: Wire[ReferableSpecInterface]) =>
         given Ref[Clock] = io.asyncDomain.clock
         given Ref[Reset] = io.asyncDomain.reset
-        val reg = RegInit(0.U(8.W))
+        val reg          = RegInit(0.U(8.W))
         io.passthrough.o := reg
         reg              := io.passthrough.i

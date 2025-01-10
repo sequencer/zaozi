@@ -296,6 +296,11 @@ given AttributeApi with
       using arena: Arena,
       context:     Context
     ): MemorySegment = firrtlAttrGetMemDir(arena, context.segment, memDir.toNative)
+  extension (string:           String)
+    inline def innerSymAttrGet(
+      using arena: Arena,
+      context:     Context
+    ) = Attribute(hwInnerSymAttrGet(arena, string.stringAttrGet.segment))
   extension (portDirections:   Seq[FirrtlDirection])
     inline def attrGetPortDirs(
       using arena: Arena,

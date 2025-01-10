@@ -281,13 +281,16 @@ given InstanceApi with
             namedAttributeApi.namedAttributeGet(
               "portNames".identifierGet,
               interface.map(_.getName().stringAttrGet).arrayAttrGet
-            )
+            ),
             // ::mlir::ArrayAttr
-            // namedAttributeApi.namedAttributeGet("annotations".identifierGet, Seq().arrayAttrGet),
+            namedAttributeApi.namedAttributeGet("annotations".identifierGet, Seq.empty.arrayAttrGet),
             // ::mlir::ArrayAttr
-            // namedAttributeApi.namedAttributeGet("portAnnotations".identifierGet, Seq().arrayAttrGet),
+            namedAttributeApi.namedAttributeGet(
+              "portAnnotations".identifierGet,
+              interface.map(_ => Seq.empty.arrayAttrGet).arrayAttrGet
+            ),
             // ::mlir::ArrayAttr
-            // namedAttributeApi.namedAttributeGet("layers".identifierGet, Seq().arrayAttrGet)
+            namedAttributeApi.namedAttributeGet("layers".identifierGet, Seq.empty.arrayAttrGet)
             // ::mlir::UnitAttr
             // namedAttributeApi.namedAttributeGet("lowerToBind".identifierGet, ???),
             // ::circt::hw::InnerSymAttr
