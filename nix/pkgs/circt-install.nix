@@ -3,15 +3,11 @@
 
 { symlinkJoin, circt }:
 symlinkJoin {
-  name = "circt-full";
+  name = "circt-install";
   paths = [
     circt
     circt.lib
     circt.dev
-
-    circt.llvm
-    circt.llvm.lib
-    circt.llvm.dev
   ];
 
   inherit (circt) meta;

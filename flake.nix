@@ -28,8 +28,8 @@
           inputsFrom = [ pkgs.zaozi.zaozi-assembly ];
           nativeBuildInputs = [  ];
           env = {
-            CIRCT_INSTALL_PATH = pkgs.circt-full;
-            MLIR_INSTALL_PATH = pkgs.circt-full;
+            CIRCT_INSTALL_PATH = pkgs.circt-install;
+            MLIR_INSTALL_PATH = pkgs.mlir-install;
             JEXTRACT_INSTALL_PATH = pkgs.jextract-21;
             LIT_INSTALL_PATH = pkgs.lit;
             SCALA_CLI_INSTALL_PATH = pkgs.scala-cli;

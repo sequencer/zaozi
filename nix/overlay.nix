@@ -26,7 +26,9 @@ final: prev: {
 
   fetchMillDeps = final.callPackage ./pkgs/mill-builder.nix { };
 
-  circt-full = final.callPackage ./pkgs/circt-full.nix { };
+  circt-install = final.callPackage ./pkgs/circt-install.nix { };
+
+  mlir-install = final.callPackage ./pkgs/mlir-install.nix { };
 
   # faster strip-undetereminism
   add-determinism = final.callPackage ./pkgs/add-determinism { };

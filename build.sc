@@ -76,16 +76,16 @@ object circtlib extends ScalaModule with ScalafmtModule with PanamaModule { oute
   def header = T(PathRef(millSourcePath / "capi" / "jextract-headers.h"))
 
   def circtInstallPath = T(
-    os.Path(T.ctx().env.getOrElse("CIRCT_INSTALL_PATH", "CIRCT_INSTALL_PATH not found, you are not in the nix env?"))
+    os.Path(T.env.getOrElse("CIRCT_INSTALL_PATH", "CIRCT_INSTALL_PATH not found, you are not in the nix env?"))
   )
 
   def jextractBinary = T(
     os.Path(
-      T.ctx().env.getOrElse("JEXTRACT_INSTALL_PATH", "JEXTRACT_INSTALL_PATH not found, you are not in the nix env?")
+      T.env.getOrElse("JEXTRACT_INSTALL_PATH", "JEXTRACT_INSTALL_PATH not found, you are not in the nix env?")
     ) / "bin" / "jextract"
   )
 
-  def includePaths = T(Seq(PathRef(circtInstallPath() / "include")))
+  def includePaths = T(Seq(mlirlib.mlirInstallPath() / "include", circtInstallPath() / "include").map(PathRef(_)))
 
   def libraryPaths = T(Seq(mlirlib.mlirInstallPath() / "lib", circtInstallPath() / "lib").map(PathRef(_)))
 
@@ -127,13 +127,13 @@ object mlirlib extends ScalaModule with ScalafmtModule with PanamaModule {
 
   def header = T(PathRef(millSourcePath / "capi" / "jextract-headers.h"))
 
-  def mlirInstallPath = T(
-    os.Path(T.ctx().env.getOrElse("MLIR_INSTALL_PATH", "MLIR_INSTALL_PATH not found, you are not in the nix env?"))
+  def mlirInstallPath = T.input(
+    os.Path(T.env.getOrElse("MLIR_INSTALL_PATH", "MLIR_INSTALL_PATH not found, you are not in the nix env?"))
   )
 
   def jextractBinary = T(
     os.Path(
-      T.ctx().env.getOrElse("JEXTRACT_INSTALL_PATH", "JEXTRACT_INSTALL_PATH not found, you are not in the nix env?")
+      T.env.getOrElse("JEXTRACT_INSTALL_PATH", "JEXTRACT_INSTALL_PATH not found, you are not in the nix env?")
     ) / "bin" / "jextract"
   )
 
@@ -173,7 +173,7 @@ trait LitModule extends Module {
   }
   def litBinary          = T(
     os.Path(
-      T.ctx().env.getOrElse("LIT_INSTALL_PATH", "LIT_INSTALL_PATH not found, you are not in the nix env?")
+      T.env.getOrElse("LIT_INSTALL_PATH", "LIT_INSTALL_PATH not found, you are not in the nix env?")
     ) / "bin" / "lit"
   )
   def run(args: String*) = T.command(

@@ -7,7 +7,8 @@
 , makeWrapper
 , jdk21
 , mill
-, circt-full
+, circt-install
+, mlir-install
 , jextract-21
 , lit
 , scala-cli
@@ -58,7 +59,8 @@ let
 
     nativeBuildInputs = [
       mill
-      circt-full
+      circt-install
+      mlir-install
       jextract-21
       lit
       scala-cli
@@ -68,8 +70,8 @@ let
       projectDependencies.setupHook
     ];
 
-    env.CIRCT_INSTALL_PATH = circt-full;
-    env.MLIR_INSTALL_PATH = circt-full;
+    env.CIRCT_INSTALL_PATH = circt-install;
+    env.MLIR_INSTALL_PATH = mlir-install;
     env.JEXTRACT_INSTALL_PATH = jextract-21;
     env.LIT_INSTALL_PATH = lit;
 
