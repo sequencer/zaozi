@@ -35,97 +35,115 @@ object SIntSpec extends TestSuite:
     val parameter = SimpleParameter(8, "SIntSpecModule")
     val out       = new StringBuilder
     test("asBits"):
-      mlirTest(parameter, SIntSpecInterface(parameter))(
+      verilogTest(parameter, SIntSpecInterface(parameter))(
+        "assign bits = a;"
       ): (p: SimpleParameter, io: Wire[SIntSpecInterface]) =>
         io.sint.dontCare()
         io.bool.dontCare()
         io.bits := io.a.asBits
     test("+"):
-      mlirTest(parameter, SIntSpecInterface(parameter))(
+      verilogTest(parameter, SIntSpecInterface(parameter))(
+        "assign sint = {a[7], a} + {b[7], b};"
       ): (p: SimpleParameter, io: Wire[SIntSpecInterface]) =>
         io.sint := io.a + io.b
         io.bool.dontCare()
         io.bits.dontCare()
     test("-"):
-      mlirTest(parameter, SIntSpecInterface(parameter))(
+      verilogTest(parameter, SIntSpecInterface(parameter))(
+        "assign sint = {a[7], a} - {b[7], b};"
       ): (p: SimpleParameter, io: Wire[SIntSpecInterface]) =>
         io.sint := io.a - io.b
         io.bool.dontCare()
         io.bits.dontCare()
     test("*"):
-      mlirTest(parameter, SIntSpecInterface(parameter))(
+      verilogTest(parameter, SIntSpecInterface(parameter))(
+        "wire [15:0] tests = {{8{a[7]}}, a} * {{8{b[7]}}, b};"
       ): (p: SimpleParameter, io: Wire[SIntSpecInterface]) =>
-        io.sint := io.a - io.b
+        io.sint := ((io.a * io.b).asBits >> p.width).asSInt
         io.bool.dontCare()
         io.bits.dontCare()
     test("/"):
-      mlirTest(parameter, SIntSpecInterface(parameter))(
+      verilogTest(parameter, SIntSpecInterface(parameter))(
+        "assign sint = $signed($signed({a[7], a}) / $signed({b[7], b}));"
       ): (p: SimpleParameter, io: Wire[SIntSpecInterface]) =>
-        io.sint := io.a - io.b
+        io.sint := io.a / io.b
         io.bool.dontCare()
         io.bits.dontCare()
     test("%"):
-      mlirTest(parameter, SIntSpecInterface(parameter))(
+      verilogTest(parameter, SIntSpecInterface(parameter))(
+        "wire [7:0] tests = $signed($signed(a) % $signed(b));"
       ): (p: SimpleParameter, io: Wire[SIntSpecInterface]) =>
-        io.sint := io.a - io.b
+        io.sint := io.a % io.b
         io.bool.dontCare()
         io.bits.dontCare()
     test("<"):
-      mlirTest(parameter, SIntSpecInterface(parameter))(
+      verilogTest(parameter, SIntSpecInterface(parameter))(
+        "assign bool = $signed(a) < $signed(b);"
       ): (p: SimpleParameter, io: Wire[SIntSpecInterface]) =>
         io.sint.dontCare()
         io.bool := io.a < io.b
         io.bits.dontCare()
     test("<="):
-      mlirTest(parameter, SIntSpecInterface(parameter))(
+      verilogTest(parameter, SIntSpecInterface(parameter))(
+        "assign bool = $signed(a) <= $signed(b);"
       ): (p: SimpleParameter, io: Wire[SIntSpecInterface]) =>
         io.sint.dontCare()
         io.bool := io.a <= io.b
         io.bits.dontCare()
     test(">"):
-      mlirTest(parameter, SIntSpecInterface(parameter))(
+      verilogTest(parameter, SIntSpecInterface(parameter))(
+        "assign bool = $signed(a) > $signed(b);"
       ): (p: SimpleParameter, io: Wire[SIntSpecInterface]) =>
         io.sint.dontCare()
         io.bool := io.a > io.b
         io.bits.dontCare()
     test(">="):
-      mlirTest(parameter, SIntSpecInterface(parameter))(
+      verilogTest(parameter, SIntSpecInterface(parameter))(
+        "assign bool = $signed(a) >= $signed(b);"
       ): (p: SimpleParameter, io: Wire[SIntSpecInterface]) =>
         io.sint.dontCare()
         io.bool := io.a >= io.b
         io.bits.dontCare()
     test("==="):
-      mlirTest(parameter, SIntSpecInterface(parameter))(
+      verilogTest(parameter, SIntSpecInterface(parameter))(
+        "assign bool = a == b;"
       ): (p: SimpleParameter, io: Wire[SIntSpecInterface]) =>
         io.sint.dontCare()
         io.bool := io.a === io.b
         io.bits.dontCare()
     test("=/="):
-      mlirTest(parameter, SIntSpecInterface(parameter))(
+      verilogTest(parameter, SIntSpecInterface(parameter))(
+        "assign bool = a != b;"
       ): (p: SimpleParameter, io: Wire[SIntSpecInterface]) =>
         io.sint.dontCare()
         io.bool := io.a =/= io.b
         io.bits.dontCare()
     test("<< int"):
-      mlirTest(parameter, SIntSpecInterface(parameter))(
+      verilogTest(parameter, SIntSpecInterface(parameter))(
+        "assign sint = {a[6:0], 2'h0};"
       ): (p: SimpleParameter, io: Wire[SIntSpecInterface]) =>
-        io.sint := io.a << 2
+        io.sint := (io.a << 2).asBits.bits(p.width, 0).asSInt
         io.bool.dontCare()
         io.bits.dontCare()
     test("<< uint"):
-      mlirTest(parameter, SIntSpecInterface(parameter))(
+      verilogTest(parameter, SIntSpecInterface(parameter))(
+        "wire [262:0] tests = {{255{a[7]}}, a} << c;",
+        "assign sint = tests[8:0];"
       ): (p: SimpleParameter, io: Wire[SIntSpecInterface]) =>
-        io.sint := io.a << io.c
+        io.sint := (io.a << io.c).asBits.bits(p.width, 0).asSInt
         io.bool.dontCare()
         io.bits.dontCare()
     test(">> int"):
-      mlirTest(parameter, SIntSpecInterface(parameter))(
+      verilogTest(parameter, SIntSpecInterface(parameter))(
+        "assign sint = {{5{a[7]}}, a[7:4]};"
       ): (p: SimpleParameter, io: Wire[SIntSpecInterface]) =>
-        io.sint := io.a >> io.c
+        io.sint := io.a >> 4
         io.bool.dontCare()
         io.bits.dontCare()
     test(">> uint"):
-      mlirTest(parameter, SIntSpecInterface(parameter))(
+      verilogTest(parameter, SIntSpecInterface(parameter))(
+        "wire [7:0] tests = $signed($signed(a) >>> c);",
+        "assign sint = {tests[7], tests};"
       ): (p: SimpleParameter, io: Wire[SIntSpecInterface]) =>
         io.sint := io.a >> io.c
         io.bool.dontCare()
