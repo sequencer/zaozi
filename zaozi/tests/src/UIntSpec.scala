@@ -35,97 +35,114 @@ object UIntSpec extends TestSuite:
     val parameter = SimpleParameter(8, "UIntSpecModule")
     val out       = new StringBuilder
     test("asBits"):
-      mlirTest(parameter, UIntSpecInterface(parameter))(
+      verilogTest(parameter, UIntSpecInterface(parameter))(
+        "assign bits = a;"
       ): (p: SimpleParameter, io: Wire[UIntSpecInterface]) =>
         io.uint.dontCare()
         io.bool.dontCare()
         io.bits := io.a.asBits
     test("+"):
-      mlirTest(parameter, UIntSpecInterface(parameter))(
+      verilogTest(parameter, UIntSpecInterface(parameter))(
+        "assign uint = {1'h0, a} + {1'h0, b};"
       ): (p: SimpleParameter, io: Wire[UIntSpecInterface]) =>
         io.uint := io.a + io.b
         io.bool.dontCare()
         io.bits.dontCare()
     test("-"):
-      mlirTest(parameter, UIntSpecInterface(parameter))(
+      verilogTest(parameter, UIntSpecInterface(parameter))(
+        "assign uint = {1'h0, a} - {1'h0, b};"
       ): (p: SimpleParameter, io: Wire[UIntSpecInterface]) =>
         io.uint := io.a - io.b
         io.bool.dontCare()
         io.bits.dontCare()
     test("*"):
-      mlirTest(parameter, UIntSpecInterface(parameter))(
+      verilogTest(parameter, UIntSpecInterface(parameter))(
+        "assign uint = {1'h0, a} * {1'h0, b};"
       ): (p: SimpleParameter, io: Wire[UIntSpecInterface]) =>
-        io.uint := io.a - io.b
+        io.uint := (io.a * io.b).asBits.bits(p.width, 0).asUInt
         io.bool.dontCare()
         io.bits.dontCare()
     test("/"):
-      mlirTest(parameter, UIntSpecInterface(parameter))(
+      verilogTest(parameter, UIntSpecInterface(parameter))(
+        "assign uint = {1'h0, a / b};"
       ): (p: SimpleParameter, io: Wire[UIntSpecInterface]) =>
-        io.uint := io.a - io.b
+        io.uint := io.a / io.b
         io.bool.dontCare()
         io.bits.dontCare()
     test("%"):
-      mlirTest(parameter, UIntSpecInterface(parameter))(
+      verilogTest(parameter, UIntSpecInterface(parameter))(
+        "assign uint = {1'h0, a % b};"
       ): (p: SimpleParameter, io: Wire[UIntSpecInterface]) =>
-        io.uint := io.a - io.b
+        io.uint := io.a % io.b
         io.bool.dontCare()
         io.bits.dontCare()
     test("<"):
-      mlirTest(parameter, UIntSpecInterface(parameter))(
+      verilogTest(parameter, UIntSpecInterface(parameter))(
+        "assign bool = a < b;"
       ): (p: SimpleParameter, io: Wire[UIntSpecInterface]) =>
         io.uint.dontCare()
         io.bool := io.a < io.b
         io.bits.dontCare()
     test("<="):
-      mlirTest(parameter, UIntSpecInterface(parameter))(
+      verilogTest(parameter, UIntSpecInterface(parameter))(
+        "assign bool = a <= b;"
       ): (p: SimpleParameter, io: Wire[UIntSpecInterface]) =>
         io.uint.dontCare()
         io.bool := io.a <= io.b
         io.bits.dontCare()
     test(">"):
-      mlirTest(parameter, UIntSpecInterface(parameter))(
+      verilogTest(parameter, UIntSpecInterface(parameter))(
+        "assign bool = a > b;"
       ): (p: SimpleParameter, io: Wire[UIntSpecInterface]) =>
         io.uint.dontCare()
         io.bool := io.a > io.b
         io.bits.dontCare()
     test(">="):
-      mlirTest(parameter, UIntSpecInterface(parameter))(
+      verilogTest(parameter, UIntSpecInterface(parameter))(
+        "assign bool = a >= b;"
       ): (p: SimpleParameter, io: Wire[UIntSpecInterface]) =>
         io.uint.dontCare()
         io.bool := io.a >= io.b
         io.bits.dontCare()
     test("==="):
-      mlirTest(parameter, UIntSpecInterface(parameter))(
+      verilogTest(parameter, UIntSpecInterface(parameter))(
+        "assign bool = a == b;"
       ): (p: SimpleParameter, io: Wire[UIntSpecInterface]) =>
         io.uint.dontCare()
         io.bool := io.a === io.b
         io.bits.dontCare()
     test("=/="):
-      mlirTest(parameter, UIntSpecInterface(parameter))(
+      verilogTest(parameter, UIntSpecInterface(parameter))(
+        "assign bool = a != b;"
       ): (p: SimpleParameter, io: Wire[UIntSpecInterface]) =>
         io.uint.dontCare()
         io.bool := io.a =/= io.b
         io.bits.dontCare()
     test("<< int"):
-      mlirTest(parameter, UIntSpecInterface(parameter))(
+      verilogTest(parameter, UIntSpecInterface(parameter))(
+        "assign uint = {a[6:0], 2'h0};"
       ): (p: SimpleParameter, io: Wire[UIntSpecInterface]) =>
-        io.uint := io.a << 2
+        io.uint := (io.a << 2).asBits.bits(p.width, 0).asUInt
         io.bool.dontCare()
         io.bits.dontCare()
     test("<< uint"):
-      mlirTest(parameter, UIntSpecInterface(parameter))(
+      verilogTest(parameter, UIntSpecInterface(parameter))(
+        "wire [262:0] tests = {255'h0, a} << b;",
+        "assign uint = tests[8:0];"
       ): (p: SimpleParameter, io: Wire[UIntSpecInterface]) =>
-        io.uint := io.a << io.b
+        io.uint := (io.a << io.b).asBits.bits(p.width, 0).asUInt
         io.bool.dontCare()
         io.bits.dontCare()
     test(">> int"):
-      mlirTest(parameter, UIntSpecInterface(parameter))(
+      verilogTest(parameter, UIntSpecInterface(parameter))(
+        "assign uint = {5'h0, a[7:4]};"
       ): (p: SimpleParameter, io: Wire[UIntSpecInterface]) =>
-        io.uint := io.a >> io.b
+        io.uint := io.a >> 4
         io.bool.dontCare()
         io.bits.dontCare()
     test(">> uint"):
-      mlirTest(parameter, UIntSpecInterface(parameter))(
+      verilogTest(parameter, UIntSpecInterface(parameter))(
+        "assign uint = {1'h0, a >> b};"
       ): (p: SimpleParameter, io: Wire[UIntSpecInterface]) =>
         io.uint := io.a >> io.b
         io.bool.dontCare()
