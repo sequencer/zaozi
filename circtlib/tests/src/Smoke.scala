@@ -1,7 +1,16 @@
 // SPDX-License-Identifier: Apache-2.0
 package me.jiuyang.zaozi.circtlib.tests
 
-import org.llvm.circt.scalalib.firrtl.capi.{FirrtlBundleFieldApi, FirrtlConvention, FirrtlNameKind, TypeApi, given_DialectHandleApi, given_FirrtlBundleFieldApi, given_FirrtlDirectionApi, given_TypeApi}
+import org.llvm.circt.scalalib.firrtl.capi.{
+  given_DialectHandleApi,
+  given_FirrtlBundleFieldApi,
+  given_FirrtlDirectionApi,
+  given_TypeApi,
+  FirrtlBundleFieldApi,
+  FirrtlConvention,
+  FirrtlNameKind,
+  TypeApi
+}
 import org.llvm.circt.scalalib.firrtl.operation.{*, given}
 import org.llvm.mlir.scalalib.{given_ModuleApi, Module as MlirModule, ModuleApi as MlirModuleApi, *, given}
 import utest.*
@@ -130,11 +139,11 @@ object Smoke extends TestSuite:
                 tpe = 1.getUInt
               )
               reset.operation.appendToBlock()
-              val resetValue = summon[ConstantApi].op(
+              val resetValue                     = summon[ConstantApi].op(
                 input = BigInt(19890604),
-                  width = 64,
-                  signed = false,
-                  location = unknownLocation,
+                width = 64,
+                signed = false,
+                location = unknownLocation
               )
               resetValue.operation.appendToBlock()
               summon[RegResetApi]

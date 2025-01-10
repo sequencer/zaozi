@@ -6,7 +6,7 @@ import me.jiuyang.zaozi.*
 import me.jiuyang.zaozi.default.{*, given}
 import me.jiuyang.zaozi.valuetpe.*
 import org.llvm.circt.scalalib.firrtl.capi.given_DialectHandleApi
-import org.llvm.mlir.scalalib.{Context, ContextApi, given_ContextApi}
+import org.llvm.mlir.scalalib.{given_ContextApi, Context, ContextApi}
 import utest.*
 
 import java.lang.foreign.Arena
@@ -61,42 +61,42 @@ object BundleSpec extends TestSuite:
       ): (p, io) =>
         io.a := io.b
     test("failures"):
-      given Arena = Arena.ofConfined()
+      given Arena   = Arena.ofConfined()
       given Context = summon[ContextApi].contextCreate
       summon[Context].loadFirrtlDialect()
-        test("Subaccess on non-Bundle type"):
+      test("Subaccess on non-Bundle type"):
+        summon[ConstructorApi].Module(parameter, new BundleSpecInterface(parameter))((p, io) =>
+          compileError("""io.a.a""").check(
+            "",
+            "Type parameter T must be a subtype of DynamicSubfield, but got me.jiuyang.zaozi.valuetpe.UInt."
+          )
+        )
+      test("Symbol not found"):
+        summon[ConstructorApi].Module(parameter, new BundleSpecInterface(parameter))((p, io) =>
+          compileError("""io.fourzerofour""").check(
+            "",
+            "Field 'fourzerofour' does not exist in type me.jiuyang.zaozi.tests.BundleSpecInterface."
+          )
+        )
+      test("Access non Data type"):
+        test("Int"):
           summon[ConstructorApi].Module(parameter, new BundleSpecInterface(parameter))((p, io) =>
-            compileError("""io.a.a""").check(
+            compileError("""io.i""").check(
               "",
-              "Type parameter T must be a subtype of DynamicSubfield, but got me.jiuyang.zaozi.valuetpe.UInt."
+              "Field type 'scala.Int' does not conform to the upper bound BundleField."
             )
           )
-        test("Symbol not found"):
+        test("UInt"):
           summon[ConstructorApi].Module(parameter, new BundleSpecInterface(parameter))((p, io) =>
-            compileError("""io.fourzerofour""").check(
+            compileError("""io.e""").check(
               "",
-              "Field 'fourzerofour' does not exist in type me.jiuyang.zaozi.tests.BundleSpecInterface."
+              "Field type 'me.jiuyang.zaozi.valuetpe.UInt' does not conform to the upper bound BundleField."
             )
           )
-        test("Access non Data type"):
-          test("Int"):
-            summon[ConstructorApi].Module(parameter, new BundleSpecInterface(parameter))((p, io) =>
-              compileError("""io.i""").check(
-                "",
-                "Field type 'scala.Int' does not conform to the upper bound BundleField."
-              )
-            )
-          test("UInt"):
-            summon[ConstructorApi].Module(parameter, new BundleSpecInterface(parameter))((p, io) =>
-              compileError("""io.e""").check(
-                "",
-                "Field type 'me.jiuyang.zaozi.valuetpe.UInt' does not conform to the upper bound BundleField."
-              )
-            )
-        test("Structural Type doesn't work"):
-          summon[ConstructorApi].Module(parameter, new BundleSpecInterface(parameter))((p, io) =>
-            compileError("""io.c.d""").check(
-              "",
-              "Field 'd' does not exist in type me.jiuyang.zaozi.valuetpe.Bundle."
-            )
+      test("Structural Type doesn't work"):
+        summon[ConstructorApi].Module(parameter, new BundleSpecInterface(parameter))((p, io) =>
+          compileError("""io.c.d""").check(
+            "",
+            "Field 'd' does not exist in type me.jiuyang.zaozi.valuetpe.Bundle."
           )
+        )

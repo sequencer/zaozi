@@ -42,7 +42,7 @@ object zaozi extends ScalaModule with ScalafmtModule { m =>
     }
   }
 
-  object tests extends ScalaTests with Utest {
+  object tests extends ScalaTests with ScalafmtModule with Utest {
     def ivyDeps = Agg(v.utest)
 
     override def forkArgs: T[Seq[String]] = T(
@@ -93,7 +93,7 @@ object circtlib extends ScalaModule with ScalafmtModule with PanamaModule { oute
 
   def ivyDeps = Agg(v.pprint)
 
-  object tests extends ScalaModule with Utest {
+  object tests extends ScalaModule with ScalafmtModule with Utest {
     override def forkArgs: T[Seq[String]] = T(outer.forkArgs)
 
     override def moduleDeps = Seq(circtlib, mlirlib)
@@ -141,7 +141,7 @@ object mlirlib extends ScalaModule with ScalafmtModule with PanamaModule {
 
   def libraryPaths = T(Seq(PathRef(mlirInstallPath() / "lib")))
 
-  object tests extends ScalaTests with Utest {
+  object tests extends ScalaTests with ScalafmtModule with Utest {
     def ivyDeps = Agg(v.utest)
 
     override def forkArgs: T[Seq[String]] = T(

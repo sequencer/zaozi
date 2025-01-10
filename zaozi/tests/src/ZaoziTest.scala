@@ -58,12 +58,12 @@ import java.lang.foreign.Arena
 
 def mlirTest[P <: Parameter, I <: Interface[P]](
   parameter:  P,
-  interface:  I,
+  interface:  I
 )(checkLines: String*
 )(body:       (Arena, Context, Block) ?=> (P, Wire[I]) => Unit
 ): Unit =
-  given Arena = Arena.ofConfined()
-  given Context = summon[ContextApi].contextCreate
+  given Arena      = Arena.ofConfined()
+  given Context    = summon[ContextApi].contextCreate
   summon[Context].loadFirrtlDialect()
   given MlirModule = summon[MlirModuleApi].moduleCreateEmpty(summon[LocationApi].locationUnknownGet)
 
@@ -81,7 +81,6 @@ def mlirTest[P <: Parameter, I <: Interface[P]](
     assert(out.toString == "Nothing To Check")
   else checkLines.foreach(l => assert(out.toString.contains(l)))
 
-
 def firrtlTest[P <: Parameter, I <: Interface[P]](
   parameter:  P,
   interface:  I,
@@ -89,8 +88,8 @@ def firrtlTest[P <: Parameter, I <: Interface[P]](
 )(checkLines: String*
 )(body:       (Arena, Context, Block) ?=> (P, Wire[I]) => Unit
 ): Unit =
-  given Arena = Arena.ofConfined()
-  given Context = summon[ContextApi].contextCreate
+  given Arena      = Arena.ofConfined()
+  given Context    = summon[ContextApi].contextCreate
   summon[Context].loadFirrtlDialect()
   // Then based on the module to construct the circuit.
   given MlirModule = summon[MlirModuleApi].moduleCreateEmpty(summon[LocationApi].locationUnknownGet)
@@ -114,15 +113,15 @@ def verilogTest[P <: Parameter, I <: Interface[P]](
 )(checkLines: String*
 )(body:       (Arena, Context, Block) ?=> (P, Wire[I]) => Unit
 ): Unit =
-  given Arena = Arena.ofConfined()
-  given Context = summon[ContextApi].contextCreate
+  given Arena          = Arena.ofConfined()
+  given Context        = summon[ContextApi].contextCreate
   summon[Context].loadFirrtlDialect()
   summon[Context].loadSvDialect()
   summon[Context].loadEmitDialect()
   given FirtoolOptions = summon[FirtoolOptionsApi].createDefault()
 
-  given PassManager = summon[org.llvm.mlir.scalalib.PassManagerApi].passManagerCreate
-  val out = new StringBuilder
+  given PassManager  = summon[org.llvm.mlir.scalalib.PassManagerApi].passManagerCreate
+  val out            = new StringBuilder
   val firtoolOptions = summon[FirtoolOptions]
   summon[PassManager].populatePreprocessTransforms(firtoolOptions)
   summon[PassManager].populateCHIRRTLToLowFIRRTL(firtoolOptions, "")

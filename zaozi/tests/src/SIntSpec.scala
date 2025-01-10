@@ -6,23 +6,28 @@ import me.jiuyang.zaozi.default.{*, given}
 import me.jiuyang.zaozi.*
 import me.jiuyang.zaozi.reftpe.*
 import me.jiuyang.zaozi.valuetpe.*
-import org.llvm.circt.scalalib.firrtl.capi.{FirtoolOptions, FirtoolOptionsApi, given_DialectHandleApi, given_FirtoolOptionsApi, given_PassManagerApi}
-import org.llvm.mlir.scalalib.{Context, ContextApi, PassManager, PassManagerApi, given_ContextApi, given_PassManagerApi}
+import org.llvm.circt.scalalib.firrtl.capi.{
+  given_DialectHandleApi,
+  given_FirtoolOptionsApi,
+  given_PassManagerApi,
+  FirtoolOptions,
+  FirtoolOptionsApi
+}
+import org.llvm.mlir.scalalib.{given_ContextApi, given_PassManagerApi, Context, ContextApi, PassManager, PassManagerApi}
 import utest.*
 
 import java.lang.foreign.Arena
 
-
 class SIntSpecInterface(parameter: SimpleParameter) extends Interface[SimpleParameter](parameter):
   def moduleName: String = parameter.moduleName
-  val a = Flipped(SInt(parameter.width.W))
-  val b = Flipped(SInt(parameter.width.W))
-  val c = Flipped(UInt(parameter.width.W))
-  val d = Flipped(Bool())
-  val sint = Aligned(SInt((parameter.width + 1).W))
-  val bits = Aligned(Bits(parameter.width.W))
-  val bool = Aligned(Bool())
-  val clock = Flipped(Clock())
+  val a          = Flipped(SInt(parameter.width.W))
+  val b          = Flipped(SInt(parameter.width.W))
+  val c          = Flipped(UInt(parameter.width.W))
+  val d          = Flipped(Bool())
+  val sint       = Aligned(SInt((parameter.width + 1).W))
+  val bits       = Aligned(Bits(parameter.width.W))
+  val bool       = Aligned(Bool())
+  val clock      = Flipped(Clock())
   val asyncReset = Flipped(AsyncReset())
 
 object SIntSpec extends TestSuite:
