@@ -84,9 +84,9 @@ let
     installPhase = ''
       mkdir -p $out/share/java
 
-      add-determinism -j $NIX_BUILD_CORES out/elaborator/assembly.dest/out.jar
+      add-determinism -j $NIX_BUILD_CORES out/zaozi/assembly.dest/out.jar
 
-      mv out/elaborator/assembly.dest/out.jar $out/share/java/elaborator.jar
+      mv out/zaozi/assembly.dest/out.jar $out/share/java/elaborator.jar
     '';
   };
 in
