@@ -6,8 +6,22 @@ import me.jiuyang.zaozi.default.{*, given}
 import me.jiuyang.zaozi.*
 import me.jiuyang.zaozi.reftpe.*
 import me.jiuyang.zaozi.valuetpe.*
-import org.llvm.circt.scalalib.firrtl.capi.{FirtoolOptions, FirtoolOptionsApi, given_DialectHandleApi, given_FirtoolOptionsApi, given_PassManagerApi}
-import org.llvm.mlir.scalalib.{Block, Context, ContextApi, PassManager, PassManagerApi, given_ContextApi, given_PassManagerApi}
+import org.llvm.circt.scalalib.firrtl.capi.{
+  given_DialectHandleApi,
+  given_FirtoolOptionsApi,
+  given_PassManagerApi,
+  FirtoolOptions,
+  FirtoolOptionsApi
+}
+import org.llvm.mlir.scalalib.{
+  given_ContextApi,
+  given_PassManagerApi,
+  Block,
+  Context,
+  ContextApi,
+  PassManager,
+  PassManagerApi
+}
 import utest.*
 
 import java.lang.foreign.Arena
@@ -17,11 +31,14 @@ case class GCDParameter(width: Int, useAsyncReset: Boolean) extends Parameter
 trait HasFire[T <: Bundle, R <: Referable[T]]:
   extension (ref: R)
     def fire(
-              using ctx: Context,
-              file:      sourcecode.File,
-              line:      sourcecode.Line,
-              valName:   sourcecode.Name
-            )(using Arena, Block): Node[Bool]
+      using ctx: Context,
+      file:      sourcecode.File,
+      line:      sourcecode.Line,
+      valName:   sourcecode.Name
+    )(
+      using Arena,
+      Block
+    ): Node[Bool]
 
 object Decoupled:
   def apply[T <: Bundle](bits: T) = new DecoupledIO[T](bits)
@@ -34,11 +51,14 @@ class DecoupledIO[T <: Bundle](_bits: T) extends Bundle:
 given [E <: Bundle, T <: DecoupledIO[E], R <: Referable[T]]: HasFire[T, R] with
   extension (ref: R)
     def fire(
-              using ctx: Context,
-              file:      sourcecode.File,
-              line:      sourcecode.Line,
-              valName:   sourcecode.Name
-            )(using Arena, Block): Node[Bool] = ref.valid & ref.ready
+      using ctx: Context,
+      file:      sourcecode.File,
+      line:      sourcecode.Line,
+      valName:   sourcecode.Name
+    )(
+      using Arena,
+      Block
+    ): Node[Bool] = ref.valid & ref.ready
 
 object Valid:
   def apply[T <: Data](bits: T): ValidIO[T] = new ValidIO[T](bits)
@@ -56,18 +76,30 @@ class GCDOutput(parameter: GCDParameter) extends Bundle:
 
 class GCDInterface(parameter: GCDParameter) extends Interface[GCDParameter](parameter):
   def moduleName = "GCD"
+
   val clock:  BundleField[Clock]                 = Flipped(Clock())
-  val reset:  BundleField[Reset]    = Flipped(if (parameter.useAsyncReset) AsyncReset() else Reset())
+  val reset:  BundleField[Reset]                 = Flipped(if (parameter.useAsyncReset) AsyncReset() else Reset())
   val input:  BundleField[DecoupledIO[GCDInput]] = Flipped(Decoupled(new GCDInput(parameter)))
   val output: BundleField[ValidIO[GCDOutput]]    = Aligned(Valid(GCDOutput(parameter)))
 
-object GCDSpec extends TestSuite:
+object ExportVerilogSpec extends TestSuite:
   val tests = Tests:
+    val parameter = SimpleParameter(32, "PassthroughModule")
+    val out       = new StringBuilder
+    test("Passthrough"):
+      verilogTest(parameter, PassthroughInterface(parameter))(
+        "assign o = i;"
+      ): (p: SimpleParameter, io: Wire[PassthroughInterface]) =>
+        io.o := io.i
     test("GCD"):
       val parameter = GCDParameter(32, false)
-      mlirTest(parameter, new GCDInterface(parameter))(): (p, io) =>
+      verilogTest(parameter, new GCDInterface(parameter))(
+        "module GCD("
+      ): (p, io) =>
         given Ref[Clock] = io.clock
+
         given Ref[Reset] = io.reset
+
         val x:           Referable[UInt] = Reg(UInt(parameter.width.W))
         val y:           Referable[UInt] = RegInit(0.U(32.W))
         val startupFlag: Referable[Bool] = RegInit(false.B)
