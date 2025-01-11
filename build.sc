@@ -4,6 +4,7 @@ import mill._
 import mill.scalalib.TestModule.Utest
 import mill.scalalib._
 import mill.scalalib.scalafmt._
+import $file.rvdecoderdb.common
 import os.Path
 
 object v {
@@ -294,4 +295,47 @@ trait PanamaModule extends JavaModule {
   def libraryPaths: Target[Seq[PathRef]]
 
   def jextractBinary: Target[Path]
+}
+
+object rvdecoderdb extends RVDecoderDB
+
+trait RVDecoderDB extends common.RVDecoderDBJVMModule with ScalaModule {
+  def scalaVersion            = T(v.scala)
+  def osLibIvy                = v.oslib
+  def upickleIvy              = v.upickle
+  override def millSourcePath = os.pwd / "rvdecoderdb" / "rvdecoderdb"
+}
+
+object cover extends ScalaModule with ScalafmtModule { m =>
+  def scalaVersion = T(v.scala)
+  def ivyDeps      = T(Seq(v.mainargs, v.oslib, v.upickle, v.sourcecode))
+  def moduleDeps   = Seq(circtlib, rvdecoderdb)
+
+  override def scalacOptions: Target[Seq[String]] = T(super.scalacOptions() ++ Some("-Xprint-suspension"))
+
+  object lit extends ScalaModule with ScalafmtModule {
+    def scalaVersion = T(v.scala)
+    def moduleDeps   = Seq(m)
+    override def forkArgs: T[Seq[String]] = T(
+      super.forkArgs() ++ circtlib.forkArgs()
+    )
+    object tests extends LitModule {
+      def scalaVersion:    T[String]       = T(m.scalaVersion())
+      def runClasspath:    T[Seq[os.Path]] = T(lit.runClasspath().map(_.path))
+      def javaLibraryPath: T[Seq[os.Path]] = T(
+        (circtlib.libraryPaths()).map(_.path)
+      )
+      def javaHome:        T[os.Path]      = T(os.Path(sys.props("java.home")))
+      def litDir:          T[os.Path]      = T(millSourcePath)
+      def litConfigIn:     T[PathRef]      = T.source(millSourcePath / "lit.site.cfg.py.in")
+    }
+  }
+
+  object tests extends ScalaTests with ScalafmtModule with Utest {
+    def ivyDeps = Agg(v.utest)
+
+    override def forkArgs: T[Seq[String]] = T(
+      super.forkArgs() ++ circtlib.forkArgs()
+    )
+  }
 }
