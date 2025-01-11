@@ -28,6 +28,7 @@ let
           ./../../circtlib
           ./../../mlirlib
           ./../../cover
+          ./../../rvdecoder
         ];
       };
 

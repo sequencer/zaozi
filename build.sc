@@ -299,10 +299,11 @@ trait PanamaModule extends JavaModule {
 
 object rvdecoderdb extends RVDecoderDB
 
-trait RVDecoderDB extends common.RVDecoderDBJVMModule with ScalaModule {
-  def scalaVersion            = T(v.scala)
-  def osLibIvy                = v.oslib
-  def upickleIvy              = v.upickle
+trait RVDecoderDB extends common.RVDecoderDBJVMModule with ScalaModule with ScalafmtModule {
+  def scalaVersion = T(v.scala)
+  def osLibIvy     = v.oslib
+  def upickleIvy   = v.upickle
+
   override def millSourcePath = os.pwd / "rvdecoderdb" / "rvdecoderdb"
 }
 

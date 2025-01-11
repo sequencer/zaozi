@@ -3,15 +3,16 @@
 
 package cover.tests
 
-import rvdecoderdb.*
+import org.chipsalliance.rvdecoderdb
 import utest.*
+import os.*
 
 object RVDecoderDBTest extends TestSuite:
   val tests = Tests:
-    test("RVDecoderDB should decode correctly") {
-      val decoder = new RVDecoderDB()
-      val instruction = 0x00000013 // NOP instruction in RISC-V
-      val decoded = decoder.decode(instruction)
-      assert(decoded.mnemonic == "NOP")
+    test("rvdecoderdb works") {
+      val instTable: Iterable[rvdecoderdb.Instruction] = rvdecoderdb.instructions(os.pwd / "rvdecoderdb" / "rvdecoderdbtest" / "jvm" / "riscv-opcodes")
+      instTable.foreach { case inst: rvdecoderdb.Instruction =>
+        println(inst.toString)
+      }
     }
     

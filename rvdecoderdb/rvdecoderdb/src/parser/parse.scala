@@ -53,7 +53,7 @@ object parse {
     val pseudoEncodingMap = collection.mutable.HashMap.empty[(String, String), org.chipsalliance.rvdecoderdb.Encoding]
 
     // create normal instructions
-    rawInstructionSets.foreach { set: RawInstructionSet =>
+    rawInstructionSets.foreach { case set: RawInstructionSet =>
       set.rawInstructions.foreach {
         case rawInst: RawInstruction if rawInst.isNormal =>
           require(
@@ -77,7 +77,7 @@ object parse {
     }
 
     // imported_instructions - these are instructions which are borrowed from an extension into a new/different extension/sub-extension. Only regular instructions can be imported. Pseudo-op or already imported instructions cannot be imported.
-    rawInstructionSets.foreach { set: RawInstructionSet =>
+    rawInstructionSets.foreach { case set: RawInstructionSet =>
       set.rawInstructions.foreach {
         case rawInst: RawInstruction if rawInst.importInstructionSet.isDefined =>
           instructionSetsMap.filter(_._2.head == rawInst.importInstructionSet.get).map {
