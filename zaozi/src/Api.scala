@@ -4,7 +4,7 @@ package me.jiuyang.zaozi
 
 import me.jiuyang.zaozi.reftpe.*
 import me.jiuyang.zaozi.valuetpe.*
-import org.llvm.circt.scalalib.firrtl.operation.Module as CirctModule
+import org.llvm.circt.scalalib.firrtl.operation.{Module as CirctModule, When}
 import org.llvm.mlir.scalalib.{Block, Context, Operation, Type, Value}
 
 import java.lang.foreign.Arena
@@ -26,6 +26,29 @@ trait ConstructorApi:
   def SInt(width: Width): SInt
 
   def Bool(): Bool
+
+  def when[COND <: Referable[Bool]](
+    cond: COND
+  )(body: (Arena, Context, Block) ?=> Unit
+  )(
+    using Arena,
+    Context,
+    Block,
+    sourcecode.File,
+    sourcecode.Line,
+    sourcecode.Name
+  ): When
+
+  extension (when: When)
+    def otherwise(
+      body: (Arena, Context, Block) ?=> Unit
+    )(
+      using Arena,
+      Context,
+      sourcecode.File,
+      sourcecode.Line,
+      sourcecode.Name
+    ): Unit
 
   def Module[P <: Parameter, I <: Interface[P]](
     parameter: P,

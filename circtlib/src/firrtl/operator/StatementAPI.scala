@@ -31,3 +31,5 @@ class IntVerifAssert(val _operation: Operation)
 class IntVerifAssume(val _operation: Operation)
 class IntVerifCover(val _operation: Operation)
 class When(val _operation: Operation)
+trait WhenApi extends HasOperation[When]:
+end WhenApi

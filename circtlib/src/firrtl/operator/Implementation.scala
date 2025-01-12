@@ -471,6 +471,36 @@ given ConnectApi with
   extension (ref: Connect) def operation: Operation = ref._operation
 end given
 
+given WhenApi with
+  inline def op(
+    cond:        Value,
+    location:    Location
+  )(
+    using arena: Arena,
+    context:     Context
+  ): When =
+    When(
+      summon[OperationApi].operationCreate(
+        name = "firrtl.when",
+        location = location,
+        operands = Seq(cond),
+        regionBlockTypeLocations = Seq(
+          // cond
+          Seq((Seq.empty, Seq.empty)),
+          // else
+          Seq((Seq.empty, Seq.empty))
+        )
+      )
+    )
+  extension (ref: When)
+    def operation: Operation = ref._operation
+    def condBlock(
+      using Arena
+    ): Block = operation.getRegion(0).getFirstBlock()
+    def elseBlock(
+      using Arena
+    ): Block = operation.getRegion(1).getFirstBlock()
+end given
 // Expression
 given AddPrimApi with
   def op(

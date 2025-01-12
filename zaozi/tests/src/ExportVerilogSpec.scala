@@ -131,3 +131,29 @@ object ExportVerilogSpec extends TestSuite:
           true.B,
           startupFlag
         )
+    test("GCD with When"):
+      val parameter = GCDParameter(32, false)
+      verilogTest(parameter, new GCDInterface(parameter))(
+        "module GCD("
+      ): (p, io) =>
+        given Ref[Clock] = io.clock
+        given Ref[Reset] = io.reset
+        val x:           Referable[UInt] = Reg(UInt(parameter.width.W))
+        val y:           Referable[UInt] = RegInit(0.U(32.W))
+        val startupFlag: Referable[Bool] = RegInit(false.B)
+        val busy:        Referable[Bool] = y =/= 0.U
+
+        when(x > y) {
+          x := (x - y).asBits.tail(32).asUInt
+        }.otherwise {
+          y := (y - x).asBits.tail(32).asUInt
+        }
+
+        when(io.input.fire) {
+          x           := io.input.bits.x
+          y           := io.input.bits.y
+          startupFlag := true.B
+        }
+        io.input.ready   := !busy
+        io.output.bits.z := x
+        io.output.valid  := !busy & startupFlag

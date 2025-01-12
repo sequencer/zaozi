@@ -51,6 +51,8 @@ import org.llvm.circt.scalalib.firrtl.operation.{
   SubPrimApi,
   SubfieldApi,
   TailPrimApi,
+  When,
+  WhenApi,
   WireApi,
   XorPrimApi,
   XorRPrimApi,
@@ -307,6 +309,39 @@ given ConstructorApi with
     private[zaozi] val _width: Int = width._width
 
   def Bool(): Bool = new Object with Bool
+
+  def when[COND <: Referable[Bool]](
+    cond: COND
+  )(body: (Arena, Context, Block) ?=> Unit
+  )(
+    using Arena,
+    Context,
+    Block,
+    sourcecode.File,
+    sourcecode.Line,
+    sourcecode.Name
+  ): When =
+    val op0 = summon[WhenApi].op(cond.refer, locate)
+    op0.operation.appendToBlock()
+    body(
+      using summon[Arena],
+      summon[Context],
+      op0.condBlock
+    )
+    op0
+
+  extension (when: When)
+    def otherwise(
+      body: (Arena, Context, Block) ?=> Unit
+    )(
+      using Arena,
+      Context,
+      sourcecode.File,
+      sourcecode.Line,
+      sourcecode.Name
+    ): Unit =
+      given Block = when.elseBlock
+      body
 
   def Module[P <: Parameter, I <: Interface[P]](
     parameter: P,
