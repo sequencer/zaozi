@@ -289,6 +289,13 @@ end FirrtlConvention
 
 trait FirrtlConventionApi extends HasSizeOf[FirrtlConvention] with EnumHasToNative[FirrtlConvention]
 
+enum FirrtlLayerConvention:
+  case Bind
+  case Inline
+end FirrtlLayerConvention
+
+trait FirrtlLayerConventionApi extends HasSizeOf[FirrtlLayerConvention] with EnumHasToNative[FirrtlLayerConvention]
+
 enum FirrtlNameKind:
   case Droppable
   case Interesting

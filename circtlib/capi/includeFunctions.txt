@@ -46,6 +46,7 @@ mlirGetDialectHandle__esi__            # header: /nix/store/y6bmy646nd1lggvsm8fl
 registerESIPasses                      # header: /nix/store/y6bmy646nd1lggvsm8fldvkfzc9flfpn-circt-full/include/circt-c/Dialect/ESI.h
 mlirGetDialectHandle__emit__ # header: /nix/store/y6bmy646nd1lggvsm8fldvkfzc9flfpn-circt-full/include/circt-c/Dialect/Emit.h
 firrtlAttrGetConvention            # header: /nix/store/y6bmy646nd1lggvsm8fldvkfzc9flfpn-circt-full/include/circt-c/Dialect/FIRRTL.h
+firrtlAttrGetLayerConvention       # header: /nix/store/y6bmy646nd1lggvsm8fldvkfzc9flfpn-circt-full/include/circt-c/Dialect/FIRRTL.h
 firrtlAttrGetEventControl          # header: /nix/store/y6bmy646nd1lggvsm8fldvkfzc9flfpn-circt-full/include/circt-c/Dialect/FIRRTL.h
 firrtlAttrGetIntegerFromString     # header: /nix/store/y6bmy646nd1lggvsm8fldvkfzc9flfpn-circt-full/include/circt-c/Dialect/FIRRTL.h
 firrtlAttrGetMemDir                # header: /nix/store/y6bmy646nd1lggvsm8fldvkfzc9flfpn-circt-full/include/circt-c/Dialect/FIRRTL.h

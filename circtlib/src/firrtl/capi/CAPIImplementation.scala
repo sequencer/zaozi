@@ -254,7 +254,7 @@ given AttributeApi with
           case double: Double => double.floatAttrDoubleGet(summon[org.llvm.mlir.scalalib.TypeApi].f64TypeGet).segment
       )
     )
-  extension (string:           String)
+  extension (string:                String)
     inline def importAnnotationsFromJSONRaw(
       using arena: Arena,
       context:     Context
@@ -266,7 +266,7 @@ given AttributeApi with
         attribute.segment
       )
       attribute
-  extension (bigInt:           BigInt)
+  extension (bigInt:                BigInt)
     inline def attrGetIntegerFromString(
       tpe:         Type,
       width:       Option[Int] = None
@@ -282,27 +282,32 @@ given AttributeApi with
           10
         )
       )
-  extension (firrtlConvention: FirrtlConvention)
+  extension (firrtlConvention:      FirrtlConvention)
     inline def toAttribute(
       using arena: Arena,
       context:     Context
     ): Attribute = Attribute(firrtlAttrGetConvention(arena, context.segment, firrtlConvention.toNative))
-  extension (ruw:              FirrtlRUW)
+  extension (firrtlLayerConvention: FirrtlLayerConvention)
+    inline def toAttribute(
+      using arena: Arena,
+      context:     Context
+    ): Attribute = Attribute(firrtlAttrGetLayerConvention(arena, context.segment, firrtlLayerConvention.toNative))
+  extension (ruw:                   FirrtlRUW)
     inline def toAttribute(
       using arena: Arena,
       context:     Context
     ): MemorySegment = firrtlAttrGetRUW(arena, context.segment, ruw.toNative)
-  extension (memDir:           FirrtlMemDir)
+  extension (memDir:                FirrtlMemDir)
     inline def toAttribute(
       using arena: Arena,
       context:     Context
     ): MemorySegment = firrtlAttrGetMemDir(arena, context.segment, memDir.toNative)
-  extension (string:           String)
+  extension (string:                String)
     inline def innerSymAttrGet(
       using arena: Arena,
       context:     Context
     ) = Attribute(hwInnerSymAttrGet(arena, string.stringAttrGet.segment))
-  extension (portDirections:   Seq[FirrtlDirection])
+  extension (portDirections:        Seq[FirrtlDirection])
     inline def attrGetPortDirs(
       using arena: Arena,
       context:     Context
@@ -524,6 +529,19 @@ given FirrtlConventionApi with
       ref match
         case FirrtlConvention.Internal   => FIRRTL_CONVENTION_INTERNAL()
         case FirrtlConvention.Scalarized => FIRRTL_CONVENTION_SCALARIZED()
+    inline def sizeOf:   Int = 4
+end given
+
+given FirrtlLayerConventionApi with
+  extension (int: Int)
+    override inline def fromNative: FirrtlLayerConvention = int match
+      case i if i == FIRRTL_LAYER_CONVENTION_BIND()   => FirrtlLayerConvention.Bind
+      case i if i == FIRRTL_LAYER_CONVENTION_INLINE() => FirrtlLayerConvention.Inline
+  extension (ref: FirrtlLayerConvention)
+    inline def toNative: Int =
+      ref match
+        case FirrtlLayerConvention.Bind   => FIRRTL_LAYER_CONVENTION_BIND()
+        case FirrtlLayerConvention.Inline => FIRRTL_LAYER_CONVENTION_INLINE()
     inline def sizeOf:   Int = 4
 end given
 

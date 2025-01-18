@@ -2,6 +2,8 @@
 # SPDX-FileCopyrightText: 2025 Jiuyang Liu <liu@jiuyang.me>
 FIRRTL_CONVENTION_INTERNAL         # header: /nix/store/y6bmy646nd1lggvsm8fldvkfzc9flfpn-circt-full/include/circt-c/Dialect/FIRRTL.h
 FIRRTL_CONVENTION_SCALARIZED       # header: /nix/store/y6bmy646nd1lggvsm8fldvkfzc9flfpn-circt-full/include/circt-c/Dialect/FIRRTL.h
+FIRRTL_LAYER_CONVENTION_BIND       # header: /nix/store/y6bmy646nd1lggvsm8fldvkfzc9flfpn-circt-full/include/circt-c/Dialect/FIRRTL.h
+FIRRTL_LAYER_CONVENTION_INLINE     # header: /nix/store/y6bmy646nd1lggvsm8fldvkfzc9flfpn-circt-full/include/circt-c/Dialect/FIRRTL.h
 FIRRTL_DIRECTION_IN                # header: /nix/store/y6bmy646nd1lggvsm8fldvkfzc9flfpn-circt-full/include/circt-c/Dialect/FIRRTL.h
 FIRRTL_DIRECTION_OUT               # header: /nix/store/y6bmy646nd1lggvsm8fldvkfzc9flfpn-circt-full/include/circt-c/Dialect/FIRRTL.h
 FIRRTL_EVENT_CONTROL_AT_EDGE       # header: /nix/store/y6bmy646nd1lggvsm8fldvkfzc9flfpn-circt-full/include/circt-c/Dialect/FIRRTL.h
