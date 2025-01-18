@@ -34,6 +34,7 @@ import org.llvm.circt.scalalib.firrtl.operation.{
   InvalidValueApi,
   LEQPrimApi,
   LTPrimApi,
+  LayerBlockApi,
   ModuleApi,
   MulPrimApi,
   MuxPrimApi,
@@ -60,6 +61,8 @@ import org.llvm.circt.scalalib.firrtl.operation.{
 }
 import org.llvm.mlir.scalalib.{
   given_AttributeApi,
+  given_BlockApi,
+  given_IdentifierApi,
   given_LocationApi,
   given_NamedAttributeApi,
   given_OperationApi,
@@ -347,6 +350,39 @@ given ConstructorApi with
     parameter: P,
     interface: I
   )(body:      (Arena, Context, Block) ?=> (P, Wire[I]) => Unit
+  extension (layer: Layer)
+    def apply(name: String): Layer =
+      layer._children(name)
+
+  extension (layers: Seq[Layer])
+    def apply(name: String): Layer =
+      layers
+        .find(_._name == name)
+        .getOrElse(
+          throw new Exception(s"No valid layer named: \"${name}\" found in ${layers.map(_._name).mkString(",")}")
+        )
+
+  def Layer(
+    layerName: String
+  )(body:      (Arena, Context, Block, Seq[Layer]) ?=> Unit
+  )(
+    using Arena,
+    Context,
+    Block,
+    Seq[Layer],
+    sourcecode.File,
+    sourcecode.Line,
+    sourcecode.Name
+  ): Unit =
+    val op0 = summon[LayerBlockApi].op(summon[Seq[Layer]](layerName)._hierarchy.map(_._name), locate)
+    op0.operation.appendToBlock()
+    body(
+      using summon[Arena],
+      summon[Context],
+      op0.block,
+      summon[Seq[Layer]](layerName)._children
+    )
+
   )(
     using Arena,
     Context

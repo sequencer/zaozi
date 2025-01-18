@@ -9,9 +9,30 @@ import org.llvm.mlir.scalalib.{Block, Context, Operation, Type, Value}
 
 import java.lang.foreign.Arena
 
-trait Parameter
-trait Interface[P <: Parameter](val parameter: P) extends Bundle:
+trait Layer:
+  layer =>
+  def _name:      String
+  def _children:  Seq[Layer]
+  def _parent:    Option[Layer] = None
+  def _hierarchy: Seq[Layer]    =
+    _parent match
+      case Some(p) => p._hierarchy :+ this
+      case None    => Seq(this)
+  def _dfs:       Seq[Layer]    =
+    this +: _children.flatMap(_._dfs)
+  def _rebuild:   Layer         =
+    def rebuildLayer(oldLayer: Layer, parent: Option[Layer]): Layer =
+      new Layer:
+        override def _name:     String        = oldLayer._name
+        override def _children: Seq[Layer]    =
+          oldLayer._children.map(child => rebuildLayer(child, Some(this)))
+        override def _parent:   Option[Layer] = parent
+    rebuildLayer(this, None)
+
+trait Parameter:
   def moduleName: String
+  def layers:     Seq[Layer]
+  def getLayers:  Seq[Layer] = layers.map(_._rebuild)
 trait ConstructorApi:
   def Clock(): Clock
 
@@ -54,6 +75,15 @@ trait ConstructorApi:
     parameter: P,
     interface: I
   )(body:      (Arena, Context, Block) ?=> (P, Wire[I]) => Unit
+  def Layer(name: String, children: Seq[Layer] = Seq.empty): Layer =
+    new Layer:
+      la =>
+      def _name:     String     = name
+      def _children: Seq[Layer] = children.map: l =>
+        new Layer:
+          def _name:     String     = l._name
+          def _children: Seq[Layer] = l._children
+
   )(
     using Arena,
     Context
