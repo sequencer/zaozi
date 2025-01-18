@@ -7,7 +7,7 @@ import org.llvm.mlir.scalalib.{Context, Type}
 
 import java.lang.foreign.Arena
 
-trait Bool extends Data:
+trait Bool extends Data with CanProbe:
   def toMlirType(
     using Arena,
     Context,

@@ -41,9 +41,12 @@ import org.llvm.circt.scalalib.firrtl.operation.{
   NEQPrimApi,
   NodeApi,
   NotPrimApi,
+  OpenSubfieldApi,
   OrPrimApi,
   OrRPrimApi,
   PadPrimApi,
+  RefDefineApi,
+  RefSendApi,
   RegApi,
   RegResetApi,
   RemPrimApi,
@@ -126,6 +129,32 @@ given [D <: Data, SRC <: Referable[D], SINK <: Referable[D]]: MonoConnect[D, SRC
         )
         .operation
         .appendToBlock()
+
+given [D <: Data & CanProbe, P <: RWProbe[D] | RProbe[D], SRC <: Referable[D], SINK <: Referable[P]]
+  : ProbeDefine[D, P, SRC, SINK] with
+  extension (ref: SINK)
+    def <==(
+      that: SRC
+    )(
+      using Arena,
+      Context,
+      Block,
+      sourcecode.File,
+      sourcecode.Line
+    ): Unit =
+      val refSendOp   = summon[RefSendApi]
+        .op(
+          that.refer,
+          locate
+        )
+      val refDefineOp = summon[RefDefineApi]
+        .op(
+          ref.refer,
+          refSendOp.result,
+          locate
+        )
+      refSendOp.operation.appendToBlock()
+      refDefineOp.operation.appendToBlock()
 
 given TypeImpl with
   extension (ref: Wire[?])
@@ -210,6 +239,57 @@ given TypeImpl with
     ): Type =
       val mlirType = 1.getUInt
       mlirType
+  extension (ref: ProbeBundle)
+    def elements: Seq[BundleField[?]] =
+      require(!ref.instantiating)
+      ref._elements.values.toSeq
+    def toMlirTypeImpl(
+      using Arena,
+      Context
+    ): Type =
+      ref.instantiating = false
+      val mlirType = elements
+        .map(f =>
+          summon[org.llvm.circt.scalalib.firrtl.capi.FirrtlBundleFieldApi]
+            .createFirrtlBundleField(f._name, f._isFlip, f._tpe.toMlirType)
+        )
+        .getBundle
+      mlirType
+    def ReadProbeImpl[T <: Data & CanProbe](
+      name:  Option[String],
+      tpe:   T,
+      layer: Layer
+    )(
+      using sourcecode.Name
+    ): BundleField[RProbe[T]] =
+      require(ref.instantiating)
+      val bf = new BundleField[RProbe[T]]:
+        val _name:   String    = name.getOrElse(valName)
+        val _isFlip: Boolean   = false
+        val _tpe:    RProbe[T] = new RProbe[T]:
+          val _baseType: T     = tpe
+          val _color:    Layer = layer
+
+      ref._elements += (valName -> bf)
+      bf
+    def ReadWriteProbeImpl[T <: Data & CanProbe](
+      name:  Option[String],
+      tpe:   T,
+      layer: Layer
+    )(
+      using sourcecode.Name
+    ): BundleField[RWProbe[T]] =
+      require(ref.instantiating)
+      val bf = new BundleField[RWProbe[T]]:
+        val _name:   String     = name.getOrElse(valName)
+        val _isFlip: Boolean    = false
+        val _tpe:    RWProbe[T] = new RWProbe[T]:
+          val _baseType: T     = tpe
+          val _color:    Layer = layer
+
+      ref._elements += (valName -> bf)
+      bf
+
   extension (ref: Bundle)
     def elements: Seq[BundleField[?]] =
       require(!ref.instantiating)
@@ -253,6 +333,22 @@ given TypeImpl with
         val _tpe:    T       = tpe
       ref._elements += (valName -> bf)
       bf
+  extension (ref: RProbe[?])
+    def toMlirTypeImpl(
+      using Arena,
+      Context,
+      TypeImpl
+    ): Type =
+      ref._baseType.toMlirType.getRef(false, ref._color._hierarchy.map(_._name))
+
+  extension (ref: RWProbe[?])
+    def toMlirTypeImpl(
+      using Arena,
+      Context,
+      TypeImpl
+    ): Type =
+      ref._baseType.toMlirType.getRef(true, ref._color._hierarchy.map(_._name))
+
   extension (ref: Vec[?])
     def elementType: Data = ref._elementType
     def count:       Int  = ref._count
@@ -262,6 +358,36 @@ given TypeImpl with
     ): Type =
       val mlirType = elementType.toMlirType.getVector(count)
       mlirType
+  extension (ref: ProbeBundle)
+    def getRefViaFieldValNameImpl[E <: Data](
+      refer:        Value,
+      fieldValName: String
+    )(
+      using Arena,
+      Block,
+      Context,
+      sourcecode.File,
+      sourcecode.Line,
+      sourcecode.Name
+    )(
+      using TypeImpl
+    ): Ref[E] =
+      def valNameToRefName(valName: String):        String =
+        ref._elements
+          .getOrElse(valName, throw new Exception(s"$valName not found in ${ref._elements.keys}"))
+          ._name
+      def valNameToTpe[T <: Data](valName: String): T      =
+        ref._elements(valName)._tpe.asInstanceOf[T]
+      val openSubfieldOp = summon[OpenSubfieldApi]
+        .op(
+          input = refer,
+          fieldIndex = ref.toMlirType.getBundleFieldIndex(valNameToRefName(fieldValName)),
+          location = locate
+        )
+      openSubfieldOp.operation.appendToBlock()
+      new Ref[E]:
+        val _tpe:       E         = valNameToTpe(fieldValName)
+        val _operation: Operation = openSubfieldOp.operation
   extension (ref: Bundle)
     def getRefViaFieldValNameImpl[E <: Data](
       refer:        Value,

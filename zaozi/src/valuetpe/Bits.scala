@@ -7,7 +7,7 @@ import org.llvm.mlir.scalalib.{Context, Type}
 
 import java.lang.foreign.Arena
 
-trait Bits extends Data:
+trait Bits extends Data with CanProbe:
   private[zaozi] val _width: Int
 
   def toMlirType(

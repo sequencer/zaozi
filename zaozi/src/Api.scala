@@ -201,6 +201,18 @@ trait AsUInt[D <: Data, R <: Referable[D]]:
       sourcecode.Line,
       sourcecode.Name
     ): Node[UInt]
+
+trait ProbeDefine[D <: Data & CanProbe, P <: RWProbe[D] | RProbe[D], SRC <: Referable[D], SINK <: Referable[P]]:
+  extension (ref: SINK)
+    def <==(
+      that: SRC
+    )(
+      using Arena,
+      Context,
+      Block,
+      sourcecode.File,
+      sourcecode.Line
+    ): Unit
 trait MonoConnect[D <: Data, SRC <: Referable[D], SINK <: Referable[D]]:
   extension (ref: SINK)
     def :=(
@@ -693,6 +705,26 @@ trait TypeImpl:
       using Arena,
       Context
     ): Type
+  extension (ref: ProbeBundle)
+    def elements: Seq[BundleField[?]]
+    def toMlirTypeImpl(
+      using Arena,
+      Context
+    ):            Type
+    def ReadProbeImpl[T <: Data & CanProbe](
+      name:  Option[String],
+      tpe:   T,
+      layer: Layer
+    )(
+      using sourcecode.Name
+    ):            BundleField[RProbe[T]]
+    def ReadWriteProbeImpl[T <: Data & CanProbe](
+      name:  Option[String],
+      tpe:   T,
+      layer: Layer
+    )(
+      using sourcecode.Name
+    ):            BundleField[RWProbe[T]]
   extension (ref: Bundle)
     def elements: Seq[BundleField[?]]
     def toMlirTypeImpl(
@@ -711,6 +743,18 @@ trait TypeImpl:
     )(
       using sourcecode.Name
     ):            BundleField[T]
+  extension (ref: RProbe[?])
+    def toMlirTypeImpl(
+      using Arena,
+      Context,
+      TypeImpl
+    ): Type
+  extension (ref: RWProbe[?])
+    def toMlirTypeImpl(
+      using Arena,
+      Context,
+      TypeImpl
+    ): Type
   extension (ref: Vec[?])
     def elementType: Data
     def count:       Int
@@ -718,6 +762,20 @@ trait TypeImpl:
       using Arena,
       Context
     ):               Type
+  extension (ref: ProbeBundle)
+    def getRefViaFieldValNameImpl[E <: Data](
+      refer:        Value,
+      fieldValName: String
+    )(
+      using Arena,
+      Block,
+      Context,
+      sourcecode.File,
+      sourcecode.Line,
+      sourcecode.Name
+    )(
+      using TypeImpl
+    ): Ref[E]
   extension (ref: Bundle)
     def getRefViaFieldValNameImpl[E <: Data](
       refer:        Value,

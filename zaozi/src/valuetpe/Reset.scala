@@ -7,7 +7,7 @@ import org.llvm.mlir.scalalib.{Context, Type}
 
 import java.lang.foreign.Arena
 
-trait Reset extends Data:
+trait Reset extends Data with CanProbe:
   private[zaozi] val _isAsync: Boolean
 
   final def toMlirType(
