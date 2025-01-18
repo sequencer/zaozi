@@ -10,9 +10,7 @@ import os.*
 object RVDecoderDBTest extends TestSuite:
   val tests = Tests:
     test("rvdecoderdb works") {
-      val instTable: Iterable[rvdecoderdb.Instruction] = rvdecoderdb.instructions(os.pwd / "rvdecoderdb" / "rvdecoderdbtest" / "jvm" / "riscv-opcodes")
-      instTable.foreach { case inst: rvdecoderdb.Instruction =>
-        println(inst.toString)
-      }
+      val instTable: Iterable[rvdecoderdb.Instruction] = rvdecoderdb.instructions(os.pwd / "rvdecoderdb" / "riscv-opcodes")
+      assert(instTable.nonEmpty)
     }
     
