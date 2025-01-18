@@ -152,10 +152,10 @@ trait AttributeApi extends HasSegment[Attribute] with HasSizeOf[Attribute]:
     inline def isSymbolRef:                         Boolean
     inline def symbolRefAttrGetRootReference(
       using arena: Arena
-    ):                                              Attribute
+    ):                                              String
     inline def symbolRefAttrGetLeafReference(
       using arena: Arena
-    ):                                              Attribute
+    ):                                              String
     inline def symbolRefAttrGetNumNestedReferences: Long
     inline def symbolRefAttrGetNestedReference(
       pos:         Long

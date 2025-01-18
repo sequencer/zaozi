@@ -851,10 +851,10 @@ given AttributeApi with
     inline def isSymbolRef = mlirAttributeIsASymbolRef(attribute.segment)
     inline def symbolRefAttrGetRootReference(
       using arena: Arena
-    ) = Attribute(mlirSymbolRefAttrGetRootReference(arena, attribute.segment))
+    ) = StringRef(mlirSymbolRefAttrGetRootReference(arena, attribute.segment)).toScalaString
     inline def symbolRefAttrGetLeafReference(
       using arena: Arena
-    ) = Attribute(mlirSymbolRefAttrGetLeafReference(arena, attribute.segment))
+    ) = StringRef(mlirSymbolRefAttrGetLeafReference(arena, attribute.segment)).toScalaString
     inline def symbolRefAttrGetNumNestedReferences: Long = mlirSymbolRefAttrGetNumNestedReferences(attribute.segment)
     inline def symbolRefAttrGetNestedReference(
       pos:         Long
