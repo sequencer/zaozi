@@ -187,9 +187,10 @@ given TypeImpl with
     def referImpl(
       using Arena
     ): Value = ref.operation.getResult(0)
-  extension (ref: Instance[?])
-    def operationImpl:     Operation = ref._operation
-    def ioImpl[T <: Data]: Wire[T]   = ref._wire.asInstanceOf[Wire[T]]
+  extension (ref: Instance[?, ?])
+    def operationImpl:        Operation = ref._operation
+    def ioImpl[T <: Data]:    Wire[T]   = ref._ioWire.asInstanceOf[Wire[T]]
+    def probeImpl[T <: Data]: Wire[T]   = ref._probeWire.asInstanceOf[Wire[T]]
 
   extension (ref: Reset)
     def toMlirTypeImpl(
@@ -477,10 +478,6 @@ given ConstructorApi with
       given Block = when.elseBlock
       body
 
-  def Module[P <: Parameter, I <: Interface[P]](
-    parameter: P,
-    interface: I
-  )(body:      (Arena, Context, Block) ?=> (P, Wire[I]) => Unit
   extension (layer: Layer)
     def apply(name: String): Layer =
       layer._children(name)
@@ -514,46 +511,86 @@ given ConstructorApi with
       summon[Seq[Layer]](layerName)._children
     )
 
+  def Module[PARAM <: Parameter, I <: HWInterface[PARAM], P <: DVInterface[PARAM]](
+    parameter: PARAM,
+    io:        I,
+    probe:     P
+  )(body:      (Arena, Context, Block, Seq[Layer], PARAM, Interface[I], Interface[P]) ?=> Unit
   )(
     using Arena,
     Context
   ): operation.Module =
     val unknownLocation = summon[LocationApi].locationUnknownGet
-    val bfs             = Seq.tabulate(interface.toMlirType.getBundleNumFields.toInt)(interface.toMlirType.getBundleFieldByIndex)
-
-    val module  = summon[ModuleApi].op(
-      interface.moduleName,
+    val ioNumFields     = io.toMlirType.getBundleNumFields.toInt
+    val probeNumFields  = probe.toMlirType.getBundleNumFields.toInt
+    val bfs             =
+      Seq.tabulate(ioNumFields)(io.toMlirType.getBundleFieldByIndex) ++
+        Seq.tabulate(probeNumFields)(probe.toMlirType.getBundleFieldByIndex)
+    given Seq[Layer]    = parameter.layers.map(_._rebuild).flatMap(_._dfs)
+    val module          = summon[ModuleApi].op(
+      parameter.moduleName,
       unknownLocation,
       FirrtlConvention.Scalarized,
-      bfs.map(i => (i, unknownLocation)) // TODO: record location for Bundle?
+      bfs.map(i => (i, unknownLocation)), // TODO: record location for Bundle?
+      summon[Seq[Layer]].filter(_._children.isEmpty).map(_._hierarchy.map(_._name))
     )
-    given Block = module.block
-    val ioWire  = summon[WireApi].op(
+    given Block         = module.block
+    val ioWire          = summon[WireApi].op(
       "io",
       summon[LocationApi].locationUnknownGet,
       FirrtlNameKind.Droppable,
-      interface.toMlirType
+      io.toMlirType
     )
     ioWire.operation.appendToBlock()
-    bfs.zipWithIndex.foreach: (bf, idx) =>
-      val flip     = bf.getIsFlip()
-      val moduleIO = module.getIO(idx)
-      val wireIO   = summon[SubfieldApi].op(
-        ioWire.result,
-        idx,
-        unknownLocation
-      )
-      wireIO.operation.appendToBlock()
-      val connect  =
-        if (flip) summon[ConnectApi].op(moduleIO, wireIO.result, unknownLocation)
-        else summon[ConnectApi].op(wireIO.result, moduleIO, unknownLocation)
-      connect.operation.appendToBlock()
-    body(
-      parameter,
-      new Wire[I]:
-        val _tpe:       I         = interface
-        val _operation: Operation = ioWire.operation
+    val probeWire       = summon[WireApi].op(
+      "probe",
+      summon[LocationApi].locationUnknownGet,
+      FirrtlNameKind.Droppable,
+      probe.toMlirType
     )
+    probeWire.operation.appendToBlock()
+    Seq
+      .tabulate(ioNumFields): ioIdx =>
+        (bfs(ioIdx), ioIdx)
+      .foreach:
+        case (bf, idx) =>
+          val subRefToIOWire = summon[SubfieldApi].op(
+            ioWire.result,
+            idx,
+            unknownLocation
+          )
+          subRefToIOWire.operation.appendToBlock()
+          (
+            if (bf.getIsFlip())
+              summon[ConnectApi].op(module.getIO(idx), subRefToIOWire.result, unknownLocation)
+            else
+              summon[ConnectApi].op(subRefToIOWire.result, module.getIO(idx), unknownLocation)
+          ).operation.appendToBlock()
+    Seq
+      .tabulate(probeNumFields): probeIdx =>
+        (bfs(ioNumFields + probeIdx), probeIdx)
+      .foreach:
+        case (bf, idx) =>
+          val subRefToProbeWire = summon[OpenSubfieldApi].op(
+            probeWire.result,
+            idx,
+            unknownLocation
+          )
+          subRefToProbeWire.operation.appendToBlock()
+          summon[RefDefineApi]
+            .op(module.getIO(ioNumFields + idx), subRefToProbeWire.result, unknownLocation)
+            .operation
+            .appendToBlock()
+    given PARAM         = parameter
+    given Interface[I]  =
+      new Interface[I]:
+        val _tpe:       I         = io
+        val _operation: Operation = ioWire.operation
+    given Interface[P]  =
+      new Interface[P]:
+        val _tpe:       P         = probe
+        val _operation: Operation = probeWire.operation
+    body
     module
 
   def Wire[T <: Data](
@@ -626,8 +663,10 @@ given ConstructorApi with
       val _tpe:       T         = input._tpe
       val _operation: Operation = regResetOp.operation
 
-  def Instance[P <: Parameter, T <: Interface[P]](
-    interface: T
+  def Instance[P <: Parameter, IOTpe <: HWInterface[P], ProbeTpe <: DVInterface[P]](
+    parameter: P,
+    ioTpe:     IOTpe,
+    probeTpe:  ProbeTpe
   )(
     using Arena,
     Context,
@@ -637,10 +676,16 @@ given ConstructorApi with
     sourcecode.File,
     sourcecode.Line,
     sourcecode.Name
-  ): Instance[T] =
-    val bfs        = Seq.tabulate(interface.toMlirType.getBundleNumFields.toInt)(interface.toMlirType.getBundleFieldByIndex)
+    // TODO: later will also return a ClassTpe
+  ): Instance[IOTpe, ProbeTpe] =
+    val bfs =
+      // IO
+      Seq.tabulate(ioTpe.toMlirType.getBundleNumFields.toInt)(ioTpe.toMlirType.getBundleFieldByIndex) ++
+        // Probe
+        Seq.tabulate(probeTpe.toMlirType.getBundleNumFields.toInt)(probeTpe.toMlirType.getBundleFieldByIndex)
+    // TODO: add layer symbol here? rather than from top to down searching?
     val instanceOp = summon[InstanceApi].op(
-      moduleName = interface.moduleName,
+      moduleName = parameter.moduleName,
       instanceName = valName,
       nameKind = FirrtlNameKind.Interesting,
       location = locate,
@@ -651,9 +696,17 @@ given ConstructorApi with
       s"${valName}_io",
       summon[LocationApi].locationUnknownGet,
       FirrtlNameKind.Droppable,
-      interface.toMlirType
+      ioTpe.toMlirType
     )
     ioWire.operation.appendToBlock()
+    val probeWire  = summon[WireApi].op(
+      s"${valName}_probe",
+      summon[LocationApi].locationUnknownGet,
+      FirrtlNameKind.Droppable,
+      probeTpe.toMlirType
+    )
+    probeWire.operation.appendToBlock()
+
     bfs.zipWithIndex.foreach: (bf, idx) =>
       val flip       = bf.getIsFlip()
       val instanceIO = instanceOp.operation.getResult(idx)
@@ -667,12 +720,16 @@ given ConstructorApi with
         if (flip) summon[ConnectApi].op(wireIO.result, instanceIO, locate)
         else summon[ConnectApi].op(instanceIO, wireIO.result, locate)
       connect.operation.appendToBlock()
-    new Instance[T]:
-      val _tpe:       T         = interface
-      val _operation: Operation = instanceOp.operation
-      val _wire:      Wire[T]   = new Wire[T]:
-        private[zaozi] val _tpe       = interface
+    new Instance[IOTpe, ProbeTpe]:
+      val _ioTpe:     IOTpe          = ioTpe
+      val _probeTpe:  ProbeTpe       = probeTpe
+      val _operation: Operation      = instanceOp.operation
+      val _ioWire:    Wire[IOTpe]    = new Wire[IOTpe]:
+        private[zaozi] val _tpe       = ioTpe
         private[zaozi] val _operation = ioWire.operation
+      val _probeWire: Wire[ProbeTpe] = new Wire[ProbeTpe]:
+        private[zaozi] val _tpe       = probeTpe
+        private[zaozi] val _operation = probeWire.operation
 
   extension (bigInt: BigInt)
     def U(

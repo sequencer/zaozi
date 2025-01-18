@@ -75,10 +75,6 @@ trait ConstructorApi:
       sourcecode.Name
     ): Unit
 
-  def Module[P <: Parameter, I <: Interface[P]](
-    parameter: P,
-    interface: I
-  )(body:      (Arena, Context, Block) ?=> (P, Wire[I]) => Unit
   def Layer(name: String, children: Seq[Layer] = Seq.empty): Layer =
     new Layer:
       la =>
@@ -88,6 +84,11 @@ trait ConstructorApi:
           def _name:     String     = l._name
           def _children: Seq[Layer] = l._children
 
+  def Module[PARAM <: Parameter, I <: HWInterface[PARAM], P <: DVInterface[PARAM]](
+    parameter: PARAM,
+    io:        I,
+    probe:     P
+  )(body:      (Arena, Context, Block, Seq[Layer], PARAM, Interface[I], Interface[P]) ?=> Unit
   )(
     using Arena,
     Context
@@ -675,9 +676,10 @@ trait TypeImpl:
     def referImpl(
       using Arena
     ):                 Value
-  extension (ref: Instance[?])
-    def operationImpl:     Operation
-    def ioImpl[T <: Data]: Wire[T]
+  extension (ref: Instance[?, ?])
+    def operationImpl:        Operation
+    def ioImpl[T <: Data]:    Wire[T]
+    def probeImpl[T <: Data]: Wire[T]
 
   extension (ref: Reset)
     def toMlirTypeImpl(

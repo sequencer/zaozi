@@ -6,10 +6,12 @@ import me.jiuyang.zaozi.TypeImpl
 import me.jiuyang.zaozi.valuetpe.Data
 import org.llvm.mlir.scalalib.Operation
 
-trait Instance[T <: Data] extends HasOperation:
-  private[zaozi] val _tpe:       T
+trait Instance[IOTpe <: Data, ProbeTpe <: Data] extends HasOperation:
+  private[zaozi] val _ioTpe:     IOTpe
+  private[zaozi] val _probeTpe:  ProbeTpe
   private[zaozi] val _operation: Operation
-  private[zaozi] val _wire:      Wire[T]
+  private[zaozi] val _ioWire:    Wire[IOTpe]
+  private[zaozi] val _probeWire: Wire[ProbeTpe]
 
   def operation(
     using TypeImpl
@@ -17,4 +19,8 @@ trait Instance[T <: Data] extends HasOperation:
 
   def io(
     using TypeImpl
-  ): Wire[T] = this.ioImpl[T]
+  ): Wire[IOTpe] = this.ioImpl[IOTpe]
+
+  def probe(
+    using TypeImpl
+  ): Wire[ProbeTpe] = this.probeImpl[ProbeTpe]
