@@ -55,7 +55,8 @@ object Smoke extends TestSuite:
             Seq(
               (api.createFirrtlBundleField("i", true, 32.getUInt), unknownLocation),
               (api.createFirrtlBundleField("o", false, 32.getUInt), unknownLocation)
-            )
+            ),
+            Seq.empty
           )
           given Module = module
           given Block  = module.block

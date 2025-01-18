@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: 2025 Jiuyang Liu <liu@jiuyang.me>
 package org.llvm.circt.scalalib.firrtl.operation
 
-import org.llvm.circt.scalalib.firrtl.capi.{FirrtlBundleField, FirrtlConvention}
+import org.llvm.circt.scalalib.firrtl.capi.{FirrtlBundleField, FirrtlConvention, FirrtlLayerConvention}
 import org.llvm.mlir.scalalib.{Block, Context, HasOperation, Location, Module as MlirModule, Operation, Value, given}
 
 import java.lang.foreign.Arena
@@ -41,7 +41,8 @@ trait ModuleApi extends HasOperation[Module]:
     name:             String,
     location:         Location,
     firrtlConvention: FirrtlConvention,
-    interface:        Seq[(FirrtlBundleField, Location)]
+    interface:        Seq[(FirrtlBundleField, Location)],
+    layers:           Seq[Seq[String]]
   )(
     using arena:      Arena,
     context:          Context
@@ -65,5 +66,15 @@ end ModuleApi
 
 class Formal(val _operation: Operation)
 class Layer(val _operation: Operation)
+trait LayerApi extends HasOperation[Layer]:
+  inline def op(
+    name:            String,
+    location:        Location,
+    layerConvention: FirrtlLayerConvention
+  )(
+    using arena:     Arena,
+    context:         Context
+  ): Layer
+end LayerApi
 class OptionCase(val _operation: Operation)
 class Option(val _operation: Operation)

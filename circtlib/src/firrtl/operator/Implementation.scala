@@ -2,7 +2,14 @@
 // SPDX-FileCopyrightText: 2025 Jiuyang Liu <liu@jiuyang.me>
 package org.llvm.circt.scalalib.firrtl.operation
 
-import org.llvm.circt.scalalib.firrtl.capi.{FirrtlBundleField, FirrtlConvention, FirrtlDirection, FirrtlNameKind, given}
+import org.llvm.circt.scalalib.firrtl.capi.{
+  FirrtlBundleField,
+  FirrtlConvention,
+  FirrtlDirection,
+  FirrtlLayerConvention,
+  FirrtlNameKind,
+  given
+}
 import org.llvm.mlir.scalalib.{
   Block,
   Context,
@@ -160,7 +167,8 @@ given ModuleApi with
     name:             String,
     location:         Location,
     firrtlConvention: FirrtlConvention,
-    interface:        Seq[(FirrtlBundleField, Location)]
+    interface:        Seq[(FirrtlBundleField, Location)],
+    layers:           Seq[Seq[String]]
   )(
     using arena:      Arena,
     context:          Context
@@ -216,11 +224,16 @@ given ModuleApi with
           namedAttributeApi.namedAttributeGet(
             "portTypes".identifierGet,
             interface.map(_._1.getType().typeAttrGet).arrayAttrGet
-          )
+          ),
           // ::mlir::ArrayAttr
           // namedAttributeApi.namedAttributeGet("annotations".identifierGet, ???),
           // ::mlir::ArrayAttr
-          // namedAttributeApi.namedAttributeGet("layers".identifierGet, ???)
+          namedAttributeApi.namedAttributeGet(
+            "layers".identifierGet,
+            layers
+              .map(path => path.reverse.last.symbolRefAttrGet(path.drop(1).map(_.flatSymbolRefAttrGet)))
+              .arrayAttrGet
+          )
         )
     )
   )
@@ -245,6 +258,46 @@ given ModuleApi with
     inline def operation: Operation = ref._operation
 end given
 
+given LayerApi with
+  inline def op(
+    name:            String,
+    location:        Location,
+    layerConvention: FirrtlLayerConvention
+  )(
+    using arena:     Arena,
+    context:         Context
+  ): Layer =
+    Layer(
+      summon[OperationApi].operationCreate(
+        name = "firrtl.layer",
+        location = location,
+        regionBlockTypeLocations = Seq(
+          Seq(
+            (Seq.empty, Seq.empty)
+          )
+        ),
+        namedAttributes =
+          val namedAttributeApi = summon[NamedAttributeApi]
+          Seq(
+            // ::mlir::StringAttr
+            namedAttributeApi.namedAttributeGet(
+              "sym_name".identifierGet,
+              name.stringAttrGet
+            ),
+            // ::circt::firrtl::LayerConventionAttr
+            namedAttributeApi.namedAttributeGet(
+              "convention".identifierGet,
+              layerConvention.toAttribute
+            )
+          )
+      )
+    )
+  extension (ref: Layer)
+    inline def block(
+      using Arena
+    ): Block = operation.getFirstRegion().getFirstBlock()
+    inline def operation: Operation = ref._operation
+end given
 // Declarations
 given InstanceApi with
   inline def op(
@@ -469,6 +522,140 @@ given ConnectApi with
       )
     )
   extension (ref: Connect) def operation: Operation = ref._operation
+end given
+
+given LayerBlockApi with
+  inline def op(
+    layerPath:   Seq[String],
+    location:    Location
+  )(
+    using arena: Arena,
+    context:     Context
+  ): LayerBlock =
+    LayerBlock(
+      summon[OperationApi].operationCreate(
+        name = "firrtl.layerblock",
+        location = location,
+        regionBlockTypeLocations = Seq(
+          Seq((Seq.empty, Seq.empty))
+        ),
+        namedAttributes =
+          val namedAttributeApi = summon[NamedAttributeApi]
+          Seq(
+            // ::mlir::SymbolRefAttr
+            namedAttributeApi.namedAttributeGet(
+              "layerName".identifierGet,
+              layerPath.reverse.last.symbolRefAttrGet(layerPath.drop(1).map(_.flatSymbolRefAttrGet))
+            )
+          )
+      )
+    )
+  extension (ref: LayerBlock)
+    inline def block(
+      using Arena
+    ): Block = operation.getFirstRegion().getFirstBlock()
+    def operation: Operation = ref._operation
+end given
+
+given RefDefineApi with
+  inline def op(
+    dest:        Value,
+    src:         Value,
+    location:    Location
+  )(
+    using arena: Arena,
+    context:     Context
+  ): RefDefine =
+    RefDefine(
+      summon[OperationApi].operationCreate(
+        name = "firrtl.ref.define",
+        location = location,
+        operands = Seq(dest, src)
+      )
+    )
+  extension (ref: RefDefine) def operation: Operation = ref._operation
+end given
+
+given RefForceInitialApi with
+  inline def op(
+    predicate:   Value,
+    dest:        Value,
+    src:         Value,
+    location:    Location
+  )(
+    using arena: Arena,
+    context:     Context
+  ): RefForceInitial =
+    RefForceInitial(
+      summon[OperationApi].operationCreate(
+        name = "firrtl.ref.force_initial",
+        location = location,
+        operands = Seq(predicate, dest, src)
+      )
+    )
+
+  extension (ref: RefForceInitial) def operation: Operation = ref._operation
+end given
+
+given RefForceApi with
+  inline def op(
+    clock:       Value,
+    predicate:   Value,
+    dest:        Value,
+    src:         Value,
+    location:    Location
+  )(
+    using arena: Arena,
+    context:     Context
+  ): RefForce =
+    RefForce(
+      summon[OperationApi].operationCreate(
+        name = "firrtl.ref.force",
+        location = location,
+        operands = Seq(clock, predicate, dest, src)
+      )
+    )
+  extension (ref: RefForce) def operation: Operation = ref._operation
+end given
+
+given RefReleaseInitialApi with
+  inline def op(
+    predicate:   Value,
+    dest:        Value,
+    location:    Location
+  )(
+    using arena: Arena,
+    context:     Context
+  ): RefReleaseInitial =
+    RefReleaseInitial(
+      summon[OperationApi].operationCreate(
+        name = "firrtl.ref.release",
+        location = location,
+        operands = Seq(predicate, dest)
+      )
+    )
+
+  extension (ref: RefReleaseInitial) def operation: Operation = ref._operation
+end given
+
+given RefReleaseApi with
+  inline def op(
+    clock:       Value,
+    predicate:   Value,
+    dest:        Value,
+    location:    Location
+  )(
+    using arena: Arena,
+    context:     Context
+  ): RefRelease =
+    RefRelease(
+      summon[OperationApi].operationCreate(
+        name = "firrtl.ref.release",
+        location = location,
+        operands = Seq(clock, predicate, dest)
+      )
+    )
+  extension (ref: RefRelease) def operation: Operation = ref._operation
 end given
 
 given WhenApi with
@@ -1185,6 +1372,42 @@ given NotPrimApi with
     ): Value = ref.operation.getResult(0)
 end given
 
+given OpenSubfieldApi with
+  def op(
+    input:       Value,
+    fieldIndex:  BigInt,
+    location:    Location
+  )(
+    using arena: Arena,
+    context:     Context
+  ): Subfield =
+    Subfield(
+      summon[OperationApi].operationCreate(
+        name = "firrtl.opensubfield",
+        location = location,
+        operands = Seq(input),
+        namedAttributes =
+          val namedAttributeApi = summon[NamedAttributeApi]
+          Seq(
+            // ::mlir::IntegerAttr
+            namedAttributeApi
+              .namedAttributeGet(
+                "fieldIndex".identifierGet,
+                fieldIndex.attrGetIntegerFromString(32.integerTypeGet)
+              )
+          )
+        ,
+        inferredResultsTypes = Some(1)
+      )
+    )
+
+  extension (ref: OpenSubfield)
+    def operation: Operation = ref._operation
+    def result(
+      using Arena
+    ): Value = ref.operation.getResult(0)
+end given
+
 given OrPrimApi with
   def op(
     lhs:         Value,
@@ -1263,7 +1486,125 @@ given PadPrimApi with
     def result(
       using Arena
     ): Value = ref.operation.getResult(0)
+end given
 
+given RefCastApi with
+  def op(
+    input:       Value,
+    tpe:         Type,
+    location:    Location
+  )(
+    using arena: Arena,
+    context:     Context
+  ): RefCast =
+    RefCast(
+      summon[OperationApi].operationCreate(
+        name = "firrtl.ref.cast",
+        location = location,
+        operands = Seq(input),
+        resultsTypes = Some(Seq(tpe))
+      )
+    )
+  extension (ref: RefCast)
+    def operation: Operation = ref._operation
+    def result(
+      using Arena
+    ): Value = ref.operation.getResult(0)
+end given
+
+given RefResolveApi with
+  def op(
+    ref:         Value,
+    location:    Location
+  )(
+    using arena: Arena,
+    context:     Context
+  ): RefResolve =
+    RefResolve(
+      summon[OperationApi].operationCreate(
+        name = "firrtl.ref.resolve",
+        location = location,
+        operands = Seq(ref),
+        inferredResultsTypes = Some(1)
+      )
+    )
+  extension (ref: RefResolve)
+    def operation: Operation = ref._operation
+    def result(
+      using Arena
+    ): Value = ref.operation.getResult(0)
+end given
+
+given RefSendApi with
+  def op(
+    ref:         Value,
+    location:    Location
+  )(
+    using arena: Arena,
+    context:     Context
+  ): RefSend =
+    RefSend(
+      summon[OperationApi].operationCreate(
+        name = "firrtl.ref.send",
+        location = location,
+        operands = Seq(ref),
+        inferredResultsTypes = Some(1)
+      )
+    )
+  def op(
+    ref:         Value,
+    layer:       Seq[String],
+    location:    Location
+  )(
+    using arena: Arena,
+    context:     Context
+  ): RefSend =
+    RefSend(
+      summon[OperationApi].operationCreate(
+        name = "firrtl.ref.send",
+        location = location,
+        operands = Seq(ref),
+        resultsTypes = Some(Seq(ref.getType.getRef(false, layer)))
+      )
+    )
+  extension (ref: RefSend)
+    def operation: Operation = ref._operation
+    def result(
+      using Arena
+    ): Value = ref.operation.getResult(0)
+end given
+
+given RefSubApi with
+  def op(
+    input:       Value,
+    index:       BigInt,
+    location:    Location
+  )(
+    using arena: Arena,
+    context:     Context
+  ): RefSub =
+    RefSub(
+      summon[OperationApi].operationCreate(
+        name = "firrtl.ref.sub",
+        location = location,
+        namedAttributes =
+          val namedAttributeApi = summon[NamedAttributeApi]
+          Seq(
+            // ::mlir::IntegerAttr
+            namedAttributeApi
+              .namedAttributeGet("index".identifierGet, index.attrGetIntegerFromString(32.integerTypeGet))
+          )
+        ,
+        operands = Seq(input),
+        inferredResultsTypes = Some(1)
+      )
+    )
+
+  extension (ref: RefSub)
+    def operation: Operation = ref._operation
+    def result(
+      using Arena
+    ): Value = ref.operation.getResult(0)
 end given
 
 given RemPrimApi with
