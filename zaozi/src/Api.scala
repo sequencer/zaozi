@@ -33,6 +33,10 @@ trait Parameter:
   def moduleName: String
   def layers:     Seq[Layer]
   def getLayers:  Seq[Layer] = layers.map(_._rebuild)
+
+class HWInterface[P <: Parameter](val parameter: P) extends Bundle
+class DVInterface[P <: Parameter](val parameter: P) extends ProbeBundle
+
 trait ConstructorApi:
   def Clock(): Clock
 
@@ -641,6 +645,11 @@ trait ClockApi[R <: Referable[Clock]]
 trait ResetApi[R <: Referable[Reset]]
 
 trait TypeImpl:
+  extension (ref: Interface[?])
+    private[zaozi] def operationImpl: Operation
+    def referImpl(
+      using Arena
+    ):                                Value
   extension (ref: Wire[?])
     private[zaozi] def operationImpl: Operation
     def referImpl(

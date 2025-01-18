@@ -157,6 +157,11 @@ given [D <: Data & CanProbe, P <: RWProbe[D] | RProbe[D], SRC <: Referable[D], S
       refDefineOp.operation.appendToBlock()
 
 given TypeImpl with
+  extension (ref: Interface[?])
+    def operationImpl: Operation = ref._operation
+    def referImpl(
+      using Arena
+    ): Value = ref.operation.getResult(0)
   extension (ref: Wire[?])
     def operationImpl: Operation = ref._operation
     def referImpl(
