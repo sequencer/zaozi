@@ -438,11 +438,16 @@ given TypeApi with
     ): Int =
       firrtlTypeGetBundleFieldIndex(tpe.segment, fieldName.toStringRef.segment)
     inline def isRef:              Boolean = firrtlTypeIsARef(tpe.segment)
-    inline def toRef(
-      forceable:   Boolean
+    inline def getRef(
+      forceable:   Boolean,
+      layer:       Seq[String]
     )(
-      using arena: Arena
-    ): Type = Type(firrtlTypeGetRef(arena, tpe.segment, forceable))
+      using arena: Arena,
+      context:     Context
+    ): Type =
+      // wait for [[https://github.com/llvm/circt/pull/8093]]
+      // Type(firrtlTypeGetRef(arena, tpe.segment, forceable, layer.reverse.last.symbolRefAttrGet(layer.drop(1).map(_.flatSymbolRefAttrGet)).segment))
+      Type(firrtlTypeGetRef(arena, tpe.segment, forceable))
     inline def isAnyRef:           Boolean = firrtlTypeIsAAnyRef(tpe.segment)
     inline def isInteger:          Boolean = firrtlTypeIsAInteger(tpe.segment)
     inline def isDouble:           Boolean = firrtlTypeIsADouble(tpe.segment)

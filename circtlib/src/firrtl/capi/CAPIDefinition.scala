@@ -642,10 +642,12 @@ trait TypeApi:
       using arena: Arena
     ): Int
     inline def isRef:     Boolean
-    inline def toRef(
-      forceable:   Boolean
+    inline def getRef(
+      forceable:   Boolean,
+      layer:       Seq[String]
     )(
-      using arena: Arena
+      using arena: Arena,
+      context:     Context
     ):                    Type
     inline def isAnyRef:  Boolean
     inline def isInteger: Boolean
