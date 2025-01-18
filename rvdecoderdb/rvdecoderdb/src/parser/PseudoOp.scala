@@ -3,6 +3,5 @@
 
 package org.chipsalliance.rvdecoderdb.parser
 
-object PseudoOp extends Token {
+object PseudoOp extends Token:
   override def toString: String = "PseudoOp"
-}

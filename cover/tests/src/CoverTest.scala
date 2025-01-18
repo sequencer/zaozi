@@ -9,8 +9,7 @@ import os.*
 
 object RVDecoderDBTest extends TestSuite:
   val tests = Tests:
-    test("rvdecoderdb works") {
+    test("rvdecoderdb works"):
       val instTable: Iterable[rvdecoderdb.Instruction] = rvdecoderdb.instructions(os.pwd / "rvdecoderdb" / "riscv-opcodes")
       assert(instTable.nonEmpty)
-    }
     

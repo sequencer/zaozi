@@ -3,6 +3,5 @@
 
 package org.chipsalliance.rvdecoderdb.parser
 
-object Import extends Token {
+object Import extends Token:
   override def toString: String = "Import"
-}

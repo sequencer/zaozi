@@ -3,13 +3,10 @@
 
 package org.chipsalliance.rvdecoderdb.parser
 
-object RefInst {
-  def unapply(str: String): Option[RefInst] = str match {
+object RefInst:
+  def unapply(str: String): Option[RefInst] = str match
     case s"$set::$instr" => Some(new RefInst(set, instr))
     case _               => None
-  }
-}
 
-class RefInst(val set: String, val inst: String) extends Token {
+class RefInst(val set: String, val inst: String) extends Token:
   override def toString: String = s"RefInst($set, $inst)"
-}

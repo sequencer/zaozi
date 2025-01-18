@@ -3,7 +3,7 @@
 
 package org.chipsalliance.rvdecoderdb
 
-object Utils {
+object Utils:
   def isR(instruction: Instruction): Boolean = instruction.args.map(_.name) == Seq("rd", "rs1", "rs2")
 
   def isI(instruction: Instruction): Boolean = instruction.args.map(_.name) == Seq("rd", "rs1", "imm12")
@@ -36,4 +36,3 @@ object Utils {
   def readRs2(instruction: Instruction): Boolean = instruction.args.map(_.name).contains("rs2")
 
   def writeRd(instruction: Instruction): Boolean = instruction.args.map(_.name).contains("rd")
-}
