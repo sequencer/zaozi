@@ -18,8 +18,7 @@ import utest.*
 
 import java.lang.foreign.Arena
 
-class UIntSpecInterface(parameter: SimpleParameter) extends Interface[SimpleParameter](parameter):
-  def moduleName: String = parameter.moduleName
+class UIntSpecIO(parameter: SimpleParameter) extends HWInterface[SimpleParameter](parameter):
   val a          = Flipped(UInt(parameter.width.W))
   val b          = Flipped(UInt(parameter.width.W))
   val c          = Flipped(UInt(parameter.width.W))
@@ -30,120 +29,141 @@ class UIntSpecInterface(parameter: SimpleParameter) extends Interface[SimplePara
   val clock      = Flipped(Clock())
   val asyncReset = Flipped(AsyncReset())
 
+class UIntSpecProbe(parameter: SimpleParameter) extends DVInterface[SimpleParameter](parameter)
+
 object UIntSpec extends TestSuite:
   val tests = Tests:
     val parameter = SimpleParameter(8, "UIntSpecModule")
     val out       = new StringBuilder
     test("asBits"):
-      verilogTest(parameter, UIntSpecInterface(parameter))(
+      verilogTest(parameter, UIntSpecIO(parameter), UIntSpecProbe(parameter))(
         "assign bits = a;"
-      ): (p: SimpleParameter, io: Wire[UIntSpecInterface]) =>
+      ):
+        val io = summon[Interface[UIntSpecIO]]
         io.uint.dontCare()
         io.bool.dontCare()
         io.bits := io.a.asBits
     test("+"):
-      verilogTest(parameter, UIntSpecInterface(parameter))(
+      verilogTest(parameter, UIntSpecIO(parameter), UIntSpecProbe(parameter))(
         "assign uint = {1'h0, a} + {1'h0, b};"
-      ): (p: SimpleParameter, io: Wire[UIntSpecInterface]) =>
+      ):
+        val io = summon[Interface[UIntSpecIO]]
         io.uint := io.a + io.b
         io.bool.dontCare()
         io.bits.dontCare()
     test("-"):
-      verilogTest(parameter, UIntSpecInterface(parameter))(
+      verilogTest(parameter, UIntSpecIO(parameter), UIntSpecProbe(parameter))(
         "assign uint = {1'h0, a} - {1'h0, b};"
-      ): (p: SimpleParameter, io: Wire[UIntSpecInterface]) =>
+      ):
+        val io = summon[Interface[UIntSpecIO]]
         io.uint := io.a - io.b
         io.bool.dontCare()
         io.bits.dontCare()
     test("*"):
-      verilogTest(parameter, UIntSpecInterface(parameter))(
+      verilogTest(parameter, UIntSpecIO(parameter), UIntSpecProbe(parameter))(
         "assign uint = {1'h0, a} * {1'h0, b};"
-      ): (p: SimpleParameter, io: Wire[UIntSpecInterface]) =>
+      ):
+        val p  = summon[SimpleParameter]
+        val io = summon[Interface[UIntSpecIO]]
         io.uint := (io.a * io.b).asBits.bits(p.width, 0).asUInt
         io.bool.dontCare()
         io.bits.dontCare()
     test("/"):
-      verilogTest(parameter, UIntSpecInterface(parameter))(
+      verilogTest(parameter, UIntSpecIO(parameter), UIntSpecProbe(parameter))(
         "assign uint = {1'h0, a / b};"
-      ): (p: SimpleParameter, io: Wire[UIntSpecInterface]) =>
+      ):
+        val io = summon[Interface[UIntSpecIO]]
         io.uint := io.a / io.b
         io.bool.dontCare()
         io.bits.dontCare()
     test("%"):
-      verilogTest(parameter, UIntSpecInterface(parameter))(
+      verilogTest(parameter, UIntSpecIO(parameter), UIntSpecProbe(parameter))(
         "assign uint = {1'h0, a % b};"
-      ): (p: SimpleParameter, io: Wire[UIntSpecInterface]) =>
+      ):
+        val io = summon[Interface[UIntSpecIO]]
         io.uint := io.a % io.b
         io.bool.dontCare()
         io.bits.dontCare()
     test("<"):
-      verilogTest(parameter, UIntSpecInterface(parameter))(
+      verilogTest(parameter, UIntSpecIO(parameter), UIntSpecProbe(parameter))(
         "assign bool = a < b;"
-      ): (p: SimpleParameter, io: Wire[UIntSpecInterface]) =>
+      ):
+        val io = summon[Interface[UIntSpecIO]]
         io.uint.dontCare()
         io.bool := io.a < io.b
         io.bits.dontCare()
     test("<="):
-      verilogTest(parameter, UIntSpecInterface(parameter))(
+      verilogTest(parameter, UIntSpecIO(parameter), UIntSpecProbe(parameter))(
         "assign bool = a <= b;"
-      ): (p: SimpleParameter, io: Wire[UIntSpecInterface]) =>
+      ):
+        val io = summon[Interface[UIntSpecIO]]
         io.uint.dontCare()
         io.bool := io.a <= io.b
         io.bits.dontCare()
     test(">"):
-      verilogTest(parameter, UIntSpecInterface(parameter))(
+      verilogTest(parameter, UIntSpecIO(parameter), UIntSpecProbe(parameter))(
         "assign bool = a > b;"
-      ): (p: SimpleParameter, io: Wire[UIntSpecInterface]) =>
+      ):
+        val io = summon[Interface[UIntSpecIO]]
         io.uint.dontCare()
         io.bool := io.a > io.b
         io.bits.dontCare()
     test(">="):
-      verilogTest(parameter, UIntSpecInterface(parameter))(
+      verilogTest(parameter, UIntSpecIO(parameter), UIntSpecProbe(parameter))(
         "assign bool = a >= b;"
-      ): (p: SimpleParameter, io: Wire[UIntSpecInterface]) =>
+      ):
+        val io = summon[Interface[UIntSpecIO]]
         io.uint.dontCare()
         io.bool := io.a >= io.b
         io.bits.dontCare()
     test("==="):
-      verilogTest(parameter, UIntSpecInterface(parameter))(
+      verilogTest(parameter, UIntSpecIO(parameter), UIntSpecProbe(parameter))(
         "assign bool = a == b;"
-      ): (p: SimpleParameter, io: Wire[UIntSpecInterface]) =>
+      ):
+        val io = summon[Interface[UIntSpecIO]]
         io.uint.dontCare()
         io.bool := io.a === io.b
         io.bits.dontCare()
     test("=/="):
-      verilogTest(parameter, UIntSpecInterface(parameter))(
+      verilogTest(parameter, UIntSpecIO(parameter), UIntSpecProbe(parameter))(
         "assign bool = a != b;"
-      ): (p: SimpleParameter, io: Wire[UIntSpecInterface]) =>
+      ):
+        val io = summon[Interface[UIntSpecIO]]
         io.uint.dontCare()
         io.bool := io.a =/= io.b
         io.bits.dontCare()
     test("<< int"):
-      verilogTest(parameter, UIntSpecInterface(parameter))(
+      verilogTest(parameter, UIntSpecIO(parameter), UIntSpecProbe(parameter))(
         "assign uint = {a[6:0], 2'h0};"
-      ): (p: SimpleParameter, io: Wire[UIntSpecInterface]) =>
+      ):
+        val p  = summon[SimpleParameter]
+        val io = summon[Interface[UIntSpecIO]]
         io.uint := (io.a << 2).asBits.bits(p.width, 0).asUInt
         io.bool.dontCare()
         io.bits.dontCare()
     test("<< uint"):
-      verilogTest(parameter, UIntSpecInterface(parameter))(
+      verilogTest(parameter, UIntSpecIO(parameter), UIntSpecProbe(parameter))(
         "wire [262:0] tests = {255'h0, a} << b;",
         "assign uint = tests[8:0];"
-      ): (p: SimpleParameter, io: Wire[UIntSpecInterface]) =>
+      ):
+        val p  = summon[SimpleParameter]
+        val io = summon[Interface[UIntSpecIO]]
         io.uint := (io.a << io.b).asBits.bits(p.width, 0).asUInt
         io.bool.dontCare()
         io.bits.dontCare()
     test(">> int"):
-      verilogTest(parameter, UIntSpecInterface(parameter))(
+      verilogTest(parameter, UIntSpecIO(parameter), UIntSpecProbe(parameter))(
         "assign uint = {5'h0, a[7:4]};"
-      ): (p: SimpleParameter, io: Wire[UIntSpecInterface]) =>
+      ):
+        val io = summon[Interface[UIntSpecIO]]
         io.uint := io.a >> 4
         io.bool.dontCare()
         io.bits.dontCare()
     test(">> uint"):
-      verilogTest(parameter, UIntSpecInterface(parameter))(
+      verilogTest(parameter, UIntSpecIO(parameter), UIntSpecProbe(parameter))(
         "assign uint = {1'h0, a >> b};"
-      ): (p: SimpleParameter, io: Wire[UIntSpecInterface]) =>
+      ):
+        val io = summon[Interface[UIntSpecIO]]
         io.uint := io.a >> io.b
         io.bool.dontCare()
         io.bits.dontCare()

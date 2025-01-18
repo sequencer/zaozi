@@ -4,28 +4,17 @@ package me.jiuyang.zaozi.tests
 
 import me.jiuyang.zaozi.*
 import me.jiuyang.zaozi.default.{*, given}
+import me.jiuyang.zaozi.magic.validateCircuit
 import me.jiuyang.zaozi.reftpe.*
 import org.llvm.circt.scalalib.firrtl.capi.{
-  given_AttributeApi,
   given_DialectHandleApi,
-  given_FirrtlDirectionApi,
   given_FirtoolOptionsApi,
   given_ModuleApi,
   given_PassManagerApi,
-  FirrtlConvention,
-  FirrtlDirection,
   FirtoolOptions,
-  FirtoolOptionsApi,
-  PassManagerApi
+  FirtoolOptionsApi
 }
-import org.llvm.circt.scalalib.firrtl.operation.{
-  given_CircuitApi,
-  given_ExtModuleApi,
-  given_ModuleApi,
-  Circuit,
-  CircuitApi,
-  ExtModule
-}
+import org.llvm.circt.scalalib.firrtl.operation.{given_CircuitApi, given_ModuleApi, Circuit, CircuitApi}
 import org.llvm.mlir.scalalib.{
   given_AttributeApi,
   given_BlockApi,
@@ -48,19 +37,18 @@ import org.llvm.mlir.scalalib.{
   NamedAttributeApi,
   OperationApi,
   PassManager,
-  Type,
-  WalkEnum,
-  WalkResultEnum
+  Type
 }
 import utest.assert
 
 import java.lang.foreign.Arena
 
-def mlirTest[P <: Parameter, I <: Interface[P]](
-  parameter:  P,
-  interface:  I
+def mlirTest[PARAM <: Parameter, I <: HWInterface[PARAM], P <: DVInterface[PARAM]](
+  parameter:  PARAM,
+  io:         I,
+  probe:      P
 )(checkLines: String*
-)(body:       (Arena, Context, Block) ?=> (P, Wire[I]) => Unit
+)(body:       (Arena, Context, Block, Seq[Layer]) ?=> (PARAM, Interface[I], Interface[P]) => Unit
 ): Unit =
   given Arena      = Arena.ofConfined()
   given Context    = summon[ContextApi].contextCreate
@@ -68,10 +56,10 @@ def mlirTest[P <: Parameter, I <: Interface[P]](
   given MlirModule = summon[MlirModuleApi].moduleCreateEmpty(summon[LocationApi].locationUnknownGet)
 
   // Then based on the module to construct the circuit.
-  given Circuit = summon[CircuitApi].op(interface.moduleName)
+  given Circuit = summon[CircuitApi].op(parameter.moduleName)
   summon[Circuit].appendToModule()
-  summon[ConstructorApi].Module(parameter, interface)(body).appendToCircuit()
-  fixupInstance()
+  summon[ConstructorApi].Module(parameter, io, probe)(body).appendToCircuit()
+  validateCircuit()
 
   val out = new StringBuilder
   summon[MlirModule].getOperation.print(out ++= _)
@@ -81,23 +69,23 @@ def mlirTest[P <: Parameter, I <: Interface[P]](
     assert(out.toString == "Nothing To Check")
   else checkLines.foreach(l => assert(out.toString.contains(l)))
 
-def firrtlTest[P <: Parameter, I <: Interface[P]](
-  parameter:  P,
-  interface:  I,
-  moduleName: Option[String] = None
+def firrtlTest[PARAM <: Parameter, I <: HWInterface[PARAM], P <: DVInterface[PARAM]](
+  parameter:  PARAM,
+  io:         I,
+  probe:      P
 )(checkLines: String*
-)(body:       (Arena, Context, Block) ?=> (P, Wire[I]) => Unit
+)(body:       (Arena, Context, Block, Seq[Layer], PARAM, Interface[I], Interface[P]) ?=> Unit
 ): Unit =
   given Arena      = Arena.ofConfined()
   given Context    = summon[ContextApi].contextCreate
   summon[Context].loadFirrtlDialect()
   // Then based on the module to construct the circuit.
   given MlirModule = summon[MlirModuleApi].moduleCreateEmpty(summon[LocationApi].locationUnknownGet)
-  given Circuit    = summon[CircuitApi].op(interface.moduleName)
+  given Circuit    = summon[CircuitApi].op(parameter.moduleName)
   summon[Circuit].appendToModule()
-  summon[ConstructorApi].Module(parameter, interface)(body).appendToCircuit()
+  summon[ConstructorApi].Module(parameter, io, probe)(body).appendToCircuit()
 
-  fixupInstance()
+  validateCircuit()
   val out = new StringBuilder
   summon[MlirModule].exportFIRRTL(out ++= _)
   summon[Context].destroy()
@@ -106,12 +94,12 @@ def firrtlTest[P <: Parameter, I <: Interface[P]](
     assert(out.toString == "Nothing To Check")
   else checkLines.foreach(l => assert(out.toString.contains(l)))
 
-def verilogTest[P <: Parameter, I <: Interface[P]](
-  parameter:  P,
-  interface:  I,
-  moduleName: Option[String] = None
+def verilogTest[PARAM <: Parameter, I <: HWInterface[PARAM], P <: DVInterface[PARAM]](
+  parameter:  PARAM,
+  io:         I,
+  probe:      P
 )(checkLines: String*
-)(body:       (Arena, Context, Block) ?=> (P, Wire[I]) => Unit
+)(body:       (Arena, Context, Block, Seq[Layer], PARAM, Interface[I], Interface[P]) ?=> Unit
 ): Unit =
   given Arena          = Arena.ofConfined()
   given Context        = summon[ContextApi].contextCreate
@@ -132,10 +120,10 @@ def verilogTest[P <: Parameter, I <: Interface[P]](
 
   // Then based on the module to construct the circuit.
   given MlirModule = summon[MlirModuleApi].moduleCreateEmpty(summon[LocationApi].locationUnknownGet)
-  given Circuit    = summon[CircuitApi].op(interface.moduleName)
+  given Circuit    = summon[CircuitApi].op(parameter.moduleName)
   summon[Circuit].appendToModule()
-  summon[ConstructorApi].Module(parameter, interface)(body).appendToCircuit()
-  fixupInstance()
+  summon[ConstructorApi].Module(parameter, io, probe)(body).appendToCircuit()
+  validateCircuit()
   summon[PassManager].runOnOp(summon[MlirModule].getOperation)
   summon[Context].destroy()
   summon[Arena].close()
@@ -143,117 +131,11 @@ def verilogTest[P <: Parameter, I <: Interface[P]](
     assert(out.toString == "Nothing To Check")
   else checkLines.foreach(l => assert(out.toString.contains(l)))
 
-case class SimpleParameter(width: Int, moduleName: String) extends Parameter
+case class SimpleParameter(width: Int, moduleName: String) extends Parameter:
+  def layers: Seq[Layer] = Seq.empty
 
-class PassthroughInterface(parameter: SimpleParameter) extends Interface[SimpleParameter](parameter):
-  def moduleName: String = parameter.moduleName
+class PassthroughIO(parameter: SimpleParameter) extends HWInterface[SimpleParameter](parameter):
   val i = Flipped(UInt(parameter.width.W))
   val o = Aligned(UInt(parameter.width.W))
 
-// Find all instantiated instance and insert to circuit
-// TODO: fix duplications
-inline def fixupInstance(
-)(
-  using Arena,
-  Context,
-  Circuit
-): Unit =
-  summon[Circuit].block
-    .getFirstOperation()
-    .walk(
-      op =>
-        if (op.getName().str() == "firrtl.instance")
-          val moduleName: String = op.getInherentAttributeByName("moduleName").flatSymbolRefAttrGetValue
-          val name:       String = op.getInherentAttributeByName("name").stringAttrGetValue
-          val portDirections = Seq
-            .tabulate(op.getNumResults.toInt)(i =>
-              op.getInherentAttributeByName("portDirections").denseBoolArrayGetElement(i)
-            )
-            .map(if (_) FirrtlDirection.Out else FirrtlDirection.In)
-            .attrGetPortDirs
-          val portNames: Seq[String] = Seq.tabulate(op.getNumResults.toInt)(i =>
-            op.getInherentAttributeByName("portNames").arrayAttrGetElement(i).stringAttrGetValue
-          )
-          val types:     Seq[Type]   = Seq.tabulate(op.getNumResults.toInt)(i => op.getResult(i).getType)
-          val extmoduleOp = ExtModule(
-            summon[OperationApi].operationCreate(
-              name = "firrtl.extmodule",
-              location = op.getLocation(),
-              namedAttributes =
-                val namedAttributeApi = summon[NamedAttributeApi]
-                Seq(
-                  // ::mlir::StringAttr
-                  namedAttributeApi.namedAttributeGet(
-                    "sym_name".identifierGet,
-                    moduleName.stringAttrGet
-                  ),
-                  // ::mlir::StringAttr
-                  namedAttributeApi.namedAttributeGet(
-                    "defname".identifierGet,
-                    moduleName.stringAttrGet
-                  ),
-                  // ::mlir::StringAttr
-                  namedAttributeApi.namedAttributeGet(
-                    "parameters".identifierGet,
-                    Seq.empty.arrayAttrGet
-                  ),
-                  // ::circt::firrtl::ConventionAttr
-                  namedAttributeApi.namedAttributeGet(
-                    "convention".identifierGet,
-                    FirrtlConvention.Internal.toAttribute
-                  ),
-                  // ::mlir::DenseBoolArrayAttr
-                  namedAttributeApi.namedAttributeGet(
-                    "portDirections".identifierGet,
-                    portDirections
-                  ),
-                  // ::mlir::ArrayAttr
-                  namedAttributeApi.namedAttributeGet(
-                    "portLocations".identifierGet,
-                    Seq.fill(op.getNumResults.toInt)(summon[LocationApi].locationUnknownGet.getAttribute).arrayAttrGet
-                  ),
-                  // ::mlir::ArrayAttr
-                  namedAttributeApi.namedAttributeGet(
-                    "portAnnotations".identifierGet,
-                    Seq.empty.arrayAttrGet
-                  ),
-                  // ::mlir::ArrayAttr
-                  namedAttributeApi.namedAttributeGet(
-                    "portSymbols".identifierGet,
-                    Seq.empty.arrayAttrGet
-                  ),
-                  // ::mlir::ArrayAttr
-                  namedAttributeApi.namedAttributeGet(
-                    "portNames".identifierGet,
-                    portNames.map(_.stringAttrGet).arrayAttrGet
-                  ),
-                  // ::mlir::ArrayAttr
-                  namedAttributeApi.namedAttributeGet(
-                    "portTypes".identifierGet,
-                    types.map(_.typeAttrGet).arrayAttrGet
-                  ),
-                  // ::mlir::ArrayAttr
-                  namedAttributeApi.namedAttributeGet(
-                    "annotations".identifierGet,
-                    Seq.empty.arrayAttrGet
-                  ),
-                  // ::mlir::ArrayAttr
-                  namedAttributeApi.namedAttributeGet(
-                    "layers".identifierGet,
-                    Seq.empty.arrayAttrGet
-                  ),
-                  // ::mlir::ArrayAttr
-                  namedAttributeApi.namedAttributeGet(
-                    "internalPaths".identifierGet,
-                    Seq.empty.arrayAttrGet
-                  )
-                )
-              ,
-              regionBlockTypeLocations = Seq(Seq())
-            )
-          )
-          summon[Circuit].block.appendOwnedOperation(extmoduleOp.operation)
-        WalkResultEnum.Advance
-      ,
-      WalkEnum.PreOrder
-    )
+class PassthroughProbe(parameter: SimpleParameter) extends DVInterface[SimpleParameter](parameter)

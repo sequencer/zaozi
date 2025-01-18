@@ -26,7 +26,7 @@ import utest.*
 
 import java.lang.foreign.Arena
 
-case class GCDParameter(width: Int, useAsyncReset: Boolean) extends Parameter
+case class GCDParameter(width: Int, useAsyncReset: Boolean, moduleName: String, layers: Seq[Layer]) extends Parameter
 
 trait HasFire[T <: Bundle, R <: Referable[T]]:
   extension (ref: R)
@@ -74,33 +74,36 @@ class GCDInput(parameter: GCDParameter) extends Bundle:
 class GCDOutput(parameter: GCDParameter) extends Bundle:
   val z: BundleField[UInt] = Aligned(UInt(parameter.width.W))
 
-class GCDInterface(parameter: GCDParameter) extends Interface[GCDParameter](parameter):
-  def moduleName = "GCD"
-
+class GCDIO(parameter: GCDParameter) extends HWInterface[GCDParameter](parameter):
   val clock:  BundleField[Clock]                 = Flipped(Clock())
   val reset:  BundleField[Reset]                 = Flipped(if (parameter.useAsyncReset) AsyncReset() else Reset())
   val input:  BundleField[DecoupledIO[GCDInput]] = Flipped(Decoupled(new GCDInput(parameter)))
   val output: BundleField[ValidIO[GCDOutput]]    = Aligned(Valid(GCDOutput(parameter)))
+
+class GCDProbe(parameter: GCDParameter) extends DVInterface[GCDParameter](parameter)
 
 object ExportVerilogSpec extends TestSuite:
   val tests = Tests:
     val parameter = SimpleParameter(32, "PassthroughModule")
     val out       = new StringBuilder
     test("Passthrough"):
-      verilogTest(parameter, PassthroughInterface(parameter))(
+      verilogTest(parameter, PassthroughIO(parameter), PassthroughProbe(parameter))(
         "assign o = i;"
-      ): (p: SimpleParameter, io: Wire[PassthroughInterface]) =>
+      ):
+        val io = summon[Interface[PassthroughIO]]
         io.o := io.i
     test("GCD"):
-      val parameter = GCDParameter(32, false)
-      verilogTest(parameter, new GCDInterface(parameter))(
+      val parameter = GCDParameter(32, false, "GCD", Seq.empty)
+      verilogTest(parameter, new GCDIO(parameter), new GCDProbe(parameter))(
         "module GCD("
-      ): (p, io) =>
+      ):
+        val p            = summon[GCDParameter]
+        val io           = summon[Interface[GCDIO]]
         given Ref[Clock] = io.clock
 
         given Ref[Reset] = io.reset
 
-        val x:           Referable[UInt] = Reg(UInt(parameter.width.W))
+        val x:           Referable[UInt] = Reg(UInt(p.width.W))
         val y:           Referable[UInt] = RegInit(0.U(32.W))
         val startupFlag: Referable[Bool] = RegInit(false.B)
         val busy:        Referable[Bool] = y =/= 0.U
@@ -132,13 +135,15 @@ object ExportVerilogSpec extends TestSuite:
           startupFlag
         )
     test("GCD with When"):
-      val parameter = GCDParameter(32, false)
-      verilogTest(parameter, new GCDInterface(parameter))(
+      val parameter = GCDParameter(32, false, "GCD", Seq.empty)
+      verilogTest(parameter, new GCDIO(parameter), new GCDProbe(parameter))(
         "module GCD("
-      ): (p, io) =>
+      ):
+        val p            = summon[GCDParameter]
+        val io           = summon[Interface[GCDIO]]
         given Ref[Clock] = io.clock
         given Ref[Reset] = io.reset
-        val x:           Referable[UInt] = Reg(UInt(parameter.width.W))
+        val x:           Referable[UInt] = Reg(UInt(p.width.W))
         val y:           Referable[UInt] = RegInit(0.U(32.W))
         val startupFlag: Referable[Bool] = RegInit(false.B)
         val busy:        Referable[Bool] = y =/= 0.U

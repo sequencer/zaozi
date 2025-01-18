@@ -11,20 +11,22 @@ import org.llvm.mlir.scalalib.{Context, ContextApi, PassManager, PassManagerApi,
 import me.jiuyang.zaozi.testutility.*
 import java.lang.foreign.Arena
 
-case class SimpleParameter(width: Int, moduleName: String) extends Parameter
+case class SimpleParameter(width: Int, moduleName: String) extends Parameter:
+  def layers: Seq[Layer] = Seq.empty
 
-class PassthroughInterface(parameter: SimpleParameter) extends Interface[SimpleParameter](parameter):
-  def moduleName: String = parameter.moduleName
+class PassthroughIO(parameter: SimpleParameter) extends HWInterface[SimpleParameter](parameter):
   val i = Flipped(UInt(parameter.width.W))
   val o = Aligned(UInt(parameter.width.W))
 
+class PassthroughProbe(parameter: SimpleParameter) extends DVInterface[SimpleParameter](parameter)
+
 // VERILOG-LABEL: module PassthroughModule(
 val parameter = SimpleParameter(32, "PassthroughModule")
-verilogTest(parameter, PassthroughInterface(parameter)):
+verilogTest(parameter, PassthroughIO(parameter), PassthroughProbe(parameter)):
   // VERILOG-NEXT:   input  [31:0] i,
   // VERILOG-NEXT:   output [31:0] o
   // VERILOG-NEXT: );
-  (p: SimpleParameter, io: Wire[PassthroughInterface]) =>
     // VERILOG:   assign o = i;
-    io.o := io.i
+  val io = summon[Interface[PassthroughIO]]
+  io.o := io.i
 // VERILOG: endmodule

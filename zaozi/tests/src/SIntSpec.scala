@@ -18,8 +18,7 @@ import utest.*
 
 import java.lang.foreign.Arena
 
-class SIntSpecInterface(parameter: SimpleParameter) extends Interface[SimpleParameter](parameter):
-  def moduleName: String = parameter.moduleName
+class SIntSpecIO(parameter: SimpleParameter) extends HWInterface[SimpleParameter](parameter):
   val a          = Flipped(SInt(parameter.width.W))
   val b          = Flipped(SInt(parameter.width.W))
   val c          = Flipped(UInt(parameter.width.W))
@@ -30,121 +29,155 @@ class SIntSpecInterface(parameter: SimpleParameter) extends Interface[SimplePara
   val clock      = Flipped(Clock())
   val asyncReset = Flipped(AsyncReset())
 
+class SIntSpecProbe(parameter: SimpleParameter) extends DVInterface[SimpleParameter](parameter)
+
 object SIntSpec extends TestSuite:
   val tests = Tests:
     val parameter = SimpleParameter(8, "SIntSpecModule")
     val out       = new StringBuilder
     test("asBits"):
-      verilogTest(parameter, SIntSpecInterface(parameter))(
+      verilogTest(parameter, SIntSpecIO(parameter), SIntSpecProbe(parameter))(
         "assign bits = a;"
-      ): (p: SimpleParameter, io: Wire[SIntSpecInterface]) =>
+      ):
+        val p  = summon[SimpleParameter]
+        val io = summon[Interface[SIntSpecIO]]
         io.sint.dontCare()
         io.bool.dontCare()
         io.bits := io.a.asBits
     test("+"):
-      verilogTest(parameter, SIntSpecInterface(parameter))(
+      verilogTest(parameter, SIntSpecIO(parameter), SIntSpecProbe(parameter))(
         "assign sint = {a[7], a} + {b[7], b};"
-      ): (p: SimpleParameter, io: Wire[SIntSpecInterface]) =>
+      ):
+        val p  = summon[SimpleParameter]
+        val io = summon[Interface[SIntSpecIO]]
         io.sint := io.a + io.b
         io.bool.dontCare()
         io.bits.dontCare()
     test("-"):
-      verilogTest(parameter, SIntSpecInterface(parameter))(
+      verilogTest(parameter, SIntSpecIO(parameter), SIntSpecProbe(parameter))(
         "assign sint = {a[7], a} - {b[7], b};"
-      ): (p: SimpleParameter, io: Wire[SIntSpecInterface]) =>
+      ):
+        val p  = summon[SimpleParameter]
+        val io = summon[Interface[SIntSpecIO]]
         io.sint := io.a - io.b
         io.bool.dontCare()
         io.bits.dontCare()
     test("*"):
-      verilogTest(parameter, SIntSpecInterface(parameter))(
+      verilogTest(parameter, SIntSpecIO(parameter), SIntSpecProbe(parameter))(
         "wire [15:0] tests = {{8{a[7]}}, a} * {{8{b[7]}}, b};"
-      ): (p: SimpleParameter, io: Wire[SIntSpecInterface]) =>
+      ):
+        val p  = summon[SimpleParameter]
+        val io = summon[Interface[SIntSpecIO]]
         io.sint := ((io.a * io.b).asBits >> p.width).asSInt
         io.bool.dontCare()
         io.bits.dontCare()
     test("/"):
-      verilogTest(parameter, SIntSpecInterface(parameter))(
+      verilogTest(parameter, SIntSpecIO(parameter), SIntSpecProbe(parameter))(
         "assign sint = $signed($signed({a[7], a}) / $signed({b[7], b}));"
-      ): (p: SimpleParameter, io: Wire[SIntSpecInterface]) =>
+      ):
+        val p  = summon[SimpleParameter]
+        val io = summon[Interface[SIntSpecIO]]
         io.sint := io.a / io.b
         io.bool.dontCare()
         io.bits.dontCare()
     test("%"):
-      verilogTest(parameter, SIntSpecInterface(parameter))(
+      verilogTest(parameter, SIntSpecIO(parameter), SIntSpecProbe(parameter))(
         "wire [7:0] tests = $signed($signed(a) % $signed(b));"
-      ): (p: SimpleParameter, io: Wire[SIntSpecInterface]) =>
+      ):
+        val p  = summon[SimpleParameter]
+        val io = summon[Interface[SIntSpecIO]]
         io.sint := io.a % io.b
         io.bool.dontCare()
         io.bits.dontCare()
     test("<"):
-      verilogTest(parameter, SIntSpecInterface(parameter))(
+      verilogTest(parameter, SIntSpecIO(parameter), SIntSpecProbe(parameter))(
         "assign bool = $signed(a) < $signed(b);"
-      ): (p: SimpleParameter, io: Wire[SIntSpecInterface]) =>
+      ):
+        val p  = summon[SimpleParameter]
+        val io = summon[Interface[SIntSpecIO]]
         io.sint.dontCare()
         io.bool := io.a < io.b
         io.bits.dontCare()
     test("<="):
-      verilogTest(parameter, SIntSpecInterface(parameter))(
+      verilogTest(parameter, SIntSpecIO(parameter), SIntSpecProbe(parameter))(
         "assign bool = $signed(a) <= $signed(b);"
-      ): (p: SimpleParameter, io: Wire[SIntSpecInterface]) =>
+      ):
+        val p  = summon[SimpleParameter]
+        val io = summon[Interface[SIntSpecIO]]
         io.sint.dontCare()
         io.bool := io.a <= io.b
         io.bits.dontCare()
     test(">"):
-      verilogTest(parameter, SIntSpecInterface(parameter))(
+      verilogTest(parameter, SIntSpecIO(parameter), SIntSpecProbe(parameter))(
         "assign bool = $signed(a) > $signed(b);"
-      ): (p: SimpleParameter, io: Wire[SIntSpecInterface]) =>
+      ):
+        val p  = summon[SimpleParameter]
+        val io = summon[Interface[SIntSpecIO]]
         io.sint.dontCare()
         io.bool := io.a > io.b
         io.bits.dontCare()
     test(">="):
-      verilogTest(parameter, SIntSpecInterface(parameter))(
+      verilogTest(parameter, SIntSpecIO(parameter), SIntSpecProbe(parameter))(
         "assign bool = $signed(a) >= $signed(b);"
-      ): (p: SimpleParameter, io: Wire[SIntSpecInterface]) =>
+      ):
+        val p  = summon[SimpleParameter]
+        val io = summon[Interface[SIntSpecIO]]
         io.sint.dontCare()
         io.bool := io.a >= io.b
         io.bits.dontCare()
     test("==="):
-      verilogTest(parameter, SIntSpecInterface(parameter))(
+      verilogTest(parameter, SIntSpecIO(parameter), SIntSpecProbe(parameter))(
         "assign bool = a == b;"
-      ): (p: SimpleParameter, io: Wire[SIntSpecInterface]) =>
+      ):
+        val p  = summon[SimpleParameter]
+        val io = summon[Interface[SIntSpecIO]]
         io.sint.dontCare()
         io.bool := io.a === io.b
         io.bits.dontCare()
     test("=/="):
-      verilogTest(parameter, SIntSpecInterface(parameter))(
+      verilogTest(parameter, SIntSpecIO(parameter), SIntSpecProbe(parameter))(
         "assign bool = a != b;"
-      ): (p: SimpleParameter, io: Wire[SIntSpecInterface]) =>
+      ):
+        val p  = summon[SimpleParameter]
+        val io = summon[Interface[SIntSpecIO]]
         io.sint.dontCare()
         io.bool := io.a =/= io.b
         io.bits.dontCare()
     test("<< int"):
-      verilogTest(parameter, SIntSpecInterface(parameter))(
+      verilogTest(parameter, SIntSpecIO(parameter), SIntSpecProbe(parameter))(
         "assign sint = {a[6:0], 2'h0};"
-      ): (p: SimpleParameter, io: Wire[SIntSpecInterface]) =>
+      ):
+        val p  = summon[SimpleParameter]
+        val io = summon[Interface[SIntSpecIO]]
         io.sint := (io.a << 2).asBits.bits(p.width, 0).asSInt
         io.bool.dontCare()
         io.bits.dontCare()
     test("<< uint"):
-      verilogTest(parameter, SIntSpecInterface(parameter))(
+      verilogTest(parameter, SIntSpecIO(parameter), SIntSpecProbe(parameter))(
         "wire [262:0] tests = {{255{a[7]}}, a} << c;",
         "assign sint = tests[8:0];"
-      ): (p: SimpleParameter, io: Wire[SIntSpecInterface]) =>
+      ):
+        val p  = summon[SimpleParameter]
+        val io = summon[Interface[SIntSpecIO]]
         io.sint := (io.a << io.c).asBits.bits(p.width, 0).asSInt
         io.bool.dontCare()
         io.bits.dontCare()
     test(">> int"):
-      verilogTest(parameter, SIntSpecInterface(parameter))(
+      verilogTest(parameter, SIntSpecIO(parameter), SIntSpecProbe(parameter))(
         "assign sint = {{5{a[7]}}, a[7:4]};"
-      ): (p: SimpleParameter, io: Wire[SIntSpecInterface]) =>
+      ):
+        val p  = summon[SimpleParameter]
+        val io = summon[Interface[SIntSpecIO]]
         io.sint := io.a >> 4
         io.bool.dontCare()
         io.bits.dontCare()
     test(">> uint"):
-      verilogTest(parameter, SIntSpecInterface(parameter))(
+      verilogTest(parameter, SIntSpecIO(parameter), SIntSpecProbe(parameter))(
         "wire [7:0] tests = $signed($signed(a) >>> c);",
         "assign sint = {tests[7], tests};"
-      ): (p: SimpleParameter, io: Wire[SIntSpecInterface]) =>
+      ):
+        val p  = summon[SimpleParameter]
+        val io = summon[Interface[SIntSpecIO]]
         io.sint := io.a >> io.c
         io.bool.dontCare()
         io.bits.dontCare()
