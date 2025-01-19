@@ -44,11 +44,12 @@ import utest.assert
 import java.lang.foreign.Arena
 
 def mlirTest[PARAM <: Parameter, I <: HWInterface[PARAM], P <: DVInterface[PARAM]](
-  parameter:  PARAM,
   io:         I,
   probe:      P
 )(checkLines: String*
 )(body:       (Arena, Context, Block, Seq[LayerTree]) ?=> (PARAM, Interface[I], Interface[P]) => Unit
+)(
+  using PARAM
 ): Unit =
   given Arena      = Arena.ofConfined()
   given Context    = summon[ContextApi].contextCreate
@@ -56,9 +57,9 @@ def mlirTest[PARAM <: Parameter, I <: HWInterface[PARAM], P <: DVInterface[PARAM
   given MlirModule = summon[MlirModuleApi].moduleCreateEmpty(summon[LocationApi].locationUnknownGet)
 
   // Then based on the module to construct the circuit.
-  given Circuit = summon[CircuitApi].op(parameter.moduleName)
+  given Circuit = summon[CircuitApi].op(summon[PARAM].moduleName)
   summon[Circuit].appendToModule()
-  summon[ConstructorApi].Module(parameter, io, probe)(body).appendToCircuit()
+  summon[ConstructorApi].Module(io, probe)(body).appendToCircuit()
   validateCircuit()
 
   val out = new StringBuilder
@@ -70,20 +71,21 @@ def mlirTest[PARAM <: Parameter, I <: HWInterface[PARAM], P <: DVInterface[PARAM
   else checkLines.foreach(l => assert(out.toString.contains(l)))
 
 def firrtlTest[PARAM <: Parameter, I <: HWInterface[PARAM], P <: DVInterface[PARAM]](
-  parameter:  PARAM,
   io:         I,
   probe:      P
 )(checkLines: String*
 )(body:       (Arena, Context, Block, Seq[LayerTree], PARAM, Interface[I], Interface[P]) ?=> Unit
+)(
+  using PARAM
 ): Unit =
   given Arena      = Arena.ofConfined()
   given Context    = summon[ContextApi].contextCreate
   summon[Context].loadFirrtlDialect()
   // Then based on the module to construct the circuit.
   given MlirModule = summon[MlirModuleApi].moduleCreateEmpty(summon[LocationApi].locationUnknownGet)
-  given Circuit    = summon[CircuitApi].op(parameter.moduleName)
+  given Circuit    = summon[CircuitApi].op(summon[PARAM].moduleName)
   summon[Circuit].appendToModule()
-  summon[ConstructorApi].Module(parameter, io, probe)(body).appendToCircuit()
+  summon[ConstructorApi].Module(io, probe)(body).appendToCircuit()
 
   validateCircuit()
   val out = new StringBuilder
@@ -95,11 +97,12 @@ def firrtlTest[PARAM <: Parameter, I <: HWInterface[PARAM], P <: DVInterface[PAR
   else checkLines.foreach(l => assert(out.toString.contains(l)))
 
 def verilogTest[PARAM <: Parameter, I <: HWInterface[PARAM], P <: DVInterface[PARAM]](
-  parameter:  PARAM,
   io:         I,
   probe:      P
 )(checkLines: String*
 )(body:       (Arena, Context, Block, Seq[LayerTree], PARAM, Interface[I], Interface[P]) ?=> Unit
+)(
+  using PARAM
 ): Unit =
   given Arena          = Arena.ofConfined()
   given Context        = summon[ContextApi].contextCreate
@@ -120,9 +123,9 @@ def verilogTest[PARAM <: Parameter, I <: HWInterface[PARAM], P <: DVInterface[PA
 
   // Then based on the module to construct the circuit.
   given MlirModule = summon[MlirModuleApi].moduleCreateEmpty(summon[LocationApi].locationUnknownGet)
-  given Circuit    = summon[CircuitApi].op(parameter.moduleName)
+  given Circuit    = summon[CircuitApi].op(summon[PARAM].moduleName)
   summon[Circuit].appendToModule()
-  summon[ConstructorApi].Module(parameter, io, probe)(body).appendToCircuit()
+  summon[ConstructorApi].Module(io, probe)(body).appendToCircuit()
   validateCircuit()
   summon[PassManager].runOnOp(summon[MlirModule].getOperation)
   summon[Context].destroy()
@@ -134,8 +137,13 @@ def verilogTest[PARAM <: Parameter, I <: HWInterface[PARAM], P <: DVInterface[PA
 case class SimpleParameter(width: Int, moduleName: String) extends Parameter:
   def layers: Seq[Layer] = Seq.empty
 
-class PassthroughIO(parameter: SimpleParameter) extends HWInterface[SimpleParameter](parameter):
-  val i = Flipped(UInt(parameter.width.W))
-  val o = Aligned(UInt(parameter.width.W))
+class PassthroughIO(
+  using SimpleParameter)
+    extends HWInterface[SimpleParameter]:
+  val parameter = summon[SimpleParameter]
+  val i         = Flipped(UInt(parameter.width.W))
+  val o         = Aligned(UInt(parameter.width.W))
 
-class PassthroughProbe(parameter: SimpleParameter) extends DVInterface[SimpleParameter](parameter)
+class PassthroughProbe(
+  using SimpleParameter)
+    extends DVInterface[SimpleParameter]

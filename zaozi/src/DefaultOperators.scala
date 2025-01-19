@@ -519,13 +519,13 @@ given ConstructorApi with
       ._rebuild
 
   def Module[PARAM <: Parameter, I <: HWInterface[PARAM], P <: DVInterface[PARAM]](
-    parameter: PARAM,
-    io:        I,
-    probe:     P
-  )(body:      (Arena, Context, Block, Seq[Layer], PARAM, Interface[I], Interface[P]) ?=> Unit
+    io:    I,
+    probe: P
+  )(body:  (Arena, Context, Block, Seq[LayerTree], PARAM, Interface[I], Interface[P]) ?=> Unit
   )(
     using Arena,
-    Context
+    Context,
+    PARAM
   ): operation.Module =
     val unknownLocation  = summon[LocationApi].locationUnknownGet
     val ioNumFields      = io.toMlirType.getBundleNumFields.toInt
@@ -535,7 +535,7 @@ given ConstructorApi with
         Seq.tabulate(probeNumFields)(probe.toMlirType.getBundleFieldByIndex)
     given Seq[LayerTree] = summon[PARAM].layerTrees.flatMap(_._dfs)
     val module           = summon[ModuleApi].op(
-      parameter.moduleName,
+      summon[PARAM].moduleName,
       unknownLocation,
       FirrtlConvention.Scalarized,
       bfs.map(i => (i, unknownLocation)), // TODO: record location for Bundle?
@@ -588,7 +588,6 @@ given ConstructorApi with
             .op(module.getIO(ioNumFields + idx), subRefToProbeWire.result, unknownLocation)
             .operation
             .appendToBlock()
-    given PARAM          = parameter
     given Interface[I]   =
       new Interface[I]:
         val _tpe:       I         = io
@@ -671,18 +670,16 @@ given ConstructorApi with
       val _operation: Operation = regResetOp.operation
 
   def Instance[P <: Parameter, IOTpe <: HWInterface[P], ProbeTpe <: DVInterface[P]](
-    parameter: P,
-    ioTpe:     IOTpe,
-    probeTpe:  ProbeTpe
+    ioTpe:    IOTpe,
+    probeTpe: ProbeTpe
   )(
     using Arena,
     Context,
     Block,
-    Ref[Clock],
-    Ref[Reset],
     sourcecode.File,
     sourcecode.Line,
-    sourcecode.Name
+    sourcecode.Name,
+    P
     // TODO: later will also return a ClassTpe
   ): Instance[IOTpe, ProbeTpe] =
     val bfs =
@@ -692,7 +689,7 @@ given ConstructorApi with
         Seq.tabulate(probeTpe.toMlirType.getBundleNumFields.toInt)(probeTpe.toMlirType.getBundleFieldByIndex)
     // TODO: add layer symbol here? rather than from top to down searching?
     val instanceOp = summon[InstanceApi].op(
-      moduleName = parameter.moduleName,
+      moduleName = summon[P].moduleName,
       instanceName = valName,
       nameKind = FirrtlNameKind.Interesting,
       location = locate,

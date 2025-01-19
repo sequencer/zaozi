@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: 2025 Jiuyang Liu <liu@jiuyang.me>
 package me.jiuyang.zaozi.valuetpe
 
-import me.jiuyang.zaozi.{Layer, TypeImpl}
+import me.jiuyang.zaozi.{LayerTree, TypeImpl}
 import me.jiuyang.zaozi.magic.DynamicSubfield
 import me.jiuyang.zaozi.reftpe.Ref
 import org.llvm.mlir.scalalib.{Block, Context, Type, Value}
@@ -19,7 +19,7 @@ trait ProbeBundle extends Data with DynamicSubfield:
 
   def ProbeRead[T <: Data & CanProbe](
     tpe:   T,
-    layer: Layer
+    layer: LayerTree
   )(
     using TypeImpl,
     sourcecode.Name
@@ -28,7 +28,7 @@ trait ProbeBundle extends Data with DynamicSubfield:
 
   def ProbeReadWrite[T <: Data & CanProbe](
     tpe:   T,
-    layer: Layer
+    layer: LayerTree
   )(
     using TypeImpl,
     sourcecode.Name

@@ -9,33 +9,43 @@ import org.llvm.mlir.scalalib.{Block, Context, Operation, Type, Value}
 
 import java.lang.foreign.Arena
 
-trait Layer:
+/** Rebuild the [[Layer]] with each [[Layer]] contains the entire tree. */
+trait LayerTree:
   layer =>
   def _name:      String
-  def _children:  Seq[Layer]
-  def _parent:    Option[Layer] = None
-  def _hierarchy: Seq[Layer]    =
+  def _children:  Seq[LayerTree]
+  def _parent:    Option[LayerTree] = None
+  def _hierarchy: Seq[LayerTree]    =
     _parent match
       case Some(p) => p._hierarchy :+ this
       case None    => Seq(this)
-  def _dfs:       Seq[Layer]    =
+  def _dfs:       Seq[LayerTree]    =
     this +: _children.flatMap(_._dfs)
-  def _rebuild:   Layer         =
-    def rebuildLayer(oldLayer: Layer, parent: Option[Layer]): Layer =
-      new Layer:
-        override def _name:     String        = oldLayer._name
-        override def _children: Seq[Layer]    =
+  def _rebuild:   LayerTree         =
+    def rebuildLayer(oldLayer: LayerTree, parent: Option[LayerTree]): LayerTree =
+      new LayerTree:
+        override def _name:     String            = oldLayer._name
+        override def _children: Seq[LayerTree]    =
           oldLayer._children.map(child => rebuildLayer(child, Some(this)))
-        override def _parent:   Option[Layer] = parent
+        override def _parent:   Option[LayerTree] = parent
     rebuildLayer(this, None)
+
+/** Serializable Layer definition. */
+case class Layer(name: String, children: Seq[Layer] = Seq.empty)
 
 trait Parameter:
   def moduleName: String
   def layers:     Seq[Layer]
-  def getLayers:  Seq[Layer] = layers.map(_._rebuild)
+  def layerTrees(
+    using ConstructorApi
+  ): Seq[LayerTree] = layers.map(_.toLayerTree)
 
-class HWInterface[P <: Parameter](val parameter: P) extends Bundle
-class DVInterface[P <: Parameter](val parameter: P) extends ProbeBundle
+class HWInterface[P <: Parameter](
+  using P)
+    extends Bundle
+class DVInterface[P <: Parameter](
+  using P)
+    extends ProbeBundle
 
 trait ConstructorApi:
   def Clock(): Clock
@@ -75,23 +85,16 @@ trait ConstructorApi:
       sourcecode.Name
     ): Unit
 
-  def Layer(name: String, children: Seq[Layer] = Seq.empty): Layer =
-    new Layer:
-      la =>
-      def _name:     String     = name
-      def _children: Seq[Layer] = children.map: l =>
-        new Layer:
-          def _name:     String     = l._name
-          def _children: Seq[Layer] = l._children
+  extension (layer: Layer) def toLayerTree: LayerTree
 
   def Module[PARAM <: Parameter, I <: HWInterface[PARAM], P <: DVInterface[PARAM]](
-    parameter: PARAM,
-    io:        I,
-    probe:     P
-  )(body:      (Arena, Context, Block, Seq[Layer], PARAM, Interface[I], Interface[P]) ?=> Unit
+    io:    I,
+    probe: P
+  )(body:  (Arena, Context, Block, Seq[LayerTree], PARAM, Interface[I], Interface[P]) ?=> Unit
   )(
     using Arena,
-    Context
+    Context,
+    PARAM
   ): CirctModule
 
   def Wire[T <: Data](
@@ -725,14 +728,14 @@ trait TypeImpl:
     def ReadProbeImpl[T <: Data & CanProbe](
       name:  Option[String],
       tpe:   T,
-      layer: Layer
+      layer: LayerTree
     )(
       using sourcecode.Name
     ):            BundleField[RProbe[T]]
     def ReadWriteProbeImpl[T <: Data & CanProbe](
       name:  Option[String],
       tpe:   T,
-      layer: Layer
+      layer: LayerTree
     )(
       using sourcecode.Name
     ):            BundleField[RWProbe[T]]

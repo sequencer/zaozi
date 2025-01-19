@@ -43,10 +43,11 @@ import org.llvm.mlir.scalalib.{
 import java.lang.foreign.Arena
 
 def mlirTest[PARAM <: Parameter, I <: HWInterface[PARAM], P <: DVInterface[PARAM]](
-  parameter: PARAM,
-  io:        I,
-  probe:     P
-)(body:      (Arena, Context, Block, Seq[LayerTree]) ?=> (PARAM, Interface[I], Interface[P]) => Unit
+  io:    I,
+  probe: P
+)(body:  (Arena, Context, Block, Seq[LayerTree]) ?=> (PARAM, Interface[I], Interface[P]) => Unit
+)(
+  using PARAM
 ): Unit =
   given Arena      = Arena.ofConfined()
   given Context    = summon[ContextApi].contextCreate
@@ -54,9 +55,9 @@ def mlirTest[PARAM <: Parameter, I <: HWInterface[PARAM], P <: DVInterface[PARAM
   given MlirModule = summon[MlirModuleApi].moduleCreateEmpty(summon[LocationApi].locationUnknownGet)
 
   // Then based on the module to construct the circuit.
-  given Circuit = summon[CircuitApi].op(parameter.moduleName)
+  given Circuit = summon[CircuitApi].op(summon[PARAM].moduleName)
   summon[Circuit].appendToModule()
-  summon[ConstructorApi].Module(parameter, io, probe)(body).appendToCircuit()
+  summon[ConstructorApi].Module(io, probe)(body).appendToCircuit()
   validateCircuit()
 
   val out = new StringBuilder
@@ -66,19 +67,20 @@ def mlirTest[PARAM <: Parameter, I <: HWInterface[PARAM], P <: DVInterface[PARAM
   summon[Arena].close()
 
 def firrtlTest[PARAM <: Parameter, I <: HWInterface[PARAM], P <: DVInterface[PARAM]](
-  parameter: PARAM,
-  io:        I,
-  probe:     P
-)(body:      (Arena, Context, Block, Seq[LayerTree], PARAM, Interface[I], Interface[P]) ?=> Unit
+  io:    I,
+  probe: P
+)(body:  (Arena, Context, Block, Seq[LayerTree], PARAM, Interface[I], Interface[P]) ?=> Unit
+)(
+  using PARAM
 ): Unit =
   given Arena      = Arena.ofConfined()
   given Context    = summon[ContextApi].contextCreate
   summon[Context].loadFirrtlDialect()
   // Then based on the module to construct the circuit.
   given MlirModule = summon[MlirModuleApi].moduleCreateEmpty(summon[LocationApi].locationUnknownGet)
-  given Circuit    = summon[CircuitApi].op(parameter.moduleName)
+  given Circuit    = summon[CircuitApi].op(summon[PARAM].moduleName)
   summon[Circuit].appendToModule()
-  summon[ConstructorApi].Module(parameter, io, probe)(body).appendToCircuit()
+  summon[ConstructorApi].Module(io, probe)(body).appendToCircuit()
 
   validateCircuit()
   summon[MlirModule].exportFIRRTL(print)
@@ -86,10 +88,11 @@ def firrtlTest[PARAM <: Parameter, I <: HWInterface[PARAM], P <: DVInterface[PAR
   summon[Arena].close()
 
 def verilogTest[PARAM <: Parameter, I <: HWInterface[PARAM], P <: DVInterface[PARAM]](
-  parameter: PARAM,
-  io:        I,
-  probe:     P
-)(body:      (Arena, Context, Block, Seq[LayerTree], PARAM, Interface[I], Interface[P]) ?=> Unit
+  io:    I,
+  probe: P
+)(body:  (Arena, Context, Block, Seq[LayerTree], PARAM, Interface[I], Interface[P]) ?=> Unit
+)(
+  using PARAM
 ): Unit =
   given Arena          = Arena.ofConfined()
   given Context        = summon[ContextApi].contextCreate
@@ -109,9 +112,9 @@ def verilogTest[PARAM <: Parameter, I <: HWInterface[PARAM], P <: DVInterface[PA
 
   // Then based on the module to construct the circuit.
   given MlirModule = summon[MlirModuleApi].moduleCreateEmpty(summon[LocationApi].locationUnknownGet)
-  given Circuit    = summon[CircuitApi].op(parameter.moduleName)
+  given Circuit    = summon[CircuitApi].op(summon[PARAM].moduleName)
   summon[Circuit].appendToModule()
-  summon[ConstructorApi].Module(parameter, io, probe)(body).appendToCircuit()
+  summon[ConstructorApi].Module(io, probe)(body).appendToCircuit()
   validateCircuit()
   summon[PassManager].runOnOp(summon[MlirModule].getOperation)
   summon[Context].destroy()

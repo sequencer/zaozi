@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: 2025 Jiuyang Liu <liu@jiuyang.me>
 package me.jiuyang.zaozi.valuetpe
 
-import me.jiuyang.zaozi.{Layer, TypeImpl}
+import me.jiuyang.zaozi.{LayerTree, TypeImpl}
 import org.llvm.mlir.scalalib.{Context, Type}
 
 import java.lang.foreign.Arena
@@ -13,7 +13,7 @@ trait CanProbe
 // But it cannot be a UInt to avoid the UInt extension exposing to it.
 trait RProbe[T <: CanProbe & Data] extends Data:
   private[zaozi] val _baseType: T
-  private[zaozi] val _color:    Layer
+  private[zaozi] val _color:    LayerTree
 
   final def toMlirType(
     using Arena,
@@ -23,7 +23,7 @@ trait RProbe[T <: CanProbe & Data] extends Data:
 
 trait RWProbe[T <: CanProbe & Data] extends Data:
   private[zaozi] val _baseType: T
-  private[zaozi] val _color:    Layer
+  private[zaozi] val _color:    LayerTree
 
   final def toMlirType(
     using Arena,
