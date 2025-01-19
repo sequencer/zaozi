@@ -46,7 +46,7 @@ def mlirTest[PARAM <: Parameter, I <: HWInterface[PARAM], P <: DVInterface[PARAM
   parameter: PARAM,
   io:        I,
   probe:     P
-)(body:      (Arena, Context, Block, Seq[Layer]) ?=> (PARAM, Interface[I], Interface[P]) => Unit
+)(body:      (Arena, Context, Block, Seq[LayerTree]) ?=> (PARAM, Interface[I], Interface[P]) => Unit
 ): Unit =
   given Arena      = Arena.ofConfined()
   given Context    = summon[ContextApi].contextCreate
@@ -69,7 +69,7 @@ def firrtlTest[PARAM <: Parameter, I <: HWInterface[PARAM], P <: DVInterface[PAR
   parameter: PARAM,
   io:        I,
   probe:     P
-)(body:      (Arena, Context, Block, Seq[Layer], PARAM, Interface[I], Interface[P]) ?=> Unit
+)(body:      (Arena, Context, Block, Seq[LayerTree], PARAM, Interface[I], Interface[P]) ?=> Unit
 ): Unit =
   given Arena      = Arena.ofConfined()
   given Context    = summon[ContextApi].contextCreate
@@ -89,7 +89,7 @@ def verilogTest[PARAM <: Parameter, I <: HWInterface[PARAM], P <: DVInterface[PA
   parameter: PARAM,
   io:        I,
   probe:     P
-)(body:      (Arena, Context, Block, Seq[Layer], PARAM, Interface[I], Interface[P]) ?=> Unit
+)(body:      (Arena, Context, Block, Seq[LayerTree], PARAM, Interface[I], Interface[P]) ?=> Unit
 ): Unit =
   given Arena          = Arena.ofConfined()
   given Context        = summon[ContextApi].contextCreate

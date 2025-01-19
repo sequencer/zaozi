@@ -77,11 +77,11 @@ object LayerSpec extends TestSuite:
         val p     = summon[LayerSpecParameter]
         val io    = summon[Interface[LayerSpecIO]]
         val probe = summon[Interface[LayerSpecProbe]]
-        Layer("A0"):
+        layer("A0"):
           probe.a0 <== io.a0
-          Layer("A0B0"):
+          layer("A0B0"):
             probe.a0b0 <== io.a0b0
-            Layer("A0B0C0"):
+            layer("A0B0C0"):
               probe.a0b0c0 <== io.a0b0c0
-          Layer("A0B1"):
+          layer("A0B1"):
             probe.a0b1 <== io.a0b1

@@ -264,7 +264,7 @@ given TypeImpl with
     def ReadProbeImpl[T <: Data & CanProbe](
       name:  Option[String],
       tpe:   T,
-      layer: Layer
+      layer: LayerTree
     )(
       using sourcecode.Name
     ): BundleField[RProbe[T]] =
@@ -273,15 +273,15 @@ given TypeImpl with
         val _name:   String    = name.getOrElse(valName)
         val _isFlip: Boolean   = false
         val _tpe:    RProbe[T] = new RProbe[T]:
-          val _baseType: T     = tpe
-          val _color:    Layer = layer
+          val _baseType: T         = tpe
+          val _color:    LayerTree = layer
 
       ref._elements += (valName -> bf)
       bf
     def ReadWriteProbeImpl[T <: Data & CanProbe](
       name:  Option[String],
       tpe:   T,
-      layer: Layer
+      layer: LayerTree
     )(
       using sourcecode.Name
     ): BundleField[RWProbe[T]] =
@@ -290,8 +290,8 @@ given TypeImpl with
         val _name:   String     = name.getOrElse(valName)
         val _isFlip: Boolean    = false
         val _tpe:    RWProbe[T] = new RWProbe[T]:
-          val _baseType: T     = tpe
-          val _color:    Layer = layer
+          val _baseType: T         = tpe
+          val _color:    LayerTree = layer
 
       ref._elements += (valName -> bf)
       bf
@@ -478,38 +478,45 @@ given ConstructorApi with
       given Block = when.elseBlock
       body
 
-  extension (layer: Layer)
-    def apply(name: String): Layer =
+  extension (layer: LayerTree)
+    def apply(name: String): LayerTree =
       layer._children(name)
 
-  extension (layers: Seq[Layer])
-    def apply(name: String): Layer =
+  extension (layers: Seq[LayerTree])
+    def apply(name: String): LayerTree =
       layers
         .find(_._name == name)
         .getOrElse(
           throw new Exception(s"No valid layer named: \"${name}\" found in ${layers.map(_._name).mkString(",")}")
         )
 
-  def Layer(
+  def layer(
     layerName: String
-  )(body:      (Arena, Context, Block, Seq[Layer]) ?=> Unit
+  )(body:      (Arena, Context, Block, Seq[LayerTree]) ?=> Unit
   )(
     using Arena,
     Context,
     Block,
-    Seq[Layer],
+    Seq[LayerTree],
     sourcecode.File,
     sourcecode.Line,
     sourcecode.Name
   ): Unit =
-    val op0 = summon[LayerBlockApi].op(summon[Seq[Layer]](layerName)._hierarchy.map(_._name), locate)
+    val op0 = summon[LayerBlockApi].op(summon[Seq[LayerTree]](layerName)._hierarchy.map(_._name), locate)
     op0.operation.appendToBlock()
     body(
       using summon[Arena],
       summon[Context],
       op0.block,
-      summon[Seq[Layer]](layerName)._children
+      summon[Seq[LayerTree]](layerName)._children
     )
+  extension (layer: Layer)
+    def toLayerTree:         LayerTree =
+      new LayerTree:
+        la =>
+        def _name:     String         = layer.name
+        def _children: Seq[LayerTree] = layer.children.map(_.toLayerTree)
+      ._rebuild
 
   def Module[PARAM <: Parameter, I <: HWInterface[PARAM], P <: DVInterface[PARAM]](
     parameter: PARAM,
@@ -520,29 +527,29 @@ given ConstructorApi with
     using Arena,
     Context
   ): operation.Module =
-    val unknownLocation = summon[LocationApi].locationUnknownGet
-    val ioNumFields     = io.toMlirType.getBundleNumFields.toInt
-    val probeNumFields  = probe.toMlirType.getBundleNumFields.toInt
-    val bfs             =
+    val unknownLocation  = summon[LocationApi].locationUnknownGet
+    val ioNumFields      = io.toMlirType.getBundleNumFields.toInt
+    val probeNumFields   = probe.toMlirType.getBundleNumFields.toInt
+    val bfs              =
       Seq.tabulate(ioNumFields)(io.toMlirType.getBundleFieldByIndex) ++
         Seq.tabulate(probeNumFields)(probe.toMlirType.getBundleFieldByIndex)
-    given Seq[Layer]    = parameter.layers.map(_._rebuild).flatMap(_._dfs)
-    val module          = summon[ModuleApi].op(
+    given Seq[LayerTree] = summon[PARAM].layerTrees.flatMap(_._dfs)
+    val module           = summon[ModuleApi].op(
       parameter.moduleName,
       unknownLocation,
       FirrtlConvention.Scalarized,
       bfs.map(i => (i, unknownLocation)), // TODO: record location for Bundle?
-      summon[Seq[Layer]].filter(_._children.isEmpty).map(_._hierarchy.map(_._name))
+      summon[Seq[LayerTree]].filter(_._children.isEmpty).map(_._hierarchy.map(_._name))
     )
-    given Block         = module.block
-    val ioWire          = summon[WireApi].op(
+    given Block          = module.block
+    val ioWire           = summon[WireApi].op(
       "io",
       summon[LocationApi].locationUnknownGet,
       FirrtlNameKind.Droppable,
       io.toMlirType
     )
     ioWire.operation.appendToBlock()
-    val probeWire       = summon[WireApi].op(
+    val probeWire        = summon[WireApi].op(
       "probe",
       summon[LocationApi].locationUnknownGet,
       FirrtlNameKind.Droppable,
@@ -581,12 +588,12 @@ given ConstructorApi with
             .op(module.getIO(ioNumFields + idx), subRefToProbeWire.result, unknownLocation)
             .operation
             .appendToBlock()
-    given PARAM         = parameter
-    given Interface[I]  =
+    given PARAM          = parameter
+    given Interface[I]   =
       new Interface[I]:
         val _tpe:       I         = io
         val _operation: Operation = ioWire.operation
-    given Interface[P]  =
+    given Interface[P]   =
       new Interface[P]:
         val _tpe:       P         = probe
         val _operation: Operation = probeWire.operation
