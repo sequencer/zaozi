@@ -20,26 +20,33 @@ class SyncDomain extends Bundle:
   val clock = Aligned(Clock())
   val reset = Aligned(Reset())
 
-class ReferableSpecIO(parameter: SimpleParameter) extends HWInterface[SimpleParameter](parameter):
+class ReferableSpecIO(
+  using SimpleParameter)
+    extends HWInterface[SimpleParameter]:
+  val parameter   = summon[SimpleParameter]
   val asyncDomain = Flipped(new AsyncDomain)
   val syncDomain  = Flipped(new SyncDomain)
-  val passthrough = Aligned(new PassthroughIO(parameter))
+  val passthrough = Aligned(new PassthroughIO)
 
-class ReferableSpecProbe(parameter: SimpleParameter) extends DVInterface[SimpleParameter](parameter)
+class ReferableSpecProbe(
+  using SimpleParameter)
+    extends DVInterface[SimpleParameter]
 
 object ReferableSpec extends TestSuite:
   val tests = Tests:
-    val parameter = SimpleParameter(8, "PassthroughModule")
+    given SimpleParameter(8, "PassthroughModule")
     test("Instance API"):
-      verilogTest(parameter, ReferableSpecIO(parameter), ReferableSpecProbe(parameter))(
+      verilogTest(new ReferableSpecIO, new ReferableSpecProbe)(
         "M0 inst0 ("
       ):
-        val p              = summon[SimpleParameter]
-        val io             = summon[Interface[ReferableSpecIO]]
-        given Ref[Clock]   = io.asyncDomain.clock
-        given Ref[Reset]   = io.asyncDomain.reset
-        val inst0Parameter = SimpleParameter(8, "M0")
-        val inst0          = Instance(inst0Parameter, ReferableSpecIO(inst0Parameter), ReferableSpecProbe(inst0Parameter))
+        val p            = summon[SimpleParameter]
+        val io           = summon[Interface[ReferableSpecIO]]
+        given Ref[Clock] = io.asyncDomain.clock
+        given Ref[Reset] = io.asyncDomain.reset
+        val inst0 =
+          // Actually the Instance should have its own PARAM
+          given SimpleParameter(8, "M0")
+          Instance(new ReferableSpecIO, new ReferableSpecProbe)
         inst0.io.asyncDomain.clock := io.asyncDomain.clock
         inst0.io.asyncDomain.reset := io.asyncDomain.reset
         inst0.io.syncDomain.clock  := io.syncDomain.clock
@@ -47,27 +54,27 @@ object ReferableSpec extends TestSuite:
         io.passthrough.o           := inst0.io.passthrough.o
         inst0.io.passthrough.i     := io.passthrough.i
     test("Wire"):
-      verilogTest(parameter, ReferableSpecIO(parameter), ReferableSpecProbe(parameter))(
+      verilogTest(new ReferableSpecIO, new ReferableSpecProbe)(
         "assign passthrough_o = passthrough_i;"
       ):
         val p    = summon[SimpleParameter]
         val io   = summon[Interface[ReferableSpecIO]]
-        val wire = Wire(UInt(parameter.width.W))
+        val wire = Wire(UInt(p.width.W))
         io.passthrough.o := wire
         wire             := io.passthrough.i
     test("Register without reset"):
-      verilogTest(parameter, ReferableSpecIO(parameter), ReferableSpecProbe(parameter))(
+      verilogTest(new ReferableSpecIO, new ReferableSpecProbe)(
         "always @(posedge syncDomain_clock)",
         "reg_0 <= passthrough_i;"
       ):
         val p            = summon[SimpleParameter]
         val io           = summon[Interface[ReferableSpecIO]]
         given Ref[Clock] = io.syncDomain.clock
-        val reg          = Reg(UInt(parameter.width.W))
+        val reg          = Reg(UInt(p.width.W))
         io.passthrough.o := reg
         reg              := io.passthrough.i
     test("Register with SyncReset"):
-      verilogTest(parameter, ReferableSpecIO(parameter), ReferableSpecProbe(parameter))(
+      verilogTest(new ReferableSpecIO, new ReferableSpecProbe)(
         "always @(posedge syncDomain_clock) begin",
         "if (syncDomain_reset)"
       ):
@@ -79,7 +86,7 @@ object ReferableSpec extends TestSuite:
         io.passthrough.o := reg
         reg              := io.passthrough.i
     test("Register with ASyncReset"):
-      verilogTest(parameter, ReferableSpecIO(parameter), ReferableSpecProbe(parameter))(
+      verilogTest(new ReferableSpecIO, new ReferableSpecProbe)(
         "always @(posedge asyncDomain_clock or posedge asyncDomain_reset) begin"
       ):
         val p            = summon[SimpleParameter]

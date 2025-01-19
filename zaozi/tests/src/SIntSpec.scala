@@ -18,7 +18,10 @@ import utest.*
 
 import java.lang.foreign.Arena
 
-class SIntSpecIO(parameter: SimpleParameter) extends HWInterface[SimpleParameter](parameter):
+class SIntSpecIO(
+  using SimpleParameter)
+    extends HWInterface[SimpleParameter]:
+  val parameter  = summon[SimpleParameter]
   val a          = Flipped(SInt(parameter.width.W))
   val b          = Flipped(SInt(parameter.width.W))
   val c          = Flipped(UInt(parameter.width.W))
@@ -29,14 +32,16 @@ class SIntSpecIO(parameter: SimpleParameter) extends HWInterface[SimpleParameter
   val clock      = Flipped(Clock())
   val asyncReset = Flipped(AsyncReset())
 
-class SIntSpecProbe(parameter: SimpleParameter) extends DVInterface[SimpleParameter](parameter)
+class SIntSpecProbe(
+  using SimpleParameter)
+    extends DVInterface[SimpleParameter]
 
 object SIntSpec extends TestSuite:
   val tests = Tests:
-    val parameter = SimpleParameter(8, "SIntSpecModule")
-    val out       = new StringBuilder
+    given SimpleParameter(8, "SIntSpecModule")
+    val out = new StringBuilder
     test("asBits"):
-      verilogTest(parameter, SIntSpecIO(parameter), SIntSpecProbe(parameter))(
+      verilogTest(new SIntSpecIO, new SIntSpecProbe)(
         "assign bits = a;"
       ):
         val p  = summon[SimpleParameter]
@@ -45,7 +50,7 @@ object SIntSpec extends TestSuite:
         io.bool.dontCare()
         io.bits := io.a.asBits
     test("+"):
-      verilogTest(parameter, SIntSpecIO(parameter), SIntSpecProbe(parameter))(
+      verilogTest(new SIntSpecIO, new SIntSpecProbe)(
         "assign sint = {a[7], a} + {b[7], b};"
       ):
         val p  = summon[SimpleParameter]
@@ -54,7 +59,7 @@ object SIntSpec extends TestSuite:
         io.bool.dontCare()
         io.bits.dontCare()
     test("-"):
-      verilogTest(parameter, SIntSpecIO(parameter), SIntSpecProbe(parameter))(
+      verilogTest(new SIntSpecIO, new SIntSpecProbe)(
         "assign sint = {a[7], a} - {b[7], b};"
       ):
         val p  = summon[SimpleParameter]
@@ -63,7 +68,7 @@ object SIntSpec extends TestSuite:
         io.bool.dontCare()
         io.bits.dontCare()
     test("*"):
-      verilogTest(parameter, SIntSpecIO(parameter), SIntSpecProbe(parameter))(
+      verilogTest(new SIntSpecIO, new SIntSpecProbe)(
         "wire [15:0] tests = {{8{a[7]}}, a} * {{8{b[7]}}, b};"
       ):
         val p  = summon[SimpleParameter]
@@ -72,7 +77,7 @@ object SIntSpec extends TestSuite:
         io.bool.dontCare()
         io.bits.dontCare()
     test("/"):
-      verilogTest(parameter, SIntSpecIO(parameter), SIntSpecProbe(parameter))(
+      verilogTest(new SIntSpecIO, new SIntSpecProbe)(
         "assign sint = $signed($signed({a[7], a}) / $signed({b[7], b}));"
       ):
         val p  = summon[SimpleParameter]
@@ -81,7 +86,7 @@ object SIntSpec extends TestSuite:
         io.bool.dontCare()
         io.bits.dontCare()
     test("%"):
-      verilogTest(parameter, SIntSpecIO(parameter), SIntSpecProbe(parameter))(
+      verilogTest(new SIntSpecIO, new SIntSpecProbe)(
         "wire [7:0] tests = $signed($signed(a) % $signed(b));"
       ):
         val p  = summon[SimpleParameter]
@@ -90,7 +95,7 @@ object SIntSpec extends TestSuite:
         io.bool.dontCare()
         io.bits.dontCare()
     test("<"):
-      verilogTest(parameter, SIntSpecIO(parameter), SIntSpecProbe(parameter))(
+      verilogTest(new SIntSpecIO, new SIntSpecProbe)(
         "assign bool = $signed(a) < $signed(b);"
       ):
         val p  = summon[SimpleParameter]
@@ -99,7 +104,7 @@ object SIntSpec extends TestSuite:
         io.bool := io.a < io.b
         io.bits.dontCare()
     test("<="):
-      verilogTest(parameter, SIntSpecIO(parameter), SIntSpecProbe(parameter))(
+      verilogTest(new SIntSpecIO, new SIntSpecProbe)(
         "assign bool = $signed(a) <= $signed(b);"
       ):
         val p  = summon[SimpleParameter]
@@ -108,7 +113,7 @@ object SIntSpec extends TestSuite:
         io.bool := io.a <= io.b
         io.bits.dontCare()
     test(">"):
-      verilogTest(parameter, SIntSpecIO(parameter), SIntSpecProbe(parameter))(
+      verilogTest(new SIntSpecIO, new SIntSpecProbe)(
         "assign bool = $signed(a) > $signed(b);"
       ):
         val p  = summon[SimpleParameter]
@@ -117,7 +122,7 @@ object SIntSpec extends TestSuite:
         io.bool := io.a > io.b
         io.bits.dontCare()
     test(">="):
-      verilogTest(parameter, SIntSpecIO(parameter), SIntSpecProbe(parameter))(
+      verilogTest(new SIntSpecIO, new SIntSpecProbe)(
         "assign bool = $signed(a) >= $signed(b);"
       ):
         val p  = summon[SimpleParameter]
@@ -126,7 +131,7 @@ object SIntSpec extends TestSuite:
         io.bool := io.a >= io.b
         io.bits.dontCare()
     test("==="):
-      verilogTest(parameter, SIntSpecIO(parameter), SIntSpecProbe(parameter))(
+      verilogTest(new SIntSpecIO, new SIntSpecProbe)(
         "assign bool = a == b;"
       ):
         val p  = summon[SimpleParameter]
@@ -135,7 +140,7 @@ object SIntSpec extends TestSuite:
         io.bool := io.a === io.b
         io.bits.dontCare()
     test("=/="):
-      verilogTest(parameter, SIntSpecIO(parameter), SIntSpecProbe(parameter))(
+      verilogTest(new SIntSpecIO, new SIntSpecProbe)(
         "assign bool = a != b;"
       ):
         val p  = summon[SimpleParameter]
@@ -144,7 +149,7 @@ object SIntSpec extends TestSuite:
         io.bool := io.a =/= io.b
         io.bits.dontCare()
     test("<< int"):
-      verilogTest(parameter, SIntSpecIO(parameter), SIntSpecProbe(parameter))(
+      verilogTest(new SIntSpecIO, new SIntSpecProbe)(
         "assign sint = {a[6:0], 2'h0};"
       ):
         val p  = summon[SimpleParameter]
@@ -153,7 +158,7 @@ object SIntSpec extends TestSuite:
         io.bool.dontCare()
         io.bits.dontCare()
     test("<< uint"):
-      verilogTest(parameter, SIntSpecIO(parameter), SIntSpecProbe(parameter))(
+      verilogTest(new SIntSpecIO, new SIntSpecProbe)(
         "wire [262:0] tests = {{255{a[7]}}, a} << c;",
         "assign sint = tests[8:0];"
       ):
@@ -163,7 +168,7 @@ object SIntSpec extends TestSuite:
         io.bool.dontCare()
         io.bits.dontCare()
     test(">> int"):
-      verilogTest(parameter, SIntSpecIO(parameter), SIntSpecProbe(parameter))(
+      verilogTest(new SIntSpecIO, new SIntSpecProbe)(
         "assign sint = {{5{a[7]}}, a[7:4]};"
       ):
         val p  = summon[SimpleParameter]
@@ -172,7 +177,7 @@ object SIntSpec extends TestSuite:
         io.bool.dontCare()
         io.bits.dontCare()
     test(">> uint"):
-      verilogTest(parameter, SIntSpecIO(parameter), SIntSpecProbe(parameter))(
+      verilogTest(new SIntSpecIO, new SIntSpecProbe)(
         "wire [7:0] tests = $signed($signed(a) >>> c);",
         "assign sint = {tests[7], tests};"
       ):

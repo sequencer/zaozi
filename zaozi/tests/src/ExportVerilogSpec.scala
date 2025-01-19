@@ -74,27 +74,32 @@ class GCDInput(parameter: GCDParameter) extends Bundle:
 class GCDOutput(parameter: GCDParameter) extends Bundle:
   val z: BundleField[UInt] = Aligned(UInt(parameter.width.W))
 
-class GCDIO(parameter: GCDParameter) extends HWInterface[GCDParameter](parameter):
+class GCDIO(
+  using GCDParameter)
+    extends HWInterface[GCDParameter]:
+  val parameter = summon[GCDParameter]
   val clock:  BundleField[Clock]                 = Flipped(Clock())
   val reset:  BundleField[Reset]                 = Flipped(if (parameter.useAsyncReset) AsyncReset() else Reset())
   val input:  BundleField[DecoupledIO[GCDInput]] = Flipped(Decoupled(new GCDInput(parameter)))
   val output: BundleField[ValidIO[GCDOutput]]    = Aligned(Valid(GCDOutput(parameter)))
 
-class GCDProbe(parameter: GCDParameter) extends DVInterface[GCDParameter](parameter)
+class GCDProbe(
+  using GCDParameter)
+    extends DVInterface[GCDParameter]
 
 object ExportVerilogSpec extends TestSuite:
   val tests = Tests:
-    val parameter = SimpleParameter(32, "PassthroughModule")
-    val out       = new StringBuilder
+    given SimpleParameter(32, "PassthroughModule")
+    val out = new StringBuilder
     test("Passthrough"):
-      verilogTest(parameter, PassthroughIO(parameter), PassthroughProbe(parameter))(
+      verilogTest(new PassthroughIO, new PassthroughProbe)(
         "assign o = i;"
       ):
         val io = summon[Interface[PassthroughIO]]
         io.o := io.i
     test("GCD"):
-      val parameter = GCDParameter(32, false, "GCD", Seq.empty)
-      verilogTest(parameter, new GCDIO(parameter), new GCDProbe(parameter))(
+      given GCDParameter(32, false, "GCD", Seq.empty)
+      verilogTest(new GCDIO, new GCDProbe)(
         "module GCD("
       ):
         val p            = summon[GCDParameter]
@@ -135,8 +140,8 @@ object ExportVerilogSpec extends TestSuite:
           startupFlag
         )
     test("GCD with When"):
-      val parameter = GCDParameter(32, false, "GCD", Seq.empty)
-      verilogTest(parameter, new GCDIO(parameter), new GCDProbe(parameter))(
+      given GCDParameter(32, false, "GCD", Seq.empty)
+      verilogTest(new GCDIO, new GCDProbe)(
         "module GCD("
       ):
         val p            = summon[GCDParameter]

@@ -28,22 +28,28 @@ import java.lang.foreign.Arena
 
 case class LayerSpecParameter(width: Int, moduleName: String, layers: Seq[Layer]) extends Parameter
 
-class LayerSpecIO(parameter: LayerSpecParameter) extends HWInterface[LayerSpecParameter](parameter):
-  val a0     = Flipped(UInt(parameter.width.W))
-  val a0b0   = Flipped(UInt(parameter.width.W))
-  val a0b0c0 = Flipped(UInt(parameter.width.W))
-  val a0b1   = Flipped(UInt(parameter.width.W))
+class LayerSpecIO(
+  using LayerSpecParameter)
+    extends HWInterface[LayerSpecParameter]:
+  val parameter = summon[LayerSpecParameter]
+  val a0        = Flipped(UInt(parameter.width.W))
+  val a0b0      = Flipped(UInt(parameter.width.W))
+  val a0b0c0    = Flipped(UInt(parameter.width.W))
+  val a0b1      = Flipped(UInt(parameter.width.W))
 
-class LayerSpecProbe(parameter: LayerSpecParameter) extends DVInterface[LayerSpecParameter](parameter):
-  val a0     = ProbeRead(UInt(parameter.width.W), parameter.getLayers("A0"))
-  val a0b0   = ProbeRead(UInt(parameter.width.W), parameter.getLayers("A0")("A0B0"))
-  val a0b0c0 = ProbeRead(UInt(parameter.width.W), parameter.getLayers("A0")("A0B0")("A0B0C0"))
-  val a0b1   = ProbeRead(UInt(parameter.width.W), parameter.getLayers("A0")("A0B1"))
+class LayerSpecProbe(
+  using LayerSpecParameter)
+    extends DVInterface[LayerSpecParameter]:
+  val parameter = summon[LayerSpecParameter]
+  val a0        = ProbeRead(UInt(parameter.width.W), parameter.layerTrees("A0"))
+  val a0b0      = ProbeRead(UInt(parameter.width.W), parameter.layerTrees("A0")("A0B0"))
+  val a0b0c0    = ProbeRead(UInt(parameter.width.W), parameter.layerTrees("A0")("A0B0")("A0B0C0"))
+  val a0b1      = ProbeRead(UInt(parameter.width.W), parameter.layerTrees("A0")("A0B1"))
 
 object LayerSpec extends TestSuite:
   val tests = Tests:
     test("Simple Layer"):
-      val parameter = LayerSpecParameter(
+      given LayerSpecParameter(
         32,
         "SimpleLayerModule",
         Seq(
@@ -68,7 +74,7 @@ object LayerSpec extends TestSuite:
           Layer("A1")
         )
       )
-      verilogTest(parameter, LayerSpecIO(parameter), LayerSpecProbe(parameter))(
+      verilogTest(new LayerSpecIO, new LayerSpecProbe)(
         "bind SimpleLayerModule SimpleLayerModule_A0 a0_0",
         "bind SimpleLayerModule SimpleLayerModule_A0_A0B1 a0_a0B1",
         "bind SimpleLayerModule SimpleLayerModule_A0_A0B0_A0B0C0 a0_a0B0_a0B0C0",

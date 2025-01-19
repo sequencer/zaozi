@@ -14,15 +14,15 @@ import java.lang.foreign.Arena
 case class SimpleParameter(width: Int, moduleName: String) extends Parameter:
   def layers: Seq[Layer] = Seq.empty
 
-class PassthroughIO(parameter: SimpleParameter) extends HWInterface[SimpleParameter](parameter):
-  val i = Flipped(UInt(parameter.width.W))
-  val o = Aligned(UInt(parameter.width.W))
+class PassthroughIO(using SimpleParameter) extends HWInterface[SimpleParameter]:
+  val i = Flipped(UInt(summon[SimpleParameter].width.W))
+  val o = Aligned(UInt(summon[SimpleParameter].width.W))
 
-class PassthroughProbe(parameter: SimpleParameter) extends DVInterface[SimpleParameter](parameter)
+class PassthroughProbe(using SimpleParameter) extends DVInterface[SimpleParameter]
 
 // VERILOG-LABEL: module PassthroughModule(
-val parameter = SimpleParameter(32, "PassthroughModule")
-verilogTest(parameter, PassthroughIO(parameter), PassthroughProbe(parameter)):
+given SimpleParameter(32, "PassthroughModule")
+verilogTest(new PassthroughIO, new PassthroughProbe):
   // VERILOG-NEXT:   input  [31:0] i,
   // VERILOG-NEXT:   output [31:0] o
   // VERILOG-NEXT: );

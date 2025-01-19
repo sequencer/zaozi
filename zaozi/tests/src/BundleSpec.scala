@@ -25,7 +25,9 @@ class SimpleBundleA extends Bundle:
 class SimpleBundleB extends Bundle:
   val b = Aligned(UInt(32.W))
 
-class BundleSpecIO(parameter: SimpleParameter) extends HWInterface[SimpleParameter](parameter):
+class BundleSpecIO(
+  using SimpleParameter)
+    extends HWInterface[SimpleParameter]:
   val a = Aligned(UInt(32.W))
   val b = Flipped(UInt(32.W))
   val c = Aligned(new Bundle {
@@ -37,31 +39,33 @@ class BundleSpecIO(parameter: SimpleParameter) extends HWInterface[SimpleParamet
   val i = 32
   val j = Aligned(new TypeParamIO(new SimpleBundleA, new SimpleBundleB))
 
-class BundleSpecProbe(parameter: SimpleParameter) extends DVInterface[SimpleParameter](parameter)
+class BundleSpecProbe(
+  using SimpleParameter)
+    extends DVInterface[SimpleParameter]
 
 object BundleSpec extends TestSuite:
   val tests = Tests:
-    val parameter = SimpleParameter(8, "BundleSpecModule")
+    given SimpleParameter(8, "BundleSpecModule")
     test("Bundle in Bundle should work"):
-      firrtlTest(parameter, new BundleSpecIO(parameter), new BundleSpecProbe(parameter))(
+      firrtlTest(new BundleSpecIO, new BundleSpecProbe)(
         "connect io.a, io.f.g"
       ):
         val io = summon[Interface[BundleSpecIO]]
         io.a := io.f.g
     test("Bundle with type parameter should work"):
-      firrtlTest(parameter, new BundleSpecIO(parameter), new BundleSpecProbe(parameter))(
+      firrtlTest(new BundleSpecIO, new BundleSpecProbe)(
         "connect io.a, io.j.a.a"
       ):
         val io = summon[Interface[BundleSpecIO]]
         io.a := io.j.a.a
     test("Custom val name"):
-      firrtlTest(parameter, new BundleSpecIO(parameter), new BundleSpecProbe(parameter))(
+      firrtlTest(new BundleSpecIO, new BundleSpecProbe)(
         "connect io.a, io.hhh"
       ):
         val io = summon[Interface[BundleSpecIO]]
         io.a := io.h
     test("Symbol found"):
-      firrtlTest(parameter, new BundleSpecIO(parameter), new BundleSpecProbe(parameter))(
+      firrtlTest(new BundleSpecIO, new BundleSpecProbe)(
         "connect io.a, io.b"
       ):
         val io = summon[Interface[BundleSpecIO]]
@@ -71,7 +75,7 @@ object BundleSpec extends TestSuite:
       given Context = summon[ContextApi].contextCreate
       summon[Context].loadFirrtlDialect()
       test("Subaccess on non-Bundle type"):
-        summon[ConstructorApi].Module(parameter, new BundleSpecIO(parameter), new BundleSpecProbe(parameter)):
+        summon[ConstructorApi].Module(new BundleSpecIO, new BundleSpecProbe):
           val io = summon[Interface[BundleSpecIO]]
           compileError("""io.a.a""").check(
             "",
@@ -79,7 +83,7 @@ object BundleSpec extends TestSuite:
           )
 
       test("Symbol not found"):
-        summon[ConstructorApi].Module(parameter, new BundleSpecIO(parameter), new BundleSpecProbe(parameter)):
+        summon[ConstructorApi].Module(new BundleSpecIO, new BundleSpecProbe):
           val io = summon[Interface[BundleSpecIO]]
           compileError("""io.fourzerofour""").check(
             "",
@@ -88,7 +92,7 @@ object BundleSpec extends TestSuite:
 
       test("Access non Data type"):
         test("Int"):
-          summon[ConstructorApi].Module(parameter, new BundleSpecIO(parameter), new BundleSpecProbe(parameter)):
+          summon[ConstructorApi].Module(new BundleSpecIO, new BundleSpecProbe):
             val io = summon[Interface[BundleSpecIO]]
             compileError("""io.i""").check(
               "",
@@ -96,7 +100,7 @@ object BundleSpec extends TestSuite:
             )
 
         test("UInt"):
-          summon[ConstructorApi].Module(parameter, new BundleSpecIO(parameter), new BundleSpecProbe(parameter)):
+          summon[ConstructorApi].Module(new BundleSpecIO, new BundleSpecProbe):
             val io = summon[Interface[BundleSpecIO]]
             compileError("""io.e""").check(
               "",
@@ -104,7 +108,7 @@ object BundleSpec extends TestSuite:
             )
 
       test("Structural Type doesn't work"):
-        summon[ConstructorApi].Module(parameter, new BundleSpecIO(parameter), new BundleSpecProbe(parameter)):
+        summon[ConstructorApi].Module(new BundleSpecIO, new BundleSpecProbe):
           val io = summon[Interface[BundleSpecIO]]
           compileError("""io.c.d""").check(
             "",
