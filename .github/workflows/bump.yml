@@ -18,7 +18,7 @@ jobs:
       - name: Bump circt
         run: |
           oldFirtool="$(nix build '.#circt' --no-link --print-out-paths)/bin/firtool"
-          nix flake update nixpkgs-for-circt
+          nix flake update nixpkgs4circt
           newFirtool="$(nix build '.#circt' --no-link --print-out-paths)/bin/firtool"
           diff_bin="$(nix build '.#diffutils' --no-link --print-out-paths)/bin/diff"
           if "$diff_bin" -u <($oldFirtool --version) <($newFirtool --version); then
@@ -35,7 +35,7 @@ jobs:
             | xargs)
           if [ -z "$newHash" ] || [ "$newHash" = "$oldHash" ]; then
             echo "Original build logs for debug: "
-            cat t1-milldeps-log.txt
+            cat milldeps-log.txt
             echo "Hash unchanged, exit"
             exit 0
           fi
