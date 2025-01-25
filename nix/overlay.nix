@@ -1,15 +1,13 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: 2024 Jiuyang Liu <liu@jiuyang.me>
+{ extraNixpkgsSrc }:
+
+final: prev:
 
 let
-  getEnv' = key:
-    let
-      val = builtins.getEnv key;
-    in if val == "" then
-      builtins.throw "${key} not set or '--impure' not applied"
-    else val;
+  extraNixpkgs = import extraNixpkgsSrc { inherit (final) system; };
 in
-final: prev: {
+{
   espresso = final.callPackage ./pkgs/espresso.nix { };
 
   mill =
@@ -26,6 +24,7 @@ final: prev: {
 
   fetchMillDeps = final.callPackage ./pkgs/mill-builder.nix { };
 
+  inherit (extraNixpkgs) circt;
   circt-install = final.callPackage ./pkgs/circt-install.nix { };
 
   mlir-install = final.callPackage ./pkgs/mlir-install.nix { };

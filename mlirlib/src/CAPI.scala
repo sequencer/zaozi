@@ -913,7 +913,11 @@ trait PassManagerApi extends HasSegment[PassManager] with HasSizeOf[PassManager]
       printAfterAll:           Boolean,
       printModuleScope:        Boolean,
       printAfterOnlyOnChange:  Boolean,
-      printAfterOnlyOnFailure: Boolean
+      printAfterOnlyOnFailure: Boolean,
+      flags:                   OpPrintingFlags,
+      treePrintingPath:        String
+    )(
+      using arena:             Arena
     ):                    Unit
     inline def enableVerifier(enable: Boolean): Unit
     inline def addOwnedPass(
