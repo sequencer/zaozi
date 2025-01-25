@@ -5,11 +5,12 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable-small";
+    nixpkgs4circt.url = "github:NixOS/nixpkgs/nixos-unstable-small";
     flake-utils.url = "github:numtide/flake-utils";
   };
 
-  outputs = inputs@{ self, nixpkgs, flake-utils }:
-    let overlay = import ./nix/overlay.nix;
+  outputs = inputs@{ self, nixpkgs, nixpkgs4circt, flake-utils }:
+    let overlay = (import ./nix/overlay.nix) { extraNixpkgsSrc = nixpkgs4circt; };
     in {
       # System-independent attr
       inherit inputs;
@@ -26,7 +27,7 @@
         legacyPackages = pkgs;
         devShells.default = pkgs.mkShell ({
           inputsFrom = [ pkgs.zaozi.zaozi-assembly ];
-          nativeBuildInputs = [  ];
+          nativeBuildInputs = [ ];
           env = {
             CIRCT_INSTALL_PATH = pkgs.circt-install;
             MLIR_INSTALL_PATH = pkgs.mlir-install;
