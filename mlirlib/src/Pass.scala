@@ -81,14 +81,20 @@ given PassManagerApi with
       printAfterAll:           Boolean,
       printModuleScope:        Boolean,
       printAfterOnlyOnChange:  Boolean,
-      printAfterOnlyOnFailure: Boolean
+      printAfterOnlyOnFailure: Boolean,
+      flags:                   OpPrintingFlags,
+      treePrintingPath:        String
+    )(
+      using arena:             Arena
     ): Unit = mlirPassManagerEnableIRPrinting(
       passManager.segment,
       printBeforeAll,
       printAfterAll,
       printModuleScope,
       printAfterOnlyOnChange,
-      printAfterOnlyOnFailure
+      printAfterOnlyOnFailure,
+      flags.segment,
+      treePrintingPath.toStringRef.segment
     )
     inline def enableVerifier(enable: Boolean): Unit = mlirPassManagerEnableVerifier(passManager.segment, enable)
     inline def addOwnedPass(
