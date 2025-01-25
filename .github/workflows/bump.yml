@@ -1,0 +1,65 @@
+name: CIRCT Bump
+on:
+  schedule:
+    # Run this job everyday at 5:30 AM UTC+8
+    - cron:  '30 21 * * *'
+  workflow_dispatch:
+
+jobs:
+  bump-deps:
+    name: "Bump CIRCT"
+    if: ${{ !cancelled() }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: DeterminateSystems/nix-installer-action@main
+      - name: Bump circt
+        run: |
+          oldFirtool="$(nix build '.#circt' --no-link --print-out-paths)/bin/firtool"
+          nix flake update nixpkgs-for-circt
+          newFirtool="$(nix build '.#circt' --no-link --print-out-paths)/bin/firtool"
+          diff_bin="$(nix build '.#diffutils' --no-link --print-out-paths)/bin/diff"
+          if "$diff_bin" -u <($oldFirtool --version) <($newFirtool --version); then
+            # if circt version is not changed, abort this bump process
+            git restore flake.lock
+          fi
+      - name: Bump all mill deps
+        run: |
+          oldHash=$(nix derivation show '.#zaozi.zaozi-assembly.millDeps' | jq -r 'to_entries[0].value.env.outputHash')
+          nix build '.#zaozi.zaozi-assembly.millDeps' --rebuild -L > milldeps-log.txt 2>&1 || true
+          newHash=$(cat milldeps-log.txt \
+            | grep -P '^\s+got:\s+sha256-.*$' \
+            | cut -d':' -f2 \
+            | xargs)
+          if [ -z "$newHash" ] || [ "$newHash" = "$oldHash" ]; then
+            echo "Original build logs for debug: "
+            cat t1-milldeps-log.txt
+            echo "Hash unchanged, exit"
+            exit 0
+          fi
+          echo "Updating hash $oldHash to $newHash"
+          sed -i "s|$oldHash|$newHash|" nix/zaozi/zaozi.nix
+      - name: Commit changes
+        env:
+          GITHUB_TOKEN: ${{ secrets.PR_PAT }}
+        run: |
+          git config user.name Avimitin
+          git config user.email dev@avimit.in
+
+          currentDate=$(date +%F)
+          branch="dependencies-bumping-$currentDate"
+          git checkout -b "$branch"
+
+          git add 'nix/zaozi'
+          git add 'flake.lock'
+
+          if ! git diff --quiet --cached --exit-code; then
+            updatedFiles=$(git diff --cached --name-only)
+            echo "File changed"
+            git commit -m "[deps] Bump zaozi dependencies"
+            git push origin "$branch" --force-with-lease
+            nix run '.#gh' -- \
+              pr create --title "Bump zaozi dependencies" --body "Updated: $updatedFiles"
+          fi
