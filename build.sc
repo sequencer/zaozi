@@ -4,7 +4,8 @@ import mill._
 import mill.scalalib.TestModule.Utest
 import mill.scalalib._
 import mill.scalalib.scalafmt._
-import os.Path
+import $ivy.`com.lihaoyi::mill-contrib-jmh:`
+import contrib.jmh.JmhModule
 
 object v {
   val scala      = "3.6.2"
@@ -14,6 +15,7 @@ object v {
   val utest      = ivy"com.lihaoyi::utest:0.8.4"
   val sourcecode = ivy"com.lihaoyi::sourcecode:0.4.2"
   val pprint     = ivy"com.lihaoyi::pprint:0.9.0"
+  val jmh        = "1.35"
 }
 
 object zaozi extends ScalaModule with ScalafmtModule { m =>
@@ -39,6 +41,11 @@ object zaozi extends ScalaModule with ScalafmtModule { m =>
       def litDir:          T[os.Path]      = T(millSourcePath)
       def litConfigIn:     T[PathRef]      = T.source(millSourcePath / "lit.site.cfg.py.in")
     }
+  }
+
+  object benchmark extends ScalaModule with JmhModule {
+    def scalaVersion = T(v.scala)
+    def jmhCoreVersion = T(v.jmh)
   }
 
   object tests extends ScalaTests with ScalafmtModule with Utest {
