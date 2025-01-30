@@ -62,6 +62,8 @@ trait ConstructorApi:
 
   def Bool(): Bool
 
+  def Vec[T <: Data](size: Int, elementType: T): Vec[T]
+
   def when[COND <: Referable[Bool]](
     cond: COND
   )(body: (Arena, Context, Block) ?=> Unit
@@ -571,6 +573,30 @@ trait Mux[Cond <: Data, CondR <: Referable[Cond]]:
       sourcecode.Line,
       sourcecode.Name
     ): Node[Ret]
+trait Index[D <: Data, E <: Data, R <: Referable[D], IDX]:
+  extension (ref: R)
+    def index(
+      idx: IDX
+    )(
+      using Arena,
+      Context,
+      Block,
+      sourcecode.File,
+      sourcecode.Line,
+      sourcecode.Name
+    ): Ref[E]
+trait DynamicIndex[D <: Data, E <: Data, R <: Referable[D], IDX]:
+  extension (ref: R)
+    def index(
+      idx: IDX
+    )(
+      using Arena,
+      Context,
+      Block,
+      sourcecode.File,
+      sourcecode.Line,
+      sourcecode.Name
+    ): Ref[E]
 trait RefElement[D <: Data, E <: Data, R <: Referable[D], IDX]:
   extension (ref: R)
     def ref(
@@ -641,6 +667,10 @@ trait SIntApi[R <: Referable[SInt]]
     with Neq[SInt, Bool, R]
     with Shl[SInt, Int | Referable[UInt], SInt, R]
     with Shr[SInt, Int | Referable[UInt], SInt, R]
+  
+trait VecApi[T <: Data, R <: Referable[Vec[T]]]
+    extends Index[Vec[T], T, R, Int]
+    with DynamicIndex[Vec[T], T, R, Int]
 
 trait BundleApi[T <: Bundle, R <: Referable[T]]
 

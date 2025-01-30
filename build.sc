@@ -4,6 +4,8 @@ import mill._
 import mill.scalalib.TestModule.Utest
 import mill.scalalib._
 import mill.scalalib.scalafmt._
+import $ivy.`com.lihaoyi::mill-contrib-jmh:`
+import contrib.jmh.JmhModule
 import os.Path
 
 object v {
@@ -14,6 +16,7 @@ object v {
   val utest      = ivy"com.lihaoyi::utest:0.8.4"
   val sourcecode = ivy"com.lihaoyi::sourcecode:0.4.2"
   val pprint     = ivy"com.lihaoyi::pprint:0.9.0"
+  val jmh        = "1.35"
 }
 
 object zaozi extends ScalaModule with ScalafmtModule { m =>
@@ -39,6 +42,27 @@ object zaozi extends ScalaModule with ScalafmtModule { m =>
       def litDir:          T[os.Path]      = T(millSourcePath)
       def litConfigIn:     T[PathRef]      = T.source(millSourcePath / "lit.site.cfg.py.in")
     }
+  }
+
+  object benchmark extends ScalaModule with JmhModule {
+    def scalaVersion   = T(v.scala)
+    def moduleDeps     = Seq(tests)
+    def jmhCoreVersion = T(v.jmh)
+    def forkArgs: T[Seq[String]] = T(
+      super.forkArgs() ++ circtlib.forkArgs()
+    )
+    def runJmh(args: String*) =
+      T.command {
+        val (_, resources) = generateBenchmarkSources()
+        mill.util.Jvm.runSubprocess(
+          "org.openjdk.jmh.Main",
+          classPath = (runClasspath() ++ generatorDeps()).map(_.path) ++
+            Seq(compileGeneratedSources().path, resources),
+          mainArgs = args,
+          workingDir = T.ctx().dest,
+          jvmArgs = forkArgs()
+        )
+      }
   }
 
   object tests extends ScalaTests with ScalafmtModule with Utest {
@@ -248,37 +272,37 @@ trait PanamaModule extends JavaModule {
       ++ Some(s"-Djava.library.path=${libraryPaths().map(_.path).distinct.mkString(":")}")
   )
 
-  def includeConstantsFile: Target[Path]
+  def includeConstantsFile: Target[os.Path]
   def includeConstants:     Target[IndexedSeq[String]] = T.input(
     os.read.lines(includeConstantsFile()).filter(s => s.nonEmpty && !s.startsWith("#")).map(_.replaceFirst(" .*", ""))
   )
 
-  def includeFunctionsFile: Target[Path]
+  def includeFunctionsFile: Target[os.Path]
   def includeFunctions:     Target[IndexedSeq[String]] = T.input(
     os.read.lines(includeFunctionsFile()).filter(s => s.nonEmpty && !s.startsWith("#")).map(_.replaceFirst(" .*", ""))
   )
 
-  def includeStructsFile: Target[Path]
+  def includeStructsFile: Target[os.Path]
   def includeStructs:     Target[IndexedSeq[String]] = T.input(
     os.read.lines(includeStructsFile()).filter(s => s.nonEmpty && !s.startsWith("#")).map(_.replaceFirst(" .*", ""))
   )
 
-  def includeTypedefsFile: Target[Path]
+  def includeTypedefsFile: Target[os.Path]
   def includeTypedefs:     Target[IndexedSeq[String]] = T.input(
     os.read.lines(includeTypedefsFile()).filter(s => s.nonEmpty && !s.startsWith("#")).map(_.replaceFirst(" .*", ""))
   )
 
-  def includeUnionsFile: Target[Path]
+  def includeUnionsFile: Target[os.Path]
   def includeUnions:     Target[IndexedSeq[String]] = T.input(
     os.read.lines(includeUnionsFile()).filter(s => s.nonEmpty && !s.startsWith("#")).map(_.replaceFirst(" .*", ""))
   )
 
-  def includeVarsFile: Target[Path]
+  def includeVarsFile: Target[os.Path]
   def includeVars:     Target[IndexedSeq[String]] = T.input(
     os.read.lines(includeVarsFile()).filter(s => s.nonEmpty && !s.startsWith("#")).map(_.replaceFirst(" .*", ""))
   )
 
-  def linkLibrariesFile: Target[Path]
+  def linkLibrariesFile: Target[os.Path]
   def linkLibraries:     Target[IndexedSeq[String]] = T.input(
     os.read.lines(linkLibrariesFile()).filter(s => s.nonEmpty && !s.startsWith("#")).map(_.replaceFirst(" .*", ""))
   )
@@ -293,5 +317,5 @@ trait PanamaModule extends JavaModule {
 
   def libraryPaths: Target[Seq[PathRef]]
 
-  def jextractBinary: Target[Path]
+  def jextractBinary: Target[os.Path]
 }

@@ -87,6 +87,22 @@ class GCDProbe(
   using GCDParameter)
     extends DVInterface[GCDParameter]
 
+// coeffs
+case class CoeffsParameter(width: Int, coeffs: Seq[UInt], useAsyncReset: Boolean, moduleName: String, layers: Seq[Layer]) extends Parameter
+
+class CoeffsIO(
+  using CoeffsParameter)
+    extends HWInterface[CoeffsParameter]:
+  val parameter = summon[CoeffsParameter]
+  val clock:  BundleField[Clock]                 = Flipped(Clock())
+  val reset:  BundleField[Reset]                 = Flipped(if (parameter.useAsyncReset) AsyncReset() else Reset())
+  val input:  BundleField[UInt] = Flipped(UInt(parameter.width.W))
+  val output: BundleField[UInt]    = Aligned(UInt(parameter.width.W))
+
+class CoeffsProbe(
+  using CoeffsParameter)
+    extends DVInterface[CoeffsParameter]
+
 object ExportVerilogSpec extends TestSuite:
   val tests = Tests:
     given SimpleParameter(32, "PassthroughModule")
@@ -167,3 +183,22 @@ object ExportVerilogSpec extends TestSuite:
         io.input.ready   := !busy
         io.output.bits.z := x
         io.output.valid  := !busy & startupFlag
+    test("coeffs"):
+      given CoeffsParameter(32, Seq.empty, false, "Coeffs", Seq.empty)
+      verilogTest(new CoeffsIO, new CoeffsProbe)(
+        "module Coeffs("
+      ):
+        val p            = summon[CoeffsParameter]
+        val io           = summon[Interface[CoeffsIO]]
+        given Ref[Clock] = io.clock
+        given Ref[Reset] = io.reset
+
+        val zs: Vec[Referable[UInt]] = Vec(p.coeffs.size, Reg(UInt(p.width.W)))
+        zs(0) := io.input
+        for i <- 1 until p.coeffs.size do
+          zs(i) := zs(i - 1)
+
+        val products = p.coeffs.zip(zs).map: 
+          (c, z) => (c * z).asBits.bits(p.width, 0).asUInt 
+
+        io.output := products.reduce(_ + _)
