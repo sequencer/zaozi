@@ -62,6 +62,8 @@ trait ConstructorApi:
 
   def Bool(): Bool
 
+  def Vec[T <: Data](size: Int, tpe: T): Vec[T]
+
   def when[COND <: Referable[Bool]](
     cond: COND
   )(body: (Arena, Context, Block) ?=> Unit
@@ -643,6 +645,8 @@ trait SIntApi[R <: Referable[SInt]]
     with Shr[SInt, Int | Referable[UInt], SInt, R]
 
 trait BundleApi[T <: Bundle, R <: Referable[T]]
+
+trait VecApi[E <: Data, V <: Vec[E], R <: Referable[V]] extends ExtractElement[V, E, R, Referable[UInt] | Int]
 
 trait ClockApi[R <: Referable[Clock]]
 
