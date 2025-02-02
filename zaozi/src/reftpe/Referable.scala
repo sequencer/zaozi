@@ -4,7 +4,7 @@ package me.jiuyang.zaozi.reftpe
 
 import me.jiuyang.zaozi.*
 import me.jiuyang.zaozi.valuetpe.*
-import me.jiuyang.zaozi.magic.referableSelectDynamic
+import me.jiuyang.zaozi.magic.{referableApplyDynamic, referableApplyDynamicNamed, referableSelectDynamic}
 import org.llvm.circt.scalalib.firrtl.operation.Module as CirctModule
 import org.llvm.mlir.scalalib.{Block, Context, Operation, Type, Value}
 
@@ -20,6 +20,10 @@ trait Referable[T <: Data] extends Dynamic:
 
   /** macro to call [[DynamicSubfield.getRefViaFieldValName]] */
   transparent inline def selectDynamic(name: String): Any = ${ referableSelectDynamic('this, 'name) }
+  transparent inline def applyDynamic(name:  String)(args: Any*): Any = ${ referableApplyDynamic('this, 'name, 'args) }
+  transparent inline def applyDynamicNamed(name: String)(args: (String, Any)*): Any = ${
+    referableApplyDynamicNamed('this, 'name, 'args)
+  }
 
 trait HasOperation:
   def operation(
