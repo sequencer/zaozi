@@ -2115,7 +2115,7 @@ end given
 
 given [E <: Data, V <: Vec[E], R <: Referable[V]]: VecApi[E, V, R] with
   extension (ref: R)
-    def bit(
+    def apply(
       idx: Referable[UInt] | Int
     )(
       using Arena,

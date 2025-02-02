@@ -40,11 +40,11 @@ object VecSpec extends TestSuite:
       ):
         val io = summon[Interface[VecSpecIO]]
         io.b.dontCare()
-        io.out := io.a.bit(io.idx)
+        io.out := io.a(io.idx)
     test("Vec static idx work"):
       firrtlTest(new VecSpecIO, new VecSpecProbe)(
         "node tests = io.a[3]"
       ):
         val io = summon[Interface[VecSpecIO]]
         io.b.dontCare()
-        io.out := io.a.bit(3)
+        io.out := io.a(3)

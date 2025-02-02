@@ -550,7 +550,7 @@ trait ExtractRange[D <: Data, IDX, E <: Data, R <: Referable[D]]:
     ): Node[E]
 trait ExtractElement[D <: Data, E <: Data, R <: Referable[D], IDX]:
   extension (ref: R)
-    def bit(
+    def apply(
       idx: IDX
     )(
       using Arena,
