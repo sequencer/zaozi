@@ -8,7 +8,7 @@ import os.Path
 
 object v {
   val scala      = "3.6.2"
-  val mainargs   = ivy"com.lihaoyi::mainargs:0.7.6"
+  val mainargs   = ivy"com.lihaoyi::mainargs:0.includePaths7.6"
   val oslib      = ivy"com.lihaoyi::os-lib:0.11.3"
   val upickle    = ivy"com.lihaoyi::upickle:4.0.2"
   val utest      = ivy"com.lihaoyi::utest:0.8.4"
@@ -53,6 +53,18 @@ object zaozi extends ScalaModule with ScalafmtModule { m =>
 // The Scala API
 object circtlib extends ScalaModule with ScalafmtModule with PanamaModule { outer =>
   def scalaVersion = T(v.scala)
+
+  override def dumpIncludes() = T.command {
+    super.dumpIncludes()()
+    includeFiles().foreach { file =>
+      val lines =
+        os.read
+          .lines(file)
+          .filter(str => str.contains(circtInstallPath().toString))
+          .map(_.replaceAll(circtInstallPath().toString, "\\$CIRCT_INSTALL_PATH").trim)
+      os.write.over(file, (license ++ lines).mkString("\n"))
+    }
+  }
 
   def includeConstantsFile = millSourcePath / "capi" / "includeConstants.txt"
 
@@ -105,6 +117,20 @@ object circtlib extends ScalaModule with ScalafmtModule with PanamaModule { oute
 
 object mlirlib extends ScalaModule with ScalafmtModule with PanamaModule {
   def scalaVersion = T(v.scala)
+
+  override def dumpIncludes() = T.command {
+    super.dumpIncludes()()
+    includeFiles().foreach { file =>
+      val lines =
+        os.read
+          .lines(file)
+          .filter(str => str.contains(mlirInstallPath().toString))
+          // to eliminte error cause by a jextract bug
+          .filter(str => !str.contains("mlirTypeIDAllocatorAllocateTypeID"))
+          .map(_.replaceAll(mlirInstallPath().toString, "\\$MLIR_INSTALL_PATH").trim)
+      os.write.over(file, (license ++ lines).mkString("\n"))
+    }
+  }
 
   def includeConstantsFile = millSourcePath / "capi" / "includeConstants.txt"
 
@@ -183,6 +209,11 @@ trait LitModule extends Module {
 
 // Panama API
 trait PanamaModule extends JavaModule {
+  val license = Seq(
+    "# SPDX-License-Identifier: Apache-2.0",
+    "# SPDX-FileCopyrightText: 2025 Jiuyang Liu <liu@jiuyang.me>",
+    ""
+  )
 
   // API to regenerate all C-API from headers
   def dumpIncludes(): Command[Unit] = T.command {
@@ -192,21 +223,17 @@ trait PanamaModule extends JavaModule {
         ++ includePaths().flatMap(p => Seq("-I", p.path.toString))
         ++ Seq("--dump-includes", f.toString)
     ).call()
-    os.remove(includeConstantsFile())
-    os.remove(includeFunctionsFile())
-    os.remove(includeStructsFile())
-    os.remove(includeTypedefsFile())
-    os.remove(includeUnionsFile())
-    os.remove(includeVarsFile())
-    os.write(includeConstantsFile(), "")
-    os.write(includeFunctionsFile(), "")
-    os.write(includeStructsFile(), "")
-    os.write(includeTypedefsFile(), "")
-    os.write(includeUnionsFile(), "")
-    os.write(includeVarsFile(), "")
 
-    os.read.lines(f).filter(s => s.nonEmpty && !s.startsWith("#")).filter(str => !str.contains("jextract")).foreach {
-      str =>
+    includeFiles().foreach { file =>
+      os.remove(file)
+      os.write(file, "")
+    }
+
+    os.read
+      .lines(f)
+      .filter(s => s.nonEmpty && !s.startsWith("#"))
+      .filter(str => !str.contains("jextract"))
+      .foreach { str =>
         val writeStr = str.replaceFirst("--include.+? ", "") + "\n"
         if (str.startsWith("--include-constant")) os.write.append(includeConstantsFile(), writeStr)
         if (str.startsWith("--include-function")) os.write.append(includeFunctionsFile(), writeStr)
@@ -214,7 +241,7 @@ trait PanamaModule extends JavaModule {
         if (str.startsWith("--include-typedef")) os.write.append(includeTypedefsFile(), writeStr)
         if (str.startsWith("--include-union")) os.write.append(includeUnionsFile(), writeStr)
         if (str.startsWith("--include-var")) os.write.append(includeVarsFile(), writeStr)
-    }
+      }
   }
 
   override def generatedSources: Target[Seq[PathRef]] = T {
@@ -246,6 +273,17 @@ trait PanamaModule extends JavaModule {
   override def forkArgs: T[Seq[String]] = T(
     super.forkArgs() ++ Seq("--enable-native-access=ALL-UNNAMED", "--enable-preview")
       ++ Some(s"-Djava.library.path=${libraryPaths().map(_.path).distinct.mkString(":")}")
+  )
+
+  def includeFiles = T(
+    Seq(
+      includeConstantsFile(),
+      includeFunctionsFile(),
+      includeStructsFile(),
+      includeTypedefsFile(),
+      includeUnionsFile(),
+      includeVarsFile()
+    )
   )
 
   def includeConstantsFile: Target[Path]
