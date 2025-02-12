@@ -311,6 +311,7 @@ rtgtestCPUAttrGet               # header: $CIRCT_INSTALL_PATH/include/circt-c/Di
 rtgtestCPUAttrGetId             # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/RTGTest.h
 rtgtestCPUTypeGet               # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/RTGTest.h
 rtgtestTypeIsACPU               # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/RTGTest.h
+mlirGetDialectHandle__smt__ # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/SMT.h
 mlirGetDialectHandle__sv__        # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/SV.h
 registerSVPasses                  # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/SV.h
 svAttrIsASVAttributeAttr          # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/SV.h

@@ -17,6 +17,7 @@
 #include <circt-c/Dialect/Seq.h>
 #include <circt-c/Dialect/LTL.h>
 #include <circt-c/Dialect/CHIRRTL.h>
+#include <circt-c/Dialect/SMT.h>
 #include <circt-c/Dialect/SV.h>
 #include <circt-c/Dialect/Debug.h>
 #include <circt-c/Dialect/Moore.h>
