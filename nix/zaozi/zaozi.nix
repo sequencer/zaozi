@@ -42,7 +42,7 @@ let
         if stdenv.isDarwin then
           "sha256-Kdxg075PfS1pKmhLUVHX3E9GEDMa7GehOLPqbVBba2o="
         else
-          "sha256-1oZ/MFsvA+Og+BjCYSWW51FodF6zZJisLJHzOsFDL7Y=";
+          "sha256-bChKXh8ycj2+8Q0fDdzO8UTmVOBGDNSiac0jJwJNb3s=";
       nativeBuildInputs = [ projectDependencies.setupHook ];
     };
 
