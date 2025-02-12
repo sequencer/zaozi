@@ -8,7 +8,7 @@ import os.Path
 
 object v {
   val scala      = "3.6.2"
-  val mainargs   = ivy"com.lihaoyi::mainargs:0.includePaths7.6"
+  val mainargs   = ivy"com.lihaoyi::mainargs:0.7.6"
   val oslib      = ivy"com.lihaoyi::os-lib:0.11.3"
   val upickle    = ivy"com.lihaoyi::upickle:4.0.2"
   val utest      = ivy"com.lihaoyi::utest:0.8.4"
