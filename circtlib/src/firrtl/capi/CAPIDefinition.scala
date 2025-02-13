@@ -442,6 +442,10 @@ trait DialectHandleApi:
     )(
       using arena: Arena
     ): Unit
+    inline def loadSmtDialect(
+    )(
+      using arena: Arena
+    ): Unit
     inline def loadSvDialect(
     )(
       using arena: Arena
