@@ -28,3 +28,26 @@ given AddApi with
               ): Value = ref.operation.getResult(0)
 end given
 
+given ApplyFuncApi with
+  def op(
+          inputs:      Seq[Value],
+          location:    Location
+        )(
+          using arena: Arena,
+          context:     Context
+        ): ApplyFunc =
+    ApplyFunc(
+      summon[OperationApi].operationCreate(
+        name = "smt.add",
+        location = location,
+        operands = inputs,
+        inferredResultsTypes = Some(1)
+      )
+    )
+  extension (ref: ApplyFunc)
+    def operation: Operation = ref._operation
+    def result(
+                using Arena
+              ): Value = ref.operation.getResult(0)
+end given
+
