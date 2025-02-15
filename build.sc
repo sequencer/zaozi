@@ -4,6 +4,8 @@ import mill._
 import mill.scalalib.TestModule.Utest
 import mill.scalalib._
 import mill.scalalib.scalafmt._
+import $ivy.`com.lihaoyi::mill-contrib-jmh:`
+import contrib.jmh.JmhModule
 import os.Path
 
 object v {
@@ -14,6 +16,7 @@ object v {
   val utest      = ivy"com.lihaoyi::utest:0.8.4"
   val sourcecode = ivy"com.lihaoyi::sourcecode:0.4.2"
   val pprint     = ivy"com.lihaoyi::pprint:0.9.0"
+  val jmh        = "1.35"
 }
 
 object zaozi extends ScalaModule with ScalafmtModule { m =>
@@ -39,6 +42,27 @@ object zaozi extends ScalaModule with ScalafmtModule { m =>
       def litDir:          T[os.Path]      = T(millSourcePath)
       def litConfigIn:     T[PathRef]      = T.source(millSourcePath / "lit.site.cfg.py.in")
     }
+  }
+
+  object benchmark extends ScalaModule with JmhModule {
+    def scalaVersion   = T(v.scala)
+    def moduleDeps     = Seq(tests)
+    def jmhCoreVersion = T(v.jmh)
+    def forkArgs: T[Seq[String]] = T(
+      super.forkArgs() ++ circtlib.forkArgs()
+    )
+    def runJmh(args: String*) =
+      T.command {
+        val (_, resources) = generateBenchmarkSources()
+        mill.util.Jvm.runSubprocess(
+          "org.openjdk.jmh.Main",
+          classPath = (runClasspath() ++ generatorDeps()).map(_.path) ++
+            Seq(compileGeneratedSources().path, resources),
+          mainArgs = args,
+          workingDir = T.ctx().dest,
+          jvmArgs = forkArgs()
+        )
+      }
   }
 
   object tests extends ScalaTests with ScalafmtModule with Utest {
