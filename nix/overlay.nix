@@ -34,5 +34,7 @@ in
 
   projectDependencies = final.callPackage ./pkgs/project-dependencies.nix { };
 
+  riscv-opcodes = final.callPackage ./pkgs/riscv-opcodes.nix { };
+
   zaozi = final.callPackage ./zaozi { };
 }

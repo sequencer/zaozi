@@ -357,3 +357,16 @@ trait PanamaModule extends JavaModule {
 
   def jextractBinary: Target[Path]
 }
+
+object rvdecoderdb extends RVDecoderDB
+
+trait RVDecoderDB extends ScalaModule with ScalafmtModule {
+  def millSourcePath = os.pwd / "rvdecoderdb"
+  override def sources: T[Seq[PathRef]] = T.sources { super.sources() ++ Some(PathRef(millSourcePath / "src"))  }
+  def scalaVersion = T(v.scala)
+  def ivyDeps      = T(Seq(v.mainargs, v.oslib, v.upickle))
+
+  object tests extends ScalaTests with ScalafmtModule with Utest {
+    def ivyDeps = Agg(v.utest)
+  }
+}

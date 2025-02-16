@@ -34,6 +34,7 @@
             JEXTRACT_INSTALL_PATH = pkgs.jextract-21;
             LIT_INSTALL_PATH = pkgs.lit;
             SCALA_CLI_INSTALL_PATH = pkgs.scala-cli;
+            RISCV_OPCODES_INSTALL_PATH = pkgs.riscv-opcodes;
             # pass to jextract
             # Jextract splits the header class into multiple classes, which are combined via extending
             # Due to https://github.com/scala/bug/issues/9272 we cannot access static fields in superclass headers, we work around this by not splitting the header
