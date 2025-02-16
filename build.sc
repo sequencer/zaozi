@@ -370,3 +370,19 @@ trait RVDecoderDB extends ScalaModule with ScalafmtModule {
     def ivyDeps = Agg(v.utest)
   }
 }
+
+object rvcover extends ScalaModule with ScalafmtModule { m =>
+  def scalaVersion = T(v.scala)
+  def ivyDeps      = T(Seq(v.mainargs, v.oslib, v.upickle, v.sourcecode))
+  def moduleDeps   = Seq(circtlib, rvdecoderdb)
+
+  override def scalacOptions: Target[Seq[String]] = T(super.scalacOptions() ++ Some("-Xprint-suspension"))
+
+  object tests extends ScalaTests with ScalafmtModule with Utest {
+    def ivyDeps = Agg(v.utest)
+
+    override def forkArgs: T[Seq[String]] = T(
+      super.forkArgs() ++ circtlib.forkArgs()
+    )
+  }
+}
