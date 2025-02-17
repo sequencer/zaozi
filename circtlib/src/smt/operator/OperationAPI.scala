@@ -4,9 +4,9 @@ package org.llvm.circt.scalalib.smt.operation
 
 import org.llvm.mlir.scalalib.{HasOperation, Operation}
 
-class Add(val _operation: Operation)
-trait AddApi extends HasOperation[Add]
-end AddApi
+class And(val _operation: Operation)
+trait AndApi extends HasOperation[And]
+end AndApi
 
 class ApplyFunc(val _operation: Operation)
 trait ApplyFuncApi extends HasOperation[ApplyFunc]

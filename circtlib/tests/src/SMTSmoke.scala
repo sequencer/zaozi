@@ -63,5 +63,5 @@ object SMTSmoke extends TestSuite:
               nameKind = FirrtlNameKind.Droppable,
               tpe = 1.getUInt
             )
-            test("Add"):
-              summon[AddApi].op(Seq(bool0.result, bool1.result), unknownLocation).operation.appendToBlock()
+            test("And"):
+              summon[AndApi].op(Seq(bool0.result, bool1.result), unknownLocation).operation.appendToBlock()

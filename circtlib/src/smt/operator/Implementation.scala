@@ -5,23 +5,23 @@ package org.llvm.circt.scalalib.smt.operation
 import org.llvm.mlir.scalalib.{Block, Context, Location, LocationApi, NamedAttributeApi, Operation, OperationApi, Type, Value, Module as MlirModule, given}
 
 import java.lang.foreign.Arena
-given AddApi with
+given AndApi with
   def op(
           inputs:      Seq[Value],
           location:    Location
         )(
           using arena: Arena,
           context:     Context
-        ): Add =
-    Add(
+        ): And =
+    And(
       summon[OperationApi].operationCreate(
-        name = "smt.add",
+        name = "smt.and",
         location = location,
         operands = inputs,
         inferredResultsTypes = Some(1)
       )
     )
-  extension (ref: Add)
+  extension (ref: And)
     def operation: Operation = ref._operation
     def result(
                 using Arena
