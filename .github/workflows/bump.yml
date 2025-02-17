@@ -8,7 +8,7 @@ on:
 jobs:
   bump-deps:
     name: "Bump CIRCT"
-    if: ${{ !cancelled() }}
+    if: ${{ !cancelled() && !github.event.respository.fork }}
     runs-on: ubuntu-latest
     permissions:
       contents: write
