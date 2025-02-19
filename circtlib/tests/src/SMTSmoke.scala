@@ -12,7 +12,6 @@ import org.llvm.circt.scalalib.firrtl.capi.{
   FirrtlNameKind,
   TypeApi
 }
-import org.llvm.circt.scalalib.firrtl.operation.{*, given}
 import org.llvm.circt.scalalib.smt.operation.{*, given}
 import org.llvm.mlir.scalalib.{given_ModuleApi, Module as MlirModule, ModuleApi as MlirModuleApi, *, given}
 import utest.*
@@ -26,42 +25,67 @@ object SMTSmoke extends TestSuite:
       given Arena = arena
       test("Load Dialect"):
         val context         = summon[ContextApi].contextCreate
-        context.loadFirrtlDialect()
         context.loadSmtDialect()
         given Context       = context
         val unknownLocation = summon[LocationApi].locationUnknownGet
-        test("Create MlirModule"):
-          given MlirModule = summon[MlirModuleApi].moduleCreateEmpty(unknownLocation)
-          // TODO: use circuit api by default to include smt dialect
-          test("Create Circuit"):
-            val circuit: Circuit = summon[CircuitApi].op("Passthrough")
-            circuit.appendToModule()
-        test("Create CirctModule"):
-          val api = summon[FirrtlBundleFieldApi]
-          val module: Module = summon[ModuleApi].op(
-            "DummyModule",
-            unknownLocation,
-            FirrtlConvention.Scalarized,
-            Seq(
-              (api.createFirrtlBundleField("i", true, 32.getUInt), unknownLocation),
-              (api.createFirrtlBundleField("o", false, 32.getUInt), unknownLocation)
-            ),
-            Seq.empty
-          )
-          given Module = module
-          given Block  = module.block
-          test("Smt"):
-            val bool0   = summon[WireApi].op(
-              name = "bool0",
-              location = unknownLocation,
-              nameKind = FirrtlNameKind.Droppable,
-              tpe = 0.getUInt
-            )
-            val bool1   = summon[WireApi].op(
-              name = "bool1",
-              location = unknownLocation,
-              nameKind = FirrtlNameKind.Droppable,
-              tpe = 1.getUInt
-            )
-            test("And"):
-              summon[AndApi].op(Seq(bool0.result, bool1.result), unknownLocation).operation.appendToBlock()
+        test("Smt"):
+          val bool0 = summon[BoolConstantApi].op(false, location = unknownLocation)
+          val bool1 = summon[BoolConstantApi].op(true, location = unknownLocation)
+          test("And"):
+            summon[AndApi].op(Seq(bool0.result, bool1.result), unknownLocation).operation
+          // test("ApplyFunc"):
+          //   summon[ApplyFuncApi].op(Seq(bool0.result, bool1.result), unknownLocation).operation.appendToBlock()
+          // test("ArrayBroadcast"):
+          //   summon[ArrayBroadcastApi].op(bool0.result, unknownLocation).operation.appendToBlock()
+          // test("ArraySelect"):
+          //   summon[ArraySelectApi].op(Seq(bool0.result, bool1.result), unknownLocation).operation.appendToBlock()
+          // test("ArrayStore"):
+          //   summon[ArrayStoreApi].op(Seq(bool0.result, bool1.result), unknownLocation).operation.appendToBlock()
+          // test("BV2Int"):
+          //   summon[BV2IntApi].op(Seq(bool0.result, bool1.result), unknownLocation).operation.appendToBlock()
+          // test("BVAdd"):
+          //   summon[BVAddApi].op(Seq(bool0.result, bool1.result), unknownLocation).operation.appendToBlock()
+          // test("BVCmp"):
+          //   summon[BVCmpApi].op(Seq(bool0.result, bool1.result), unknownLocation).operation.appendToBlock()
+          // test("BVLShr"):
+          //   summon[BVLShrApi].op(Seq(bool0.result, bool1.result), unknownLocation).operation.appendToBlock()
+          // test("BVNeg"):
+          //   summon[BVNegApi].op(Seq(bool0.result, bool1.result), unknownLocation).operation.appendToBlock()
+          // test("BVOr"):
+          //   summon[BVOrApi].op(Seq(bool0.result, bool1.result), unknownLocation).operation.appendToBlock()
+          // test("BVSMod"):
+          //   summon[BVSModApi].op(Seq(bool0.result, bool1.result), unknownLocation).operation.appendToBlock()
+          // test("BVShl"):
+          //   summon[BVShlApi].op(Seq(bool0.result, bool1.result), unknownLocation).operation.appendToBlock()
+          // test("BVURem"):
+          //   summon[BVURemApi].op(Seq(bool0.result, bool1.result), unknownLocation).operation.appendToBlock()
+          // test("BoolConstant"):
+          //   summon[BoolConstantApi].op(Seq(bool0.result, bool1.result), unknownLocation).operation.appendToBlock()
+          // test("Concat"):
+          //   summon[ConcatApi].op(Seq(bool0.result, bool1.result), unknownLocation).operation.appendToBlock()
+          // test("Distinct"):
+          //   summon[DistinctApi].op(Seq(bool0.result, bool1.result), unknownLocation).operation.appendToBlock()
+          // test("Exists"):
+          //   summon[ExistsApi].op(Seq(bool0.result, bool1.result), unknownLocation).operation.appendToBlock()
+          // test("Forall"):
+          //   summon[ForallApi].op(Seq(bool0.result, bool1.result), unknownLocation).operation.appendToBlock()
+          // test("Int2BV"):
+          //   summon[Int2BVApi].op(Seq(bool0.result, bool1.result), unknownLocation).operation.appendToBlock()
+          // test("IntAdd"):
+          //   summon[IntAddApi].op(Seq(bool0.result, bool1.result), unknownLocation).operation.appendToBlock()
+          // test("IntConstant"):
+          //   summon[IntConstantApi].op(Seq(bool0.result, bool1.result), unknownLocation).operation.appendToBlock()
+          // test("IntMod"):
+          //   summon[IntModApi].op(Seq(bool0.result, bool1.result), unknownLocation).operation.appendToBlock()
+          // test("IntSub"):
+          //   summon[IntSubApi].op(Seq(bool0.result, bool1.result), unknownLocation).operation.appendToBlock()
+          // test("Not"):
+          //   summon[NotApi].op(Seq(bool0.result, bool1.result), unknownLocation).operation.appendToBlock()
+          // test("Pop"):
+          //   summon[PopApi].op(Seq(bool0.result, bool1.result), unknownLocation).operation.appendToBlock()
+          // test("Repeat"):
+          //   summon[RepeatApi].op(Seq(bool0.result, bool1.result), unknownLocation).operation.appendToBlock()
+          // test("SetLogic"):
+          //   summon[SetLogicApi].op(Seq(bool0.result, bool1.result), unknownLocation).operation.appendToBlock()
+          // test("XOr"):
+          //   summon[XOrApi].op(Seq(bool0.result, bool1.result), unknownLocation).operation.appendToBlock()
