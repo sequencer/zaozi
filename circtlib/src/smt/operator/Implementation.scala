@@ -182,7 +182,7 @@ given BV2IntApi with
           val namedAttributeApi = summon[NamedAttributeApi]
           Seq(
             // ::mlir::UnitAttr
-            namedAttributeApi.namedAttributeGet("is_signed".identifierGet, ???)
+            namedAttributeApi.namedAttributeGet("is_signed".identifierGet, unitAttrGet)
           )
         ,
         operands = Seq(input),
