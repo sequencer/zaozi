@@ -10,6 +10,7 @@ import org.llvm.mlir.scalalib.{
   Module as MlirModule,
   NamedAttribute,
   NamedAttributeApi,
+  AttributeApi,
   Operation,
   OperationApi,
   Type,
@@ -180,9 +181,10 @@ given BV2IntApi with
         location = location,
         namedAttributes =
           val namedAttributeApi = summon[NamedAttributeApi]
+          val attributeApi = summon[AttributeApi]
           Seq(
             // ::mlir::UnitAttr
-            namedAttributeApi.namedAttributeGet("is_signed".identifierGet, unitAttrGet)
+            namedAttributeApi.namedAttributeGet("is_signed".identifierGet, attributeApi.unitAttrGet)
           )
         ,
         operands = Seq(input),
