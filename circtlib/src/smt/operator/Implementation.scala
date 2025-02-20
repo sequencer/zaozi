@@ -166,9 +166,9 @@ given AssertApi with
     ): Value = ref.operation.getResult(0)
 end given
 
-// TODO: unit Attribute
 given BV2IntApi with
   def op(
+    isSigned: Boolean,
     input:       Value,
     location:    Location
   )(
@@ -179,13 +179,15 @@ given BV2IntApi with
       summon[OperationApi].operationCreate(
         name = "smt.bv2int",
         location = location,
-        namedAttributes =
-          val namedAttributeApi = summon[NamedAttributeApi]
-          val attributeApi = summon[AttributeApi]
-          Seq(
-            // ::mlir::UnitAttr
-            namedAttributeApi.namedAttributeGet("is_signed".identifierGet, attributeApi.unitAttrGet)
-          )
+        namedAttributes = isSigned match
+          case true =>
+            val namedAttributeApi = summon[NamedAttributeApi]
+            val attributeApi = summon[AttributeApi]
+            Seq(
+              // ::mlir::UnitAttr
+              namedAttributeApi.namedAttributeGet("is_signed".identifierGet, attributeApi.unitAttrGet)
+            )
+          case false => Seq.empty
         ,
         operands = Seq(input),
         inferredResultsTypes = Some(1)
@@ -691,7 +693,6 @@ given ConcatApi with
     ): Value = ref.operation.getResult(0)
 end given
 
-// operation ::= `smt.declare_fun` ($namePrefix^)? attr-dict `:` qualified(type($result))
 given DeclareFunApi with
   def op(
     namePrefix:  String,
@@ -767,12 +768,10 @@ given EqApi with
     ): Value = ref.operation.getResult(0)
 end given
 
-// operation ::= `smt.exists` ($boundVarNames^)? (`no_pattern` $noPattern^)? (`weight` $weight^)?
-//               attr-dict-with-keyword $body (`patterns` $patterns^)?
 given ExistsApi with
   def op(
     weight:        BigInt,
-    noPattern:     String,
+    noPattern:     Boolean,
     boundVarNames: Seq[String],
     location:      Location
   )(
@@ -785,14 +784,19 @@ given ExistsApi with
         location = location,
         namedAttributes =
           val namedAttributeApi = summon[NamedAttributeApi]
+          val attributeApi = summon[AttributeApi]
+          val noPatternAttr = noPattern match
+            case true =>
+              // ::mlir::UnitAttr
+              Seq(namedAttributeApi.namedAttributeGet("noPattern".identifierGet, attributeApi.unitAttrGet))
+            case false => Seq.empty
           Seq(
             // ::mlir::IntegerAttr
             namedAttributeApi.namedAttributeGet(
               "weight".identifierGet,
               weight.toLong.integerAttrGet(32.integerTypeGet)
-            ),
-            // ::mlir::UnitAttr
-            namedAttributeApi.namedAttributeGet("noPattern".identifierGet, ???),
+            )
+          ) ++ noPatternAttr ++ Seq(
             // ::mlir::ArrayAttr
             namedAttributeApi.namedAttributeGet("boundVarNames".identifierGet, Seq.empty.arrayAttrGet)
           )
@@ -844,7 +848,7 @@ end given
 given ForallApi with
   def op(
     weight:        BigInt,
-    noPattern:     String,
+    noPattern:     Boolean,
     boundVarNames: Seq[String],
     location:      Location
   )(
@@ -857,14 +861,19 @@ given ForallApi with
         location = location,
         namedAttributes =
           val namedAttributeApi = summon[NamedAttributeApi]
+          val attributeApi = summon[AttributeApi]
+          val noPatternAttr = noPattern match
+            case true =>
+              // ::mlir::UnitAttr
+              Seq(namedAttributeApi.namedAttributeGet("noPattern".identifierGet, attributeApi.unitAttrGet))
+            case false => Seq.empty
           Seq(
             // ::mlir::IntegerAttr
             namedAttributeApi.namedAttributeGet(
               "weight".identifierGet,
               weight.toLong.integerAttrGet(32.integerTypeGet)
-            ),
-            // ::mlir::UnitAttr
-            namedAttributeApi.namedAttributeGet("noPattern".identifierGet, ???),
+            )
+          ) ++ noPatternAttr ++ Seq(
             // ::mlir::ArrayAttr
             namedAttributeApi.namedAttributeGet("boundVarNames".identifierGet, Seq.empty.arrayAttrGet)
           )
