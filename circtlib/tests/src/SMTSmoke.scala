@@ -2,18 +2,9 @@
 // SPDX-FileCopyrightText: 2025 Jiuyang Liu <liu@jiuyang.me>
 package me.jiuyang.zaozi.circtlib.tests
 
-import org.llvm.circt.scalalib.firrtl.capi.{
-  given_DialectHandleApi,
-  given_FirrtlBundleFieldApi,
-  given_FirrtlDirectionApi,
-  given_TypeApi,
-  FirrtlBundleFieldApi,
-  FirrtlConvention,
-  FirrtlNameKind,
-  TypeApi
-}
+import org.llvm.circt.scalalib.smt.capi.given_DialectHandleApi
 import org.llvm.circt.scalalib.smt.operation.{*, given}
-import org.llvm.mlir.scalalib.{given_ModuleApi, Module as MlirModule, ModuleApi as MlirModuleApi, *, given}
+import org.llvm.mlir.scalalib.{Module as MlirModule, ModuleApi as MlirModuleApi, *, given}
 import utest.*
 
 import java.lang.foreign.Arena
