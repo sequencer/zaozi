@@ -107,8 +107,6 @@ trait AttributeApi extends HasSegment[Attribute] with HasSizeOf[Attribute]:
   // Bool
   extension (bool:      Boolean)
     inline def boolAttrGet(
-      tpe:         Type
-    )(
       using arena: Arena,
       context:     Context
     ): Attribute
@@ -372,6 +370,11 @@ trait DialectHandleApi extends HasSegment[DialectHandle] with HasSizeOf[DialectH
     inline def insertDialect(
     )(
       using context: Context
+    ): Unit
+  extension (context: Context)
+    inline def loadFuncDialect(
+    )(
+      using arena: Arena
     ): Unit
 end DialectHandleApi
 

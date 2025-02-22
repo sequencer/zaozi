@@ -143,6 +143,14 @@ given DialectHandleApi with
         using arena,
         context
       )
+    inline def loadSmtDialect(
+    )(
+      using arena: Arena
+    ): Unit =
+      DialectHandle(mlirGetDialectHandle__smt__(arena)).loadDialect(
+        using arena,
+        context
+      )
     inline def loadSvDialect(
     )(
       using arena: Arena
