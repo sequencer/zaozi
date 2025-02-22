@@ -20,16 +20,15 @@ object SMTSmoke extends TestSuite:
         context.loadFuncDialect()
         given Context       = context
         val unknownLocation = summon[LocationApi].locationUnknownGet
-        test("Create MlirModule"):
-          given MlirModule = summon[MlirModuleApi].moduleCreateEmpty(unknownLocation)
-          test("Create Func"):
-            val func: Func = summon[FuncApi].op("Passthrough")
-            func.appendToModule()
         test("Smt"):
+          given MlirModule = summon[MlirModuleApi].moduleCreateEmpty(unknownLocation)
+          val func: Func = summon[FuncApi].op("Passthrough")
+          func.appendToModule()
+          given Block = func.block
           val bool0 = summon[BoolConstantApi].op(false, location = unknownLocation)
           val bool1 = summon[BoolConstantApi].op(true, location = unknownLocation)
           test("And"):
-            summon[AndApi].op(Seq(bool0.result, bool1.result), unknownLocation).operation
+            summon[AndApi].op(Seq(bool0.result, bool1.result), unknownLocation).operation.appendToBlock()
           // test("ApplyFunc"):
           //   summon[ApplyFuncApi].op(Seq(bool0.result, bool1.result), unknownLocation).operation.appendToBlock()
           // test("ArrayBroadcast"):
