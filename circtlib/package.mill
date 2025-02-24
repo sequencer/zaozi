@@ -1,0 +1,74 @@
+// SPDX-License-Identifier: Apache-2.0
+// SPDX-FileCopyrightText: 2025 Jiuyang Liu <liu@jiuyang.me>
+package build.circtlib
+
+import mill._
+import mill.scalalib._
+import mill.scalalib.TestModule.Utest
+import mill.scalalib.scalafmt._
+
+import build.{mlirlib, v, PanamaModule}
+
+object `package` extends RootModule with ScalaModule with ScalafmtModule with PanamaModule { outer =>
+  def scalaVersion = Task(v.scala)
+
+  override def dumpIncludes() = Task.Command {
+    super.dumpIncludes()()
+    includeFiles().foreach { file =>
+      val lines =
+        os.read
+          .lines(file)
+          .filter(str => str.contains(circtInstallPath().toString))
+          .map(_.replaceAll(circtInstallPath().toString, "\\$CIRCT_INSTALL_PATH").trim)
+      os.write.over(file, (license ++ lines).mkString("\n"))
+    }
+  }
+
+  def includeConstantsFile = millSourcePath / "capi" / "includeConstants.txt"
+
+  def includeFunctionsFile = millSourcePath / "capi" / "includeFunctions.txt"
+
+  def includeStructsFile = millSourcePath / "capi" / "includeStructs.txt"
+
+  def includeTypedefsFile = millSourcePath / "capi" / "includeTypedefs.txt"
+
+  def includeUnionsFile = millSourcePath / "capi" / "includeUnions.txt"
+
+  def includeVarsFile = millSourcePath / "capi" / "includeVars.txt"
+
+  def linkLibrariesFile = millSourcePath / "capi" / "linkLibraries.txt"
+
+  def target = Task("org.llvm.circt")
+
+  def headerClassName = Task("CAPI")
+
+  def header = Task(PathRef(millSourcePath / "capi" / "jextract-headers.h"))
+
+  def circtInstallPath = Task(
+    os.Path(Task.env.getOrElse("CIRCT_INSTALL_PATH", "CIRCT_INSTALL_PATH not found, you are not in the nix env?"))
+  )
+
+  def jextractBinary = Task(
+    os.Path(
+      Task.env.getOrElse("JEXTRACT_INSTALL_PATH", "JEXTRACT_INSTALL_PATH not found, you are not in the nix env?")
+    ) / "bin" / "jextract"
+  )
+
+  def includePaths = Task(Seq(mlirlib.mlirInstallPath() / "include", circtInstallPath() / "include").map(PathRef(_)))
+
+  def libraryPaths = Task(Seq(mlirlib.mlirInstallPath() / "lib", circtInstallPath() / "lib").map(PathRef(_)))
+
+  override def moduleDeps = Seq(mlirlib)
+
+  def ivyDeps = Agg(v.pprint)
+
+  object tests extends ScalaModule with ScalafmtModule with Utest {
+    override def forkArgs: T[Seq[String]] = Task(outer.forkArgs)
+
+    override def moduleDeps = Seq(outer, mlirlib)
+
+    def ivyDeps = Agg(v.utest)
+
+    override def scalaVersion = outer.scalaVersion
+  }
+}

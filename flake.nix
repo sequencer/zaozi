@@ -27,7 +27,7 @@
         legacyPackages = pkgs;
         devShells.default = pkgs.mkShell ({
           inputsFrom = [ pkgs.zaozi.zaozi-assembly ];
-          nativeBuildInputs = [ ];
+          nativeBuildInputs = [ pkgs.nixd ];
           env = {
             CIRCT_INSTALL_PATH = pkgs.circt-install;
             MLIR_INSTALL_PATH = pkgs.mlir-install;

@@ -24,7 +24,7 @@ let
       toSource {
         root = ./../..;
         fileset = unions [
-          ./../../build.sc
+          ./../../build.mill
           ./../../circtlib
           ./../../mlirlib
           ./../../zaozi
@@ -36,7 +36,7 @@ let
       src = with lib.fileset;
         toSource {
           root = ./../..;
-          fileset = unions [ ./../../build.sc ];
+          fileset = unions [ ./../../build.mill ];
         };
       millDepsHash =
         if stdenv.isDarwin then

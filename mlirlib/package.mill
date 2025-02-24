@@ -1,0 +1,71 @@
+// SPDX-License-Identifier: Apache-2.0
+// SPDX-FileCopyrightText: 2025 Jiuyang Liu <liu@jiuyang.me>
+package build.mlirlib
+
+import mill._
+import mill.scalalib._
+import mill.scalalib.TestModule.Utest
+import mill.scalalib.scalafmt._
+
+import build.{v, PanamaModule}
+
+object `package` extends RootModule with ScalaModule with ScalafmtModule with PanamaModule {
+  def scalaVersion = Task(v.scala)
+
+  override def dumpIncludes() = Task.Command {
+    super.dumpIncludes()()
+    includeFiles().foreach { file =>
+      val lines =
+        os.read
+          .lines(file)
+          .filter(str => str.contains(mlirInstallPath().toString))
+          // to eliminte error cause by a jextract bug
+          .filter(str => !str.contains("mlirTypeIDAllocatorAllocateTypeID"))
+          .map(_.replaceAll(mlirInstallPath().toString, "\\$MLIR_INSTALL_PATH").trim)
+      os.write.over(file, (license ++ lines).mkString("\n"))
+    }
+  }
+
+  def includeConstantsFile = millSourcePath / "capi" / "includeConstants.txt"
+
+  def includeFunctionsFile = millSourcePath / "capi" / "includeFunctions.txt"
+
+  def includeStructsFile = millSourcePath / "capi" / "includeStructs.txt"
+
+  def includeTypedefsFile = millSourcePath / "capi" / "includeTypedefs.txt"
+
+  def includeUnionsFile = millSourcePath / "capi" / "includeUnions.txt"
+
+  def includeVarsFile = millSourcePath / "capi" / "includeVars.txt"
+
+  def linkLibrariesFile = millSourcePath / "capi" / "linkLibraries.txt"
+
+  def target = Task("org.llvm.mlir")
+
+  def headerClassName = Task("CAPI")
+
+  def header = Task(PathRef(millSourcePath / "capi" / "jextract-headers.h"))
+
+  def mlirInstallPath = Task.Input(
+    os.Path(Task.env.getOrElse("MLIR_INSTALL_PATH", "MLIR_INSTALL_PATH not found, you are not in the nix env?"))
+  )
+
+  def jextractBinary = Task(
+    os.Path(
+      Task.env.getOrElse("JEXTRACT_INSTALL_PATH", "JEXTRACT_INSTALL_PATH not found, you are not in the nix env?")
+    ) / "bin" / "jextract"
+  )
+
+  def includePaths = Task(Seq(PathRef(mlirInstallPath() / "include")))
+
+  def libraryPaths = Task(Seq(PathRef(mlirInstallPath() / "lib")))
+
+  object tests extends ScalaTests with ScalafmtModule with Utest {
+    def ivyDeps = Agg(v.utest)
+
+    override def forkArgs: T[Seq[String]] = Task(
+      super.forkArgs() ++ Seq("--enable-native-access=ALL-UNNAMED", "--enable-preview")
+        ++ libraryPaths().map(p => s"-Djava.library.path=${p.path}")
+    )
+  }
+}
