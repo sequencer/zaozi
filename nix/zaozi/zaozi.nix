@@ -3,9 +3,8 @@
 
 { lib
 , stdenv
-, fetchMillDeps
+, generateIvyCache
 , makeWrapper
-, jdk21
 , mill
 , circt-install
 , mlir-install
@@ -13,7 +12,6 @@
 , lit
 , scala-cli
 , add-determinism
-, projectDependencies
 }:
 
 let
@@ -31,31 +29,13 @@ let
         ];
       };
 
-    passthru.millDeps = fetchMillDeps {
+    passthru.millDeps = generateIvyCache {
       inherit name;
-      src = with lib.fileset;
-        toSource {
-          root = ./../..;
-          fileset = unions [ ./../../build.mill ];
-        };
-      millDepsHash =
-        if stdenv.isDarwin then
-          "sha256-Kdxg075PfS1pKmhLUVHX3E9GEDMa7GehOLPqbVBba2o="
-        else
-          "sha256-bChKXh8ycj2+8Q0fDdzO8UTmVOBGDNSiac0jJwJNb3s=";
-      nativeBuildInputs = [ projectDependencies.setupHook ];
+      src = self.src;
+      hash = "sha256-ZBmLvwtnQ027UjcDKFZv3OZfCt8SVf6bQHPoRFSucV0=";
     };
 
-    passthru.editable = self.overrideAttrs (_: {
-      shellHook = ''
-        setupSubmodulesEditable
-        mill mill.bsp.BSP/install 0
-      '';
-    });
-
-    shellHook = ''
-      setupSubmodules
-    '';
+    buildInputs = passthru.millDeps.cache.ivyDepsList;
 
     nativeBuildInputs = [
       mill
@@ -66,14 +46,13 @@ let
       scala-cli
       add-determinism
       makeWrapper
-      passthru.millDeps.setupHook
-      projectDependencies.setupHook
     ];
 
     env.CIRCT_INSTALL_PATH = circt-install;
     env.MLIR_INSTALL_PATH = mlir-install;
     env.JEXTRACT_INSTALL_PATH = jextract-21;
     env.LIT_INSTALL_PATH = lit;
+    env.JAVA_TOOL_OPTIONS = "--enable-preview";
 
     outputs = [ "out" ];
 
