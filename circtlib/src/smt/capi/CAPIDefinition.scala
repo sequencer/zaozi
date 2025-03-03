@@ -52,14 +52,15 @@ trait TypeApi:
     using arena: Arena,
     context:     Context
   ): Type
-  inline def isAnyNonFuncSMTValueType: Boolean
-  inline def isAnySMTValueType: Boolean
-  inline def isArray: Boolean
-  inline def isBitVector: Boolean
-  inline def isBool: Boolean
-  inline def isInt: Boolean
-  inline def isSMTFunc: Boolean
-  inline def isSort: Boolean
+  extension (tpe:                Type)
+    inline def isAnyNonFuncSMTValueType: Boolean
+    inline def isAnySMTValueType: Boolean
+    inline def isArray: Boolean
+    inline def isBitVector: Boolean
+    inline def isBool: Boolean
+    inline def isInt: Boolean
+    inline def isSMTFunc: Boolean
+    inline def isSort: Boolean
 end TypeApi
 
 trait AttributeApi:
@@ -73,14 +74,14 @@ trait AttributeApi:
       context:     Context
     ): Attribute
   inline def getBitVectorAttribute(
-    value: BigInt,
+    value: Int,
     width: Int
     )(
     using arena: Arena,
     context:     Context
   ): Attribute
-
-  inline def isSMTAttribute: Boolean
+  extension(attr: Attribute)
+    inline def isSMTAttribute: Boolean
   extension(str: String)
     inline def checkBVCmpPredicateAttribute(
       using arena: Arena,
