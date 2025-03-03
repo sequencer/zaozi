@@ -1058,8 +1058,8 @@ given IntCmpApi with
         namedAttributes =
           val namedAttributeApi = summon[NamedAttributeApi]
           Seq(
-            // ::circt::smt::BVCmpPredicateAttr
-            // namedAttributeApi.namedAttributeGet("pred".identifierGet, pred.bvCmpPredicateAttrGet),
+            // ::circt::smt::IntPredicateAttr
+            // namedAttributeApi.namedAttributeGet("pred".identifierGet, pred.IntPredicateAttrGet),
           )
         ,
         inferredResultsTypes = Some(1)
