@@ -1,0 +1,24 @@
+
+// SPDX-License-Identifier: Apache-2.0
+// SPDX-FileCopyrightText: 2025 Jiuyang Liu <liu@jiuyang.me>
+package build.rvdecoderdb
+
+import mill._
+import mill.scalalib._
+import mill.scalalib.TestModule.Utest
+import mill.scalalib.scalafmt._
+
+import build.v
+
+object `package` extends RootModule with RVDecoderDB
+
+trait RVDecoderDB extends ScalaModule with ScalafmtModule {
+  def millSourcePath = os.pwd / "rvdecoderdb"
+  override def sources: T[Seq[PathRef]] = Task.Sources { super.sources() ++ Some(PathRef(millSourcePath / "src"))  }
+  def scalaVersion = Task(v.scala)
+  def ivyDeps      = Task(Seq(v.mainargs, v.oslib, v.upickle))
+
+  object tests extends ScalaTests with ScalafmtModule with Utest {
+    def ivyDeps = Agg(v.utest)
+  }
+}

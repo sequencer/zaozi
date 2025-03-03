@@ -1,0 +1,153 @@
+// SPDX-License-Identifier: Apache-2.0
+// SPDX-FileCopyrightText: 2025 Jiuyang Liu <liu@jiuyang.me>
+package build
+
+import mill._
+import mill.scalalib.TestModule.Utest
+import mill.scalalib._
+import mill.scalalib.scalafmt._
+import $ivy.`com.lihaoyi::mill-contrib-jmh:`
+import contrib.jmh.JmhModule
+import os.Path
+
+import $packages._
+
+object v {
+  val scala      = "3.6.2"
+  val mainargs   = ivy"com.lihaoyi::mainargs:0.7.6"
+  val oslib      = ivy"com.lihaoyi::os-lib:0.11.3"
+  val upickle    = ivy"com.lihaoyi::upickle:4.0.2"
+  val utest      = ivy"com.lihaoyi::utest:0.8.4"
+  val sourcecode = ivy"com.lihaoyi::sourcecode:0.4.2"
+  val pprint     = ivy"com.lihaoyi::pprint:0.9.0"
+  val jmh        = "1.35"
+}
+
+// Panama API
+trait PanamaModule extends JavaModule {
+  val license = Seq(
+    "# SPDX-License-Identifier: Apache-2.0",
+    "# SPDX-FileCopyrightText: 2025 Jiuyang Liu <liu@jiuyang.me>",
+    ""
+  )
+
+  // API to regenerate all C-API from headers
+  def dumpIncludes(): Command[Unit] = Task.Command {
+    val f = os.temp()
+    os.proc(
+      Seq(jextractBinary().toString, header().path.toString)
+        ++ includePaths().flatMap(p => Seq("-I", p.path.toString))
+        ++ Seq("--dump-includes", f.toString)
+    ).call()
+
+    includeFiles().foreach { file =>
+      os.remove(file)
+      os.write(file, "")
+    }
+
+    os.read
+      .lines(f)
+      .filter(s => s.nonEmpty && !s.startsWith("#"))
+      .filter(str => !str.contains("jextract"))
+      .foreach { str =>
+        val writeStr = str.replaceFirst("--include.+? ", "") + "\n"
+        if (str.startsWith("--include-constant")) os.write.append(includeConstantsFile(), writeStr)
+        if (str.startsWith("--include-function")) os.write.append(includeFunctionsFile(), writeStr)
+        if (str.startsWith("--include-struct")) os.write.append(includeStructsFile(), writeStr)
+        if (str.startsWith("--include-typedef")) os.write.append(includeTypedefsFile(), writeStr)
+        if (str.startsWith("--include-union")) os.write.append(includeUnionsFile(), writeStr)
+        if (str.startsWith("--include-var")) os.write.append(includeVarsFile(), writeStr)
+      }
+  }
+
+  override def generatedSources: Target[Seq[PathRef]] = T {
+    super.generatedSources() ++ {
+      // @formatter:off
+      os.proc(
+        Seq(jextractBinary().toString, header().path.toString)
+          ++ includePaths().flatMap(p => Seq("-I", p.path.toString))
+          ++ Seq(
+          "-t", target(),
+          "--header-class-name", headerClassName(),
+          "--source",
+          "--output", Task.dest.toString
+        ) ++ includeFunctions().flatMap(f => Seq("--include-function", f)) ++
+          includeConstants().flatMap(f => Seq("--include-constant", f)) ++
+          includeStructs().flatMap(f => Seq("--include-struct", f)) ++
+          includeTypedefs().flatMap(f => Seq("--include-typedef", f)) ++
+          includeUnions().flatMap(f => Seq("--include-union", f)) ++
+          includeVars().flatMap(f => Seq("--include-var", f)) ++
+          linkLibraries().flatMap(l => Seq("-l", l))
+      ).call(Task.dest)
+      // @formatter:on
+      Seq(PathRef(Task.dest))
+    }
+  }
+
+  override def javacOptions: Target[Seq[String]] = Task(
+    super.javacOptions() ++ Seq("--enable-preview", "--release", "21")
+  )
+
+  override def forkArgs: T[Seq[String]] = Task(
+    super.forkArgs() ++ Seq("--enable-native-access=ALL-UNNAMED", "--enable-preview")
+      ++ Some(s"-Djava.library.path=${libraryPaths().map(_.path).distinct.mkString(":")}")
+  )
+
+  def includeFiles = Task(
+    Seq(
+      includeConstantsFile(),
+      includeFunctionsFile(),
+      includeStructsFile(),
+      includeTypedefsFile(),
+      includeUnionsFile(),
+      includeVarsFile()
+    )
+  )
+
+  def includeConstantsFile: Target[Path]
+  def includeConstants:     Target[IndexedSeq[String]] = Task.Input(
+    os.read.lines(includeConstantsFile()).filter(s => s.nonEmpty && !s.startsWith("#")).map(_.replaceFirst(" .*", ""))
+  )
+
+  def includeFunctionsFile: Target[Path]
+  def includeFunctions:     Target[IndexedSeq[String]] = Task.Input(
+    os.read.lines(includeFunctionsFile()).filter(s => s.nonEmpty && !s.startsWith("#")).map(_.replaceFirst(" .*", ""))
+  )
+
+  def includeStructsFile: Target[Path]
+  def includeStructs:     Target[IndexedSeq[String]] = Task.Input(
+    os.read.lines(includeStructsFile()).filter(s => s.nonEmpty && !s.startsWith("#")).map(_.replaceFirst(" .*", ""))
+  )
+
+  def includeTypedefsFile: Target[Path]
+  def includeTypedefs:     Target[IndexedSeq[String]] = Task.Input(
+    os.read.lines(includeTypedefsFile()).filter(s => s.nonEmpty && !s.startsWith("#")).map(_.replaceFirst(" .*", ""))
+  )
+
+  def includeUnionsFile: Target[Path]
+  def includeUnions:     Target[IndexedSeq[String]] = Task.Input(
+    os.read.lines(includeUnionsFile()).filter(s => s.nonEmpty && !s.startsWith("#")).map(_.replaceFirst(" .*", ""))
+  )
+
+  def includeVarsFile: Target[Path]
+  def includeVars:     Target[IndexedSeq[String]] = Task.Input(
+    os.read.lines(includeVarsFile()).filter(s => s.nonEmpty && !s.startsWith("#")).map(_.replaceFirst(" .*", ""))
+  )
+
+  def linkLibrariesFile: Target[Path]
+  def linkLibraries:     Target[IndexedSeq[String]] = Task.Input(
+    os.read.lines(linkLibrariesFile()).filter(s => s.nonEmpty && !s.startsWith("#")).map(_.replaceFirst(" .*", ""))
+  )
+
+  def target: Target[String]
+
+  def headerClassName: Target[String]
+
+  def header: Target[PathRef]
+
+  def includePaths: Target[Seq[PathRef]]
+
+  def libraryPaths: Target[Seq[PathRef]]
+
+  def jextractBinary: Target[Path]
+}

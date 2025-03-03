@@ -1,0 +1,101 @@
+// SPDX-License-Identifier: Apache-2.0
+// SPDX-FileCopyrightText: 2025 Jiuyang Liu <liu@jiuyang.me>
+package build.zaozi
+
+import mill._
+import mill.scalalib.TestModule.Utest
+import mill.scalalib._
+import mill.scalalib.scalafmt._
+import $ivy.`com.lihaoyi::mill-contrib-jmh:`
+import contrib.jmh.JmhModule
+import os.Path
+
+import build.{circtlib, v}
+
+object `package` extends RootModule with ScalaModule with ScalafmtModule { m =>
+  def scalaVersion = Task(v.scala)
+  def ivyDeps      = Task(Seq(v.mainargs, v.oslib, v.upickle, v.sourcecode))
+  def moduleDeps   = Seq(circtlib)
+
+  override def scalacOptions: Target[Seq[String]] = Task(super.scalacOptions() ++ Some("-Xprint-suspension"))
+
+  object lit extends ScalaModule with ScalafmtModule {
+    def scalaVersion = Task(v.scala)
+    def moduleDeps   = Seq(m)
+    override def forkArgs: T[Seq[String]] = Task(
+      super.forkArgs() ++ circtlib.forkArgs()
+    )
+    object tests extends LitModule {
+      def scalaVersion:    T[String]       = Task(m.scalaVersion())
+      def runClasspath:    T[Seq[os.Path]] = Task(lit.runClasspath().map(_.path))
+      def javaLibraryPath: T[Seq[os.Path]] = Task(
+        (circtlib.libraryPaths()).map(_.path)
+      )
+      def javaHome:        T[os.Path]      = Task(os.Path(sys.props("java.home")))
+      def litDir:          T[os.Path]      = Task(millSourcePath)
+      def litConfigIn:     T[PathRef]      = Task.Source(millSourcePath / "lit.site.cfg.py.in")
+    }
+  }
+
+  object benchmark extends ScalaModule with JmhModule {
+    def scalaVersion   = Task(v.scala)
+    def moduleDeps     = Seq(tests)
+    def jmhCoreVersion = Task(v.jmh)
+    def forkArgs: T[Seq[String]] = Task(
+      super.forkArgs() ++ circtlib.forkArgs()
+    )
+    def runJmh(args: String*) = Task.Command {
+      val (_, resources) = generateBenchmarkSources()
+      mill.util.Jvm.callProcess(
+        "org.openjdk.jmh.Main",
+        classPath = (runClasspath() ++ generatorDeps()).map(_.path) ++
+          Seq(compileGeneratedSources().path, resources),
+        mainArgs = args,
+        cwd = Task.ctx().dest,
+        jvmArgs = forkArgs(),
+        stdin = os.Inherit,
+        stdout = os.Inherit
+      )
+      ()
+    }
+  }
+
+  object tests extends ScalaTests with ScalafmtModule with Utest {
+    def ivyDeps = Agg(v.utest)
+
+    override def forkArgs: T[Seq[String]] = Task(
+      super.forkArgs() ++ circtlib.forkArgs()
+    )
+  }
+}
+
+// Lit-based Test
+trait LitModule extends Module {
+  def scalaVersion:    T[String]
+  def runClasspath:    T[Seq[os.Path]]
+  def javaLibraryPath: T[Seq[os.Path]]
+  def javaHome:        T[os.Path]
+  def litDir:          T[os.Path]
+  def litConfigIn:     T[PathRef]
+  def litConfig:       T[PathRef] = T {
+    os.write(
+      Task.dest / "lit.site.cfg.py",
+      os.read(litConfigIn().path)
+        .replaceAll("@SCALA_VERSION@", scalaVersion())
+        .replaceAll("@RUN_CLASSPATH@", runClasspath().mkString(","))
+        .replaceAll("@JAVA_HOME@", javaHome().toString)
+        .replaceAll("@JAVA_LIBRARY_PATH@", javaLibraryPath().mkString(","))
+        .replaceAll("@LIT_DIR@", litDir().toString)
+    )
+    PathRef(Task.dest)
+  }
+  def litBinary          = Task(
+    os.Path(
+      Task.env.getOrElse("LIT_INSTALL_PATH", "LIT_INSTALL_PATH not found, you are not in the nix env?")
+    ) / "bin" / "lit"
+  )
+  def run(args: String*) = Task.Command(
+    os.proc(litBinary().toString(), litConfig().path, "-a")
+      .call(Task.dest, stdout = os.ProcessOutput.Readlines(line => Task.ctx().log.info("[lit] " + line)))
+  )
+}
