@@ -5,7 +5,6 @@
 , stdenv
 , fetchMillDeps
 , makeWrapper
-, jdk21
 , mill
 , circt-install
 , mlir-install
@@ -13,7 +12,6 @@
 , lit
 , scala-cli
 , add-determinism
-, projectDependencies
 }:
 
 let
@@ -38,24 +36,8 @@ let
           root = ./../..;
           fileset = unions [ ./../../build.mill ];
         };
-      millDepsHash =
-        if stdenv.isDarwin then
-          "sha256-Kdxg075PfS1pKmhLUVHX3E9GEDMa7GehOLPqbVBba2o="
-        else
-          "sha256-bChKXh8ycj2+8Q0fDdzO8UTmVOBGDNSiac0jJwJNb3s=";
-      nativeBuildInputs = [ projectDependencies.setupHook ];
+      millDepsHash = "";
     };
-
-    passthru.editable = self.overrideAttrs (_: {
-      shellHook = ''
-        setupSubmodulesEditable
-        mill mill.bsp.BSP/install 0
-      '';
-    });
-
-    shellHook = ''
-      setupSubmodules
-    '';
 
     nativeBuildInputs = [
       mill
@@ -67,7 +49,6 @@ let
       add-determinism
       makeWrapper
       passthru.millDeps.setupHook
-      projectDependencies.setupHook
     ];
 
     env.CIRCT_INSTALL_PATH = circt-install;
