@@ -76,6 +76,15 @@ given DialectHandleApi with
       mlirDialectHandleRegisterDialect(dialectHandle.segment, context.segment)
     inline def segment:                                         MemorySegment = dialectHandle._segment
     inline def sizeOf:                                          Int           = MlirDialectHandle.sizeof().toInt
+  extension (context:       Context)
+    inline def loadFuncDialect(
+    )(
+      using arena: Arena
+    ): Unit =
+      DialectHandle(mlirGetDialectHandle__func__(arena)).loadDialect(
+        using arena,
+        context
+      )
 end given
 
 given DialectRegistryApi with
@@ -805,11 +814,9 @@ given AttributeApi with
   // Bool
   extension (bool:      Boolean)
     inline def boolAttrGet(
-      tpe:         Type
-    )(
       using arena: Arena,
       context:     Context
-    ): Attribute = Attribute(mlirBoolAttrGet(arena, tpe.segment, if (bool) 1 else 0))
+    ): Attribute = Attribute(mlirBoolAttrGet(arena, context.segment, if (bool) 1 else 0))
   extension (attribute: Attribute)
     inline def isBool:           Boolean = mlirAttributeIsAInteger(attribute.segment)
     inline def boolAttrGetValue: Boolean = mlirBoolAttrGetValue(attribute.segment)
