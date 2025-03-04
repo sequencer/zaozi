@@ -22,7 +22,7 @@ object SMTSmoke extends TestSuite:
         val unknownLocation = summon[LocationApi].locationUnknownGet
         test("Smt"):
           given MlirModule = summon[MlirModuleApi].moduleCreateEmpty(unknownLocation)
-          val func: Func = summon[FuncApi].op("Passthrough")
+          val func: Func = summon[FuncApi].op("Func")
           func.appendToModule()
           given Block = func.block
           val bool0 = summon[BoolConstantApi].op(false, location = unknownLocation)

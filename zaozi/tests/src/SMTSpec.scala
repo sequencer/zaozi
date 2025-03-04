@@ -12,7 +12,7 @@ import java.lang.foreign.Arena
 object SMTSpec extends TestSuite:
   val tests = Tests:
     test("AndApi"):
-      smtTest():
+      smtTest(""):
         val unknownLocation = summon[LocationApi].locationUnknownGet
         val bool0 = summon[BoolConstantApi].op(false, location = unknownLocation)
         val bool1 = summon[BoolConstantApi].op(true, location = unknownLocation)

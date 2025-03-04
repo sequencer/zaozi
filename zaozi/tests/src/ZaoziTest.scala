@@ -15,6 +15,7 @@ import org.llvm.circt.scalalib.firrtl.capi.{
   FirtoolOptionsApi
 }
 import org.llvm.circt.scalalib.firrtl.operation.{given_CircuitApi, given_ModuleApi, Circuit, CircuitApi}
+import org.llvm.circt.scalalib.smt.capi.{given_DialectHandleApi, given_ModuleApi}
 import org.llvm.circt.scalalib.smt.operation.{given_FuncApi, FuncApi, Func}
 import org.llvm.mlir.scalalib.{
   given_AttributeApi,
