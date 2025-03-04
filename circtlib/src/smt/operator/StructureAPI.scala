@@ -9,7 +9,7 @@ import java.lang.foreign.Arena
 class Func(val _operation: Operation)
 trait FuncApi extends HasOperation[Func]:
   inline def op(
-    symName: String,
+    symName:     String
     // funcType: Type,
     // symVisibility: String,
     // argAttrs: Seq[NamedAttribute],

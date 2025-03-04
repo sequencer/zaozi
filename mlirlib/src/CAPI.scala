@@ -371,7 +371,7 @@ trait DialectHandleApi extends HasSegment[DialectHandle] with HasSizeOf[DialectH
     )(
       using context: Context
     ): Unit
-  extension (context: Context)
+  extension (context:       Context)
     inline def loadFuncDialect(
     )(
       using arena: Arena

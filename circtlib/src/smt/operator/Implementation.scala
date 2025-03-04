@@ -3,6 +3,7 @@
 package org.llvm.circt.scalalib.smt.operation
 
 import org.llvm.mlir.scalalib.{
+  AttributeApi,
   Block,
   Context,
   Location,
@@ -10,7 +11,6 @@ import org.llvm.mlir.scalalib.{
   Module as MlirModule,
   NamedAttribute,
   NamedAttributeApi,
-  AttributeApi,
   Operation,
   OperationApi,
   Type,
@@ -23,7 +23,7 @@ import java.lang.foreign.Arena
 // Structure
 given FuncApi with
   inline def op(
-    symName: String,
+    symName:     String
     // funcType: Type,
     // symVisibility: String,
     // argAttrs: Seq[NamedAttribute],
@@ -52,7 +52,7 @@ given FuncApi with
         //   case false => Seq.empty
         Seq(
           // ::mlir::StringAttr
-          namedAttributeApi.namedAttributeGet("symName".identifierGet, symName.stringAttrGet),
+          namedAttributeApi.namedAttributeGet("symName".identifierGet, symName.stringAttrGet)
           // ::mlir::TypeAttr
           // namedAttributeApi.namedAttributeGet("funcType".identifierGet, ???),
           // ::mlir::StringAttr
@@ -61,7 +61,7 @@ given FuncApi with
           // namedAttributeApi.namedAttributeGet("argAttrs".identifierGet, ???),
           // ::mlir::ArrayAttr
           // namedAttributeApi.namedAttributeGet("resAttrs".identifierGet, ???),
-        ) 
+        )
         // ++ noInlineAttr
     )
   )
@@ -227,7 +227,7 @@ end given
 
 given BV2IntApi with
   def op(
-    isSigned: Boolean,
+    isSigned:    Boolean,
     input:       Value,
     location:    Location
   )(
@@ -239,9 +239,9 @@ given BV2IntApi with
         name = "smt.bv2int",
         location = location,
         namedAttributes = isSigned match
-          case true =>
+          case true  =>
             val namedAttributeApi = summon[NamedAttributeApi]
-            val attributeApi = summon[AttributeApi]
+            val attributeApi      = summon[AttributeApi]
             Seq(
               // ::mlir::UnitAttr
               namedAttributeApi.namedAttributeGet("is_signed".identifierGet, attributeApi.unitAttrGet)
@@ -843,9 +843,9 @@ given ExistsApi with
         location = location,
         namedAttributes =
           val namedAttributeApi = summon[NamedAttributeApi]
-          val attributeApi = summon[AttributeApi]
-          val noPatternAttr = noPattern match
-            case true =>
+          val attributeApi      = summon[AttributeApi]
+          val noPatternAttr     = noPattern match
+            case true  =>
               // ::mlir::UnitAttr
               Seq(namedAttributeApi.namedAttributeGet("noPattern".identifierGet, attributeApi.unitAttrGet))
             case false => Seq.empty
@@ -920,9 +920,9 @@ given ForallApi with
         location = location,
         namedAttributes =
           val namedAttributeApi = summon[NamedAttributeApi]
-          val attributeApi = summon[AttributeApi]
-          val noPatternAttr = noPattern match
-            case true =>
+          val attributeApi      = summon[AttributeApi]
+          val noPatternAttr     = noPattern match
+            case true  =>
               // ::mlir::UnitAttr
               Seq(namedAttributeApi.namedAttributeGet("noPattern".identifierGet, attributeApi.unitAttrGet))
             case false => Seq.empty

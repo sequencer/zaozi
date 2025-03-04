@@ -76,7 +76,7 @@ given DialectHandleApi with
       mlirDialectHandleRegisterDialect(dialectHandle.segment, context.segment)
     inline def segment:                                         MemorySegment = dialectHandle._segment
     inline def sizeOf:                                          Int           = MlirDialectHandle.sizeof().toInt
-  extension (context: Context)
+  extension (context:       Context)
     inline def loadFuncDialect(
     )(
       using arena: Arena

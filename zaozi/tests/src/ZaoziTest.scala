@@ -16,7 +16,7 @@ import org.llvm.circt.scalalib.firrtl.capi.{
 }
 import org.llvm.circt.scalalib.firrtl.operation.{given_CircuitApi, given_ModuleApi, Circuit, CircuitApi}
 import org.llvm.circt.scalalib.smt.capi.{given_DialectHandleApi, given_ModuleApi}
-import org.llvm.circt.scalalib.smt.operation.{given_FuncApi, FuncApi, Func}
+import org.llvm.circt.scalalib.smt.operation.{given_FuncApi, Func, FuncApi}
 import org.llvm.mlir.scalalib.{
   given_AttributeApi,
   given_BlockApi,
@@ -99,17 +99,17 @@ def firrtlTest[PARAM <: Parameter, I <: HWInterface[PARAM], P <: DVInterface[PAR
     assert(out.toString == "Nothing To Check")
   else checkLines.foreach(l => assert(out.toString.contains(l)))
 
-def smtTest(checkLines: String*)(body:       (Arena, Context, Block) ?=> Unit): Unit =
-  given Arena      = Arena.ofConfined()
+def smtTest(checkLines: String*)(body: (Arena, Context, Block) ?=> Unit): Unit =
+  given Arena   = Arena.ofConfined()
   given Context = summon[ContextApi].contextCreate
   summon[Context].loadSmtDialect()
   summon[Context].loadFuncDialect()
 
   // Then based on the module to construct the Func.func .
   given MlirModule = summon[MlirModuleApi].moduleCreateEmpty(summon[LocationApi].locationUnknownGet)
-  given Func = summon[FuncApi].op("func")
+  given Func       = summon[FuncApi].op("func")
   summon[Func].appendToModule()
-  given Block = summon[Func].block
+  given Block      = summon[Func].block
 
   val out = new StringBuilder
   summon[MlirModule].exportSMTLIB(out ++= _)

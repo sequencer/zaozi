@@ -33,14 +33,14 @@ end given
 
 given TypeApi with
   inline def getArray(
-    domainType:     Type,
-    rangeType:     Type
+    domainType:  Type,
+    rangeType:   Type
   )(
     using arena: Arena,
     context:     Context
   ): Type = Type(smtTypeGetArray(arena, context.segment, domainType.segment, rangeType.segment))
   inline def getBitVector(
-    width:     Int,
+    width:       Int
   )(
     using arena: Arena,
     context:     Context
@@ -56,34 +56,38 @@ given TypeApi with
     context:     Context
   ): Type = Type(smtTypeGetInt(arena, context.segment))
   inline def getSMTFunc(
-    domainTypes:    Seq[Type],
-    rangeType: Type
+    domainTypes: Seq[Type],
+    rangeType:   Type
   )(
     using arena: Arena,
     context:     Context
-  ): Type = Type(smtTypeGetSMTFunc(arena, context.segment, domainTypes.length, domainTypes.toMlirArray, rangeType.segment))
+  ): Type = Type(
+    smtTypeGetSMTFunc(arena, context.segment, domainTypes.length, domainTypes.toMlirArray, rangeType.segment)
+  )
   inline def getSort(
-    identifier:    String,
-    sortParams: Seq[Type]
+    identifier:  String,
+    sortParams:  Seq[Type]
   )(
     using arena: Arena,
     context:     Context
-  ): Type = Type(smtTypeGetSort(arena, context.segment, identifier.toStringRef.segment, sortParams.length, sortParams.toMlirArray))
+  ): Type = Type(
+    smtTypeGetSort(arena, context.segment, identifier.toStringRef.segment, sortParams.length, sortParams.toMlirArray)
+  )
 
-  extension (tpe:                Type)
+  extension (tpe: Type)
     inline def isAnyNonFuncSMTValueType: Boolean = smtTypeIsAnyNonFuncSMTValueType(tpe.segment)
-    inline def isAnySMTValueType: Boolean = smtTypeIsAnySMTValueType(tpe.segment)
-    inline def isArray: Boolean = smtTypeIsAArray(tpe.segment)
-    inline def isBitVector: Boolean = smtTypeIsABitVector(tpe.segment)
-    inline def isBool: Boolean = smtTypeIsABool(tpe.segment)
-    inline def isInt: Boolean = smtTypeIsAInt(tpe.segment)
-    inline def isSMTFunc: Boolean = smtTypeIsASMTFunc(tpe.segment)
-    inline def isSort: Boolean = smtTypeIsASort(tpe.segment)
+    inline def isAnySMTValueType:        Boolean = smtTypeIsAnySMTValueType(tpe.segment)
+    inline def isArray:                  Boolean = smtTypeIsAArray(tpe.segment)
+    inline def isBitVector:              Boolean = smtTypeIsABitVector(tpe.segment)
+    inline def isBool:                   Boolean = smtTypeIsABool(tpe.segment)
+    inline def isInt:                    Boolean = smtTypeIsAInt(tpe.segment)
+    inline def isSMTFunc:                Boolean = smtTypeIsASMTFunc(tpe.segment)
+    inline def isSort:                   Boolean = smtTypeIsASort(tpe.segment)
 
 end given
 
 given AttributeApi with
-  extension(str: String)
+  extension (str:  String)
     inline def getBVCmpPredicateAttribute(
       using arena: Arena,
       context:     Context
@@ -93,16 +97,15 @@ given AttributeApi with
       context:     Context
     ): Attribute = Attribute(smtAttrGetIntPredicate(arena, context.segment, str.toStringRef.segment))
   inline def getBitVectorAttribute(
-    value: Int,
-    width: Int
-    )(
+    value:       Int,
+    width:       Int
+  )(
     using arena: Arena,
     context:     Context
   ): Attribute = Attribute(smtAttrGetBitVector(arena, context.segment, value, width))
-  extension(attr: Attribute)
-    inline def isSMTAttribute: Boolean = smtAttrIsASMTAttribute(attr.segment)
+  extension (attr: Attribute) inline def isSMTAttribute: Boolean = smtAttrIsASMTAttribute(attr.segment)
 
-  extension(str: String)
+  extension (str: String)
     inline def checkBVCmpPredicateAttribute(
       using arena: Arena,
       context:     Context

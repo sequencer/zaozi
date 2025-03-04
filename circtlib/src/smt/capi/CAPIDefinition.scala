@@ -16,14 +16,14 @@ end DialectHandleApi
 
 trait TypeApi:
   inline def getArray(
-    domainType:     Type,
-    rangeType:     Type
+    domainType:  Type,
+    rangeType:   Type
   )(
     using arena: Arena,
     context:     Context
   ): Type
   inline def getBitVector(
-    width:     Int,
+    width:       Int
   )(
     using arena: Arena,
     context:     Context
@@ -39,32 +39,32 @@ trait TypeApi:
     context:     Context
   ): Type
   inline def getSMTFunc(
-    domainTypes:    Seq[Type],
-    rangeType: Type
+    domainTypes: Seq[Type],
+    rangeType:   Type
   )(
     using arena: Arena,
     context:     Context
   ): Type
   inline def getSort(
-    identifier:    String,
-    sortParams: Seq[Type]
+    identifier:  String,
+    sortParams:  Seq[Type]
   )(
     using arena: Arena,
     context:     Context
   ): Type
-  extension (tpe:                Type)
+  extension (tpe: Type)
     inline def isAnyNonFuncSMTValueType: Boolean
-    inline def isAnySMTValueType: Boolean
-    inline def isArray: Boolean
-    inline def isBitVector: Boolean
-    inline def isBool: Boolean
-    inline def isInt: Boolean
-    inline def isSMTFunc: Boolean
-    inline def isSort: Boolean
+    inline def isAnySMTValueType:        Boolean
+    inline def isArray:                  Boolean
+    inline def isBitVector:              Boolean
+    inline def isBool:                   Boolean
+    inline def isInt:                    Boolean
+    inline def isSMTFunc:                Boolean
+    inline def isSort:                   Boolean
 end TypeApi
 
 trait AttributeApi:
-  extension(str: String)
+  extension (str:  String)
     inline def getBVCmpPredicateAttribute(
       using arena: Arena,
       context:     Context
@@ -74,15 +74,14 @@ trait AttributeApi:
       context:     Context
     ): Attribute
   inline def getBitVectorAttribute(
-    value: Int,
-    width: Int
-    )(
+    value:       Int,
+    width:       Int
+  )(
     using arena: Arena,
     context:     Context
   ): Attribute
-  extension(attr: Attribute)
-    inline def isSMTAttribute: Boolean
-  extension(str: String)
+  extension (attr: Attribute) inline def isSMTAttribute: Boolean
+  extension (str:  String)
     inline def checkBVCmpPredicateAttribute(
       using arena: Arena,
       context:     Context

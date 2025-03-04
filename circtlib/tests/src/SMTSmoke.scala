@@ -25,8 +25,8 @@ object SMTSmoke extends TestSuite:
           val func: Func = summon[FuncApi].op("Func")
           func.appendToModule()
           given Block = func.block
-          val bool0 = summon[BoolConstantApi].op(false, location = unknownLocation)
-          val bool1 = summon[BoolConstantApi].op(true, location = unknownLocation)
+          val bool0   = summon[BoolConstantApi].op(false, location = unknownLocation)
+          val bool1   = summon[BoolConstantApi].op(true, location = unknownLocation)
           test("And"):
             summon[AndApi].op(Seq(bool0.result, bool1.result), unknownLocation).operation.appendToBlock()
           // test("ApplyFunc"):
