@@ -1,5 +1,40 @@
 {
   "nodes": {
+    "chisel-nix": {
+      "inputs": {
+        "mill-ivy-fetcher": "mill-ivy-fetcher"
+      },
+      "locked": {
+        "lastModified": 1741176569,
+        "narHash": "sha256-UnF7xr24w+M+kkKruMs7OTbR1zubFfNm1VxiQdN9ktY=",
+        "owner": "chipsalliance",
+        "repo": "chisel-nix",
+        "rev": "bd385ee2a18c2a85830a139e7259cbb398afebd9",
+        "type": "github"
+      },
+      "original": {
+        "owner": "chipsalliance",
+        "ref": "new-mill-flow",
+        "repo": "chisel-nix",
+        "type": "github"
+      }
+    },
+    "chisel-nix_2": {
+      "locked": {
+        "lastModified": 1740575980,
+        "narHash": "sha256-m/mzO4mjJ1qZTPwmfTtoy8lS/Irz91kQ/9ahMVGmKt0=",
+        "owner": "chipsalliance",
+        "repo": "chisel-nix",
+        "rev": "70e6c995014a86e3a9a9c22383c8b8e834705e3f",
+        "type": "github"
+      },
+      "original": {
+        "owner": "chipsalliance",
+        "ref": "new-mill-flow",
+        "repo": "chisel-nix",
+        "type": "github"
+      }
+    },
     "flake-utils": {
       "inputs": {
         "systems": "systems"
@@ -18,18 +53,56 @@
         "type": "github"
       }
     },
+    "flake-utils_2": {
+      "inputs": {
+        "systems": "systems_2"
+      },
+      "locked": {
+        "lastModified": 1731533236,
+        "narHash": "sha256-l0KFg5HjrsfsO/JpG+r7fRrqm12kzFHyUHqHCVpMMbI=",
+        "owner": "numtide",
+        "repo": "flake-utils",
+        "rev": "11707dc2f618dd54ca8739b309ec4fc024de578b",
+        "type": "github"
+      },
+      "original": {
+        "owner": "numtide",
+        "repo": "flake-utils",
+        "type": "github"
+      }
+    },
+    "mill-ivy-fetcher": {
+      "inputs": {
+        "chisel-nix": "chisel-nix_2",
+        "flake-utils": "flake-utils",
+        "nixpkgs": "nixpkgs"
+      },
+      "locked": {
+        "lastModified": 1741175654,
+        "narHash": "sha256-1I14XOZhX0Te3/Sv60QwwLExL6PW7QFw3Nzidl9EqyY=",
+        "owner": "Avimitin",
+        "repo": "mill-ivy-fetcher",
+        "rev": "bff5833d5c4ad264ce4f2cf14df400c9c8f7c51a",
+        "type": "github"
+      },
+      "original": {
+        "owner": "Avimitin",
+        "repo": "mill-ivy-fetcher",
+        "type": "github"
+      }
+    },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1737706285,
-        "narHash": "sha256-k/f1rAyCjGkNu4BnlnUGEvQPSnYVG7UHoOeaQQcjQps=",
+        "lastModified": 1738961098,
+        "narHash": "sha256-yWNBf6VDW38tl179FEuJ0qukthVfB02kv+mRsfUsWC0=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "dcb7446a099fe1c95b3694fdb7a4dda8f19d6ba8",
+        "rev": "a3eaf5e8eca7cab680b964138fb79073704aca75",
         "type": "github"
       },
       "original": {
         "owner": "NixOS",
-        "ref": "nixos-unstable-small",
+        "ref": "nixos-unstable",
         "repo": "nixpkgs",
         "type": "github"
       }
@@ -50,14 +123,46 @@
         "type": "github"
       }
     },
+    "nixpkgs_2": {
+      "locked": {
+        "lastModified": 1740938536,
+        "narHash": "sha256-m6Lz7cRoZ8GS7tziYrNWv0WXTYtKx3oOC9Bwa6a13EA=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "2ffed2bc3d27861b821f9bec127cf51a4dbfabb4",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "ref": "nixos-unstable-small",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
     "root": {
       "inputs": {
-        "flake-utils": "flake-utils",
-        "nixpkgs": "nixpkgs",
+        "chisel-nix": "chisel-nix",
+        "flake-utils": "flake-utils_2",
+        "nixpkgs": "nixpkgs_2",
         "nixpkgs4circt": "nixpkgs4circt"
       }
     },
     "systems": {
+      "locked": {
+        "lastModified": 1681028828,
+        "narHash": "sha256-Vy1rq5AaRuLzOxct8nz4T6wlgyUR7zLU309k9mBC768=",
+        "owner": "nix-systems",
+        "repo": "default",
+        "rev": "da67096a3b9bf56a91d16901293e51ba5b49a27e",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-systems",
+        "repo": "default",
+        "type": "github"
+      }
+    },
+    "systems_2": {
       "locked": {
         "lastModified": 1681028828,
         "narHash": "sha256-Vy1rq5AaRuLzOxct8nz4T6wlgyUR7zLU309k9mBC768=",
