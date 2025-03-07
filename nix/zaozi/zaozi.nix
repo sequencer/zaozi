@@ -12,6 +12,7 @@
 , lit
 , scala-cli
 , add-determinism
+, mill-ivy-env-shell-hook
 }:
 
 let
@@ -39,6 +40,7 @@ let
 
     nativeBuildInputs = [
       mill
+      mill.jre
       circt-install
       mlir-install
       jextract-21
@@ -47,6 +49,13 @@ let
       add-determinism
       makeWrapper
     ];
+
+    shellHook = ''
+      ${mill-ivy-env-shell-hook}
+
+      mill -i mill.bsp.BSP/install
+      # other commands
+    '';
 
     env.CIRCT_INSTALL_PATH = circt-install;
     env.MLIR_INSTALL_PATH = mlir-install;
