@@ -5,6 +5,8 @@ package me.jiuyang.zaozi.circtlib.tests
 import org.llvm.circt.scalalib.smt.capi.{*, given}
 import org.llvm.circt.scalalib.smt.operation.{*, given}
 import org.llvm.mlir.scalalib.{Module as MlirModule, ModuleApi as MlirModuleApi, TypeApi as MlirTypeApi, *, given}
+import org.llvm.mlir.scalalib.dialect.func.{Func, FuncApi, *, given}
+
 import utest.*
 
 import java.lang.foreign.Arena
