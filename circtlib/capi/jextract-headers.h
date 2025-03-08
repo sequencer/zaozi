@@ -5,6 +5,7 @@
 
 #include <circt-c/Firtool/Firtool.h>
 #include <circt-c/ExportVerilog.h>
+#include <circt-c/ExportSMTLIB.h>
 #include <circt-c/Conversion.h>
 #include <circt-c/Dialect/Arc.h>
 #include <circt-c/Dialect/Verif.h>
@@ -17,6 +18,7 @@
 #include <circt-c/Dialect/Seq.h>
 #include <circt-c/Dialect/LTL.h>
 #include <circt-c/Dialect/CHIRRTL.h>
+#include <circt-c/Dialect/SMT.h>
 #include <circt-c/Dialect/SV.h>
 #include <circt-c/Dialect/Debug.h>
 #include <circt-c/Dialect/Moore.h>
