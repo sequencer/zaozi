@@ -5,7 +5,7 @@ package rvcover.tests
 import rvcover.{*, given}
 import rvcover.default.{*, given}
 
-import org.llvm.mlir.scalalib.dialect.func.{FuncApi, given}
+import org.llvm.mlir.scalalib.dialect.func.{FuncApi, Func, given}
 import org.llvm.circt.scalalib.smt.capi.{given_DialectHandleApi, given_ModuleApi}
 import org.llvm.mlir.scalalib.{
   given_DialectHandleApi,
@@ -29,12 +29,15 @@ def smtTest(checkLines: String*)(body: (Arena, Context, Block) ?=> Unit): Unit =
 
   // Then based on the module to construct the Func.func .
   given Module = summon[ModuleApi].moduleCreateEmpty(summon[LocationApi].locationUnknownGet)
-  val func     = summon[FuncApi].op("func")
-  given Block  = func.block
-  summon[ConstructorApi].func(body)
+  given Func   = summon[FuncApi].op("func")
+  given Block  = summon[Func].block
+  summon[Func].appendToModule()
+
+  body
+
   // dump mlir
-  func.operation.dump()
-  val out      = new StringBuilder
+  summon[Func].operation.dump()
+  val out = new StringBuilder
   summon[Module].exportSMTLIB(out ++= _)
   summon[Context].destroy()
   summon[Arena].close()

@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: 2025 Jianhao Ye <Clo91eaf@qq.com>
 package rvcover
 
-import org.llvm.mlir.scalalib.{Block, Context, Value, given}
+import org.llvm.mlir.scalalib.{Block, Context, Type, Value, given}
 
 import java.lang.foreign.Arena
 
@@ -18,18 +18,9 @@ trait ConstructorApi:
     sourcecode.Name
   ): Value
 
-  def func(
-    body: (Arena, Context, Block) ?=> Unit
-  )(
-    using Arena,
-    Context,
-    Block
-  ): Unit
-
-  def check(
-    sat:     (Arena, Context, Block) ?=> Unit
-  )(unknown: (Arena, Context, Block) ?=> Unit
-  )(unsat:   (Arena, Context, Block) ?=> Unit
+  def declareFun(
+    namePrefix: String,
+    tpe:        Type
   )(
     using Arena,
     Context,
@@ -38,6 +29,94 @@ trait ConstructorApi:
     sourcecode.Line,
     sourcecode.Name
   ): Value
+
+  def intCmp(
+    lhs:  Value,
+    rhs:  Value,
+    pred: String
+  )(
+    using Arena,
+    Context,
+    Block,
+    sourcecode.File,
+    sourcecode.Line,
+    sourcecode.Name
+  ): Value
+
+  def and(
+    values: Seq[Value]
+  )(
+    using Arena,
+    Context,
+    Block,
+    sourcecode.File,
+    sourcecode.Line,
+    sourcecode.Name
+  ): Value
+
+  def smtAssert(
+    value: Value
+  )(
+    using Arena,
+    Context,
+    Block,
+    sourcecode.File,
+    sourcecode.Line,
+    sourcecode.Name
+  ): Value
+
+  def smtDistinct(
+    values: Seq[Value]
+  )(
+    using Arena,
+    Context,
+    Block,
+    sourcecode.File,
+    sourcecode.Line,
+    sourcecode.Name
+  ): Value
+
+  def intAdd(
+    values: Seq[Value]
+  )(
+    using Arena,
+    Context,
+    Block,
+    sourcecode.File,
+    sourcecode.Line,
+    sourcecode.Name
+  ): Value
+
+  def smtEq(
+    values: Seq[Value]
+  )(
+    using Arena,
+    Context,
+    Block,
+    sourcecode.File,
+    sourcecode.Line,
+    sourcecode.Name
+  ): Value
+
+  def solver(
+    body: (Arena, Context, Block) ?=> Unit
+  )(
+    using Arena,
+    Context,
+    Block,
+    sourcecode.File,
+    sourcecode.Line,
+    sourcecode.Name
+  ): Unit
+
+  def check(
+    using Arena,
+    Context,
+    Block,
+    sourcecode.File,
+    sourcecode.Line,
+    sourcecode.Name
+  ): Unit
 
   def smtYield(
     values: Seq[Value]

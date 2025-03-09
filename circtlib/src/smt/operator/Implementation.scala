@@ -154,7 +154,7 @@ given AssertApi with
         name = "smt.assert",
         location = location,
         operands = Seq(input),
-        inferredResultsTypes = Some(1)
+        resultsTypes = Some(Seq.empty)
       )
     )
   extension (ref: Assert)
@@ -646,8 +646,7 @@ end given
 
 given CheckApi with
   def op(
-    location:    Location,
-    tpe:         Type
+    location:    Location
   )(
     using arena: Arena,
     context:     Context
@@ -662,12 +661,12 @@ given CheckApi with
           // unknown
           Seq((Seq.empty, Seq.empty)),
           // unsat
-          Seq((Seq.empty, Seq.empty))
+          Seq((Seq.empty, Seq.empty)),
         ),
-        resultsTypes = Some(Seq(tpe))
+        resultsTypes = Some(Seq.empty)
       )
     )
-  extension (ref: Check)
+  extension (ref: Check) 
     def operation: Operation = ref._operation
     def satBlock(
       using Arena
@@ -678,9 +677,6 @@ given CheckApi with
     def unsatBlock(
       using Arena
     ): Block = operation.getRegion(2).getFirstBlock()
-    def result(
-      using Arena
-    ): Value = ref.operation.getResult(0)
 end given
 
 given ConcatApi with
@@ -1038,7 +1034,7 @@ given IntCmpApi with
           val namedAttributeApi = summon[NamedAttributeApi]
           Seq(
             // ::circt::smt::IntPredicateAttr
-            // namedAttributeApi.namedAttributeGet("pred".identifierGet, pred.IntPredicateAttrGet),
+            namedAttributeApi.namedAttributeGet("pred".identifierGet, pred.getIntPredicateAttribute)
           )
         ,
         inferredResultsTypes = Some(1)
@@ -1268,11 +1264,7 @@ given PopApi with
         resultsTypes = Some(Seq.empty)
       )
     )
-  extension (ref: Pop)
-    def operation: Operation = ref._operation
-    def result(
-      using Arena
-    ): Value = ref.operation.getResult(0)
+  extension (ref: Pop) def operation: Operation = ref._operation
 end given
 
 given PushApi with
@@ -1297,11 +1289,7 @@ given PushApi with
         resultsTypes = Some(Seq.empty)
       )
     )
-  extension (ref: Push)
-    def operation: Operation = ref._operation
-    def result(
-      using Arena
-    ): Value = ref.operation.getResult(0)
+  extension (ref: Push) def operation: Operation = ref._operation
 end given
 
 given RepeatApi with
@@ -1342,11 +1330,7 @@ given ResetApi with
         resultsTypes = Some(Seq.empty)
       )
     )
-  extension (ref: Reset)
-    def operation: Operation = ref._operation
-    def result(
-      using Arena
-    ): Value = ref.operation.getResult(0)
+  extension (ref: Reset) def operation: Operation = ref._operation
 end given
 
 given SetLogicApi with
@@ -1371,18 +1355,12 @@ given SetLogicApi with
         resultsTypes = Some(Seq.empty)
       )
     )
-  extension (ref: SetLogic)
-    def operation: Operation = ref._operation
-    def result(
-      using Arena
-    ): Value = ref.operation.getResult(0)
+  extension (ref: SetLogic) def operation: Operation = ref._operation
 end given
 
 given SolverApi with
   def op(
-    inputs:      Seq[Value],
-    location:    Location,
-    tpe:         Type
+    location:    Location
   )(
     using arena: Arena,
     context:     Context
@@ -1392,12 +1370,9 @@ given SolverApi with
         name = "smt.solver",
         location = location,
         regionBlockTypeLocations = Seq(
-          Seq(
-            (Seq.empty, Seq.empty)
-          )
+          Seq((Seq.empty, Seq.empty))
         ),
-        operands = inputs,
-        resultsTypes = Some(Seq(tpe))
+        resultsTypes = Some(Seq.empty)
       )
     )
   extension (ref: Solver)
@@ -1405,9 +1380,6 @@ given SolverApi with
     def bodyBlock(
       using Arena
     ): Block = operation.getRegion(0).getFirstBlock()
-    def result(
-      using Arena
-    ): Value = ref.operation.getResult(0)
 end given
 
 given XOrApi with

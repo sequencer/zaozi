@@ -55,6 +55,8 @@ object SMTSmoke extends TestSuite:
               summon[ArraySelectApi].op(array0, int0, unknownLocation).operation.appendToBlock()
             test("ArrayStore"):
               summon[ArrayStoreApi].op(array0, int0, bool1, unknownLocation).operation.appendToBlock()
+            test("Assert"):
+              summon[AssertApi].op(bool0, unknownLocation).operation.appendToBlock()
           test("BV"):
             test("BV2Int"):
               summon[BV2IntApi].op(true, bv1, unknownLocation).operation.appendToBlock()
@@ -91,7 +93,7 @@ object SMTSmoke extends TestSuite:
           test("BoolConstant"):
             summon[BoolConstantApi].op(true, unknownLocation).operation.appendToBlock()
           test("Check"):
-            summon[CheckApi].op(unknownLocation, boolType).operation.appendToBlock()
+            summon[CheckApi].op(unknownLocation).operation.appendToBlock()
           test("Concat"):
             summon[ConcatApi].op(bv0, bv1, unknownLocation).operation.appendToBlock()
           test("DeclareFun"):
@@ -144,7 +146,7 @@ object SMTSmoke extends TestSuite:
           test("SetLogic"):
             summon[SetLogicApi].op("HORN", unknownLocation).operation.appendToBlock()
           test("Solver"):
-            summon[SolverApi].op(Seq(bool0), unknownLocation, funcType).operation.appendToBlock()
+            summon[SolverApi].op(unknownLocation).operation.appendToBlock()
           test("XOr"):
             summon[XOrApi].op(Seq(bool0, bool1), unknownLocation).operation.appendToBlock()
           test("Yield"):

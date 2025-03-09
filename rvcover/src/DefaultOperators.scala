@@ -3,7 +3,7 @@
 package rvcover.default
 
 import org.llvm.circt.scalalib.smt.operation.{*, given}
-import org.llvm.mlir.scalalib.{Block, Context, Location, LocationApi, Value, given}
+import org.llvm.mlir.scalalib.{Block, Context, Location, LocationApi, Type, Value, given}
 import rvcover.ConstructorApi
 
 import java.lang.foreign.Arena
@@ -27,21 +27,9 @@ given ConstructorApi with
     op.operation.appendToBlock()
     op.result
 
-  def func(
-    body: (Arena, Context, Block) ?=> Unit
-  )(
-    using Arena,
-    Context,
-    Block
-  ): Unit =
-    val unknownLocation = summon[LocationApi].locationUnknownGet
-    body
-    ()
-
-  def check(
-    sat:     (Arena, Context, Block) ?=> Unit
-  )(unknown: (Arena, Context, Block) ?=> Unit
-  )(unsat:   (Arena, Context, Block) ?=> Unit
+  def declareFun(
+    namePrefix: String,
+    tpe:        Type
   )(
     using Arena,
     Context,
@@ -50,24 +38,139 @@ given ConstructorApi with
     sourcecode.Line,
     sourcecode.Name
   ): Value =
-    val op = summon[CheckApi].op(locate, 32.integerTypeGet)
-    sat(
+    val op = summon[DeclareFunApi].op(namePrefix, locate, tpe)
+    op.operation.appendToBlock()
+    op.result
+
+  def intCmp(
+    lhs:  Value,
+    rhs:  Value,
+    pred: String
+  )(
+    using Arena,
+    Context,
+    Block,
+    sourcecode.File,
+    sourcecode.Line,
+    sourcecode.Name
+  ): Value =
+    val op = summon[IntCmpApi].op(lhs, rhs, pred, locate)
+    op.operation.appendToBlock()
+    op.result
+
+  def and(
+    values: Seq[Value]
+  )(
+    using Arena,
+    Context,
+    Block,
+    sourcecode.File,
+    sourcecode.Line,
+    sourcecode.Name
+  ): Value =
+    val op = summon[AndApi].op(values, locate)
+    op.operation.appendToBlock()
+    op.result
+
+  def smtAssert(
+    value: Value
+  )(
+    using Arena,
+    Context,
+    Block,
+    sourcecode.File,
+    sourcecode.Line,
+    sourcecode.Name
+  ): Value =
+    val op = summon[AssertApi].op(value, locate)
+    op.operation.appendToBlock()
+    op.result
+
+  def smtDistinct(
+    values: Seq[Value]
+  )(
+    using Arena,
+    Context,
+    Block,
+    sourcecode.File,
+    sourcecode.Line,
+    sourcecode.Name
+  ): Value =
+    val op = summon[DistinctApi].op(values, locate)
+    op.operation.appendToBlock()
+    op.result
+
+  def intAdd(
+    values: Seq[Value]
+  )(
+    using Arena,
+    Context,
+    Block,
+    sourcecode.File,
+    sourcecode.Line,
+    sourcecode.Name
+  ): Value =
+    val op = summon[IntAddApi].op(values, locate)
+    op.operation.appendToBlock()
+    op.result
+
+  def smtEq(
+    values: Seq[Value]
+  )(
+    using Arena,
+    Context,
+    Block,
+    sourcecode.File,
+    sourcecode.Line,
+    sourcecode.Name
+  ): Value =
+    val op = summon[EqApi].op(values, locate)
+    op.operation.appendToBlock()
+    op.result
+
+  def solver(
+    body: (Arena, Context, Block) ?=> Unit
+  )(
+    using Arena,
+    Context,
+    Block,
+    sourcecode.File,
+    sourcecode.Line,
+    sourcecode.Name
+  ): Unit =
+    val op = summon[SolverApi].op(locate)
+    body(
+      using summon[Arena],
+      summon[Context],
+      op.bodyBlock
+    )
+    op.operation.appendToBlock()
+
+  def check(
+    using Arena,
+    Context,
+    Block,
+    sourcecode.File,
+    sourcecode.Line,
+    sourcecode.Name
+  ): Unit =
+    val op = summon[CheckApi].op(locate)
+    smtYield(Seq.empty)(
       using summon[Arena],
       summon[Context],
       op.satBlock
     )
-    unknown(
+    smtYield(Seq.empty)(
       using summon[Arena],
       summon[Context],
       op.unknownBlock
     )
-    unsat(
+    smtYield(Seq.empty)(
       using summon[Arena],
       summon[Context],
       op.unsatBlock
     )
     op.operation.appendToBlock()
-    op.result
 
   def smtYield(
     values: Seq[Value]
