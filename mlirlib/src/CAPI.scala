@@ -107,8 +107,6 @@ trait AttributeApi extends HasSegment[Attribute] with HasSizeOf[Attribute]:
   // Bool
   extension (bool:      Boolean)
     inline def boolAttrGet(
-      tpe:         Type
-    )(
       using arena: Arena,
       context:     Context
     ): Attribute
