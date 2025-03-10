@@ -805,11 +805,9 @@ given AttributeApi with
   // Bool
   extension (bool:      Boolean)
     inline def boolAttrGet(
-      tpe:         Type
-    )(
       using arena: Arena,
       context:     Context
-    ): Attribute = Attribute(mlirBoolAttrGet(arena, tpe.segment, if (bool) 1 else 0))
+    ): Attribute = Attribute(mlirBoolAttrGet(arena, context.segment, if (bool) 1 else 0))
   extension (attribute: Attribute)
     inline def isBool:           Boolean = mlirAttributeIsAInteger(attribute.segment)
     inline def boolAttrGetValue: Boolean = mlirBoolAttrGetValue(attribute.segment)
