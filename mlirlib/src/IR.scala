@@ -158,11 +158,20 @@ given ModuleApi with
   ): Module = new Module(mlirModuleCreateEmpty(arena, location.segment))
 
   inline def moduleCreateParse(
-    module:      String
+    module:      String | Array[Byte]
   )(
     using arena: Arena,
     context:     Context
-  ): Module = new Module(mlirModuleCreateParse(arena, context.segment, module.toStringRef.segment))
+  ): Module = new Module(
+    mlirModuleCreateParse(
+      arena,
+      context.segment,
+      (module match
+        case string: String      => string.toStringRef
+        case bytes:  Array[Byte] => bytes.toStringRef
+      ).segment
+    )
+  )
 
   inline def moduleFromOperation(
     op:          Operation
