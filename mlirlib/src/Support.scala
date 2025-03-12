@@ -75,6 +75,18 @@ given StringRefApi with
       val buffer = arena.allocate(bytes.length + 1)
       buffer.copyFrom(MemorySegment.ofArray(bytes))
       StringRef(mlirStringRefCreateFromCString(arena, buffer))
+
+  extension (bytes: Array[Byte])
+    inline def toStringRef(
+      using arena: Arena
+    ): StringRef =
+      val buffer    = arena.allocate(bytes.length)
+      buffer.copyFrom(MemorySegment.ofArray(bytes))
+      StringRef(mlirStringRefCreateFromCString(arena, buffer))
+      val stringRef = MlirStringRef.allocate(arena)
+      MlirStringRef.data$set(stringRef, buffer)
+      MlirStringRef.length$set(stringRef, bytes.length)
+      StringRef(stringRef)
 end given
 
 given LogicalResultApi with

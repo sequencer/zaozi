@@ -453,7 +453,7 @@ trait ModuleApi extends HasSegment[Module] with HasSizeOf[Module]:
     using arena: Arena
   ): Module
   inline def moduleCreateParse(
-    module:      String
+    module:      String | Array[Byte]
   )(
     using arena: Arena,
     context:     Context
