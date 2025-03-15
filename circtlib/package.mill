@@ -67,7 +67,7 @@ object `package` extends RootModule with ScalaModule with ScalafmtModule with Pa
 
     override def moduleDeps = Seq(outer, mlirlib)
 
-    def ivyDeps = Agg(v.utest)
+    def ivyDeps = Agg(v.utest, v.oslib)
 
     override def scalaVersion = outer.scalaVersion
   }
