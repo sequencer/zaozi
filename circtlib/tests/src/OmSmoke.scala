@@ -4,6 +4,7 @@ package me.jiuyang.zaozi.circtlib.tests
 
 import org.llvm.circt.scalalib.emit.capi.given_DialectHandleApi
 import org.llvm.circt.scalalib.firrtl.capi.given_DialectHandleApi
+import org.llvm.circt.scalalib.hw.capi.given_AttributeApi
 import org.llvm.circt.scalalib.om.capi.{*, given}
 import org.llvm.mlir.scalalib.{Module as MlirModule, ModuleApi as MlirModuleApi, *, given}
 
@@ -93,9 +94,11 @@ object OmSmoke extends TestSuite:
         val myrefAttr = refClass.objectGetField("myref").getPrimitive
         val symAttr   = refClass.objectGetField("sym").getPrimitive
 
-        // TODO: add hwInner* CAPI to lower refs to string
-        myrefAttr.referenceAttrGetInnerRef
-        symAttr.symbolRefAttrGetRootReference
+        // TODO: add CAPI for SymbolRefAttr in CIRCT
+        myrefAttr.isAReferenceAttr ==> true
+
+        myrefAttr.referenceAttrGetInnerRef.innerRefAttrGetModule.stringAttrGetValue ==> "A"
+        myrefAttr.referenceAttrGetInnerRef.innerRefAttrGetName.stringAttrGetValue ==> "inst_1"
 
       test("List"):
         test("List Constant"):
