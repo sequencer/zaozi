@@ -1,0 +1,17 @@
+// SPDX-License-Identifier: Apache-2.0
+// SPDX-FileCopyrightText: 2025 Yuhang Zeng <unlsycn@unlsycn.com>
+package build.omlib
+
+import mill._
+import mill.scalalib.TestModule.Utest
+import mill.scalalib._
+import mill.scalalib.scalafmt._
+
+import build.{circtlib, v}
+
+object `package` extends RootModule with ScalaModule with ScalafmtModule { m =>
+  def scalaVersion = Task(v.scala)
+  def ivyDeps      = Task(Seq(v.upickle))
+  def moduleDeps   = Seq(circtlib)
+
+}
