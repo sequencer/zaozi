@@ -443,6 +443,11 @@ trait LocationApi extends HasSegment[Location] with HasSizeOf[Location]:
     inline def locationGetContext(
       using arena: Arena
     ): Context
+    inline def print(
+      callback:    StringCallback
+    )(
+      using arena: Arena
+    ): Unit
 end LocationApi
 
 class Module(val _segment: MemorySegment)
