@@ -146,6 +146,13 @@ given LocationApi with
     inline def locationGetContext(
       using arena: Arena
     ): Context = Context(mlirLocationGetContext(arena, location.segment))
+    inline def print(
+      callback:    StringCallback
+    )(
+      using arena: Arena
+    ): Unit =
+      // The opaque data is meaningless here since Scala supports function currying
+      mlirLocationPrint(location.segment, callback.segment, MemorySegment.NULL)
     inline def segment: MemorySegment = location._segment
     inline def sizeOf:  Int           = MlirLocation.sizeof().toInt
 end given
