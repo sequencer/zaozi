@@ -48,7 +48,7 @@ object OmSmoke extends TestSuite:
           os.read(os.Path(s"${sys.env.get("MILL_TEST_RESOURCE_DIR").get}/value.mlir"))
         )
       val evaluator = summon[EvaluatorApi].evaluatorNew(module)
-      test("Object Field"):
+      test("Object"):
         val thingy = evaluator.instantiate(
           "Thingy",
           4.integerAttrGet(8.integerTypeGet).toEvaluatorValue,
@@ -82,6 +82,10 @@ object OmSmoke extends TestSuite:
           widgetBlue1.getPrimitive.isAIntegerAttr ==> false
           widgetBlue1.getPrimitive.isInteger ==> true
           widgetBlue1.getPrimitive.integerAttrGetValueInt ==> 5
+
+        test("Nested Fields"):
+          val nestFieldClass = evaluator.instantiate("NestedField4")
+          nestFieldClass.objectGetField("result").getPrimitive.boolAttrGetValue ==> true
 
       test("Discardable Attribute"):
         val discardableClass =
@@ -208,3 +212,17 @@ object OmSmoke extends TestSuite:
           objField.isAObject ==> true
           strField.isAPrimitive ==> true
           strField.getPrimitive.stringAttrGetValue ==> "foo"
+
+      test("with Object Field"):
+        val objectFieldClass = evaluator.instantiate("ObjectField")
+        objectFieldClass.objectGetField("field").isAObject ==> true
+
+      test("Nested Reference Value"):
+        val outerClass = evaluator.instantiate("OuterClass1")
+        outerClass
+          .objectGetField("om")
+          .objectGetField("any_list1")
+          .listGetElement(0)
+          .objectGetField("any_list2")
+          .listGetElement(0)
+          .isAObject ==> true

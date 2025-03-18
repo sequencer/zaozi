@@ -28,6 +28,27 @@ om.class @DiscardableAttrs() attributes {foo.bar="baz"} {
   om.class.fields
 }
 
+om.class @NestedField1() -> (baz: i1) {
+  %0 = om.constant 1 : i1
+  om.class.fields %0 : i1
+}
+
+om.class @NestedField2() -> (bar: !om.class.type<@NestedField1>) {
+  %0 = om.object @NestedField1() : () -> !om.class.type<@NestedField1>
+  om.class.fields %0 : !om.class.type<@NestedField1>
+}
+
+om.class @NestedField3() -> (foo: !om.class.type<@NestedField2>) {
+  %0 = om.object @NestedField2() : () -> !om.class.type<@NestedField2>
+  om.class.fields %0 : !om.class.type<@NestedField2>
+}
+
+om.class @NestedField4() -> (result: i1) {
+  %0 = om.object @NestedField3() : () -> !om.class.type<@NestedField3>
+  %1 = om.object.field %0, [@foo, @bar, @baz] : (!om.class.type<@NestedField3>) -> i1
+  om.class.fields %1 : i1
+}
+
 om.class @ReferenceConstant() -> (myref: !om.ref, sym: !om.sym_ref) {
   %0 = om.constant #om.ref<#hw.innerNameRef<@A::@inst_1>> : !om.ref
 
@@ -110,4 +131,38 @@ om.class @Any() -> (object: !om.any, string: !om.any) {
   %2 = om.constant "foo" : !om.string
   %3 = om.any_cast %2 : (!om.string) -> !om.any
   om.class.fields %1, %3 : !om.any, !om.any
+}
+
+om.class @ObjectField() -> (field: !om.any) {
+  %0 = om.object @Any() : () -> !om.class.type<@Any>
+  %1 = om.object.field %0, [@object] : (!om.class.type<@Any>) -> !om.any
+  om.class.fields %1 : !om.any
+}
+
+om.class @InnerClass1(%anyListIn: !om.list<!om.any>)  -> (any_list1: !om.list<!om.any>) {
+  om.class.fields %anyListIn : !om.list<!om.any>
+}
+om.class @InnerClass2(%anyListIn: !om.list<!om.any>)  -> (any_list2: !om.list<!om.any>) {
+  om.class.fields %anyListIn : !om.list<!om.any>
+}
+om.class @OuterClass2()  -> (om: !om.class.type<@InnerClass2>) {
+  %0 = om.object @InnerClass2(%5) : (!om.list<!om.any>) -> !om.class.type<@InnerClass2>
+  %1 = om.object @Any() : () -> !om.class.type<@Any>
+  %2 = om.object.field %1, [@object] : (!om.class.type<@Any>) -> !om.any
+  %3 = om.object @Any() : () -> !om.class.type<@Any>
+  %4 = om.object.field %3, [@object] : (!om.class.type<@Any>) -> !om.any
+  %5 = om.list_create %2, %4 : !om.any
+  om.class.fields %0 : !om.class.type<@InnerClass2>
+}
+om.class @OuterClass1()  -> (om: !om.any) {
+  %0 = om.object @InnerClass1(%8) : (!om.list<!om.any>) -> !om.class.type<@InnerClass1>
+  %1 = om.any_cast %0 : (!om.class.type<@InnerClass1>) -> !om.any
+  %2 = om.object @OuterClass2() : () -> !om.class.type<@OuterClass2>
+  %3 = om.object.field %2, [@om] : (!om.class.type<@OuterClass2>) -> !om.class.type<@InnerClass2>
+  %4 = om.any_cast %3 : (!om.class.type<@InnerClass2>) -> !om.any
+  %5 = om.object @OuterClass2() : () -> !om.class.type<@OuterClass2>
+  %6 = om.object.field %5, [@om] : (!om.class.type<@OuterClass2>) -> !om.class.type<@InnerClass2>
+  %7 = om.any_cast %6 : (!om.class.type<@InnerClass2>) -> !om.any
+  %8 = om.list_create %4, %7 : !om.any
+  om.class.fields %1 : !om.any
 }
