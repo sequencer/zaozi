@@ -669,13 +669,13 @@ given CheckApi with
     def operation: Operation = ref._operation
     def satBlock(
       using Arena
-    ): Block = operation.getRegion(0).getFirstBlock()
+    ): Block = operation.getRegion(0).getFirstBlock
     def unknownBlock(
       using Arena
-    ): Block = operation.getRegion(1).getFirstBlock()
+    ): Block = operation.getRegion(1).getFirstBlock
     def unsatBlock(
       using Arena
-    ): Block = operation.getRegion(2).getFirstBlock()
+    ): Block = operation.getRegion(2).getFirstBlock
 end given
 
 given ConcatApi with
@@ -825,7 +825,7 @@ given ExistsApi with
     def operation: Operation = ref._operation
     def bodyBlock(
       using Arena
-    ): Block = operation.getRegion(0).getFirstBlock()
+    ): Block = operation.getRegion(0).getFirstBlock
     def result(
       using Arena
     ): Value = ref.operation.getResult(0)
@@ -911,10 +911,10 @@ given ForallApi with
     def operation: Operation = ref._operation
     def bodyBlock(
       using Arena
-    ): Block = operation.getRegion(0).getFirstBlock()
+    ): Block = operation.getRegion(0).getFirstBlock
     def patternBlock(
       using Arena
-    ): Block = operation.getRegion(1).getFirstBlock()
+    ): Block = operation.getRegion(1).getFirstBlock
     def result(
       using Arena
     ): Value = ref.operation.getResult(0)
@@ -1378,7 +1378,7 @@ given SolverApi with
     def operation: Operation = ref._operation
     def bodyBlock(
       using Arena
-    ): Block = operation.getRegion(0).getFirstBlock()
+    ): Block = operation.getRegion(0).getFirstBlock
 end given
 
 given XOrApi with

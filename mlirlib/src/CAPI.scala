@@ -268,19 +268,15 @@ trait BlockApi extends HasSegment[Block] with HasSizeOf[Block]:
   ): Block
   extension (block: Block)
     inline def getParentOperation(
-    )(
       using arena: Arena
     ):                    Operation
     inline def getNextInRegion(
-    )(
       using arena: Arena
     ):                    Block
     inline def getFirstOperation(
-    )(
       using arena: Arena
     ):                    Operation
     inline def getTerminator(
-    )(
       using arena: Arena
     ):                    Operation
     inline def addArgument(
@@ -302,7 +298,6 @@ trait BlockApi extends HasSegment[Block] with HasSizeOf[Block]:
       using arena: Arena
     ):                    Value
     inline def argumentGetOwner(
-    )(
       using arena: Arena
     ):                    Block
     inline def destroy(): Unit
@@ -359,7 +354,6 @@ class DialectHandle(val _segment: MemorySegment)
 trait DialectHandleApi extends HasSegment[DialectHandle] with HasSizeOf[DialectHandle]:
   extension (dialectHandle: DialectHandle)
     inline def getNamespace(
-    )(
       using arena: Arena
     ): String
     inline def loadDialect(
@@ -396,11 +390,9 @@ trait IdentifierApi extends HasSegment[Identifier] with HasSizeOf[Identifier]:
     ): Identifier
   extension (identifier:       Identifier)
     inline def getContext(
-    )(
       using arena: Arena
     ): Context
     inline def str(
-    )(
       using arena: Arena
     ): String
 end IdentifierApi
@@ -473,7 +465,6 @@ trait ModuleApi extends HasSegment[Module] with HasSizeOf[Module]:
   ): Module
   extension (module: Module)
     inline def getContext(
-    )(
       using arena: Arena
     ):                    Context
     inline def getBody(
@@ -549,27 +540,21 @@ trait OperationApi extends HasSegment[Operation] with HasSizeOf[Operation]:
   ): Operation
   extension (operation: Operation)
     inline def getContext(
-    )(
       using arena: Arena
     ):                             Context
     inline def getLocation(
-    )(
       using arena: Arena
     ):                             Location
     inline def getTypeID(
-    )(
       using arena: Arena
     ):                             TypeID
     inline def getName(
-    )(
       using arena: Arena
     ):                             Identifier
     inline def getBlock(
-    )(
       using arena: Arena
     ):                             Block
     inline def getParentOperation(
-    )(
       using arena: Arena
     ):                             Operation
     inline def getRegion(
@@ -578,7 +563,6 @@ trait OperationApi extends HasSegment[Operation] with HasSizeOf[Operation]:
       using arena: Arena
     ):                             Region
     inline def getNextInBlock(
-    )(
       using arena: Arena
     ):                             Operation
     inline def getOperand(
@@ -629,7 +613,6 @@ trait OperationApi extends HasSegment[Operation] with HasSizeOf[Operation]:
       using arena: Arena
     ):                             LogicalResult
     inline def getFirstRegion(
-    )(
       using arena: Arena
     ):                             Region
     inline def destroy():          Unit
@@ -755,11 +738,9 @@ trait RegionApi extends HasSegment[Region] with HasSizeOf[Region]:
   ): Region
   extension (op: Region)
     inline def getFirstBlock(
-    )(
       using arena: Arena
     ): Block
     inline def getNextInOperation(
-    )(
       using arena: Arena
     ): Region
     inline def destroy(
@@ -897,7 +878,6 @@ trait PassManagerApi extends HasSegment[PassManager] with HasSizeOf[PassManager]
 
   extension (passManager: PassManager)
     inline def getAsOpPassManager(
-    )(
       using arena: Arena
     ):                    OpPassManager
     inline def runOnOp(

@@ -474,11 +474,10 @@ given FirrtlBundleFieldApi with
     FirrtlBundleField(buffer)
   extension (firrtlBundleField: FirrtlBundleField)
     inline def getName(
-    )(
       using arena: Arena
-    ): String = Identifier(FIRRTLBundleField.name$slice(firrtlBundleField.segment)).str()
-    inline def getIsFlip(): Boolean = FIRRTLBundleField.isFlip$get(firrtlBundleField.segment)
-    inline def getType():   Type    = Type(FIRRTLBundleField.type$slice(firrtlBundleField.segment))
+    ): String = Identifier(FIRRTLBundleField.name$slice(firrtlBundleField.segment)).str
+    inline def getIsFlip: Boolean = FIRRTLBundleField.isFlip$get(firrtlBundleField.segment)
+    inline def getType:   Type    = Type(FIRRTLBundleField.type$slice(firrtlBundleField.segment))
 
     inline def segment: MemorySegment = firrtlBundleField._segment
     inline def sizeOf:  Int           = FIRRTLBundleField.sizeof().toInt

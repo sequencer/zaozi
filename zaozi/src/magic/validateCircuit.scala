@@ -66,11 +66,10 @@ def validateCircuit(
   Context,
   Circuit
 ): Unit =
-  summon[Circuit].block
-    .getFirstOperation()
+  summon[Circuit].block.getFirstOperation
     .walk(
       op =>
-        op.getName().str() match
+        op.getName.str match
           // Find all instance and create an extmodule for it, which is a placeholder for linking at circt time.
           case i if i == "firrtl.instance" =>
             val moduleName: String = op.getInherentAttributeByName("moduleName").flatSymbolRefAttrGetValue
@@ -88,7 +87,7 @@ def validateCircuit(
             val extmoduleOp = ExtModule(
               summon[OperationApi].operationCreate(
                 name = "firrtl.extmodule",
-                location = op.getLocation(),
+                location = op.getLocation,
                 namedAttributes =
                   val namedAttributeApi = summon[NamedAttributeApi]
                   Seq(
