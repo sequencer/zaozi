@@ -229,7 +229,7 @@ given AttributeApi with
     firrtlAttrGetMemInit(
       arena,
       context.segment,
-      filename.toStringRef.segment,
+      filename.identifierGet.segment,
       isBinary,
       isInline
     )
@@ -246,7 +246,7 @@ given AttributeApi with
       firrtlAttrGetParamDecl(
         arena,
         context.segment,
-        name.toStringRef.segment,
+        name.identifierGet.segment,
         tpe.segment,
         value match
           case string: String => string.stringAttrGet.segment

@@ -71,7 +71,7 @@ given TypeApi with
     using arena: Arena,
     context:     Context
   ): Type = Type(
-    smtTypeGetSort(arena, context.segment, identifier.toStringRef.segment, sortParams.length, sortParams.toMlirArray)
+    smtTypeGetSort(arena, context.segment, identifier.identifierGet.segment, sortParams.length, sortParams.toMlirArray)
   )
 
   extension (tpe: Type)
