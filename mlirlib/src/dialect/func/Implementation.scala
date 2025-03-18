@@ -54,7 +54,7 @@ given FuncApi with
   extension (c:   Func)
     inline def block(
       using Arena
-    ): Block = c.operation.getFirstRegion().getFirstBlock()
+    ): Block = c.operation.getFirstRegion.getFirstBlock
     inline def appendToModule(
     )(
       using arena: Arena,

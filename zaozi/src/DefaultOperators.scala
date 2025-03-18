@@ -568,7 +568,7 @@ given ConstructorApi with
           )
           subRefToIOWire.operation.appendToBlock()
           (
-            if (bf.getIsFlip())
+            if (bf.getIsFlip)
               summon[ConnectApi].op(module.getIO(idx), subRefToIOWire.result, unknownLocation)
             else
               summon[ConnectApi].op(subRefToIOWire.result, module.getIO(idx), unknownLocation)
@@ -712,7 +712,7 @@ given ConstructorApi with
     probeWire.operation.appendToBlock()
 
     bfs.zipWithIndex.foreach: (bf, idx) =>
-      val flip       = bf.getIsFlip()
+      val flip       = bf.getIsFlip
       val instanceIO = instanceOp.operation.getResult(idx)
       val wireIO     = summon[SubfieldApi].op(
         ioWire.result,

@@ -63,7 +63,7 @@ given CircuitApi with
   extension (c:   Circuit)
     inline def block(
       using Arena
-    ): Block = c.operation.getFirstRegion().getFirstBlock()
+    ): Block = c.operation.getFirstRegion.getFirstBlock
     inline def appendToModule(
     )(
       using arena: Arena,
@@ -88,7 +88,7 @@ given ExtModuleApi with
         location = location,
         regionBlockTypeLocations = Seq(
           Seq(
-            (interface.map(_._1.getType()), interface.map(_._2))
+            (interface.map(_._1.getType), interface.map(_._2))
           )
         ),
         namedAttributes =
@@ -115,7 +115,7 @@ given ExtModuleApi with
               interface
                 .map:
                   case (bf, _) =>
-                    if (bf.getIsFlip()) FirrtlDirection.In else FirrtlDirection.Out
+                    if (bf.getIsFlip) FirrtlDirection.In else FirrtlDirection.Out
                 .attrGetPortDirs
             ),
             // ::mlir::ArrayAttr
@@ -136,12 +136,12 @@ given ExtModuleApi with
             // ::mlir::ArrayAttr
             namedAttributeApi.namedAttributeGet(
               "portNames".identifierGet,
-              interface.map(_._1.getName().stringAttrGet).arrayAttrGet
+              interface.map(_._1.getName.stringAttrGet).arrayAttrGet
             ),
             // ::mlir::ArrayAttr
             namedAttributeApi.namedAttributeGet(
               "portTypes".identifierGet,
-              interface.map(_._1.getType().typeAttrGet).arrayAttrGet
+              interface.map(_._1.getType.typeAttrGet).arrayAttrGet
             ),
             // ::mlir::ArrayAttr
             namedAttributeApi.namedAttributeGet(
@@ -178,7 +178,7 @@ given ModuleApi with
       location = location,
       regionBlockTypeLocations = Seq(
         Seq(
-          (interface.map(_._1.getType()), interface.map(_._2))
+          (interface.map(_._1.getType), interface.map(_._2))
         )
       ),
       namedAttributes =
@@ -197,7 +197,7 @@ given ModuleApi with
             interface
               .map:
                 case (bf, _) =>
-                  if (bf.getIsFlip()) FirrtlDirection.In else FirrtlDirection.Out
+                  if (bf.getIsFlip) FirrtlDirection.In else FirrtlDirection.Out
               .attrGetPortDirs
           ),
           // ::mlir::ArrayAttr
@@ -218,12 +218,12 @@ given ModuleApi with
           // ::mlir::ArrayAttr
           namedAttributeApi.namedAttributeGet(
             "portNames".identifierGet,
-            interface.map(_._1.getName().stringAttrGet).arrayAttrGet
+            interface.map(_._1.getName.stringAttrGet).arrayAttrGet
           ),
           // ::mlir::ArrayAttr
           namedAttributeApi.namedAttributeGet(
             "portTypes".identifierGet,
-            interface.map(_._1.getType().typeAttrGet).arrayAttrGet
+            interface.map(_._1.getType.typeAttrGet).arrayAttrGet
           ),
           // ::mlir::ArrayAttr
           // namedAttributeApi.namedAttributeGet("annotations".identifierGet, ???),
@@ -240,7 +240,7 @@ given ModuleApi with
   extension (ref: Module)
     inline def block(
       using Arena
-    ): Block = operation.getFirstRegion().getFirstBlock()
+    ): Block = operation.getFirstRegion.getFirstBlock
 
     inline def getIO(
       idx: Long
@@ -295,7 +295,7 @@ given LayerApi with
   extension (ref: Layer)
     inline def block(
       using Arena
-    ): Block = operation.getFirstRegion().getFirstBlock()
+    ): Block = operation.getFirstRegion.getFirstBlock
     inline def operation: Operation = ref._operation
 end given
 // Declarations
@@ -328,13 +328,13 @@ given InstanceApi with
               "portDirections".identifierGet,
               interface
                 .map: bf =>
-                  if (bf.getIsFlip()) FirrtlDirection.In else FirrtlDirection.Out
+                  if (bf.getIsFlip) FirrtlDirection.In else FirrtlDirection.Out
                 .attrGetPortDirs
             ),
             // ::mlir::ArrayAttr
             namedAttributeApi.namedAttributeGet(
               "portNames".identifierGet,
-              interface.map(_.getName().stringAttrGet).arrayAttrGet
+              interface.map(_.getName.stringAttrGet).arrayAttrGet
             ),
             // ::mlir::ArrayAttr
             namedAttributeApi.namedAttributeGet("annotations".identifierGet, Seq.empty.arrayAttrGet),
@@ -351,7 +351,7 @@ given InstanceApi with
             // namedAttributeApi.namedAttributeGet("inner_sym".identifierGet, ???)
           )
         ,
-        resultsTypes = Some(interface.map(_.getType()))
+        resultsTypes = Some(interface.map(_.getType))
       )
     )
   extension (ref: Instance) def operation: Operation = ref._operation
@@ -553,7 +553,7 @@ given LayerBlockApi with
   extension (ref: LayerBlock)
     inline def block(
       using Arena
-    ): Block = operation.getFirstRegion().getFirstBlock()
+    ): Block = operation.getFirstRegion.getFirstBlock
     def operation: Operation = ref._operation
 end given
 
@@ -683,10 +683,10 @@ given WhenApi with
     def operation: Operation = ref._operation
     def condBlock(
       using Arena
-    ): Block = operation.getRegion(0).getFirstBlock()
+    ): Block = operation.getRegion(0).getFirstBlock
     def elseBlock(
       using Arena
-    ): Block = operation.getRegion(1).getFirstBlock()
+    ): Block = operation.getRegion(1).getFirstBlock
 end given
 // Expression
 given AddPrimApi with

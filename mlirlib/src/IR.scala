@@ -60,7 +60,6 @@ end given
 given DialectHandleApi with
   extension (dialectHandle: DialectHandle)
     inline def getNamespace(
-    )(
       using arena: Arena
     ): String = StringRef(mlirDialectHandleGetNamespace(arena, dialectHandle.segment)).toScalaString
     inline def loadDialect(
@@ -173,7 +172,6 @@ given ModuleApi with
 
   extension (module: Module)
     inline def getContext(
-    )(
       using arena: Arena
     ): Context = Context(mlirModuleGetContext(arena, module.segment))
     inline def getBody(
@@ -337,27 +335,21 @@ given OperationApi with
   ): Operation = Operation(mlirOperationClone(arena, op.segment))
   extension (operation: Operation)
     inline def getContext(
-    )(
       using arena: Arena
     ): Context = Context(mlirOperationGetContext(arena, operation.segment))
     inline def getLocation(
-    )(
       using arena: Arena
     ): Location = Location(mlirOperationGetLocation(arena, operation.segment))
     inline def getTypeID(
-    )(
       using arena: Arena
     ): TypeID = TypeID(mlirOperationGetTypeID(arena, operation.segment))
     inline def getName(
-    )(
       using arena: Arena
     ): Identifier = Identifier(mlirOperationGetName(arena, operation.segment))
     inline def getBlock(
-    )(
       using arena: Arena
     ): Block = Block(mlirOperationGetBlock(arena, operation.segment))
     inline def getParentOperation(
-    )(
       using arena: Arena
     ): Operation = Operation(mlirOperationGetParentOperation(arena, operation.segment))
     inline def getRegion(
@@ -366,7 +358,6 @@ given OperationApi with
       using arena: Arena
     ): Region = Region(mlirOperationGetRegion(arena, operation.segment, pos))
     inline def getNextInBlock(
-    )(
       using arena: Arena
     ): Operation = Operation(mlirOperationGetNextInBlock(arena, operation.segment))
     inline def getOperand(
@@ -430,7 +421,6 @@ given OperationApi with
       )
     )
     inline def getFirstRegion(
-    )(
       using arena: Arena
     ): Region = Region(mlirOperationGetFirstRegion(arena, operation.segment))
 
@@ -559,11 +549,9 @@ given RegionApi with
 
   extension (region: Region)
     inline def getFirstBlock(
-    )(
       using arena: Arena
     ): Block = Block(mlirRegionGetFirstBlock(arena, region.segment))
     inline def getNextInOperation(
-    )(
       using arena: Arena
     ): Region = Region(mlirRegionGetNextInOperation(arena, region.segment))
     inline def destroy(
@@ -594,19 +582,15 @@ given BlockApi with
 
   extension (block: Block)
     inline def getParentOperation(
-    )(
       using arena: Arena
     ): Operation = Operation(mlirBlockGetParentOperation(arena, block.segment))
     inline def getNextInRegion(
-    )(
       using arena: Arena
     ): Block = Block(mlirBlockGetNextInRegion(arena, block.segment))
     inline def getFirstOperation(
-    )(
       using arena: Arena
     ): Operation = Operation(mlirBlockGetFirstOperation(arena, block.segment))
     inline def getTerminator(
-    )(
       using arena: Arena
     ): Operation = Operation(mlirBlockGetTerminator(arena, block.segment))
     inline def addArgument(
@@ -628,7 +612,6 @@ given BlockApi with
       using arena: Arena
     ): Value = Value(mlirBlockGetArgument(arena, block.segment, pos))
     inline def argumentGetOwner(
-    )(
       using arena: Arena
     ): Block = Block(mlirBlockArgumentGetOwner(arena, block.segment))
     inline def destroy():                                                              Unit = mlirBlockDestroy(block.segment)
@@ -990,11 +973,9 @@ given IdentifierApi with
       Identifier(mlirIdentifierGet(arena, context._segment, identifierString.toStringRef.segment))
   extension (identifier:       Identifier)
     inline def getContext(
-    )(
       using arena: Arena
     ): Context = Context(mlirIdentifierGetContext(arena, identifier.segment))
     inline def str(
-    )(
       using arena: Arena
     ): String = StringRef(mlirIdentifierStr(arena, identifier.segment)).toScalaString
     inline def segment: MemorySegment = identifier._segment

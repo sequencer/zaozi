@@ -60,7 +60,6 @@ given PassManagerApi with
   ): PassManager = PassManager(mlirPassManagerCreateOnOperation(arena, context.segment, name.toStringRef.segment))
   extension (passManager: PassManager)
     inline def getAsOpPassManager(
-    )(
       using arena: Arena
     ): OpPassManager = OpPassManager(mlirPassManagerGetAsOpPassManager(arena, passManager.segment))
     inline def runOnOp(

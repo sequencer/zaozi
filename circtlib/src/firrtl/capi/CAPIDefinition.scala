@@ -20,11 +20,10 @@ trait FirrtlBundleFieldApi extends HasSegment[FirrtlBundleField] with HasSizeOf[
 
   extension (firrtlBundleField: FirrtlBundleField)
     inline def getName(
-    )(
       using arena: Arena
-    ):                      String
-    inline def getIsFlip(): Boolean
-    inline def getType():   Type
+    ):                    String
+    inline def getIsFlip: Boolean
+    inline def getType:   Type
 end FirrtlBundleFieldApi
 
 class FirrtlClassElement(val _segment: MemorySegment)
