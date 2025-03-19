@@ -881,8 +881,6 @@ given ForallApi with
           Seq(
             // body
             (Seq.empty, Seq.empty),
-            // pattern
-            (Seq.empty, Seq.empty)
           )
         ),
         namedAttributes =
