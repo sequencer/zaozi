@@ -28,9 +28,9 @@ object SMTSmoke extends TestSuite:
           func.appendToModule()
           given Block = func.block
 
-          val boolType  = summon[TypeApi].getBool()
+          val boolType  = summon[TypeApi].getBool
           val funcType  = summon[TypeApi].getSMTFunc(Seq(boolType, boolType), boolType)
-          val intType   = summon[TypeApi].getInt()
+          val intType   = summon[TypeApi].getInt
           val arrayType = summon[TypeApi].getArray(intType, boolType)
           val bvType    = summon[TypeApi].getBitVector(1)
 
