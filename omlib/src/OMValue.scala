@@ -58,6 +58,14 @@ sealed trait OMValue:
     case _            => None
   def map    = mapOpt.get
 
+  def flatten: Seq[OMValue] = Seq(this) ++ (this match
+    case OMObj(value)   => value.flatMap((_, child) => child.flatten).toSeq
+    case OMMap(value)   => value.flatMap((_, child) => child.flatten).toSeq
+    case OMList(value)  => value.flatMap(_.flatten).toSeq
+    case OMTuple(value) => value._1.flatten ++ value._2.flatten
+    case _              => Seq()
+  )
+
 end OMValue
 
 case class OMObj(value: LinkedHashMap[String, OMValue]) extends OMValue
