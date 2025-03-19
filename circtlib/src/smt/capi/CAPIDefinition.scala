@@ -29,12 +29,10 @@ trait TypeApi:
     context:     Context
   ): Type
   inline def getBool(
-  )(
     using arena: Arena,
     context:     Context
   ): Type
   inline def getInt(
-  )(
     using arena: Arena,
     context:     Context
   ): Type

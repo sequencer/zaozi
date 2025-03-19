@@ -46,12 +46,10 @@ given TypeApi with
     context:     Context
   ): Type = Type(smtTypeGetBitVector(arena, context.segment, width))
   inline def getBool(
-  )(
     using arena: Arena,
     context:     Context
   ): Type = Type(smtTypeGetBool(arena, context.segment))
   inline def getInt(
-  )(
     using arena: Arena,
     context:     Context
   ): Type = Type(smtTypeGetInt(arena, context.segment))
