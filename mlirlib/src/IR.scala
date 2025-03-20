@@ -143,7 +143,7 @@ given LocationApi with
       using arena: Arena
     ): Attribute =
       Attribute(mlirLocationGetAttribute(arena, location.segment))
-    inline def locationGetContext(
+    inline def getContext(
       using arena: Arena
     ): Context = Context(mlirLocationGetContext(arena, location.segment))
     inline def print(
@@ -817,7 +817,7 @@ given AttributeApi with
       context:     Context
     ): Attribute = Attribute(mlirBoolAttrGet(arena, context.segment, if (bool) 1 else 0))
   extension (attribute: Attribute)
-    inline def isBool:           Boolean = mlirAttributeIsAInteger(attribute.segment)
+    inline def isBool:           Boolean = mlirAttributeIsABool(attribute.segment)
     inline def boolAttrGetValue: Boolean = mlirBoolAttrGetValue(attribute.segment)
   // String
   def stringAttrGetTypeID(

@@ -22,13 +22,13 @@ end given
 
 given TypeApi with
   extension (tpe: Type)
-    inline def isAAnyType:            Boolean = omTypeIsAAnyType(tpe.segment)
-    inline def isAClassType:          Boolean = omTypeIsAClassType(tpe.segment)
-    inline def isAFrozenBasePathType: Boolean = omTypeIsAFrozenBasePathType(tpe.segment)
-    inline def isAFrozenPathType:     Boolean = omTypeIsAFrozenPathType(tpe.segment)
-    inline def isAListType:           Boolean = omTypeIsAListType(tpe.segment)
-    inline def isAMapType:            Boolean = omTypeIsAMapType(tpe.segment)
-    inline def isAStringType:         Boolean = omTypeIsAStringType(tpe.segment)
+    inline def isAnyType:            Boolean = omTypeIsAAnyType(tpe.segment)
+    inline def isClassType:          Boolean = omTypeIsAClassType(tpe.segment)
+    inline def isFrozenBasePathType: Boolean = omTypeIsAFrozenBasePathType(tpe.segment)
+    inline def isFrozenPathType:     Boolean = omTypeIsAFrozenPathType(tpe.segment)
+    inline def isListType:           Boolean = omTypeIsAListType(tpe.segment)
+    inline def isMapType:            Boolean = omTypeIsAMapType(tpe.segment)
+    inline def isStringType:         Boolean = omTypeIsAStringType(tpe.segment)
     inline def classTypeGetName(
       using arena: Arena
     ): Identifier = Identifier(omClassTypeGetName(arena, tpe.segment))
@@ -146,15 +146,15 @@ given EvaluatorValueApi with
 
     inline def isNull: Boolean = omEvaluatorValueIsNull(evaluatorValue.segment)
 
-    inline def isAObject: Boolean = omEvaluatorValueIsAObject(evaluatorValue.segment)
+    inline def isObject: Boolean = omEvaluatorValueIsAObject(evaluatorValue.segment)
 
-    inline def isAPrimitive: Boolean = omEvaluatorValueIsAPrimitive(evaluatorValue.segment)
+    inline def isPrimitive: Boolean = omEvaluatorValueIsAPrimitive(evaluatorValue.segment)
 
     inline def getPrimitive(
       using arena: Arena
     ): Attribute = Attribute(omEvaluatorValueGetPrimitive(arena, evaluatorValue.segment))
 
-    inline def isAList: Boolean = omEvaluatorValueIsAList(evaluatorValue.segment)
+    inline def isList: Boolean = omEvaluatorValueIsAList(evaluatorValue.segment)
 
     inline def listGetNumElements: Int = omEvaluatorListGetNumElements(evaluatorValue.segment).toInt
 
@@ -164,7 +164,7 @@ given EvaluatorValueApi with
       using arena: Arena
     ): EvaluatorValue = EvaluatorValue(omEvaluatorListGetElement(arena, evaluatorValue.segment, pos))
 
-    inline def isATuple: Boolean = omEvaluatorValueIsATuple(evaluatorValue.segment)
+    inline def isTuple: Boolean = omEvaluatorValueIsATuple(evaluatorValue.segment)
 
     inline def tupleGetNumElements: Int = omEvaluatorTupleGetNumElements(evaluatorValue.segment).toInt
 
@@ -184,21 +184,21 @@ given EvaluatorValueApi with
       using arena: Arena
     ): Attribute = new Attribute(omEvaluatorMapGetKeys(arena, evaluatorValue.segment))
 
-    inline def isAMap: Boolean = omEvaluatorValueIsAMap(evaluatorValue.segment)
+    inline def isMap: Boolean = omEvaluatorValueIsAMap(evaluatorValue.segment)
 
     inline def mapGetType(
       using arena: Arena
     ): Type = new Type(omEvaluatorMapGetType(arena, evaluatorValue.segment))
 
-    inline def isABasePath: Boolean = omEvaluatorValueIsABasePath(evaluatorValue.segment)
+    inline def isBasePath: Boolean = omEvaluatorValueIsABasePath(evaluatorValue.segment)
 
-    inline def isAPath: Boolean = omEvaluatorValueIsAPath(evaluatorValue.segment)
+    inline def isPath: Boolean = omEvaluatorValueIsAPath(evaluatorValue.segment)
 
     inline def pathGetAsString(
       using arena: Arena
     ): Attribute = new Attribute(omEvaluatorPathGetAsString(arena, evaluatorValue.segment))
 
-    inline def isAReference: Boolean = omEvaluatorValueIsAReference(evaluatorValue.segment)
+    inline def isReference: Boolean = omEvaluatorValueIsAReference(evaluatorValue.segment)
 
     inline def getReferenceValue(
       using arena: Arena
@@ -227,14 +227,14 @@ end given
 
 given ReferenceAttrApi with
   extension (attr: Attribute)
-    inline def isAReferenceAttr: Boolean = omAttrIsAReferenceAttr(attr.segment)
+    inline def isReferenceAttr: Boolean = omAttrIsAReferenceAttr(attr.segment)
     inline def referenceAttrGetInnerRef(
       using arena: Arena
     ): Attribute = Attribute(omReferenceAttrGetInnerRef(arena, attr.segment))
 
 given IntegerAttrApi with
   extension (attr: Attribute)
-    inline def isAIntegerAttr: Boolean = omAttrIsAIntegerAttr(attr.segment)
+    inline def isIntegerAttr: Boolean = omAttrIsAIntegerAttr(attr.segment)
     inline def integerAttrGetInt(
       using arena: Arena
     ): Attribute = Attribute(omIntegerAttrGetInt(arena, attr.segment))
@@ -247,7 +247,7 @@ given IntegerAttrApi with
 
 given ListAttrApi with
   extension (attr: Attribute)
-    inline def isAListAttr:            Boolean = omAttrIsAListAttr(attr.segment)
+    inline def isListAttr:             Boolean = omAttrIsAListAttr(attr.segment)
     inline def listAttrGetNumElements: Int     = omListAttrGetNumElements(attr.segment).toInt
     inline def listAttrGetElement(
       pos:         Int
@@ -257,7 +257,7 @@ given ListAttrApi with
 
 given MapAttrApi with
   extension (attr: Attribute)
-    inline def isAMapAttr:            Boolean = omAttrIsAMapAttr(attr.segment)
+    inline def isMapAttr:             Boolean = omAttrIsAMapAttr(attr.segment)
     inline def mapAttrGetNumElements: Int     = omMapAttrGetNumElements(attr.segment).toInt
     inline def mapAttrGetElementKey(
       pos:         Int

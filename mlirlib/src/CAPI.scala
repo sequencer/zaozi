@@ -440,7 +440,7 @@ trait LocationApi extends HasSegment[Location] with HasSizeOf[Location]:
     inline def getAttribute(
       using arena: Arena
     ): Attribute
-    inline def locationGetContext(
+    inline def getContext(
       using arena: Arena
     ): Context
     inline def print(

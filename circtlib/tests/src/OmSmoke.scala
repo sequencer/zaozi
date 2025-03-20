@@ -38,8 +38,8 @@ object OmSmoke extends TestSuite:
         .objectGetField(gcdClass.objectGetFieldNames.arrayAttrGetElement((0)))
         .objectGetField("width")
 
-      width.isAPrimitive ==> true
-      width.getPrimitive.isAIntegerAttr ==> true
+      width.isPrimitive ==> true
+      width.getPrimitive.isIntegerAttr ==> true
       width.getPrimitive.integerAttrGetInt.integerAttrGetValueInt ==> 16
 
     test("EvaluatorValue Types"):
@@ -55,8 +55,8 @@ object OmSmoke extends TestSuite:
           8.integerAttrGet(32.integerTypeGet).toEvaluatorValue
         )
 
-        thingy.isAObject ==> true
-        thingy.objectGetType.isAClassType ==> true
+        thingy.isObject ==> true
+        thingy.objectGetType.isClassType ==> true
         thingy.objectGetType.classTypeGetName.str ==> "Thingy"
 
         val widget = thingy.objectGetField("widget")
@@ -73,13 +73,13 @@ object OmSmoke extends TestSuite:
             "blue_2"
           )
 
-        widget.isAObject ==> true
-        gadget.isAObject ==> true
+        widget.isObject ==> true
+        gadget.isObject ==> true
 
         test("MLIR IntegerAttr"):
           val widgetBlue1 = widget.objectGetField("blue_1")
-          widgetBlue1.isAPrimitive ==> true
-          widgetBlue1.getPrimitive.isAIntegerAttr ==> false
+          widgetBlue1.isPrimitive ==> true
+          widgetBlue1.getPrimitive.isIntegerAttr ==> false
           widgetBlue1.getPrimitive.isInteger ==> true
           widgetBlue1.getPrimitive.integerAttrGetValueInt ==> 5
 
@@ -99,7 +99,7 @@ object OmSmoke extends TestSuite:
         val symAttr   = refClass.objectGetField("sym").getPrimitive
 
         // TODO: add CAPI for SymbolRefAttr in CIRCT
-        myrefAttr.isAReferenceAttr ==> true
+        myrefAttr.isReferenceAttr ==> true
 
         myrefAttr.referenceAttrGetInnerRef.innerRefAttrGetModule.stringAttrGetValue ==> "A"
         myrefAttr.referenceAttrGetInnerRef.innerRefAttrGetName.stringAttrGetValue ==> "inst_1"
@@ -110,14 +110,14 @@ object OmSmoke extends TestSuite:
           val listI64   = listClass.objectGetField("list_i64")
           val listI32   = listClass.objectGetField("list_i32")
 
-          listI64.isAList ==> false
-          listI32.isAList ==> false
+          listI64.isList ==> false
+          listI32.isList ==> false
 
           val listI64Attr = listI64.getPrimitive
           val listI32Attr = listI32.getPrimitive
 
-          listI64Attr.isAListAttr ==> true
-          listI32Attr.isAListAttr ==> true
+          listI64Attr.isListAttr ==> true
+          listI32Attr.isListAttr ==> true
           listI64Attr.listAttrGetElement(0).integerAttrGetValueInt ==> 42
           listI32Attr.listAttrGetNumElements ==> 0
 
@@ -125,7 +125,7 @@ object OmSmoke extends TestSuite:
           val listCreateClass = evaluator.instantiate("ListCreate")
           val listField       = listCreateClass.objectGetField("list_field")
 
-          listField.isAList ==> true
+          listField.isList ==> true
           listField.listGetNumElements ==> 2
           listField.listGetElement(0).objectGetField("blue_1").getPrimitive.integerAttrGetValueInt ==> 5
 
@@ -133,7 +133,7 @@ object OmSmoke extends TestSuite:
         val intClass = evaluator.instantiate("IntegerConstant")
         val intAttr  = intClass.objectGetField(intClass.objectGetFieldNames.arrayAttrGetElement(0)).getPrimitive
 
-        intAttr.isAIntegerAttr ==> true
+        intAttr.isIntegerAttr ==> true
         intAttr.integerAttrGetInt.integerAttrGetValueInt ==> 8428132854L
 
       test("String Constant"):
@@ -158,8 +158,8 @@ object OmSmoke extends TestSuite:
           val mapClass = evaluator.instantiate("MapConstant")
           val mapI64   = mapClass.objectGetField("map_i64")
 
-          mapI64.isAMap ==> false
-          mapI64.getPrimitive.isAMapAttr ==> true
+          mapI64.isMap ==> false
+          mapI64.getPrimitive.isMapAttr ==> true
 
           val mapI64Attr = mapI64.getPrimitive
 
@@ -172,20 +172,20 @@ object OmSmoke extends TestSuite:
             evaluator.instantiate("MapCreate")
           val mapField       = mapCreateClass.objectGetField("map_field")
 
-          mapField.isAMap ==> true
+          mapField.isMap ==> true
 
           val keys = mapField.mapGetKeys
           keys.arrayAttrGetNumElements ==> 2
-          mapField.mapGetElement(keys.arrayAttrGetElement(0)).isAObject ==> true
-          mapField.mapGetType.isAMapType ==> true
-          mapField.mapGetType.mapTypeGetKeyType.isAStringType ==> true
+          mapField.mapGetElement(keys.arrayAttrGetElement(0)).isObject ==> true
+          mapField.mapGetType.isMapType ==> true
+          mapField.mapGetType.mapTypeGetKeyType.isStringType ==> true
 
       test("Tuple"):
         val tupleClass = evaluator.instantiate("Tuple", true.boolAttrGet.toEvaluatorValue)
         val tuple      = tupleClass.objectGetField("tuple")
         val value      = tupleClass.objectGetField("val")
 
-        tuple.isATuple ==> true
+        tuple.isTuple ==> true
         tuple.tupleGetElement(0).getPrimitive.boolAttrGetValue ==> true
         tuple.tupleGetElement(1).getPrimitive.stringAttrGetValue ==> value.getPrimitive.stringAttrGetValue
 
@@ -195,13 +195,13 @@ object OmSmoke extends TestSuite:
           val path      = pathClass.objectGetField("path")
           val pathEmpty = pathClass.objectGetField("path_empty")
 
-          pathEmpty.isAPath ==> true
+          pathEmpty.isPath ==> true
           path.pathGetAsString.stringAttrGetValue ==> "OMReferenceTarget:~Foo|Foo/bar:Bar>w.a"
 
         test("FrozenBasePath"):
           val basepath = pathClass.objectGetField("basepath")
 
-          basepath.isABasePath ==> true
+          basepath.isBasePath ==> true
 
       test("Any"):
         test("Any Type will preserve the original type"):
@@ -209,13 +209,13 @@ object OmSmoke extends TestSuite:
           val objField = anyClass.objectGetField("object")
           val strField = anyClass.objectGetField("string")
 
-          objField.isAObject ==> true
-          strField.isAPrimitive ==> true
+          objField.isObject ==> true
+          strField.isPrimitive ==> true
           strField.getPrimitive.stringAttrGetValue ==> "foo"
 
       test("with Object Field"):
         val objectFieldClass = evaluator.instantiate("ObjectField")
-        objectFieldClass.objectGetField("field").isAObject ==> true
+        objectFieldClass.objectGetField("field").isObject ==> true
 
       test("Nested Reference Value"):
         val outerClass = evaluator.instantiate("OuterClass1")
@@ -225,4 +225,4 @@ object OmSmoke extends TestSuite:
           .listGetElement(0)
           .objectGetField("any_list2")
           .listGetElement(0)
-          .isAObject ==> true
+          .isObject ==> true
