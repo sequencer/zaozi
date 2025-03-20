@@ -83,7 +83,7 @@ extension (evaluatorValue: EvaluatorValue)
     using Arena,
     Context
   ): OMValue = evaluatorValue match
-    case obj if obj.isAObject                =>
+    case obj if obj.isObject                =>
       val fieldNames = obj.objectGetFieldNames
       OMObj(
         LinkedHashMap.from(
@@ -93,19 +93,19 @@ extension (evaluatorValue: EvaluatorValue)
             .map((fieldName, i) => (fieldName, obj.objectGetField(fieldName.stringAttrGet).toScala))
         )
       )
-    case primitive if primitive.isAPrimitive =>
+    case primitive if primitive.isPrimitive =>
       primitive.getPrimitive match
-        case string if string.isString        => OMString(string.stringAttrGetValue)
-        case int if int.isInteger             => OMInt(int.integerAttrGetValueInt)
-        case omInt if omInt.isAIntegerAttr    => OMInt(omInt.integerAttrGetInt.integerAttrGetValueInt)
-        case bool if bool.isBool              => OMBool(bool.boolAttrGetValue)
-        case listAttr if listAttr.isAListAttr =>
+        case string if string.isString       => OMString(string.stringAttrGetValue)
+        case int if int.isInteger            => OMInt(int.integerAttrGetValueInt)
+        case omInt if omInt.isIntegerAttr    => OMInt(omInt.integerAttrGetInt.integerAttrGetValueInt)
+        case bool if bool.isBool             => OMBool(bool.boolAttrGetValue)
+        case listAttr if listAttr.isListAttr =>
           OMList(
             Array.tabulate(listAttr.listAttrGetNumElements)(i =>
               listAttr.listAttrGetElement(i).toEvaluatorValue.toScala
             )
           )
-        case mapAttr if mapAttr.isAMapAttr    =>
+        case mapAttr if mapAttr.isMapAttr    =>
           OMMap(
             LinkedHashMap.from(
               Seq.tabulate(mapAttr.mapAttrGetNumElements)(i =>
@@ -113,16 +113,16 @@ extension (evaluatorValue: EvaluatorValue)
               )
             )
           )
-        case ref if ref.isAReferenceAttr      =>
+        case ref if ref.isReferenceAttr      =>
           val innerRef = ref.referenceAttrGetInnerRef
           OMRef((innerRef.innerRefAttrGetModule.stringAttrGetValue, innerRef.innerRefAttrGetName.stringAttrGetValue))
         // TODO: support SymbolRefAttr
-        case _                                => throw new Exception(s"Unsupport MLIR Attribute Type")
-    case list if list.isAList                =>
+        case _                               => throw new Exception(s"Unsupport MLIR Attribute Type")
+    case list if list.isList                =>
       OMList(
         Array.tabulate(list.listGetNumElements)(i => list.listGetElement(i).toScala)
       )
-    case map if map.isAMap                   =>
+    case map if map.isMap                   =>
       val keys = map.mapGetKeys
       OMMap(
         LinkedHashMap.from(
@@ -132,8 +132,8 @@ extension (evaluatorValue: EvaluatorValue)
           )
         )
       )
-    case tuple if tuple.isATuple             =>
+    case tuple if tuple.isTuple             =>
       OMTuple((tuple.tupleGetElement(0).toScala, tuple.tupleGetElement(1).toScala))
-    case path if path.isAPath                => OMPath(path.pathGetAsString.stringAttrGetValue)
-    case basepath if basepath.isABasePath    => throw new Exception(s"not support BasePath")
-    case _                                   => throw new Exception(s"Unsupport ObjectModel Evaluator Type")
+    case path if path.isPath                => OMPath(path.pathGetAsString.stringAttrGetValue)
+    case basepath if basepath.isBasePath    => throw new Exception(s"not support BasePath")
+    case _                                  => throw new Exception(s"Unsupport ObjectModel Evaluator Type")

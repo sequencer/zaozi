@@ -16,22 +16,22 @@ end DialectHandleApi
 
 trait TypeApi:
   extension (tpe: Type)
-    inline def isAAnyType:            Boolean
-    inline def isAClassType:          Boolean
-    inline def isAFrozenBasePathType: Boolean
-    inline def isAFrozenPathType:     Boolean
-    inline def isAListType:           Boolean
-    inline def isAMapType:            Boolean
-    inline def isAStringType:         Boolean
+    inline def isAnyType:            Boolean
+    inline def isClassType:          Boolean
+    inline def isFrozenBasePathType: Boolean
+    inline def isFrozenPathType:     Boolean
+    inline def isListType:           Boolean
+    inline def isMapType:            Boolean
+    inline def isStringType:         Boolean
     inline def classTypeGetName(
       using arena: Arena
-    ):                                Identifier
+    ):                               Identifier
     inline def listTypeGetElementType(
       using arena: Arena
-    ):                                Type
+    ):                               Type
     inline def mapTypeGetKeyType(
       using arena: Arena
-    ):                                Type
+    ):                               Type
 
   inline def anyTypeGetTypeID(
     using arena: Arena
@@ -102,20 +102,20 @@ trait EvaluatorValueApi extends HasSegment[EvaluatorValue] with HasSizeOf[Evalua
       using arena: Arena
     ):                              Location
     inline def isNull:              Boolean
-    inline def isAObject:           Boolean
-    inline def isAPrimitive:        Boolean
+    inline def isObject:            Boolean
+    inline def isPrimitive:         Boolean
     inline def getPrimitive(
       using arena: Arena
     ):                              Attribute
     // TODO: add CAPI to get MlirType of a list
-    inline def isAList:             Boolean
+    inline def isList:              Boolean
     inline def listGetNumElements:  Int
     inline def listGetElement(
       pos:         Int
     )(
       using arena: Arena
     ):                              EvaluatorValue
-    inline def isATuple:            Boolean
+    inline def isTuple:             Boolean
     inline def tupleGetNumElements: Int
     inline def tupleGetElement(
       pos:         Int
@@ -130,16 +130,16 @@ trait EvaluatorValueApi extends HasSegment[EvaluatorValue] with HasSizeOf[Evalua
     inline def mapGetKeys(
       using arena: Arena
     ):                              Attribute
-    inline def isAMap:              Boolean
+    inline def isMap:               Boolean
     inline def mapGetType(
       using arena: Arena
     ):                              Type
-    inline def isABasePath:         Boolean
-    inline def isAPath:             Boolean
+    inline def isBasePath:          Boolean
+    inline def isPath:              Boolean
     inline def pathGetAsString(
       using arena: Arena
     ):                              Attribute
-    inline def isAReference:        Boolean
+    inline def isReference:         Boolean
     inline def getReferenceValue(
       using arena: Arena
     ):                              EvaluatorValue
@@ -158,29 +158,29 @@ end EvaluatorValueApi
 
 trait ReferenceAttrApi:
   extension (attr: Attribute)
-    inline def isAReferenceAttr: Boolean
+    inline def isReferenceAttr: Boolean
     inline def referenceAttrGetInnerRef(
       using arena: Arena
-    ):                           Attribute
+    ):                          Attribute
 end ReferenceAttrApi
 
 trait IntegerAttrApi:
   extension (attr: Attribute)
-    inline def isAIntegerAttr: Boolean
+    inline def isIntegerAttr: Boolean
     inline def integerAttrGetInt(
       using arena: Arena
-    ):                         Attribute
+    ):                        Attribute
     inline def integerAttrGet(
       using arena: Arena
-    ):                         Attribute
+    ):                        Attribute
     inline def integerAttrToString(
       using arena: Arena
-    ):                         String
+    ):                        String
 end IntegerAttrApi
 
 trait ListAttrApi:
   extension (attr: Attribute)
-    inline def isAListAttr:            Boolean
+    inline def isListAttr:             Boolean
     inline def listAttrGetNumElements: Int
     inline def listAttrGetElement(
       pos:         Int
@@ -191,7 +191,7 @@ end ListAttrApi
 
 trait MapAttrApi:
   extension (attr: Attribute)
-    inline def isAMapAttr:            Boolean
+    inline def isMapAttr:             Boolean
     inline def mapAttrGetNumElements: Int
     inline def mapAttrGetElementKey(
       pos:         Int
