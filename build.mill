@@ -2,10 +2,14 @@
 // SPDX-FileCopyrightText: 2025 Jiuyang Liu <liu@jiuyang.me>
 package build
 
+import $ivy.`de.tototec::de.tobiasroeser.mill.vcs.version::0.4.1`
+
 import mill._
 import mill.scalalib.TestModule.Utest
 import mill.scalalib._
+import mill.scalalib.publish._
 import mill.scalalib.scalafmt._
+import de.tobiasroeser.mill.vcs.version.VcsVersion
 import $ivy.`com.lihaoyi::mill-contrib-jmh:`
 import contrib.jmh.JmhModule
 import os.Path
@@ -21,6 +25,31 @@ object v {
   val sourcecode = ivy"com.lihaoyi::sourcecode:0.4.2"
   val pprint     = ivy"com.lihaoyi::pprint:0.9.0"
   val jmh        = "1.35"
+}
+
+trait ZaoziPublishModule extends PublishModule {
+  def publishVersion: mill.T[String] = VcsVersion
+    .vcsState()
+    .format(
+      countSep = "+",
+      revHashDigits = 8,
+      untaggedSuffix = "-SNAPSHOT"
+    )
+
+  def pomSettings = T(
+    PomSettings(
+      description = artifactName(),
+      organization = "me.jiuyang",
+      url = "https://github.com/sequencer/zaozi",
+      licenses = Seq(License.`Apache-2.0`),
+      versionControl = VersionControl.github("sequencer", "zaozi"),
+      developers = Seq(
+        Developer("sequencer", "Jiuyang Liu", "https://github.com/sequencer"),
+        Developer("unlsycn", "Yuhang Zeng", "https://github.com/unlsycn"),
+        Developer("Clo91eaf", "Jianhao Ye", "https://github.com/Clo91eaf")
+      )
+    )
+  )
 }
 
 // Panama API

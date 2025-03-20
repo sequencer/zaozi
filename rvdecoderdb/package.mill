@@ -1,4 +1,3 @@
-
 // SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2025 Jiuyang Liu <liu@jiuyang.me>
 package build.rvdecoderdb
@@ -14,7 +13,7 @@ object `package` extends RootModule with RVDecoderDB
 
 trait RVDecoderDB extends ScalaModule with ScalafmtModule {
   def millSourcePath = os.pwd / "rvdecoderdb"
-  override def sources: T[Seq[PathRef]] = Task.Sources { super.sources() ++ Some(PathRef(millSourcePath / "src"))  }
+  override def sources: T[Seq[PathRef]] = Task.Sources { super.sources() ++ Some(PathRef(millSourcePath / "src")) }
   def scalaVersion = Task(v.scala)
   def ivyDeps      = Task(Seq(v.mainargs, v.oslib, v.upickle))
 
