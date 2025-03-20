@@ -53,7 +53,9 @@ import org.llvm.circt.scalalib.firrtl.operation.{
   ShlPrimApi,
   ShrPrimApi,
   SubPrimApi,
+  SubaccessApi,
   SubfieldApi,
+  SubindexApi,
   TailPrimApi,
   When,
   WhenApi,
@@ -444,6 +446,11 @@ given ConstructorApi with
     private[zaozi] val _width: Int = width._width
 
   def Bool(): Bool = new Object with Bool
+
+  def Vec[T <: Data](count: Int, tpe: T): Vec[T] =
+    new Vec[T]:
+      private[zaozi] val _elementType = tpe
+      private[zaozi] val _count       = count
 
   def when[COND <: Referable[Bool]](
     cond: COND
@@ -2106,6 +2113,38 @@ given [R <: Referable[Bool]]: BoolApi[R] with
         val _operation: Operation = nodeOp.operation
 end given
 
+given [E <: Data, V <: Vec[E], R <: Referable[V]]: VecApi[E, V, R] with
+  extension (ref: R)
+    def apply(
+      idx: Referable[UInt] | Int
+    )(
+      using Arena,
+      Context,
+      Block,
+      sourcecode.File,
+      sourcecode.Line,
+      sourcecode.Name
+    ): Node[E] =
+      val nodeOp = summon[NodeApi].op(
+        name = valName,
+        location = locate,
+        nameKind = FirrtlNameKind.Interesting,
+        input = idx match
+          case that: Referable[UInt] =>
+            val op0 = summon[SubaccessApi].op(ref.refer, that.refer, locate)
+            op0.operation.appendToBlock()
+            op0.result
+          case that: Int             =>
+            val op0 = summon[SubindexApi].op(ref.refer, that, locate)
+            op0.operation.appendToBlock()
+            op0.result
+      )
+      nodeOp.operation.appendToBlock()
+      new Node[E]:
+        val _tpe:       E         = ref._tpe._elementType
+        val _operation: Operation = nodeOp.operation
+
+end given
 private inline def locate(
   using Arena,
   Context,
