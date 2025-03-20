@@ -7,9 +7,10 @@ import mill.scalalib._
 import mill.scalalib.TestModule.Utest
 import mill.scalalib.scalafmt._
 
-import build.{mlirlib, v, PanamaModule}
+import build.{mlirlib, v, PanamaModule, ZaoziPublishModule}
 
-object `package` extends RootModule with ScalaModule with ScalafmtModule with PanamaModule { outer =>
+object `package` extends RootModule with ScalaModule with ScalafmtModule with PanamaModule with ZaoziPublishModule {
+  outer =>
   def scalaVersion = Task(v.scala)
 
   override def dumpIncludes() = Task.Command {

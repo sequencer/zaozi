@@ -33,7 +33,7 @@ let
     passthru.millDeps = generateIvyCache {
       inherit name;
       src = self.src;
-      hash = "sha256-S5mmXOyUJMuJj4CJSdcyMyVIF6f4hgoGRfvMnWWeah4=";
+      hash = "sha256-C4IUEPWLyl+KCSBZeYU26aEBnHAcRRHa2BEihoXdtc8=";
     };
 
     buildInputs = passthru.millDeps.cache.ivyDepsList;

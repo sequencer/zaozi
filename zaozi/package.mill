@@ -10,9 +10,9 @@ import $ivy.`com.lihaoyi::mill-contrib-jmh:`
 import contrib.jmh.JmhModule
 import os.Path
 
-import build.{circtlib, v}
+import build.{circtlib, v, ZaoziPublishModule}
 
-object `package` extends RootModule with ScalaModule with ScalafmtModule { m =>
+object `package` extends RootModule with ScalaModule with ScalafmtModule with ZaoziPublishModule { m =>
   def scalaVersion = Task(v.scala)
   def ivyDeps      = Task(Seq(v.mainargs, v.oslib, v.upickle, v.sourcecode))
   def moduleDeps   = Seq(circtlib)
