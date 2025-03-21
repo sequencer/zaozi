@@ -9,6 +9,7 @@ import org.llvm.circt.scalalib.hw.capi.given_AttributeApi
 import org.llvm.mlir.scalalib.{_, given}
 
 import java.lang.foreign.Arena
+import upickle.default._
 
 sealed trait OMValue:
   def value: Any
@@ -66,7 +67,21 @@ sealed trait OMValue:
     case _              => Seq()
   )
 
+  // Due to https://github.com/com-lihaoyi/upickle/issues/394, we convert OMValue to ujson.Value for serialization
+  def toUjson: ujson.Value = this match
+    case OMObj(value)    => ujson.Obj.from(value.mapValues(_.toUjson))
+    case OMString(value) => ujson.Str(value)
+    case OMInt(value)    => ujson.Num(value)
+    case OMBool(value)   => ujson.Bool(value)
+    case OMList(value)   => ujson.Arr.from(value.map(_.toUjson))
+    case OMMap(value)    => ujson.Obj.from(value.mapValues(_.toUjson))
+    case OMTuple(value)  => ujson.Obj(("_1", value._1.toUjson), ("_2", value._2.toUjson))
+    case OMRef(value)    => ujson.Obj(("module", value._1), ("name", value._2))
+    case OMPath(value)   => ujson.Str(value)
+
 end OMValue
+
+given omValueWriter: Writer[OMValue] = writer[ujson.Value].comap(_.toUjson)
 
 case class OMObj(value: LinkedHashMap[String, OMValue]) extends OMValue
 case class OMString(value: String)                      extends OMValue
