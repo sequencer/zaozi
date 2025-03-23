@@ -12,30 +12,29 @@ object QuantifierSpec extends TestSuite:
   val tests = Tests:
     test("Exist"):
       smtTest(
+        "(declare-const x Int)",
         "(assert (let ((tmp (exists ()",
-        "                           ( ! (let ((tmp_0 (x)))",
-        "                           (let ((tmp_1 (= tmp_0 1)))",
-        "                           tmp_1)) :weight 1))))",
+        "                           ( ! (let ((tmp_0 (= x 1)))",
+        "                           tmp_0) :weight 1))))",
         "        tmp))"
       ):
         solver {
           smtAssert(smtExists(1, false, Seq.empty) {
-            val x = SMTFunc(SInt)
-            smtYield(x() === 1.S)
+            val x = smtValue(SInt)
+            smtYield(x === 1.S)
           })
         }
     test("Forall"):
       smtTest(
-        "(declare-fun x () Int)",
+        "(declare-const x Int)",
         "(assert (let ((tmp (forall ()",
-        "                           ( ! (let ((tmp_0 (x)))",
-        "                           (let ((tmp_1 (= tmp_0 1)))",
-        "                           tmp_1)) :weight 1))))",
+        "                           ( ! (let ((tmp_0 (= x 1)))",
+        "                           tmp_0) :weight 1))))",
         "        tmp))"
       ):
         solver {
           smtAssert(smtForall(1, false, Seq.empty) {
-            val x = SMTFunc(SInt)
-            smtYield(x() === 1.S)
+            val x = smtValue(SInt)
+            smtYield(x === 1.S)
           })
         }

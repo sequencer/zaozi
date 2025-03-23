@@ -34,7 +34,7 @@ trait ConstructorApi:
   ): Sort[T]
 
   // values
-  def SMTFunc[T <: Data](
+  def smtValue[T <: Data](
     rangeType: T
   )(
     using Arena,
@@ -43,7 +43,19 @@ trait ConstructorApi:
     sourcecode.File,
     sourcecode.Line,
     sourcecode.Name
-  ): Ref[SMTFunc[?, T]]
+  ): Ref[T]
+
+  def smtFunc[T <: Data, U <: Data](
+    domainTypes: Seq[T],
+    rangeType:   U
+  )(
+    using Arena,
+    Context,
+    Block,
+    sourcecode.File,
+    sourcecode.Line,
+    sourcecode.Name
+  ): Ref[SMTFunc[T, U]]
 
   // smt functions
   def smtDistinct[T <: Data, D <: Referable[T]](
