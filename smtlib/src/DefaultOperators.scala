@@ -86,8 +86,8 @@ given ConstructorApi with
     domainTypes: Seq[T],
     rangeType:   U
   ): SMTFunc[T, U] = new SMTFunc[T, U]:
-    private[smtlib] val _domainTypes = domainTypes
-    private[smtlib] val _rangeType   = rangeType
+    private[smtlib] val _domainTypes: Seq[T] = domainTypes
+    private[smtlib] val _rangeType:   U      = rangeType
 
   def Sort[T <: Data](
     identifier: String,
@@ -97,7 +97,7 @@ given ConstructorApi with
     private[smtlib] val _sortParams: Seq[T] = sortParams
 
   // values
-  def SMTFunc[T <: Data](
+  def smtValue[T <: Data](
     rangeType: T
   )(
     using Arena,
@@ -106,14 +106,29 @@ given ConstructorApi with
     sourcecode.File,
     sourcecode.Line,
     sourcecode.Name
-  ): Ref[SMTFunc[?, T]] =
-    val tpe = SMTFunc(Seq.empty, rangeType)
+  ): Ref[T] =
+    val op = summon[DeclareFunApi].op(summon[sourcecode.Name].value, locate, rangeType.toMlirType)
+    op.operation.appendToBlock()
+    new Ref[T]:
+      val _tpe:       T         = rangeType
+      val _operation: Operation = op.operation
+
+  def smtFunc[T <: Data, U <: Data](
+    domainTypes: Seq[T],
+    rangeType:   U
+  )(
+    using Arena,
+    Context,
+    Block,
+    sourcecode.File,
+    sourcecode.Line,
+    sourcecode.Name
+  ): Ref[SMTFunc[T, U]] =
+    val tpe = SMTFunc(domainTypes, rangeType)
     val op  = summon[DeclareFunApi].op(summon[sourcecode.Name].value, locate, tpe.toMlirType)
     op.operation.appendToBlock()
-    new Ref[SMTFunc[?, T]]:
-      val _tpe:       SMTFunc[?, T] = new SMTFunc[?, T]:
-        private[smtlib] val _domainTypes = Seq()
-        private[smtlib] val _rangeType   = rangeType
+    new Ref[SMTFunc[T, U]]:
+      val _tpe:       SMTFunc[T, U] = tpe
       val _operation: Operation     = op.operation
 
   def smtDistinct[T <: Data, D <: Referable[T]](

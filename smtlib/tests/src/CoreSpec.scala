@@ -21,10 +21,23 @@ object CoreSpec extends TestSuite:
             smtAssert(false.B)
           }
       test("Ref[Bool]"):
-        smtTest("(assert (let ((tmp (a)))", "tmp))"):
+        smtTest("declare-const a Bool"):
           solver {
-            val a = SMTFunc(Bool)
-            smtAssert(a())
+            val a = smtValue(Bool)
+            smtAssert(a)
+          }
+    test("declare"):
+      test("const"):
+        smtTest("declare-const a Bool"):
+          solver {
+            val a = smtValue(Bool)
+            smtAssert(a)
+          }
+      test("fun"):
+        smtTest("declare-fun a (Int Bool) Bool"):
+          solver {
+            val a = smtFunc(Seq(SInt, Bool), Bool)
+            smtAssert(a(1.S, true.B))
           }
     test("distinct"):
       test("Const[Bool]"):
@@ -49,11 +62,16 @@ object CoreSpec extends TestSuite:
             smtAssert(smtDistinct(true.B, true.B, false.B, false.B))
           }
       test("Ref[Bool]"):
-        smtTest("(let ((tmp (b)))", "(let ((tmp_0 (a)))", "(let ((tmp_1 (distinct tmp_0 tmp)))"):
+        smtTest(
+          "(declare-const a Bool)",
+          "(declare-const b Bool)",
+          "(assert (let ((tmp (distinct a b)))",
+          "        tmp))"
+        ):
           solver {
-            val a = SMTFunc(Bool)
-            val b = SMTFunc(Bool)
-            smtAssert(smtDistinct(a(), b()))
+            val a = smtValue(Bool)
+            val b = smtValue(Bool)
+            smtAssert(smtDistinct(a, b))
           }
     test("reset"):
       smtTest("(reset)\n(reset)"):
@@ -87,17 +105,15 @@ object CoreSpec extends TestSuite:
           smtAssert(smtEq(true.B, false.B))
         }
       smtTest(
-        "(declare-fun a () Bool)",
-        "(declare-fun b () Int)",
-        "(assert (let ((tmp (b)))",
-        "        (let ((tmp_0 (a)))",
-        "        (let ((tmp_1 (= tmp_0 tmp)))",
-        "        tmp_1))))"
+        "(declare-const a Bool)",
+        "(declare-const b Int)",
+        "(assert (let ((tmp (= a b)))",
+        "        tmp))"
       ):
         solver {
-          val a = SMTFunc(Bool)
-          val b = SMTFunc(SInt)
-          smtAssert(smtEq(a(), b()))
+          val a = smtValue(Bool)
+          val b = smtValue(SInt)
+          smtAssert(smtEq(a, b))
         }
       smtTest("= true 1"):
         solver {
@@ -105,26 +121,21 @@ object CoreSpec extends TestSuite:
         }
       smtTest(
         "(declare-sort e 1)",
-        "(declare-fun a () Bool)",
-        "(declare-fun b () Int)",
-        "(declare-fun c () (_ BitVec 32))",
-        "(declare-fun d () (Int Bool) Bool)",
-        "(declare-fun e () (e Int))",
-        "(assert (let ((tmp (e)))",
-        "        (let ((tmp_0 (d)))",
-        "        (let ((tmp_1 (c)))",
-        "        (let ((tmp_2 (b)))",
-        "        (let ((tmp_3 (a)))",
-        "        (let ((tmp_4 (= true 1 #x00000001 tmp_3 tmp_2 tmp_1 tmp_0 tmp)))",
-        "        tmp_4)))))))"
+        "(declare-const a Bool)",
+        "(declare-const b Int)",
+        "(declare-const c (_ BitVec 32))",
+        "(declare-fun d (Int Bool) Bool)",
+        "(declare-const e (e Int))",
+        "(assert (let ((tmp (= true 1 #x00000001 a b c d e)))",
+        "        tmp))"
       ):
         solver {
-          val a = SMTFunc(Bool)
-          val b = SMTFunc(SInt)
-          val c = SMTFunc(BitVector(true, 32))
-          val d = SMTFunc(SMTFunc(Seq(SInt, Bool), Bool))
-          val e = SMTFunc(Sort("e", Seq(SInt)))
-          smtAssert(smtEq(true.B, 1.S, 1.B(true, 32), a(), b(), c(), d(), e()))
+          val a = smtValue(Bool)
+          val b = smtValue(SInt)
+          val c = smtValue(BitVector(true, 32))
+          val d = smtValue(SMTFunc(Seq(SInt, Bool), Bool))
+          val e = smtValue(Sort("e", Seq(SInt)))
+          smtAssert(smtEq(true.B, 1.S, 1.B(true, 32), a, b, c, d, e))
         }
     test("ite"):
       smtTest("ite true true false"):
@@ -133,21 +144,18 @@ object CoreSpec extends TestSuite:
           smtAssert(smtIte(true.B) { true.B } { false.B })
         }
       smtTest(
-        "(declare-fun a () Bool)",
-        "(declare-fun b () Int)",
-        "(declare-fun c () Int)",
-        "(assert (let ((tmp (c)))",
-        "        (let ((tmp_0 (b)))",
-        "        (let ((tmp_1 (a)))",
-        "        (let ((tmp_2 (ite tmp_1 tmp_0 tmp)))",
-        "        (let ((tmp_3 (= tmp_2 0)))",
-        "        tmp_3))))))"
+        "(declare-const a Bool)",
+        "(declare-const b Int)",
+        "(declare-const c Int)",
+        "(assert (let ((tmp (ite a b c)))",
+        "        (let ((tmp_0 (= tmp 0)))",
+        "        tmp_0)))"
       ):
         solver {
-          val a = SMTFunc(Bool)
-          val b = SMTFunc(SInt)
-          val c = SMTFunc(SInt)
-          smtAssert(smtIte(a()) { b() } { c() } === 0.S)
+          val a = smtValue(Bool)
+          val b = smtValue(SInt)
+          val c = smtValue(SInt)
+          smtAssert(smtIte(a) { b } { c } === 0.S)
         }
     test("push"):
       smtTest("push 1"):
