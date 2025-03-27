@@ -81,6 +81,7 @@ object OmSmoke extends TestSuite:
           widgetBlue1.isPrimitive ==> true
           widgetBlue1.getPrimitive.isIntegerAttr ==> false
           widgetBlue1.getPrimitive.isInteger ==> true
+          widgetBlue1.getPrimitive.isBool ==> false
           widgetBlue1.getPrimitive.integerAttrGetValueInt ==> 5
 
         test("Nested Fields"):
@@ -152,6 +153,12 @@ object OmSmoke extends TestSuite:
         bool1Attr.boolAttrGetValue ==> true
         bool2Attr.boolAttrGetValue ==> true
         bool3Attr.boolAttrGetValue ==> false
+
+        test("Bool value is also an integer"):
+          bool1Attr.isInteger ==> true
+          bool1Attr.integerAttrGetValueUInt ==> 1
+          bool2Attr.integerAttrGetValueInt ==> -1
+          bool3Attr.integerAttrGetValueInt ==> 0
 
       test("Map"):
         test("Map Constant"):
