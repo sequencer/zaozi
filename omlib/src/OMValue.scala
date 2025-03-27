@@ -111,9 +111,10 @@ extension (evaluatorValue: EvaluatorValue)
     case primitive if primitive.isPrimitive =>
       primitive.getPrimitive match
         case string if string.isString       => OMString(string.stringAttrGetValue)
+        // match bool before integer since a bool is also an integer
+        case bool if bool.isBool             => OMBool(bool.boolAttrGetValue)
         case int if int.isInteger            => OMInt(int.integerAttrGetValueInt)
         case omInt if omInt.isIntegerAttr    => OMInt(omInt.integerAttrGetInt.integerAttrGetValueInt)
-        case bool if bool.isBool             => OMBool(bool.boolAttrGetValue)
         case listAttr if listAttr.isListAttr =>
           OMList(
             Array.tabulate(listAttr.listAttrGetNumElements)(i =>
