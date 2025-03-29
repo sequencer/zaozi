@@ -32,6 +32,10 @@ trait AttributeApi extends HasSegment[Attribute] with HasSizeOf[Attribute]:
     using arena: Arena,
     context:     Context
   ): Attribute
+  extension (attribute: Attribute)
+    inline def getType(
+      using arena: Arena
+    ): Type
   // Location
   extension (attribute: Attribute) inline def isLocation: Boolean
   // Array
