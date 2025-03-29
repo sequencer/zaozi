@@ -723,6 +723,10 @@ given AttributeApi with
     using arena: Arena,
     context:     Context
   ): Attribute = Attribute(mlirAttributeGetNull(arena))
+  extension (attribute: Attribute)
+    inline def getType(
+      using arena: Arena
+    ): Type = Type(mlirAttributeGetType(arena, attribute.segment))
   // Location
   extension (attribute: Attribute) inline def isLocation: Boolean = mlirAttributeIsALocation(attribute.segment)
   // Array
