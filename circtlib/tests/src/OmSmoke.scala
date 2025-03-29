@@ -122,6 +122,8 @@ object OmSmoke extends TestSuite:
           listI64Attr.listAttrGetElement(0).integerAttrGetValueInt ==> 42
           listI32Attr.listAttrGetNumElements ==> 0
 
+          listI64Attr.getType.isListType ==> true
+
         test("OM List"):
           val listCreateClass = evaluator.instantiate("ListCreate")
           val listField       = listCreateClass.objectGetField("list_field")
@@ -143,6 +145,8 @@ object OmSmoke extends TestSuite:
 
         stringAttr.isString ==> true
         stringAttr.stringAttrGetValue ==> "foo"
+
+        stringAttr.getType.isStringType ==> true
 
       test("Bool Constant"):
         val boolClass                            = evaluator.instantiate("BoolConstant", true.boolAttrGet.toEvaluatorValue)
@@ -173,6 +177,8 @@ object OmSmoke extends TestSuite:
           mapI64Attr.mapAttrGetNumElements ==> 2
           mapI64Attr.mapAttrGetElementKey(0).str ==> "a"
           mapI64Attr.mapAttrGetElementValue(1).integerAttrGetValueInt ==> 32
+
+          mapI64Attr.getType.isMapType ==> true
 
         test("OM Map"):
           val mapCreateClass =
