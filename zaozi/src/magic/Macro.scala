@@ -3,6 +3,8 @@
 package me.jiuyang.zaozi.magic
 
 import scala.quoted.*
+import scala.language.reflectiveCalls
+import scala.reflect.Selectable.reflectiveSelectable
 
 /** This macro takes [[fieldName]] from dynamic access, retrieve type at compile time and call runtimeSelectDynamic to
   * do subaccess
@@ -122,3 +124,79 @@ def referableSelectDynamic[T <: me.jiuyang.zaozi.valuetpe.Data: Type](
     case _                      =>
       report.errorAndAbort(s"Field type '${fieldType.show}' does not conform to the upper bound Data.")
   }
+
+def referableApplyDynamic[T <: me.jiuyang.zaozi.valuetpe.Data: Type](
+  ref:       Expr[me.jiuyang.zaozi.reftpe.Referable[T]],
+  fieldName: Expr[String],
+  args:      Expr[Seq[Any]]
+)(
+  using Quotes
+): Expr[Any] =
+  import quotes.reflect.*
+  // Get the "field" expression via selectDynamic
+  val fieldValueExpr: Expr[Any] = referableSelectDynamic[T](ref, fieldName)
+
+  // Deconstruct the varargs
+  // TODO: How to fix: varargs is not capture at compileTime!
+  //       [error] -- Error: zaozi/zaozi/tests/src/VecSpec.scala:43:18 ---
+  //       [error] 43 |        io.out := io.a(io.idx)
+  //       [error]    |                  ^^^^^^^^^^^
+  //       [error]    |                  Expected varargs for applyDynamic, got: args$proxy1
+  val varargs = args match
+    case Varargs(exprs) => exprs
+    case other          =>
+      report.errorAndAbort(s"Expected varargs for applyDynamic, got: ${other.show}")
+
+  // Build an Apply node: fieldValue.apply(arg1, arg2, ...)
+  val fieldValueTerm = fieldValueExpr.asTerm
+  val applyCallTerm  =
+    Apply(
+      Select.unique(fieldValueTerm, "apply"), // fieldValue.apply
+      varargs.map(_.asTerm).toList
+    )
+
+  // Turn it back into an Expr
+  applyCallTerm.asExpr
+
+def referableApplyDynamicNamed[T <: me.jiuyang.zaozi.valuetpe.Data: Type](
+  ref:       Expr[me.jiuyang.zaozi.reftpe.Referable[T]],
+  fieldName: Expr[String],
+  args:      Expr[Seq[(String, Any)]]
+)(
+  using Quotes
+): Expr[Any] =
+  import quotes.reflect.*
+
+  // Get the "field" expression via selectDynamic
+  val fieldValueExpr: Expr[Any] = referableSelectDynamic[T](ref, fieldName)
+
+  // Deconstruct the varargs
+  val varargs: Seq[(String, Expr[Any])] = args match
+    case Varargs(argExprs) =>
+      argExprs.map {
+        case '{ ($key: String, $value: Any) } =>
+          key.value match
+            case Some(k) => (k, value)
+            case None    =>
+              report.errorAndAbort("Named argument must have a statically known key string.")
+        case other                            =>
+          report.errorAndAbort(s"Expected a literal (String, Any), got: ${other.show}")
+      }
+    case other             =>
+      report.errorAndAbort(s"Expected varargs for applyDynamicNamed, got: ${other.show}")
+
+  // Build a call with NamedArg nodes for each parameter
+  val fieldValueTerm = fieldValueExpr.asTerm
+  val namedArgs      = varargs.map { case (k, v) =>
+    NamedArg(k, v.asTerm)
+  }
+
+  // Turn it back into an Expr
+  val applyCallTerm =
+    Apply(
+      Select.unique(fieldValueTerm, "apply"), // fieldValue.apply
+      namedArgs.toList
+    )
+
+  // Turn it back into an Expr
+  applyCallTerm.asExpr
