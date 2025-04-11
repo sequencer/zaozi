@@ -9,11 +9,7 @@ import mill.scalalib.scalafmt._
 
 import build.v
 
-object `package` extends RootModule with RVDecoderDB
-
-trait RVDecoderDB extends ScalaModule with ScalafmtModule {
-  def millSourcePath = os.pwd / "rvdecoderdb"
-  override def sources: T[Seq[PathRef]] = Task.Sources { super.sources() ++ Some(PathRef(millSourcePath / "src")) }
+object `package` extends RootModule with ScalaModule with ScalafmtModule {
   def scalaVersion = Task(v.scala)
   def ivyDeps      = Task(Seq(v.mainargs, v.oslib, v.upickle))
 
