@@ -20,8 +20,10 @@ trait Referable[T <: Data] extends Dynamic:
 
   /** macro to call [[DynamicSubfield.getRefViaFieldValName]] */
   transparent inline def selectDynamic(name: String): Any = ${ referableSelectDynamic('this, 'name) }
-  transparent inline def applyDynamic(name:  String)(args: Any*): Any = ${ referableApplyDynamic('this, 'name, 'args) }
-  transparent inline def applyDynamicNamed(name: String)(args: (String, Any)*): Any = ${
+  transparent inline def applyDynamic(name: String)(inline args: Any*):                Any = ${
+    referableApplyDynamic('this, 'name, 'args)
+  }
+  transparent inline def applyDynamicNamed(name: String)(inline args: (String, Any)*): Any = ${
     referableApplyDynamicNamed('this, 'name, 'args)
   }
 

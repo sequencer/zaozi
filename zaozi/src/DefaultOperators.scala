@@ -1252,6 +1252,41 @@ given [R <: Referable[Bits]]: BitsApi[R] with
         val _tpe:       Bits      = new Bits:
           private[zaozi] val _width = nodeOp.operation.getResult(0).getType.getBitWidth(true).toInt
         val _operation: Operation = nodeOp.operation
+
+    def bit(
+      idx: Int
+    )(
+      using Arena,
+      Context,
+      Block,
+      sourcecode.File,
+      sourcecode.Line,
+      sourcecode.Name
+    ): Node[Bits] = bits(idx, idx)
+
+    // sugars
+    def apply(
+      hi: Int,
+      lo: Int
+    )(
+      using Arena,
+      Context,
+      Block,
+      sourcecode.File,
+      sourcecode.Line,
+      sourcecode.Name
+    ): Node[Bits] = bits(hi, lo)
+
+    def apply(
+      idx: Int
+    )(
+      using Arena,
+      Context,
+      Block,
+      sourcecode.File,
+      sourcecode.Line,
+      sourcecode.Name
+    ): Node[Bits] = bit(idx)
 end given
 
 given [R <: Referable[UInt]]: UIntApi[R] with
@@ -2115,7 +2150,7 @@ end given
 
 given [E <: Data, V <: Vec[E], R <: Referable[V]]: VecApi[E, V, R] with
   extension (ref: R)
-    def apply(
+    def bit(
       idx: Referable[UInt] | Int
     )(
       using Arena,
@@ -2143,6 +2178,18 @@ given [E <: Data, V <: Vec[E], R <: Referable[V]]: VecApi[E, V, R] with
       new Node[E]:
         val _tpe:       E         = ref._tpe._elementType
         val _operation: Operation = nodeOp.operation
+
+    // sugars
+    def apply(
+      idx: Referable[UInt] | Int
+    )(
+      using Arena,
+      Context,
+      Block,
+      sourcecode.File,
+      sourcecode.Line,
+      sourcecode.Name
+    ): Node[E] = bit(idx)
 
 end given
 private inline def locate(
