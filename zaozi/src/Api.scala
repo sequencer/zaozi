@@ -535,7 +535,7 @@ trait Pad[D <: Data, THAT, OUT <: Data, R <: Referable[D]]:
       sourcecode.Line,
       sourcecode.Name
     ): Node[OUT]
-trait ExtractRange[D <: Data, IDX, E <: Data, R <: Referable[D]]:
+trait ExtractRange[D <: Data, E <: Data, R <: Referable[D], IDX]:
   extension (ref: R)
     def bits(
       hi: IDX,
@@ -550,7 +550,7 @@ trait ExtractRange[D <: Data, IDX, E <: Data, R <: Referable[D]]:
     ): Node[E]
 trait ExtractElement[D <: Data, E <: Data, R <: Referable[D], IDX]:
   extension (ref: R)
-    def apply(
+    def bit(
       idx: IDX
     )(
       using Arena,
@@ -603,7 +603,8 @@ trait BitsApi[R <: Referable[Bits]]
     with Head[Bits, Int, Bits, R]
     with Tail[Bits, Int, Bits, R]
     with Pad[Bits, Int, Bits, R]
-    with ExtractRange[Bits, Int, Bits, R]
+    with ExtractElement[Bits, Bits, R, Int]
+    with ExtractRange[Bits, Bits, R, Int]
 
 trait BoolApi[R <: Referable[Bool]]
     extends AsBits[Bool, R]
