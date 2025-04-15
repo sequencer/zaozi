@@ -35,6 +35,7 @@ import org.llvm.circt.scalalib.firrtl.operation.{
   LEQPrimApi,
   LTPrimApi,
   LayerBlockApi,
+  MatchingConnectApi,
   ModuleApi,
   MulPrimApi,
   MuxPrimApi,
@@ -89,8 +90,7 @@ import java.lang.foreign.Arena
 val constructorApi = summon[ConstructorApi]
 export constructorApi.*
 
-// TODO: split LHS & RHS into two different trait? this might help for Vec static accessing assignment.
-given [D <: Data, SRC <: Referable[D], SINK <: Referable[D]]: MonoConnect[D, SRC, SINK] with
+given [D <: Data, SRC <: Referable[D], SINK <: Referable[D]]: StrictMonoConnect[D, SRC, SINK] with
   extension (ref: SINK)
     def :=(
       that: SRC
@@ -101,7 +101,7 @@ given [D <: Data, SRC <: Referable[D], SINK <: Referable[D]]: MonoConnect[D, SRC
       sourcecode.File,
       sourcecode.Line
     ): Unit =
-      summon[ConnectApi]
+      summon[MatchingConnectApi]
         .op(
           that.refer,
           ref.refer,
@@ -123,7 +123,7 @@ given [D <: Data, SRC <: Referable[D], SINK <: Referable[D]]: MonoConnect[D, SRC
           locate
         )
       invalidOp.operation.appendToBlock()
-      summon[ConnectApi]
+      summon[MatchingConnectApi]
         .op(
           invalidOp.result,
           ref.refer,

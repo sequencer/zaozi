@@ -524,6 +524,25 @@ given ConnectApi with
   extension (ref: Connect) def operation: Operation = ref._operation
 end given
 
+given MatchingConnectApi with
+  inline def op(
+    src:         Value,
+    dst:         Value,
+    location:    Location
+  )(
+    using arena: Arena,
+    context:     Context
+  ): MatchingConnect =
+    MatchingConnect(
+      summon[OperationApi].operationCreate(
+        name = "firrtl.matchingconnect",
+        location = location,
+        operands = Seq(dst, src)
+      )
+    )
+  extension (ref: MatchingConnect) def operation: Operation = ref._operation
+end given
+
 given LayerBlockApi with
   inline def op(
     layerPath:   Seq[String],

@@ -20,6 +20,8 @@ trait LayerBlockApi        extends HasOperation[LayerBlock]:
 end LayerBlockApi
 class Match(val _operation: Operation)
 class MatchingConnect(val _operation: Operation)
+trait MatchingConnectApi   extends HasOperation[MatchingConnect]:
+end MatchingConnectApi
 class Printf(val _operation: Operation)
 class Propassign(val _operation: Operation)
 class RefDefine(val _operation: Operation)

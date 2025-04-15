@@ -234,6 +234,17 @@ trait MonoConnect[D <: Data, SRC <: Referable[D], SINK <: Referable[D]]:
       sourcecode.File,
       sourcecode.Line
     ): Unit
+trait StrictMonoConnect[D <: Data, SRC <: Referable[D], SINK <: Referable[D]]:
+  extension (ref: SINK)
+    def :=(
+      that: SRC
+    )(
+      using Arena,
+      Context,
+      Block,
+      sourcecode.File,
+      sourcecode.Line
+    ): Unit
 trait Cvt[D <: Data, RET <: Data, R <: Referable[D]]:
   extension (ref: R)
     def zext(
