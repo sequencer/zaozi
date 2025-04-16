@@ -46,6 +46,15 @@ class HWInterface[P <: Parameter](
 class DVInterface[P <: Parameter](
   using P)
     extends ProbeBundle
+trait Generator[PARAM <: Parameter, I <: HWInterface[PARAM], P <: DVInterface[PARAM]](
+  using PARAM):
+  def parameter:      PARAM = summon[PARAM]
+  // todo: @yuhang, fill hwInterface and probeInterface with macro
+  def hwInterface:    I
+  def probeInterface: P
+
+  /** The RTL implementation. */
+  def architecture: (Arena, Context, Block, Interface[I], Interface[P]) ?=> Unit
 
 trait ConstructorApi:
   def Clock(): Clock
@@ -89,14 +98,10 @@ trait ConstructorApi:
 
   extension (layer: Layer) def toLayerTree: LayerTree
 
-  def Module[PARAM <: Parameter, I <: HWInterface[PARAM], P <: DVInterface[PARAM]](
-    io:    I,
-    probe: P
-  )(body:  (Arena, Context, Block, Seq[LayerTree], PARAM, Interface[I], Interface[P]) ?=> Unit
-  )(
+  def Module[PARAM <: Parameter, I <: HWInterface[PARAM], P <: DVInterface[PARAM], G <: Generator[PARAM, I, P]](
     using Arena,
     Context,
-    PARAM
+    G
   ): CirctModule
 
   def Wire[T <: Data](

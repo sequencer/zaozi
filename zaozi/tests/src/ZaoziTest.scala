@@ -45,13 +45,8 @@ import utest.assert
 
 import java.lang.foreign.Arena
 
-def mlirTest[PARAM <: Parameter, I <: HWInterface[PARAM], P <: DVInterface[PARAM]](
-  io:         I,
-  probe:      P
-)(checkLines: String*
-)(body:       (Arena, Context, Block, Seq[LayerTree]) ?=> (PARAM, Interface[I], Interface[P]) => Unit
-)(
-  using PARAM
+def mlirTest[G <: TestGenerator[?, ?, ?]](
+  using G
 ): Unit =
   given Arena      = Arena.ofConfined()
   given Context    = summon[ContextApi].contextCreate
@@ -59,52 +54,43 @@ def mlirTest[PARAM <: Parameter, I <: HWInterface[PARAM], P <: DVInterface[PARAM
   given MlirModule = summon[MlirModuleApi].moduleCreateEmpty(summon[LocationApi].locationUnknownGet)
 
   // Then based on the module to construct the circuit.
-  given Circuit = summon[CircuitApi].op(summon[PARAM].moduleName)
+  given Circuit = summon[CircuitApi].op(summon[G].parameter.moduleName)
   summon[Circuit].appendToModule()
-  summon[ConstructorApi].Module(io, probe)(body).appendToCircuit()
+  summon[ConstructorApi].Module.appendToCircuit()
   validateCircuit()
 
-  val out = new StringBuilder
+  val out        = new StringBuilder
   summon[MlirModule].getOperation.print(out ++= _)
   summon[Context].destroy()
   summon[Arena].close()
+  val checkLines = summon[G].parameter.tests(summon[G].parameter.test)
   if (checkLines.isEmpty)
     assert(out.toString == "Nothing To Check")
   else checkLines.foreach(l => assert(out.toString.contains(l)))
 
-def firrtlTest[PARAM <: Parameter, I <: HWInterface[PARAM], P <: DVInterface[PARAM]](
-  io:         I,
-  probe:      P
-)(checkLines: String*
-)(body:       (Arena, Context, Block, Seq[LayerTree], PARAM, Interface[I], Interface[P]) ?=> Unit
-)(
-  using PARAM
+def firrtlTest[G <: TestGenerator[?, ?, ?]](
+  using G
 ): Unit =
   given Arena      = Arena.ofConfined()
   given Context    = summon[ContextApi].contextCreate
   summon[Context].loadFirrtlDialect()
   // Then based on the module to construct the circuit.
   given MlirModule = summon[MlirModuleApi].moduleCreateEmpty(summon[LocationApi].locationUnknownGet)
-  given Circuit    = summon[CircuitApi].op(summon[PARAM].moduleName)
+  given Circuit    = summon[CircuitApi].op(summon[G].parameter.moduleName)
   summon[Circuit].appendToModule()
-  summon[ConstructorApi].Module(io, probe)(body).appendToCircuit()
-
+  summon[ConstructorApi].Module.appendToCircuit()
   validateCircuit()
-  val out = new StringBuilder
+  val out          = new StringBuilder
   summon[MlirModule].exportFIRRTL(out ++= _)
   summon[Context].destroy()
   summon[Arena].close()
+  val checkLines   = summon[G].parameter.tests(summon[G].parameter.test)
   if (checkLines.isEmpty)
     assert(out.toString == "Nothing To Check")
   else checkLines.foreach(l => assert(out.toString.contains(l)))
 
-def verilogTest[PARAM <: Parameter, I <: HWInterface[PARAM], P <: DVInterface[PARAM]](
-  io:         I,
-  probe:      P
-)(checkLines: String*
-)(body:       (Arena, Context, Block, Seq[LayerTree], PARAM, Interface[I], Interface[P]) ?=> Unit
-)(
-  using PARAM
+def verilogTest[G <: TestGenerator[?, ?, ?]](
+  using G
 ): Unit =
   given Arena          = Arena.ofConfined()
   given Context        = summon[ContextApi].contextCreate
@@ -125,27 +111,23 @@ def verilogTest[PARAM <: Parameter, I <: HWInterface[PARAM], P <: DVInterface[PA
 
   // Then based on the module to construct the circuit.
   given MlirModule = summon[MlirModuleApi].moduleCreateEmpty(summon[LocationApi].locationUnknownGet)
-  given Circuit    = summon[CircuitApi].op(summon[PARAM].moduleName)
+  given Circuit    = summon[CircuitApi].op(summon[G].parameter.moduleName)
   summon[Circuit].appendToModule()
-  summon[ConstructorApi].Module(io, probe)(body).appendToCircuit()
+  summon[ConstructorApi].Module.appendToCircuit()
   validateCircuit()
   summon[PassManager].runOnOp(summon[MlirModule].getOperation)
   summon[Context].destroy()
   summon[Arena].close()
+  val checkLines   = summon[G].parameter.tests(summon[G].parameter.test)
   if (checkLines.isEmpty)
     assert(out.toString == "Nothing To Check")
   else checkLines.foreach(l => assert(out.toString.contains(l)))
 
-case class SimpleParameter(width: Int, moduleName: String) extends Parameter:
-  def layers: Seq[Layer] = Seq.empty
-
-class PassthroughIO(
-  using SimpleParameter)
-    extends HWInterface[SimpleParameter]:
-  val parameter = summon[SimpleParameter]
-  val i         = Flipped(UInt(parameter.width.W))
-  val o         = Aligned(UInt(parameter.width.W))
-
-class PassthroughProbe(
-  using SimpleParameter)
-    extends DVInterface[SimpleParameter]
+// @todo: use FileCheck in the future.
+trait TestParameter extends Parameter:
+  def test:  String
+  def tests: Map[String, Seq[String]]
+trait TestGenerator[PARAM <: TestParameter, I <: HWInterface[PARAM], P <: DVInterface[PARAM]](
+  using PARAM)
+    extends Generator[PARAM, I, P]:
+  override def parameter: PARAM = summon[PARAM]

@@ -525,24 +525,24 @@ given ConstructorApi with
         def _children: Seq[LayerTree] = layer.children.map(_.toLayerTree)
       ._rebuild
 
-  def Module[PARAM <: Parameter, I <: HWInterface[PARAM], P <: DVInterface[PARAM]](
-    io:    I,
-    probe: P
-  )(body:  (Arena, Context, Block, Seq[LayerTree], PARAM, Interface[I], Interface[P]) ?=> Unit
-  )(
+  def Module[PARAM <: Parameter, I <: HWInterface[PARAM], P <: DVInterface[PARAM], G <: Generator[PARAM, I, P]](
     using Arena,
     Context,
-    PARAM
+    G
   ): operation.Module =
+    val generator        = summon[G]
+    val parameter        = generator.parameter
+    val io               = generator.hwInterface
+    val probe            = generator.probeInterface
     val unknownLocation  = summon[LocationApi].locationUnknownGet
     val ioNumFields      = io.toMlirType.getBundleNumFields.toInt
     val probeNumFields   = probe.toMlirType.getBundleNumFields.toInt
     val bfs              =
       Seq.tabulate(ioNumFields)(io.toMlirType.getBundleFieldByIndex) ++
         Seq.tabulate(probeNumFields)(probe.toMlirType.getBundleFieldByIndex)
-    given Seq[LayerTree] = summon[PARAM].layerTrees.flatMap(_._dfs)
+    given Seq[LayerTree] = parameter.layerTrees.flatMap(_._dfs)
     val module           = summon[ModuleApi].op(
-      summon[PARAM].moduleName,
+      parameter.moduleName,
       unknownLocation,
       FirrtlConvention.Scalarized,
       bfs.map(i => (i, unknownLocation)), // TODO: record location for Bundle?
@@ -603,7 +603,7 @@ given ConstructorApi with
       new Interface[P]:
         val _tpe:       P         = probe
         val _operation: Operation = probeWire.operation
-    body
+    generator.architecture
     module
 
   def Wire[T <: Data](
