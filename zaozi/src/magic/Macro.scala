@@ -28,8 +28,8 @@ private def summonImplicitParameters(
   val line     = Expr.summon[sourcecode.Line].getOrElse {
     report.errorAndAbort("No implicit value found for sourcecode.Line.")
   }
-  val valName  = Expr.summon[sourcecode.Name].getOrElse {
-    report.errorAndAbort("No implicit value found for sourcecode.Name.")
+  val valName  = Expr.summon[sourcecode.Name.Machine].getOrElse {
+    report.errorAndAbort("No implicit value found for sourcecode.Name.Machine.")
   }
 
   (arena, typeImpl, context, block, file, line, valName)
@@ -46,7 +46,7 @@ private def summonImplicitParameters(
   *       ctx:       Context,
   *       file:      sourcecode.File,
   *       line:      sourcecode.Line,
-  *       valName:   sourcecode.Name
+  *       valName:   sourcecode.Name.Machine
   *     ): Ref[E]
   *   given [D <: Bundle, R <: Referable[D]]: RefElementViaValName[D, R]
   * }}}
@@ -113,7 +113,7 @@ def referableSelectDynamic[T <: me.jiuyang.zaozi.valuetpe.Data: Type](
         given org.llvm.mlir.scalalib.Block   = $block
         given sourcecode.File                = $file
         given sourcecode.Line                = $line
-        given sourcecode.Name                = $valName
+        given sourcecode.Name.Machine        = $valName
         $ref._tpe
           .asInstanceOf[me.jiuyang.zaozi.magic.DynamicSubfield]
           // Hack with union type
@@ -141,7 +141,7 @@ object ApplyHelper:
     Block,
     sourcecode.File,
     sourcecode.Line,
-    sourcecode.Name
+    sourcecode.Name.Machine
   ): Node[E] =
     import me.jiuyang.zaozi.default.given_VecApi_E_V_R
     vecRef.apply(idx)
@@ -156,7 +156,7 @@ object ApplyHelper:
     Block,
     sourcecode.File,
     sourcecode.Line,
-    sourcecode.Name
+    sourcecode.Name.Machine
   ): Node[Bits] =
     import me.jiuyang.zaozi.default.given_BitsApi_R
     bitsRef.apply(hi, lo)
@@ -170,7 +170,7 @@ object ApplyHelper:
     Block,
     sourcecode.File,
     sourcecode.Line,
-    sourcecode.Name
+    sourcecode.Name.Machine
   ): Node[Bits] =
     import me.jiuyang.zaozi.default.given_BitsApi_R
     bitsRef.apply(idx)
