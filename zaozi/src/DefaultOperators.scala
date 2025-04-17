@@ -268,7 +268,7 @@ given TypeImpl with
       tpe:   T,
       layer: LayerTree
     )(
-      using sourcecode.Name
+      using sourcecode.Name.Machine
     ): BundleField[RProbe[T]] =
       require(ref.instantiating)
       val bf = new BundleField[RProbe[T]]:
@@ -285,7 +285,7 @@ given TypeImpl with
       tpe:   T,
       layer: LayerTree
     )(
-      using sourcecode.Name
+      using sourcecode.Name.Machine
     ): BundleField[RWProbe[T]] =
       require(ref.instantiating)
       val bf = new BundleField[RWProbe[T]]:
@@ -318,7 +318,7 @@ given TypeImpl with
       name: Option[String],
       tpe:  T
     )(
-      using sourcecode.Name
+      using sourcecode.Name.Machine
     ): BundleField[T] =
       require(ref.instantiating)
       val bf = new BundleField[T]:
@@ -332,7 +332,7 @@ given TypeImpl with
       name: Option[String],
       tpe:  T
     )(
-      using sourcecode.Name
+      using sourcecode.Name.Machine
     ): BundleField[T] =
       require(ref.instantiating)
       val bf = new BundleField[T]:
@@ -376,7 +376,7 @@ given TypeImpl with
       Context,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name
+      sourcecode.Name.Machine
     )(
       using TypeImpl
     ): Ref[E] =
@@ -406,7 +406,7 @@ given TypeImpl with
       Context,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name
+      sourcecode.Name.Machine
     )(
       using TypeImpl
     ): Ref[E] =
@@ -461,7 +461,7 @@ given ConstructorApi with
     Block,
     sourcecode.File,
     sourcecode.Line,
-    sourcecode.Name
+    sourcecode.Name.Machine
   ): When =
     val op0 = summon[WhenApi].op(cond.refer, locate)
     op0.operation.appendToBlock()
@@ -480,7 +480,7 @@ given ConstructorApi with
       Context,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name
+      sourcecode.Name.Machine
     ): Unit =
       given Block = when.elseBlock
       body
@@ -507,7 +507,7 @@ given ConstructorApi with
     Seq[LayerTree],
     sourcecode.File,
     sourcecode.Line,
-    sourcecode.Name
+    sourcecode.Name.Machine
   ): Unit =
     val op0 = summon[LayerBlockApi].op(summon[Seq[LayerTree]](layerName)._hierarchy.map(_._name), locate)
     op0.operation.appendToBlock()
@@ -614,7 +614,7 @@ given ConstructorApi with
     Block,
     sourcecode.File,
     sourcecode.Line,
-    sourcecode.Name
+    sourcecode.Name.Machine
   ): Wire[T] =
     val wireOp = summon[WireApi].op(
       name = valName,
@@ -636,7 +636,7 @@ given ConstructorApi with
     Ref[Clock],
     sourcecode.File,
     sourcecode.Line,
-    sourcecode.Name
+    sourcecode.Name.Machine
   ): Reg[T] =
     val regOp = summon[RegApi].op(
       name = valName,
@@ -660,7 +660,7 @@ given ConstructorApi with
     Ref[Reset],
     sourcecode.File,
     sourcecode.Line,
-    sourcecode.Name
+    sourcecode.Name.Machine
   ): Reg[T] =
     val regResetOp = summon[RegResetApi].op(
       name = valName,
@@ -685,7 +685,7 @@ given ConstructorApi with
     Block,
     sourcecode.File,
     sourcecode.Line,
-    sourcecode.Name,
+    sourcecode.Name.Machine,
     P
     // TODO: later will also return a ClassTpe
   ): Instance[IOTpe, ProbeTpe] =
@@ -842,7 +842,7 @@ given [R <: Referable[Bits]]: BitsApi[R] with
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name
+      sourcecode.Name.Machine
     ): Node[SInt] =
       val op0    = summon[AsSIntPrimApi].op(ref.refer, locate)
       op0.operation.appendToBlock()
@@ -863,7 +863,7 @@ given [R <: Referable[Bits]]: BitsApi[R] with
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name
+      sourcecode.Name.Machine
     ): Node[UInt] =
       val nodeOp = summon[NodeApi].op(
         name = valName,
@@ -883,7 +883,7 @@ given [R <: Referable[Bits]]: BitsApi[R] with
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name
+      sourcecode.Name.Machine
     ): Node[Bits] =
       val op0    = summon[NotPrimApi].op(ref.refer, locate)
       op0.operation.appendToBlock()
@@ -905,7 +905,7 @@ given [R <: Referable[Bits]]: BitsApi[R] with
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name
+      sourcecode.Name.Machine
     ): Node[Bool] =
       val op0    = summon[AndRPrimApi].op(ref.refer, locate)
       op0.operation.appendToBlock()
@@ -926,7 +926,7 @@ given [R <: Referable[Bits]]: BitsApi[R] with
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name
+      sourcecode.Name.Machine
     ): Node[Bool] =
       val op0    = summon[OrRPrimApi].op(ref.refer, locate)
       op0.operation.appendToBlock()
@@ -947,7 +947,7 @@ given [R <: Referable[Bits]]: BitsApi[R] with
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name
+      sourcecode.Name.Machine
     ): Node[Bool] =
       val op0    = summon[XorRPrimApi].op(ref.refer, locate)
       op0.operation.appendToBlock()
@@ -970,7 +970,7 @@ given [R <: Referable[Bits]]: BitsApi[R] with
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name
+      sourcecode.Name.Machine
     ): Node[Bool] =
       val op0    = summon[EQPrimApi].op(ref.refer, that.refer, locate)
       op0.operation.appendToBlock()
@@ -992,7 +992,7 @@ given [R <: Referable[Bits]]: BitsApi[R] with
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name
+      sourcecode.Name.Machine
     ): Node[Bool] =
       val op0    = summon[NEQPrimApi].op(ref.refer, that.refer, locate)
       op0.operation.appendToBlock()
@@ -1014,7 +1014,7 @@ given [R <: Referable[Bits]]: BitsApi[R] with
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name
+      sourcecode.Name.Machine
     ): Node[Bits] =
       val op0    = summon[AndPrimApi].op(ref.refer, that.refer, locate)
       op0.operation.appendToBlock()
@@ -1037,7 +1037,7 @@ given [R <: Referable[Bits]]: BitsApi[R] with
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name
+      sourcecode.Name.Machine
     ): Node[Bits] =
       val op0    = summon[OrPrimApi].op(ref.refer, that.refer, locate)
       op0.operation.appendToBlock()
@@ -1061,7 +1061,7 @@ given [R <: Referable[Bits]]: BitsApi[R] with
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name
+      sourcecode.Name.Machine
     ): Node[Bits] =
       val op0    = summon[XorPrimApi].op(ref.refer, that.refer, locate)
       op0.operation.appendToBlock()
@@ -1085,7 +1085,7 @@ given [R <: Referable[Bits]]: BitsApi[R] with
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name
+      sourcecode.Name.Machine
     ): Node[Bits] =
       val op0    = summon[CatPrimApi].op(ref.refer, that.refer, locate)
       op0.operation.appendToBlock()
@@ -1108,7 +1108,7 @@ given [R <: Referable[Bits]]: BitsApi[R] with
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name
+      sourcecode.Name.Machine
     ): Node[Bits] =
       val nodeOp = summon[NodeApi].op(
         name = valName,
@@ -1137,7 +1137,7 @@ given [R <: Referable[Bits]]: BitsApi[R] with
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name
+      sourcecode.Name.Machine
     ): Node[Bits] =
       val nodeOp = summon[NodeApi].op(
         name = valName,
@@ -1167,7 +1167,7 @@ given [R <: Referable[Bits]]: BitsApi[R] with
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name
+      sourcecode.Name.Machine
     ): Node[Bits] =
       val op0    = summon[HeadPrimApi].op(ref.refer, that, locate)
       op0.operation.appendToBlock()
@@ -1190,7 +1190,7 @@ given [R <: Referable[Bits]]: BitsApi[R] with
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name
+      sourcecode.Name.Machine
     ): Node[Bits] =
       val op0    = summon[TailPrimApi].op(ref.refer, that, locate)
       op0.operation.appendToBlock()
@@ -1213,7 +1213,7 @@ given [R <: Referable[Bits]]: BitsApi[R] with
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name
+      sourcecode.Name.Machine
     ): Node[Bits] =
       val op0    = summon[PadPrimApi].op(ref.refer, that, locate)
       op0.operation.appendToBlock()
@@ -1237,7 +1237,7 @@ given [R <: Referable[Bits]]: BitsApi[R] with
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name
+      sourcecode.Name.Machine
     ): Node[Bits] =
       val op0    = summon[BitsPrimApi].op(ref.refer, hi, lo, locate)
       op0.operation.appendToBlock()
@@ -1261,7 +1261,7 @@ given [R <: Referable[Bits]]: BitsApi[R] with
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name
+      sourcecode.Name.Machine
     ): Node[Bits] = bits(idx, idx)
 
     // sugars
@@ -1274,7 +1274,7 @@ given [R <: Referable[Bits]]: BitsApi[R] with
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name
+      sourcecode.Name.Machine
     ): Node[Bits] = bits(hi, lo)
 
     def apply(
@@ -1285,7 +1285,7 @@ given [R <: Referable[Bits]]: BitsApi[R] with
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name
+      sourcecode.Name.Machine
     ): Node[Bits] = bit(idx)
 end given
 
@@ -1297,7 +1297,7 @@ given [R <: Referable[UInt]]: UIntApi[R] with
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name
+      sourcecode.Name.Machine
     ): Node[Bits] =
       val nodeOp = summon[NodeApi].op(
         name = valName,
@@ -1319,7 +1319,7 @@ given [R <: Referable[UInt]]: UIntApi[R] with
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name
+      sourcecode.Name.Machine
     ): Node[UInt] =
       val op0    = summon[AddPrimApi].op(ref.refer, that.refer, locate)
       op0.operation.appendToBlock()
@@ -1342,7 +1342,7 @@ given [R <: Referable[UInt]]: UIntApi[R] with
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name
+      sourcecode.Name.Machine
     ): Node[UInt] =
       val op0    = summon[SubPrimApi].op(ref.refer, that.refer, locate)
       op0.operation.appendToBlock()
@@ -1365,7 +1365,7 @@ given [R <: Referable[UInt]]: UIntApi[R] with
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name
+      sourcecode.Name.Machine
     ): Node[UInt] =
       val op0    = summon[MulPrimApi].op(ref.refer, that.refer, locate)
       op0.operation.appendToBlock()
@@ -1388,7 +1388,7 @@ given [R <: Referable[UInt]]: UIntApi[R] with
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name
+      sourcecode.Name.Machine
     ): Node[UInt] =
       val op0    = summon[DivPrimApi].op(ref.refer, that.refer, locate)
       op0.operation.appendToBlock()
@@ -1411,7 +1411,7 @@ given [R <: Referable[UInt]]: UIntApi[R] with
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name
+      sourcecode.Name.Machine
     ): Node[UInt] =
       val op0    = summon[RemPrimApi].op(ref.refer, that.refer, locate)
       op0.operation.appendToBlock()
@@ -1434,7 +1434,7 @@ given [R <: Referable[UInt]]: UIntApi[R] with
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name
+      sourcecode.Name.Machine
     ): Node[Bool] =
       val op0    = summon[LTPrimApi].op(ref.refer, that.refer, locate)
       op0.operation.appendToBlock()
@@ -1456,7 +1456,7 @@ given [R <: Referable[UInt]]: UIntApi[R] with
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name
+      sourcecode.Name.Machine
     ): Node[Bool] =
       val op0    = summon[LEQPrimApi].op(ref.refer, that.refer, locate)
       op0.operation.appendToBlock()
@@ -1479,7 +1479,7 @@ given [R <: Referable[UInt]]: UIntApi[R] with
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name
+      sourcecode.Name.Machine
     ): Node[Bool] =
       val op0    = summon[GTPrimApi].op(ref.refer, that.refer, locate)
       op0.operation.appendToBlock()
@@ -1502,7 +1502,7 @@ given [R <: Referable[UInt]]: UIntApi[R] with
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name
+      sourcecode.Name.Machine
     ): Node[Bool] =
       val op0    = summon[GEQPrimApi].op(ref.refer, that.refer, locate)
       op0.operation.appendToBlock()
@@ -1525,7 +1525,7 @@ given [R <: Referable[UInt]]: UIntApi[R] with
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name
+      sourcecode.Name.Machine
     ): Node[Bool] =
       val op0    = summon[EQPrimApi].op(ref.refer, that.refer, locate)
       op0.operation.appendToBlock()
@@ -1548,7 +1548,7 @@ given [R <: Referable[UInt]]: UIntApi[R] with
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name
+      sourcecode.Name.Machine
     ): Node[Bool] =
       val op0    = summon[NEQPrimApi].op(ref.refer, that.refer, locate)
       op0.operation.appendToBlock()
@@ -1571,7 +1571,7 @@ given [R <: Referable[UInt]]: UIntApi[R] with
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name
+      sourcecode.Name.Machine
     ): Node[UInt] =
       val nodeOp = summon[NodeApi].op(
         name = valName,
@@ -1600,7 +1600,7 @@ given [R <: Referable[UInt]]: UIntApi[R] with
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name
+      sourcecode.Name.Machine
     ): Node[UInt] =
       val nodeOp = summon[NodeApi].op(
         name = valName,
@@ -1631,7 +1631,7 @@ given [R <: Referable[SInt]]: SIntApi[R] with
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name
+      sourcecode.Name.Machine
     ): Node[Bits] =
       val op0    = summon[AsUIntPrimApi].op(ref.refer, locate)
       op0.operation.appendToBlock()
@@ -1654,7 +1654,7 @@ given [R <: Referable[SInt]]: SIntApi[R] with
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name
+      sourcecode.Name.Machine
     ): Node[SInt] =
       val op0    = summon[AddPrimApi].op(ref.refer, that.refer, locate)
       op0.operation.appendToBlock()
@@ -1678,7 +1678,7 @@ given [R <: Referable[SInt]]: SIntApi[R] with
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name
+      sourcecode.Name.Machine
     ): Node[SInt] =
       val op0    = summon[SubPrimApi].op(ref.refer, that.refer, locate)
       op0.operation.appendToBlock()
@@ -1702,7 +1702,7 @@ given [R <: Referable[SInt]]: SIntApi[R] with
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name
+      sourcecode.Name.Machine
     ): Node[SInt] =
       val op0    = summon[MulPrimApi].op(ref.refer, that.refer, locate)
       op0.operation.appendToBlock()
@@ -1726,7 +1726,7 @@ given [R <: Referable[SInt]]: SIntApi[R] with
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name
+      sourcecode.Name.Machine
     ): Node[SInt] =
       val op0    = summon[DivPrimApi].op(ref.refer, that.refer, locate)
       op0.operation.appendToBlock()
@@ -1750,7 +1750,7 @@ given [R <: Referable[SInt]]: SIntApi[R] with
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name
+      sourcecode.Name.Machine
     ): Node[SInt] =
       val op0    = summon[RemPrimApi].op(ref.refer, that.refer, locate)
       op0.operation.appendToBlock()
@@ -1774,7 +1774,7 @@ given [R <: Referable[SInt]]: SIntApi[R] with
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name
+      sourcecode.Name.Machine
     ): Node[Bool] =
       val op0    = summon[LTPrimApi].op(ref.refer, that.refer, locate)
       op0.operation.appendToBlock()
@@ -1797,7 +1797,7 @@ given [R <: Referable[SInt]]: SIntApi[R] with
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name
+      sourcecode.Name.Machine
     ): Node[Bool] =
       val op0    = summon[LEQPrimApi].op(ref.refer, that.refer, locate)
       op0.operation.appendToBlock()
@@ -1820,7 +1820,7 @@ given [R <: Referable[SInt]]: SIntApi[R] with
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name
+      sourcecode.Name.Machine
     ): Node[Bool] =
       val op0    = summon[GTPrimApi].op(ref.refer, that.refer, locate)
       op0.operation.appendToBlock()
@@ -1843,7 +1843,7 @@ given [R <: Referable[SInt]]: SIntApi[R] with
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name
+      sourcecode.Name.Machine
     ): Node[Bool] =
       val op0    = summon[GEQPrimApi].op(ref.refer, that.refer, locate)
       op0.operation.appendToBlock()
@@ -1866,7 +1866,7 @@ given [R <: Referable[SInt]]: SIntApi[R] with
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name
+      sourcecode.Name.Machine
     ): Node[Bool] =
       val op0    = summon[EQPrimApi].op(ref.refer, that.refer, locate)
       op0.operation.appendToBlock()
@@ -1889,7 +1889,7 @@ given [R <: Referable[SInt]]: SIntApi[R] with
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name
+      sourcecode.Name.Machine
     ): Node[Bool] =
       val op0    = summon[NEQPrimApi].op(ref.refer, that.refer, locate)
       op0.operation.appendToBlock()
@@ -1912,7 +1912,7 @@ given [R <: Referable[SInt]]: SIntApi[R] with
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name
+      sourcecode.Name.Machine
     ): Node[SInt] =
       val nodeOp = summon[NodeApi].op(
         name = valName,
@@ -1942,7 +1942,7 @@ given [R <: Referable[SInt]]: SIntApi[R] with
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name
+      sourcecode.Name.Machine
     ): Node[SInt] =
       val nodeOp = summon[NodeApi].op(
         name = valName,
@@ -1973,7 +1973,7 @@ given [R <: Referable[Bool]]: BoolApi[R] with
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name
+      sourcecode.Name.Machine
     ): Node[Bool] =
       val op0    = summon[NotPrimApi].op(ref.refer, locate)
       op0.operation.appendToBlock()
@@ -1994,7 +1994,7 @@ given [R <: Referable[Bool]]: BoolApi[R] with
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name
+      sourcecode.Name.Machine
     ): Node[Bits] =
       val nodeOp = summon[NodeApi].op(
         name = valName,
@@ -2016,7 +2016,7 @@ given [R <: Referable[Bool]]: BoolApi[R] with
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name
+      sourcecode.Name.Machine
     ): Node[Bool] =
       val op0    = summon[EQPrimApi].op(ref.refer, that.refer, locate)
       op0.operation.appendToBlock()
@@ -2039,7 +2039,7 @@ given [R <: Referable[Bool]]: BoolApi[R] with
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name
+      sourcecode.Name.Machine
     ): Node[Bool] =
       val op0    = summon[NEQPrimApi].op(ref.refer, that.refer, locate)
       op0.operation.appendToBlock()
@@ -2062,7 +2062,7 @@ given [R <: Referable[Bool]]: BoolApi[R] with
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name
+      sourcecode.Name.Machine
     ): Node[Bool] =
       val op0    = summon[AndPrimApi].op(ref.refer, that.refer, locate)
       op0.operation.appendToBlock()
@@ -2085,7 +2085,7 @@ given [R <: Referable[Bool]]: BoolApi[R] with
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name
+      sourcecode.Name.Machine
     ): Node[Bool] =
       val op0    = summon[OrPrimApi].op(ref.refer, that.refer, locate)
       op0.operation.appendToBlock()
@@ -2108,7 +2108,7 @@ given [R <: Referable[Bool]]: BoolApi[R] with
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name
+      sourcecode.Name.Machine
     ): Node[Bool] =
       val op0    = summon[XorPrimApi].op(ref.refer, that.refer, locate)
       op0.operation.appendToBlock()
@@ -2132,7 +2132,7 @@ given [R <: Referable[Bool]]: BoolApi[R] with
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name
+      sourcecode.Name.Machine
     ): Node[Ret] =
       val op0    = summon[MuxPrimApi].op(ref.refer, con.refer, alt.refer, locate)
       op0.operation.appendToBlock()
@@ -2158,7 +2158,7 @@ given [E <: Data, V <: Vec[E], R <: Referable[V]]: VecApi[E, V, R] with
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name
+      sourcecode.Name.Machine
     ): Node[E] =
       val nodeOp = summon[NodeApi].op(
         name = valName,
@@ -2188,7 +2188,7 @@ given [E <: Data, V <: Vec[E], R <: Referable[V]]: VecApi[E, V, R] with
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name
+      sourcecode.Name.Machine
     ): Node[E] = bit(idx)
 
 end given
@@ -2205,5 +2205,10 @@ private inline def locate(
   )
 
 private inline def valName(
-  using sourcecode.Name
-): String = summon[sourcecode.Name].value
+  using sourcecode.Name.Machine,
+  sourcecode.File,
+  sourcecode.Line
+): String = summon[sourcecode.Name.Machine].value match
+  case actualName if !sourcecode.Util.isSyntheticName(actualName) => actualName
+  // TODO: add a mutable state in generator to store the counter
+  case _                                                          => "_GEN_${counter}"

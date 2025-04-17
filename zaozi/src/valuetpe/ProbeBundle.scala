@@ -22,7 +22,7 @@ trait ProbeBundle extends Data with DynamicSubfield:
     layer: LayerTree
   )(
     using TypeImpl,
-    sourcecode.Name
+    sourcecode.Name.Machine
   ): BundleField[RProbe[T]] =
     this.ReadProbeImpl(None, tpe, layer)
 
@@ -31,7 +31,7 @@ trait ProbeBundle extends Data with DynamicSubfield:
     layer: LayerTree
   )(
     using TypeImpl,
-    sourcecode.Name
+    sourcecode.Name.Machine
   ): BundleField[RWProbe[T]] =
     this.ReadWriteProbeImpl(None, tpe, layer)
 
@@ -44,7 +44,7 @@ trait ProbeBundle extends Data with DynamicSubfield:
     Context,
     sourcecode.File,
     sourcecode.Line,
-    sourcecode.Name
+    sourcecode.Name.Machine
   )(
     using TypeImpl
   ): Ref[E] = this.getRefViaFieldValNameImpl(
