@@ -26,7 +26,7 @@ trait DynamicSubfield:
     Context,
     sourcecode.File,
     sourcecode.Line,
-    sourcecode.Name
+    sourcecode.Name.Machine
   )(
     using TypeImpl
   ): Ref[E]
