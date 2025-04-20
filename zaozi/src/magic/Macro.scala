@@ -10,29 +10,33 @@ private def summonImplicitParameters(
   using Quotes
 ) =
   import quotes.reflect.*
-  val arena    = Expr.summon[java.lang.foreign.Arena].getOrElse {
+  val arena           = Expr.summon[java.lang.foreign.Arena].getOrElse {
     report.errorAndAbort("No implicit value found for Arena.")
   }
-  val typeImpl = Expr.summon[me.jiuyang.zaozi.TypeImpl].getOrElse {
+  val typeImpl        = Expr.summon[me.jiuyang.zaozi.TypeImpl].getOrElse {
     report.errorAndAbort("No implicit value found for Arena.")
   }
-  val context  = Expr.summon[org.llvm.mlir.scalalib.Context].getOrElse {
+  val context         = Expr.summon[org.llvm.mlir.scalalib.Context].getOrElse {
     report.errorAndAbort("No implicit value found for Context.")
   }
-  val block    = Expr.summon[org.llvm.mlir.scalalib.Block].getOrElse {
+  val block           = Expr.summon[org.llvm.mlir.scalalib.Block].getOrElse {
     report.errorAndAbort("No implicit value found for Block.")
   }
-  val file     = Expr.summon[sourcecode.File].getOrElse {
+  val file            = Expr.summon[sourcecode.File].getOrElse {
     report.errorAndAbort("No implicit value found for sourcecode.File.")
   }
-  val line     = Expr.summon[sourcecode.Line].getOrElse {
+  val line            = Expr.summon[sourcecode.Line].getOrElse {
     report.errorAndAbort("No implicit value found for sourcecode.Line.")
   }
-  val valName  = Expr.summon[sourcecode.Name.Machine].getOrElse {
+  val valName         = Expr.summon[sourcecode.Name.Machine].getOrElse {
     report.errorAndAbort("No implicit value found for sourcecode.Name.Machine.")
   }
+  val instanceContext =
+    Expr.summon[me.jiuyang.zaozi.InstanceContext].getOrElse {
+      report.errorAndAbort("No implicit value found for me.jiuyang.zaozi.InstanceContext.")
+    }
 
-  (arena, typeImpl, context, block, file, line, valName)
+  (arena, typeImpl, context, block, file, line, valName, instanceContext)
 
 /** This macro takes [[fieldName]] from dynamic access, retrieve type at compile time and call runtimeSelectDynamic to
   * do subaccess
@@ -46,7 +50,8 @@ private def summonImplicitParameters(
   *       ctx:       Context,
   *       file:      sourcecode.File,
   *       line:      sourcecode.Line,
-  *       valName:   sourcecode.Name.Machine
+  *       valName:   sourcecode.Name.Machine,
+  *       instCtx:   InstanceContext
   *     ): Ref[E]
   *   given [D <: Bundle, R <: Referable[D]]: RefElementViaValName[D, R]
   * }}}
@@ -99,7 +104,7 @@ def referableSelectDynamic[T <: me.jiuyang.zaozi.valuetpe.Data: Type](
     report.errorAndAbort(s"Field type '${fieldType.show}' does not conform to the upper bound BundleField.")
   }
 
-  val (arena, typeImpl, context, block, file, line, valName) = summonImplicitParameters
+  val (arena, typeImpl, context, block, file, line, valName, instanceContext) = summonImplicitParameters
 
   val fieldDataType = fieldType.typeArgs.head
 
@@ -107,13 +112,14 @@ def referableSelectDynamic[T <: me.jiuyang.zaozi.valuetpe.Data: Type](
   fieldDataType.asType match {
     case tpe @ '[fieldDataType] =>
       '{
-        given java.lang.foreign.Arena        = $arena
-        given me.jiuyang.zaozi.TypeImpl      = $typeImpl
-        given org.llvm.mlir.scalalib.Context = $context
-        given org.llvm.mlir.scalalib.Block   = $block
-        given sourcecode.File                = $file
-        given sourcecode.Line                = $line
-        given sourcecode.Name.Machine        = $valName
+        given java.lang.foreign.Arena          = $arena
+        given me.jiuyang.zaozi.TypeImpl        = $typeImpl
+        given org.llvm.mlir.scalalib.Context   = $context
+        given org.llvm.mlir.scalalib.Block     = $block
+        given sourcecode.File                  = $file
+        given sourcecode.Line                  = $line
+        given sourcecode.Name.Machine          = $valName
+        given me.jiuyang.zaozi.InstanceContext = $instanceContext
         $ref._tpe
           .asInstanceOf[me.jiuyang.zaozi.magic.DynamicSubfield]
           // Hack with union type
@@ -129,6 +135,7 @@ def referableSelectDynamic[T <: me.jiuyang.zaozi.valuetpe.Data: Type](
 object ApplyHelper:
   import me.jiuyang.zaozi.valuetpe.*
   import me.jiuyang.zaozi.reftpe.*
+  import me.jiuyang.zaozi.InstanceContext
   import org.llvm.mlir.scalalib.*
   import java.lang.foreign.Arena
 
@@ -141,7 +148,8 @@ object ApplyHelper:
     Block,
     sourcecode.File,
     sourcecode.Line,
-    sourcecode.Name.Machine
+    sourcecode.Name.Machine,
+    InstanceContext
   ): Node[E] =
     import me.jiuyang.zaozi.default.given_VecApi_E_V_R
     vecRef.apply(idx)
@@ -156,7 +164,8 @@ object ApplyHelper:
     Block,
     sourcecode.File,
     sourcecode.Line,
-    sourcecode.Name.Machine
+    sourcecode.Name.Machine,
+    InstanceContext
   ): Node[Bits] =
     import me.jiuyang.zaozi.default.given_BitsApi_R
     bitsRef.apply(hi, lo)
@@ -170,7 +179,8 @@ object ApplyHelper:
     Block,
     sourcecode.File,
     sourcecode.Line,
-    sourcecode.Name.Machine
+    sourcecode.Name.Machine,
+    InstanceContext
   ): Node[Bits] =
     import me.jiuyang.zaozi.default.given_BitsApi_R
     bitsRef.apply(idx)
@@ -220,7 +230,7 @@ def referableApplyDynamic[T <: me.jiuyang.zaozi.valuetpe.Data: Type](
     case other          =>
       report.errorAndAbort(s"Expected varargs for applyDynamic, got: ${other.show}")
 
-  val (arena, _, context, block, file, line, valName) = summonImplicitParameters
+  val (arena, _, context, block, file, line, valName, instanceContext) = summonImplicitParameters
 
   // If we have more than one apply() method, we can dispatch them here based on the args type.
   val applyCallTerm = getTypeParameters(fieldValueExpr) match
@@ -234,7 +244,7 @@ def referableApplyDynamic[T <: me.jiuyang.zaozi.valuetpe.Data: Type](
             )
             .appliedToTypes(List(eType, vType, rType))
             .appliedToArgs(List(fieldValueExpr, idx).map(_.asTerm))
-            .appliedToArgs(List(arena, context, block, file, line, valName).map(_.asTerm))
+            .appliedToArgs(List(arena, context, block, file, line, valName, instanceContext).map(_.asTerm))
         case _          => report.errorAndAbort(s"Expected 1 args, but got ${varargs.length}")
     case (rType, None, None)               =>
       varargs match
@@ -246,7 +256,7 @@ def referableApplyDynamic[T <: me.jiuyang.zaozi.valuetpe.Data: Type](
             )
             .appliedToTypes(List(rType))
             .appliedToArgs(List(fieldValueExpr, idx).map(_.asTerm))
-            .appliedToArgs(List(arena, context, block, file, line, valName).map(_.asTerm))
+            .appliedToArgs(List(arena, context, block, file, line, valName, instanceContext).map(_.asTerm))
         case hi +: lo +: Nil =>
           Select
             .unique(
@@ -255,7 +265,7 @@ def referableApplyDynamic[T <: me.jiuyang.zaozi.valuetpe.Data: Type](
             )
             .appliedToTypes(List(rType))
             .appliedToArgs(List(fieldValueExpr, hi, lo).map(_.asTerm))
-            .appliedToArgs(List(arena, context, block, file, line, valName).map(_.asTerm))
+            .appliedToArgs(List(arena, context, block, file, line, valName, instanceContext).map(_.asTerm))
         case _               => report.errorAndAbort(s"Expected 1 or 2 args, but got ${varargs.length}")
     case (rType, vTypeOpt, eTypeOpt)       =>
       report.errorAndAbort(
@@ -293,7 +303,7 @@ def referableApplyDynamicNamed[T <: me.jiuyang.zaozi.valuetpe.Data: Type](
     case other             =>
       report.errorAndAbort(s"Expected varargs for applyDynamicNamed, got: ${other.show}")
 
-  val (arena, _, context, block, file, line, valName) = summonImplicitParameters
+  val (arena, _, context, block, file, line, valName, instanceContext) = summonImplicitParameters
 
   val applyCallTerm = getTypeParameters(fieldValueExpr) match
     case (rType, Some(vType), Some(eType)) =>
@@ -306,7 +316,7 @@ def referableApplyDynamicNamed[T <: me.jiuyang.zaozi.valuetpe.Data: Type](
             )
             .appliedToTypes(List(eType, vType, rType))
             .appliedToArgs(List(fieldValueExpr.asTerm, idx))
-            .appliedToArgs(List(arena, context, block, file, line, valName).map(_.asTerm))
+            .appliedToArgs(List(arena, context, block, file, line, valName, instanceContext).map(_.asTerm))
         case _          => report.errorAndAbort(s"Expected 1 args, but got ${varargs.length}")
     case (rType, None, None)               =>
       varargs match
@@ -318,7 +328,7 @@ def referableApplyDynamicNamed[T <: me.jiuyang.zaozi.valuetpe.Data: Type](
             )
             .appliedToTypes(List(rType))
             .appliedToArgs(List(fieldValueExpr.asTerm, idx))
-            .appliedToArgs(List(arena, context, block, file, line, valName).map(_.asTerm))
+            .appliedToArgs(List(arena, context, block, file, line, valName, instanceContext).map(_.asTerm))
         case hi +: lo +: Nil =>
           Select
             .unique(
@@ -327,7 +337,7 @@ def referableApplyDynamicNamed[T <: me.jiuyang.zaozi.valuetpe.Data: Type](
             )
             .appliedToTypes(List(rType))
             .appliedToArgs(List(fieldValueExpr.asTerm, hi, lo))
-            .appliedToArgs(List(arena, context, block, file, line, valName).map(_.asTerm))
+            .appliedToArgs(List(arena, context, block, file, line, valName, instanceContext).map(_.asTerm))
         case _               => report.errorAndAbort(s"Expected 1 or 2 args, but got ${varargs.length}")
     case (rType, vTypeOpt, eTypeOpt)       =>
       report.errorAndAbort(
