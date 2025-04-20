@@ -71,7 +71,8 @@ given ConstructorApi with
     Block,
     sourcecode.File,
     sourcecode.Line,
-    sourcecode.Name.Machine
+    sourcecode.Name.Machine,
+    InstanceContext
   ): When =
     val op0 = summon[WhenApi].op(cond.refer, locate)
     op0.operation.appendToBlock()
@@ -90,7 +91,8 @@ given ConstructorApi with
       Context,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name.Machine
+      sourcecode.Name.Machine,
+      InstanceContext
     ): Unit =
       given Block = when.elseBlock
       body
@@ -117,7 +119,8 @@ given ConstructorApi with
     Seq[LayerTree],
     sourcecode.File,
     sourcecode.Line,
-    sourcecode.Name.Machine
+    sourcecode.Name.Machine,
+    InstanceContext
   ): Unit =
     val op0 = summon[LayerBlockApi].op(summon[Seq[LayerTree]](layerName)._hierarchy.map(_._name), locate)
     op0.operation.appendToBlock()
@@ -135,38 +138,39 @@ given ConstructorApi with
         def _children: Seq[LayerTree] = layer.children.map(_.toLayerTree)
       ._rebuild
 
-  def Module[PARAM <: Parameter, I <: HWInterface[PARAM], P <: DVInterface[PARAM]](
-    io:    I,
-    probe: P
-  )(body:  (Arena, Context, Block, Seq[LayerTree], PARAM, Interface[I], Interface[P]) ?=> Unit
+  def Module[PARAM <: Parameter, I <: HWInterface[PARAM], P <: DVInterface[PARAM], G <: Generator[PARAM, I, P]](
+    generator: G
   )(
     using Arena,
     Context,
-    PARAM
+    Submodules
   ): operation.Module =
-    val unknownLocation  = summon[LocationApi].locationUnknownGet
-    val ioNumFields      = io.toMlirType.getBundleNumFields.toInt
-    val probeNumFields   = probe.toMlirType.getBundleNumFields.toInt
-    val bfs              =
+    val parameter         = generator.parameter
+    val io                = generator.interface
+    val probe             = generator.probe
+    val unknownLocation   = summon[LocationApi].locationUnknownGet
+    val ioNumFields       = io.toMlirType.getBundleNumFields.toInt
+    val probeNumFields    = probe.toMlirType.getBundleNumFields.toInt
+    val bfs               =
       Seq.tabulate(ioNumFields)(io.toMlirType.getBundleFieldByIndex) ++
         Seq.tabulate(probeNumFields)(probe.toMlirType.getBundleFieldByIndex)
-    given Seq[LayerTree] = summon[PARAM].layerTrees.flatMap(_._dfs)
-    val module           = summon[ModuleApi].op(
-      summon[PARAM].moduleName,
+    given Seq[LayerTree]  = parameter.layerTrees.flatMap(_._dfs)
+    val module            = summon[ModuleApi].op(
+      parameter.moduleName,
       unknownLocation,
       FirrtlConvention.Scalarized,
       bfs.map(i => (i, unknownLocation)), // TODO: record location for Bundle?
       summon[Seq[LayerTree]].filter(_._children.isEmpty).map(_._hierarchy.map(_._name))
     )
-    given Block          = module.block
-    val ioWire           = summon[WireApi].op(
+    given Block           = module.block
+    val ioWire            = summon[WireApi].op(
       "io",
       summon[LocationApi].locationUnknownGet,
       FirrtlNameKind.Droppable,
       io.toMlirType
     )
     ioWire.operation.appendToBlock()
-    val probeWire        = summon[WireApi].op(
+    val probeWire         = summon[WireApi].op(
       "probe",
       summon[LocationApi].locationUnknownGet,
       FirrtlNameKind.Droppable,
@@ -205,15 +209,16 @@ given ConstructorApi with
             .op(module.getIO(ioNumFields + idx), subRefToProbeWire.result, unknownLocation)
             .operation
             .appendToBlock()
-    given Interface[I]   =
+    given Interface[I]    =
       new Interface[I]:
         val _tpe:       I         = io
         val _operation: Operation = ioWire.operation
-    given Interface[P]   =
+    given Interface[P]    =
       new Interface[P]:
         val _tpe:       P         = probe
         val _operation: Operation = probeWire.operation
-    body
+    given InstanceContext = new InstanceContext
+    generator.architecture
     module
 
   def Wire[T <: Data](
@@ -224,7 +229,8 @@ given ConstructorApi with
     Block,
     sourcecode.File,
     sourcecode.Line,
-    sourcecode.Name.Machine
+    sourcecode.Name.Machine,
+    InstanceContext
   ): Wire[T] =
     val wireOp = summon[WireApi].op(
       name = valName,
@@ -246,7 +252,8 @@ given ConstructorApi with
     Ref[Clock],
     sourcecode.File,
     sourcecode.Line,
-    sourcecode.Name.Machine
+    sourcecode.Name.Machine,
+    InstanceContext
   ): Reg[T] =
     val regOp = summon[RegApi].op(
       name = valName,
@@ -270,7 +277,8 @@ given ConstructorApi with
     Ref[Reset],
     sourcecode.File,
     sourcecode.Line,
-    sourcecode.Name.Machine
+    sourcecode.Name.Machine,
+    InstanceContext
   ): Reg[T] =
     val regResetOp = summon[RegResetApi].op(
       name = valName,
@@ -296,6 +304,7 @@ given ConstructorApi with
     sourcecode.File,
     sourcecode.Line,
     sourcecode.Name.Machine,
+    InstanceContext,
     P
     // TODO: later will also return a ClassTpe
   ): Instance[IOTpe, ProbeTpe] =

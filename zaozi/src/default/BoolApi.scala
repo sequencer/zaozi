@@ -3,6 +3,7 @@
 package me.jiuyang.zaozi.default
 
 import me.jiuyang.zaozi.BoolApi
+import me.jiuyang.zaozi.InstanceContext
 import me.jiuyang.zaozi.reftpe.*
 import me.jiuyang.zaozi.valuetpe.*
 
@@ -30,7 +31,8 @@ given [R <: Referable[Bool]]: BoolApi[R] with
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name.Machine
+      sourcecode.Name.Machine,
+      InstanceContext
     ): Node[Bool] =
       val op0    = summon[NotPrimApi].op(ref.refer, locate)
       op0.operation.appendToBlock()
@@ -51,7 +53,8 @@ given [R <: Referable[Bool]]: BoolApi[R] with
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name.Machine
+      sourcecode.Name.Machine,
+      InstanceContext
     ): Node[Bits] =
       val nodeOp = summon[NodeApi].op(
         name = valName,
@@ -73,7 +76,8 @@ given [R <: Referable[Bool]]: BoolApi[R] with
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name.Machine
+      sourcecode.Name.Machine,
+      InstanceContext
     ): Node[Bool] =
       val op0    = summon[EQPrimApi].op(ref.refer, that.refer, locate)
       op0.operation.appendToBlock()
@@ -96,7 +100,8 @@ given [R <: Referable[Bool]]: BoolApi[R] with
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name.Machine
+      sourcecode.Name.Machine,
+      InstanceContext
     ): Node[Bool] =
       val op0    = summon[NEQPrimApi].op(ref.refer, that.refer, locate)
       op0.operation.appendToBlock()
@@ -119,7 +124,8 @@ given [R <: Referable[Bool]]: BoolApi[R] with
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name.Machine
+      sourcecode.Name.Machine,
+      InstanceContext
     ): Node[Bool] =
       val op0    = summon[AndPrimApi].op(ref.refer, that.refer, locate)
       op0.operation.appendToBlock()
@@ -142,7 +148,8 @@ given [R <: Referable[Bool]]: BoolApi[R] with
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name.Machine
+      sourcecode.Name.Machine,
+      InstanceContext
     ): Node[Bool] =
       val op0    = summon[OrPrimApi].op(ref.refer, that.refer, locate)
       op0.operation.appendToBlock()
@@ -165,7 +172,8 @@ given [R <: Referable[Bool]]: BoolApi[R] with
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name.Machine
+      sourcecode.Name.Machine,
+      InstanceContext
     ): Node[Bool] =
       val op0    = summon[XorPrimApi].op(ref.refer, that.refer, locate)
       op0.operation.appendToBlock()
@@ -189,7 +197,8 @@ given [R <: Referable[Bool]]: BoolApi[R] with
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name.Machine
+      sourcecode.Name.Machine,
+      InstanceContext
     ): Node[Ret] =
       val op0    = summon[MuxPrimApi].op(ref.refer, con.refer, alt.refer, locate)
       op0.operation.appendToBlock()
