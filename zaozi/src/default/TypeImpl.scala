@@ -126,13 +126,13 @@ given TypeImpl with
     ): BundleField[RProbe[T]] =
       require(ref.instantiating)
       val bf = new BundleField[RProbe[T]]:
-        val _name:   String    = name.getOrElse(valName)
+        val _name:   String    = name.getOrElse(bundleFieldName)
         val _isFlip: Boolean   = false
         val _tpe:    RProbe[T] = new RProbe[T]:
           val _baseType: T         = tpe
           val _color:    LayerTree = layer
 
-      ref._elements += (valName -> bf)
+      ref._elements += (bundleFieldName -> bf)
       bf
     def ReadWriteProbeImpl[T <: Data & CanProbe](
       name:  Option[String],
@@ -143,13 +143,13 @@ given TypeImpl with
     ): BundleField[RWProbe[T]] =
       require(ref.instantiating)
       val bf = new BundleField[RWProbe[T]]:
-        val _name:   String     = name.getOrElse(valName)
+        val _name:   String     = name.getOrElse(bundleFieldName)
         val _isFlip: Boolean    = false
         val _tpe:    RWProbe[T] = new RWProbe[T]:
           val _baseType: T         = tpe
           val _color:    LayerTree = layer
 
-      ref._elements += (valName -> bf)
+      ref._elements += (bundleFieldName -> bf)
       bf
 
   extension (ref: Bundle)
@@ -176,10 +176,10 @@ given TypeImpl with
     ): BundleField[T] =
       require(ref.instantiating)
       val bf = new BundleField[T]:
-        val _name:   String  = name.getOrElse(valName)
+        val _name:   String  = name.getOrElse(bundleFieldName)
         val _isFlip: Boolean = true
         val _tpe:    T       = tpe
-      ref._elements += (valName -> bf)
+      ref._elements += (bundleFieldName -> bf)
       bf
 
     def AlignedImpl[T <: Data](
@@ -190,10 +190,10 @@ given TypeImpl with
     ): BundleField[T] =
       require(ref.instantiating)
       val bf = new BundleField[T]:
-        val _name:   String  = name.getOrElse(valName)
+        val _name:   String  = name.getOrElse(bundleFieldName)
         val _isFlip: Boolean = false
         val _tpe:    T       = tpe
-      ref._elements += (valName -> bf)
+      ref._elements += (bundleFieldName -> bf)
       bf
   extension (ref: RProbe[?])
     def toMlirTypeImpl(

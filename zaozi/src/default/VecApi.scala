@@ -3,6 +3,7 @@
 package me.jiuyang.zaozi.default
 
 import me.jiuyang.zaozi.VecApi
+import me.jiuyang.zaozi.InstanceContext
 import me.jiuyang.zaozi.reftpe.*
 import me.jiuyang.zaozi.valuetpe.*
 
@@ -22,7 +23,8 @@ given [E <: Data, V <: Vec[E], R <: Referable[V]]: VecApi[E, V, R] with
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name.Machine
+      sourcecode.Name.Machine,
+      InstanceContext
     ): Node[E] =
       val nodeOp = summon[NodeApi].op(
         name = valName,
@@ -52,7 +54,8 @@ given [E <: Data, V <: Vec[E], R <: Referable[V]]: VecApi[E, V, R] with
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name.Machine
+      sourcecode.Name.Machine,
+      InstanceContext
     ): Node[E] = bit(idx)
 
 end given
