@@ -9,6 +9,8 @@ import org.llvm.mlir.scalalib.{Block, Context, Operation, Type, Value}
 
 import java.lang.foreign.Arena
 
+type Submodules = scala.collection.mutable.ListBuffer[Module]
+
 /** Rebuild the [[Layer]] with each [[Layer]] contains the entire tree. */
 trait LayerTree:
   layer =>
@@ -32,6 +34,34 @@ trait LayerTree:
 
 /** Serializable Layer definition. */
 case class Layer(name: String, children: Seq[Layer] = Seq.empty)
+
+class InstanceContext:
+  class AnonSignalCounter(private var _count: Int):
+    def count = _count
+    def inc() =
+      val o = count
+      _count += 1
+      o
+
+  val anonSignalCounter = new AnonSignalCounter(0)
+
+trait Generator[PARAM <: Parameter, I <: HWInterface[PARAM], P <: DVInterface[PARAM]]:
+  def parameter: PARAM
+  given PARAM = parameter
+  def interface: I
+  given I = interface
+  def probe: P
+  given P = probe
+
+  def architecture: (
+    Arena,
+    Context,
+    Block,
+    Interface[I],
+    Interface[P],
+    InstanceContext,
+    Submodules
+  ) ?=> Unit
 
 trait Parameter:
   def moduleName: String
@@ -73,7 +103,8 @@ trait ConstructorApi:
     Block,
     sourcecode.File,
     sourcecode.Line,
-    sourcecode.Name.Machine
+    sourcecode.Name.Machine,
+    InstanceContext
   ): When
 
   extension (when: When)
@@ -84,19 +115,18 @@ trait ConstructorApi:
       Context,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name.Machine
+      sourcecode.Name.Machine,
+      InstanceContext
     ): Unit
 
   extension (layer: Layer) def toLayerTree: LayerTree
 
-  def Module[PARAM <: Parameter, I <: HWInterface[PARAM], P <: DVInterface[PARAM]](
-    io:    I,
-    probe: P
-  )(body:  (Arena, Context, Block, Seq[LayerTree], PARAM, Interface[I], Interface[P]) ?=> Unit
+  def Module[PARAM <: Parameter, I <: HWInterface[PARAM], P <: DVInterface[PARAM], G <: Generator[PARAM, I, P]](
+    generator: G
   )(
     using Arena,
     Context,
-    PARAM
+    Submodules
   ): CirctModule
 
   def Wire[T <: Data](
@@ -107,7 +137,8 @@ trait ConstructorApi:
     Block,
     sourcecode.File,
     sourcecode.Line,
-    sourcecode.Name.Machine
+    sourcecode.Name.Machine,
+    InstanceContext
   ): Wire[T]
   def Reg[T <: Data](
     refType: T
@@ -118,7 +149,8 @@ trait ConstructorApi:
     Ref[Clock],
     sourcecode.File,
     sourcecode.Line,
-    sourcecode.Name.Machine
+    sourcecode.Name.Machine,
+    InstanceContext
   ): Reg[T]
   def RegInit[T <: Data](
     input: Const[T]
@@ -130,7 +162,8 @@ trait ConstructorApi:
     Ref[Reset],
     sourcecode.File,
     sourcecode.Line,
-    sourcecode.Name.Machine
+    sourcecode.Name.Machine,
+    InstanceContext
   ): Reg[T]
   extension (bigInt: BigInt)
     def U(
@@ -179,7 +212,8 @@ trait AsBits[D <: Data, R <: Referable[D]]:
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name.Machine
+      sourcecode.Name.Machine,
+      InstanceContext
     ): Node[Bits]
 trait AsBool[D <: Data, R <: Referable[D]]:
   extension (ref: R)
@@ -189,7 +223,8 @@ trait AsBool[D <: Data, R <: Referable[D]]:
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name.Machine
+      sourcecode.Name.Machine,
+      InstanceContext
     ): Node[Bool]
 trait AsSInt[D <: Data, R <: Referable[D]]:
   extension (ref: R)
@@ -199,7 +234,8 @@ trait AsSInt[D <: Data, R <: Referable[D]]:
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name.Machine
+      sourcecode.Name.Machine,
+      InstanceContext
     ): Node[SInt]
 trait AsUInt[D <: Data, R <: Referable[D]]:
   extension (ref: R)
@@ -209,7 +245,8 @@ trait AsUInt[D <: Data, R <: Referable[D]]:
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name.Machine
+      sourcecode.Name.Machine,
+      InstanceContext
     ): Node[UInt]
 
 trait ProbeDefine[D <: Data & CanProbe, P <: RWProbe[D] | RProbe[D], SRC <: Referable[D], SINK <: Referable[P]]:
@@ -242,7 +279,8 @@ trait Cvt[D <: Data, RET <: Data, R <: Referable[D]]:
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name.Machine
+      sourcecode.Name.Machine,
+      InstanceContext
     ): Node[RET]
 trait Neg[D <: Data, RET <: Data, R <: Referable[D]]:
   extension (ref: R)
@@ -252,7 +290,8 @@ trait Neg[D <: Data, RET <: Data, R <: Referable[D]]:
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name.Machine
+      sourcecode.Name.Machine,
+      InstanceContext
     ): Node[RET]
 trait Not[D <: Data, RET <: Data, R <: Referable[D]]:
   extension (ref: R)
@@ -262,7 +301,8 @@ trait Not[D <: Data, RET <: Data, R <: Referable[D]]:
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name.Machine
+      sourcecode.Name.Machine,
+      InstanceContext
     ): Node[RET]
 trait AndR[D <: Data, RET <: Data, R <: Referable[D]]:
   extension (ref: R)
@@ -272,7 +312,8 @@ trait AndR[D <: Data, RET <: Data, R <: Referable[D]]:
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name.Machine
+      sourcecode.Name.Machine,
+      InstanceContext
     ): Node[RET]
 trait OrR[D <: Data, RET <: Data, R <: Referable[D]]:
   extension (ref: R)
@@ -282,7 +323,8 @@ trait OrR[D <: Data, RET <: Data, R <: Referable[D]]:
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name.Machine
+      sourcecode.Name.Machine,
+      InstanceContext
     ): Node[RET]
 trait XorR[D <: Data, RET <: Data, R <: Referable[D]]:
   extension (ref: R)
@@ -292,7 +334,8 @@ trait XorR[D <: Data, RET <: Data, R <: Referable[D]]:
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name.Machine
+      sourcecode.Name.Machine,
+      InstanceContext
     ): Node[RET]
 trait Add[D <: Data, RET <: Data, R <: Referable[D]]:
   extension (ref: R)
@@ -304,7 +347,8 @@ trait Add[D <: Data, RET <: Data, R <: Referable[D]]:
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name.Machine
+      sourcecode.Name.Machine,
+      InstanceContext
     ): Node[RET]
 trait Sub[D <: Data, RET <: Data, R <: Referable[D]]:
   extension (ref: R)
@@ -316,7 +360,8 @@ trait Sub[D <: Data, RET <: Data, R <: Referable[D]]:
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name.Machine
+      sourcecode.Name.Machine,
+      InstanceContext
     ): Node[RET]
 trait Mul[D <: Data, RET <: Data, R <: Referable[D]]:
   extension (ref: R)
@@ -328,7 +373,8 @@ trait Mul[D <: Data, RET <: Data, R <: Referable[D]]:
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name.Machine
+      sourcecode.Name.Machine,
+      InstanceContext
     ): Node[RET]
 trait Div[D <: Data, RET <: Data, R <: Referable[D]]:
   extension (ref: R)
@@ -340,7 +386,8 @@ trait Div[D <: Data, RET <: Data, R <: Referable[D]]:
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name.Machine
+      sourcecode.Name.Machine,
+      InstanceContext
     ): Node[RET]
 trait Rem[D <: Data, RET <: Data, R <: Referable[D]]:
   extension (ref: R)
@@ -352,7 +399,8 @@ trait Rem[D <: Data, RET <: Data, R <: Referable[D]]:
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name.Machine
+      sourcecode.Name.Machine,
+      InstanceContext
     ): Node[RET]
 trait Lt[D <: Data, RET <: Data, R <: Referable[D]]:
   extension (ref: R)
@@ -364,7 +412,8 @@ trait Lt[D <: Data, RET <: Data, R <: Referable[D]]:
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name.Machine
+      sourcecode.Name.Machine,
+      InstanceContext
     ): Node[RET]
 trait Leq[D <: Data, RET <: Data, R <: Referable[D]]:
   extension (ref: R)
@@ -376,7 +425,8 @@ trait Leq[D <: Data, RET <: Data, R <: Referable[D]]:
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name.Machine
+      sourcecode.Name.Machine,
+      InstanceContext
     ): Node[RET]
 trait Gt[D <: Data, RET <: Data, R <: Referable[D]]:
   extension (ref: R)
@@ -388,7 +438,8 @@ trait Gt[D <: Data, RET <: Data, R <: Referable[D]]:
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name.Machine
+      sourcecode.Name.Machine,
+      InstanceContext
     ): Node[RET]
 trait Geq[D <: Data, RET <: Data, R <: Referable[D]]:
   extension (ref: R)
@@ -400,7 +451,8 @@ trait Geq[D <: Data, RET <: Data, R <: Referable[D]]:
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name.Machine
+      sourcecode.Name.Machine,
+      InstanceContext
     ): Node[RET]
 trait Eq[D <: Data, RET <: Data, R <: Referable[D]]:
   extension (ref: R)
@@ -412,7 +464,8 @@ trait Eq[D <: Data, RET <: Data, R <: Referable[D]]:
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name.Machine
+      sourcecode.Name.Machine,
+      InstanceContext
     ): Node[RET]
 trait Neq[D <: Data, RET <: Data, R <: Referable[D]]:
   extension (ref: R)
@@ -424,7 +477,8 @@ trait Neq[D <: Data, RET <: Data, R <: Referable[D]]:
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name.Machine
+      sourcecode.Name.Machine,
+      InstanceContext
     ): Node[RET]
 trait And[D <: Data, RET <: Data, R <: Referable[D]]:
   extension (ref: R)
@@ -436,7 +490,8 @@ trait And[D <: Data, RET <: Data, R <: Referable[D]]:
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name.Machine
+      sourcecode.Name.Machine,
+      InstanceContext
     ): Node[RET]
 trait Or[D <: Data, RET <: Data, R <: Referable[D]]:
   extension (ref: R)
@@ -448,7 +503,8 @@ trait Or[D <: Data, RET <: Data, R <: Referable[D]]:
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name.Machine
+      sourcecode.Name.Machine,
+      InstanceContext
     ): Node[RET]
 trait Xor[D <: Data, RET <: Data, R <: Referable[D]]:
   extension (ref: R)
@@ -460,7 +516,8 @@ trait Xor[D <: Data, RET <: Data, R <: Referable[D]]:
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name.Machine
+      sourcecode.Name.Machine,
+      InstanceContext
     ): Node[RET]
 trait Cat[D <: Data, R <: Referable[D]]:
   extension (ref: R)
@@ -472,7 +529,8 @@ trait Cat[D <: Data, R <: Referable[D]]:
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name.Machine
+      sourcecode.Name.Machine,
+      InstanceContext
     ): Node[D]
 
 trait Shl[D <: Data, THAT, OUT <: Data, R <: Referable[D]]:
@@ -485,7 +543,8 @@ trait Shl[D <: Data, THAT, OUT <: Data, R <: Referable[D]]:
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name.Machine
+      sourcecode.Name.Machine,
+      InstanceContext
     ): Node[OUT]
 trait Shr[D <: Data, THAT, OUT <: Data, R <: Referable[D]]:
   extension (ref: R)
@@ -497,7 +556,8 @@ trait Shr[D <: Data, THAT, OUT <: Data, R <: Referable[D]]:
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name.Machine
+      sourcecode.Name.Machine,
+      InstanceContext
     ): Node[D]
 trait Head[D <: Data, THAT, OUT <: Data, R <: Referable[D]]:
   extension (ref: R)
@@ -509,7 +569,8 @@ trait Head[D <: Data, THAT, OUT <: Data, R <: Referable[D]]:
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name.Machine
+      sourcecode.Name.Machine,
+      InstanceContext
     ): Node[OUT]
 trait Tail[D <: Data, THAT, OUT <: Data, R <: Referable[D]]:
   extension (ref: R)
@@ -521,7 +582,8 @@ trait Tail[D <: Data, THAT, OUT <: Data, R <: Referable[D]]:
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name.Machine
+      sourcecode.Name.Machine,
+      InstanceContext
     ): Node[OUT]
 trait Pad[D <: Data, THAT, OUT <: Data, R <: Referable[D]]:
   extension (ref: R)
@@ -533,7 +595,8 @@ trait Pad[D <: Data, THAT, OUT <: Data, R <: Referable[D]]:
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name.Machine
+      sourcecode.Name.Machine,
+      InstanceContext
     ): Node[OUT]
 trait ExtractRange[D <: Data, E <: Data, R <: Referable[D], IDX]:
   extension (ref: R)
@@ -546,7 +609,8 @@ trait ExtractRange[D <: Data, E <: Data, R <: Referable[D], IDX]:
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name.Machine
+      sourcecode.Name.Machine,
+      InstanceContext
     ): Node[E]
 trait ExtractElement[D <: Data, E <: Data, R <: Referable[D], IDX]:
   extension (ref: R)
@@ -558,7 +622,8 @@ trait ExtractElement[D <: Data, E <: Data, R <: Referable[D], IDX]:
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name.Machine
+      sourcecode.Name.Machine,
+      InstanceContext
     ): Node[E]
 trait Mux[Cond <: Data, CondR <: Referable[Cond]]:
   extension (ref: CondR)
@@ -571,7 +636,8 @@ trait Mux[Cond <: Data, CondR <: Referable[Cond]]:
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name.Machine
+      sourcecode.Name.Machine,
+      InstanceContext
     ): Node[Ret]
 trait RefElement[D <: Data, E <: Data, R <: Referable[D], IDX]:
   extension (ref: R)
@@ -583,7 +649,8 @@ trait RefElement[D <: Data, E <: Data, R <: Referable[D], IDX]:
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name.Machine
+      sourcecode.Name.Machine,
+      InstanceContext
     ): Ref[E]
 trait BitsApi[R <: Referable[Bits]]
     extends AsSInt[Bits, R]
