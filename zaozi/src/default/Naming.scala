@@ -12,7 +12,6 @@ import org.llvm.mlir.scalalib.Block
 import me.jiuyang.zaozi.reftpe.Interface
 import org.llvm.circt.scalalib.firrtl.operation.Module
 import me.jiuyang.zaozi.ConstructorApi
-import me.jiuyang.zaozi.Submodules
 import me.jiuyang.zaozi.InstanceContext
 import javax.naming.NameNotFoundException
 
