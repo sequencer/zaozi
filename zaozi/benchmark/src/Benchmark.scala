@@ -2,34 +2,35 @@
 // SPDX-FileCopyrightText: 2025 Jiuyang Liu <liu@jiuyang.me>
 package me.jiuyang.zaozi.benchmark
 
-import java.util.concurrent.TimeUnit
-import org.openjdk.jmh.annotations.*
-import org.openjdk.jmh.infra.Blackhole
-
-import me.jiuyang.zaozi.tests.{*, given}
-import me.jiuyang.zaozi.default.{*, given}
 import me.jiuyang.zaozi.*
+import me.jiuyang.zaozi.default.{*, given}
+import me.jiuyang.zaozi.magic.validateCircuit
 import me.jiuyang.zaozi.reftpe.*
+import me.jiuyang.zaozi.tests.{*, given}
 import me.jiuyang.zaozi.valuetpe.*
-import org.llvm.circt.scalalib.firrtl.capi.{
-  given_DialectHandleApi,
-  given_FirtoolOptionsApi,
-  given_PassManagerApi,
-  FirtoolOptions,
-  FirtoolOptionsApi
-}
+
+import org.llvm.circt.scalalib.firrtl.capi.given_DialectHandleApi
+import org.llvm.circt.scalalib.firrtl.operation.{given_CircuitApi, given_ModuleApi, Circuit, CircuitApi}
+import org.llvm.circt.scalalib.sv.capi.given_DialectHandleApi
 import org.llvm.mlir.scalalib.{
   given_ContextApi,
-  given_PassManagerApi,
-  Block,
+  given_LocationApi,
+  given_ModuleApi,
+  given_NamedAttributeApi,
+  given_RegionApi,
+  given_TypeApi,
+  given_ValueApi,
   Context,
   ContextApi,
-  PassManager,
-  PassManagerApi
+  LocationApi,
+  Module as MlirModule,
+  ModuleApi as MlirModuleApi,
+  NamedAttributeApi
 }
-import utest.*
 
 import java.lang.foreign.Arena
+import org.openjdk.jmh.annotations.*
+import org.openjdk.jmh.infra.Blackhole
 
 @generator
 object GCD extends Generator[GCDParameter, GCDIO, GCDProbe]:
@@ -80,11 +81,16 @@ class ZaoziBenchmark {
   @Fork(value = 1)
   @Threads(value = 1)
   def ZaoziGCDTest(blackHole: Blackhole): Unit =
+    val parameter = GCDParameter(32, false)
     given Arena   = Arena.ofConfined()
     given Context = summon[ContextApi].contextCreate
     summon[Context].loadFirrtlDialect()
 
-    GCD.dumpMlirbc(GCDParameter(32, false))
+    given MlirModule = summon[MlirModuleApi].moduleCreateEmpty(summon[LocationApi].locationUnknownGet)
+    given Circuit    = summon[CircuitApi].op(parameter.moduleName)
+    summon[Circuit].appendToModule()
+    GCD.module(parameter).appendToCircuit()
+    validateCircuit()
 
     summon[Context].destroy()
     summon[Arena].close()
