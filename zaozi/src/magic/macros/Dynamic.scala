@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2025 Jiuyang Liu <liu@jiuyang.me>
-package me.jiuyang.zaozi.magic
+package me.jiuyang.zaozi.magic.macros
 
 import scala.language.reflectiveCalls
 import scala.quoted.*
 import scala.reflect.Selectable.reflectiveSelectable
 
-private def summonImplicitParameters(
+private def summonContextualParameters(
   using Quotes
 ) =
   import quotes.reflect.*
@@ -104,7 +104,7 @@ def referableSelectDynamic[T <: me.jiuyang.zaozi.valuetpe.Data: Type](
     report.errorAndAbort(s"Field type '${fieldType.show}' does not conform to the upper bound BundleField.")
   }
 
-  val (arena, typeImpl, context, block, file, line, valName, instanceContext) = summonImplicitParameters
+  val (arena, typeImpl, context, block, file, line, valName, instanceContext) = summonContextualParameters
 
   val fieldDataType = fieldType.typeArgs.head
 
@@ -131,59 +131,6 @@ def referableSelectDynamic[T <: me.jiuyang.zaozi.valuetpe.Data: Type](
     case _                      =>
       report.errorAndAbort(s"Field type '${fieldType.show}' does not conform to the upper bound Data.")
   }
-
-object ApplyHelper:
-  import me.jiuyang.zaozi.valuetpe.*
-  import me.jiuyang.zaozi.reftpe.*
-  import me.jiuyang.zaozi.InstanceContext
-  import org.llvm.mlir.scalalib.*
-  import java.lang.foreign.Arena
-
-  def vecApplyWrapper[E <: Data, V <: Vec[E], R <: Referable[V]](
-    vecRef: R,
-    idx:    Referable[UInt] | Int
-  )(
-    using Arena,
-    Context,
-    Block,
-    sourcecode.File,
-    sourcecode.Line,
-    sourcecode.Name.Machine,
-    InstanceContext
-  ): Node[E] =
-    import me.jiuyang.zaozi.default.given_VecApi_E_V_R
-    vecRef.apply(idx)
-
-  def bitsApplyBitsWrapper[R <: Referable[Bits]](
-    bitsRef: R,
-    hi:      Int,
-    lo:      Int
-  )(
-    using Arena,
-    Context,
-    Block,
-    sourcecode.File,
-    sourcecode.Line,
-    sourcecode.Name.Machine,
-    InstanceContext
-  ): Node[Bits] =
-    import me.jiuyang.zaozi.default.given_BitsApi_R
-    bitsRef.apply(hi, lo)
-
-  def bitsApplyBitWrapper[R <: Referable[Bits]](
-    bitsRef: R,
-    idx:     Int
-  )(
-    using Arena,
-    Context,
-    Block,
-    sourcecode.File,
-    sourcecode.Line,
-    sourcecode.Name.Machine,
-    InstanceContext
-  ): Node[Bits] =
-    import me.jiuyang.zaozi.default.given_BitsApi_R
-    bitsRef.apply(idx)
 
 private def getTypeParameters(
   fieldValueExpr: Expr[Any]
@@ -213,60 +160,59 @@ private def getTypeParameters(
 
   (rType, vTypeOpt, eTypeOpt)
 
-def referableApplyDynamic[T <: me.jiuyang.zaozi.valuetpe.Data: Type](
-  ref:       Expr[me.jiuyang.zaozi.reftpe.Referable[T]],
-  fieldName: Expr[String],
-  args:      Expr[Seq[Any]]
-)(
+def referableApplyCall[T <: me.jiuyang.zaozi.valuetpe.Data: Type](
   using Quotes
+)(ref:       Expr[me.jiuyang.zaozi.reftpe.Referable[T]],
+  fieldName: Expr[String],
+  args:      Seq[quotes.reflect.Term]
 ): Expr[Any] =
   import quotes.reflect.*
+
   // Get the "field" expression via selectDynamic
   val fieldValueExpr = referableSelectDynamic[T](ref, fieldName)
 
-  // Deconstruct the varargs
-  val varargs = args match
-    case Varargs(exprs) => exprs
-    case other          =>
-      report.errorAndAbort(s"Expected varargs for applyDynamic, got: ${other.show}")
-
-  val (arena, _, context, block, file, line, valName, instanceContext) = summonImplicitParameters
+  val contextualArgs = summonContextualParameters match
+    case (arena, _, context, block, file, line, valName, instanceContext) =>
+      List(arena, context, block, file, line, valName, instanceContext).map(_.asTerm)
+  val fieldValueTerm = fieldValueExpr.asTerm
 
   // If we have more than one apply() method, we can dispatch them here based on the args type.
   val applyCallTerm = getTypeParameters(fieldValueExpr) match
     case (rType, Some(vType), Some(eType)) =>
-      varargs match
+      args match
         case idx +: Nil =>
           Select
             .unique(
-              Ref(Symbol.requiredModule("me.jiuyang.zaozi.magic.ApplyHelper")),
-              "vecApplyWrapper"
+              Ref(Symbol.requiredModule("me.jiuyang.zaozi.default.given_VecApi_E_V_R"))
+                .appliedToTypes(List(eType, vType, rType)),
+              "bit"
             )
-            .appliedToTypes(List(eType, vType, rType))
-            .appliedToArgs(List(fieldValueExpr, idx).map(_.asTerm))
-            .appliedToArgs(List(arena, context, block, file, line, valName, instanceContext).map(_.asTerm))
-        case _          => report.errorAndAbort(s"Expected 1 args, but got ${varargs.length}")
+            .appliedTo(fieldValueTerm)
+            .appliedTo(idx)
+            .appliedToArgs(contextualArgs)
+        case _          => report.errorAndAbort(s"Expected 1 args, but got ${args.length}")
     case (rType, None, None)               =>
-      varargs match
+      args match
         case idx +: Nil      =>
           Select
             .unique(
-              Ref(Symbol.requiredModule("me.jiuyang.zaozi.magic.ApplyHelper")),
-              "bitsApplyBitWrapper"
+              Ref(Symbol.requiredModule("me.jiuyang.zaozi.default.given_BitsApi_R")).appliedToType(rType),
+              // apply() is just the syntax sugar of bit/bits...
+              "bit"
             )
-            .appliedToTypes(List(rType))
-            .appliedToArgs(List(fieldValueExpr, idx).map(_.asTerm))
-            .appliedToArgs(List(arena, context, block, file, line, valName, instanceContext).map(_.asTerm))
+            .appliedTo(fieldValueTerm)
+            .appliedTo(idx)
+            .appliedToArgs(contextualArgs)
         case hi +: lo +: Nil =>
           Select
             .unique(
-              Ref(Symbol.requiredModule("me.jiuyang.zaozi.magic.ApplyHelper")),
-              "bitsApplyBitsWrapper"
+              Ref(Symbol.requiredModule("me.jiuyang.zaozi.default.given_BitsApi_R")).appliedToType(rType),
+              "bits"
             )
-            .appliedToTypes(List(rType))
-            .appliedToArgs(List(fieldValueExpr, hi, lo).map(_.asTerm))
-            .appliedToArgs(List(arena, context, block, file, line, valName, instanceContext).map(_.asTerm))
-        case _               => report.errorAndAbort(s"Expected 1 or 2 args, but got ${varargs.length}")
+            .appliedTo(fieldValueTerm)
+            .appliedToArgs(List(hi, lo))
+            .appliedToArgs(contextualArgs)
+        case _               => report.errorAndAbort(s"Expected 1 or 2 args, but got ${args.length}")
     case (rType, vTypeOpt, eTypeOpt)       =>
       report.errorAndAbort(
         s"Unexpected type parameters ${rType.show}, ${vTypeOpt.flatMap(t => Some(t.show))} and ${eTypeOpt
@@ -275,6 +221,21 @@ def referableApplyDynamic[T <: me.jiuyang.zaozi.valuetpe.Data: Type](
 
   // Turn it back into an Expr
   applyCallTerm.asExpr
+
+def referableApplyDynamic[T <: me.jiuyang.zaozi.valuetpe.Data: Type](
+  ref:       Expr[me.jiuyang.zaozi.reftpe.Referable[T]],
+  fieldName: Expr[String],
+  args:      Expr[Seq[Any]]
+)(
+  using Quotes
+): Expr[Any] =
+  import quotes.reflect.*
+  val varargs = args match
+    case Varargs(exprs) => exprs.map(_.asTerm)
+    case other          =>
+      report.errorAndAbort(s"Expected varargs for applyDynamic, got: ${other.show}")
+
+  referableApplyCall(ref, fieldName, varargs)
 
 def referableApplyDynamicNamed[T <: me.jiuyang.zaozi.valuetpe.Data: Type](
   ref:       Expr[me.jiuyang.zaozi.reftpe.Referable[T]],
@@ -284,14 +245,9 @@ def referableApplyDynamicNamed[T <: me.jiuyang.zaozi.valuetpe.Data: Type](
   using Quotes
 ): Expr[Any] =
   import quotes.reflect.*
-
-  // Get the "field" expression via selectDynamic
-  val fieldValueExpr = referableSelectDynamic[T](ref, fieldName)
-
-  // Deconstruct the varargs
   val varargs = args match
     case Varargs(argExprs) =>
-      argExprs.map {
+      (argExprs.map {
         case '{ ($key: String, $value: Any) } =>
           key.value match
             case Some(k) => NamedArg(k, value.asTerm)
@@ -299,51 +255,19 @@ def referableApplyDynamicNamed[T <: me.jiuyang.zaozi.valuetpe.Data: Type](
               report.errorAndAbort("Named argument must have a statically known key string.")
         case other                            =>
           report.errorAndAbort(s"Expected a literal (String, Any), got: ${other.show}")
-      }
+      } match
+        // we will drop the names of the arguments later so check them here
+        case idx +: Nil          =>
+          if (idx.name != "idx") report.errorAndAbort(s"Unexpected named arguments ${idx.name}.")
+          Seq(idx)
+        case arg1 +: arg2 +: Nil =>
+          (arg1.name, arg2.name) match
+            case ("hi", "lo")   => Seq(arg1, arg2)
+            case ("lo", "hi")   => Seq(arg2, arg1)
+            case (name1, name2) => report.errorAndAbort(s"Unexpected named arguments (${name1}, ${name2}).")
+        case args                => args
+      ).map(_.value)
     case other             =>
       report.errorAndAbort(s"Expected varargs for applyDynamicNamed, got: ${other.show}")
 
-  val (arena, _, context, block, file, line, valName, instanceContext) = summonImplicitParameters
-
-  val applyCallTerm = getTypeParameters(fieldValueExpr) match
-    case (rType, Some(vType), Some(eType)) =>
-      varargs match
-        case idx +: Nil =>
-          Select
-            .unique(
-              Ref(Symbol.requiredModule("me.jiuyang.zaozi.magic.ApplyHelper")),
-              "vecApplyWrapper"
-            )
-            .appliedToTypes(List(eType, vType, rType))
-            .appliedToArgs(List(fieldValueExpr.asTerm, idx))
-            .appliedToArgs(List(arena, context, block, file, line, valName, instanceContext).map(_.asTerm))
-        case _          => report.errorAndAbort(s"Expected 1 args, but got ${varargs.length}")
-    case (rType, None, None)               =>
-      varargs match
-        case idx +: Nil      =>
-          Select
-            .unique(
-              Ref(Symbol.requiredModule("me.jiuyang.zaozi.magic.ApplyHelper")),
-              "bitsApplyBitWrapper"
-            )
-            .appliedToTypes(List(rType))
-            .appliedToArgs(List(fieldValueExpr.asTerm, idx))
-            .appliedToArgs(List(arena, context, block, file, line, valName, instanceContext).map(_.asTerm))
-        case hi +: lo +: Nil =>
-          Select
-            .unique(
-              Ref(Symbol.requiredModule("me.jiuyang.zaozi.magic.ApplyHelper")),
-              "bitsApplyBitsWrapper"
-            )
-            .appliedToTypes(List(rType))
-            .appliedToArgs(List(fieldValueExpr.asTerm, hi, lo))
-            .appliedToArgs(List(arena, context, block, file, line, valName, instanceContext).map(_.asTerm))
-        case _               => report.errorAndAbort(s"Expected 1 or 2 args, but got ${varargs.length}")
-    case (rType, vTypeOpt, eTypeOpt)       =>
-      report.errorAndAbort(
-        s"Unexpected type parameters ${rType.show}, ${vTypeOpt.flatMap(t => Some(t.show))} and ${eTypeOpt
-            .flatMap(t => Some(t.show))}"
-      )
-
-  // Turn it back into an Expr
-  applyCallTerm.asExpr
+  referableApplyCall(ref, fieldName, varargs)
