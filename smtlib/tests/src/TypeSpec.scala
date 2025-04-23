@@ -7,7 +7,7 @@ import me.jiuyang.smtlib.*
 import utest.*
 
 import java.lang.foreign.Arena
-import org.llvm.circt.scalalib.smt.tpe.BitVectorType
+import org.llvm.mlir.scalalib.dialect.smt.tpe.BitVectorType
 
 object TypeSpec extends TestSuite:
   val tests = Tests:

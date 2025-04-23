@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2025 Jianhao Ye <Clo91eaf@qq.com>
-package org.llvm.circt.scalalib.smt.tpe
+package org.llvm.mlir.scalalib.dialect.smt.tpe
 
 class ArrayType
 class BitVectorType

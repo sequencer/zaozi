@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2025 Jianhao Ye <Clo91eaf@qq.com>
-package org.llvm.circt.scalalib.smt.operation
+package org.llvm.mlir.scalalib.dialect.smt.operation
 
 import org.llvm.mlir.scalalib.{
   AttributeApi,
@@ -16,7 +16,7 @@ import org.llvm.mlir.scalalib.{
   Value,
   given
 }
-import org.llvm.circt.scalalib.smt.capi.{*, given}
+import org.llvm.mlir.scalalib.dialect.smt.capi.{*, given}
 
 import java.lang.foreign.Arena
 
@@ -880,7 +880,7 @@ given ForallApi with
         regionBlockTypeLocations = Seq(
           Seq(
             // body
-            (Seq.empty, Seq.empty),
+            (Seq.empty, Seq.empty)
           )
         ),
         namedAttributes =
