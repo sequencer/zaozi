@@ -38,11 +38,13 @@
 #include <mlir-c/Dialect/Tensor.h>
 #include <mlir-c/Dialect/Arith.h>
 #include <mlir-c/Dialect/PDL.h>
+#include <mlir-c/Dialect/SMT.h>
 #include <mlir-c/AffineMap.h>
 #include <mlir-c/Debug.h>
 #include <mlir-c/AffineExpr.h>
 //fatal error: 'inttypes.h' file not found
 //#include <mlir-c/Target/LLVMIR.h>
+#include <mlir-c/Target/ExportSMTLIB.h>
 #include <mlir-c/Transforms.h>
 #include <mlir-c/Rewrite.h>
 #include <mlir-c/RegisterEverything.h>

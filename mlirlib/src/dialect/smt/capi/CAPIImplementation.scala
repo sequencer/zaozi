@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2025 Jianhao Ye <Clo91eaf@qq.com>
-package org.llvm.circt.scalalib.smt.capi
+package org.llvm.mlir.scalalib.dialect.smt.capi
 
-import org.llvm.circt.*
-import org.llvm.circt.CAPI.*
+import org.llvm.mlir.*
+import org.llvm.mlir.CAPI.*
 import org.llvm.mlir.scalalib.{
   given_AttributeApi,
   Attribute,
