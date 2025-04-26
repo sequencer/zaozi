@@ -10,7 +10,7 @@ import os.Path
 
 import build.{circtlib, v}
 
-object `package` extends RootModule with ScalaModule with ScalafmtModule { m =>
+object `package` extends RootModule with ScalaModule with ScalafmtModule {
   def scalaVersion = Task(v.scala)
   def ivyDeps      = Task(Seq(v.mainargs, v.oslib, v.upickle, v.sourcecode, v.fastparse))
   def moduleDeps   = Seq(circtlib)
