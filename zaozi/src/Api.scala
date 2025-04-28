@@ -67,35 +67,16 @@ trait Generator[PARAM <: Parameter, I <: HWInterface[PARAM], P <: DVInterface[PA
   def interface(parameter: PARAM): I
   def probe(parameter:     PARAM): P
 
-  def module(
-    parameter: PARAM
-  )(
-    using Arena,
-    Context
-  ): CirctModule
-
-  def instance(
-    parameter: PARAM
-  )(
-    using Arena,
-    Context,
-    Block,
-    sourcecode.File,
-    sourcecode.Line,
-    sourcecode.Name.Machine,
-    InstanceContext
-  ): Instance[I, P]
-
 trait GeneratorApi:
   extension [PARAM <: Parameter, I <: HWInterface[PARAM], P <: DVInterface[PARAM]](generator: Generator[PARAM, I, P])
-    def moduleImpl(
+    def module(
       parameter: PARAM
     )(
       using Arena,
       Context
     ): CirctModule
 
-    def instanceImpl(
+    def instance(
       parameter: PARAM
     )(
       using Arena,
@@ -106,6 +87,7 @@ trait GeneratorApi:
       sourcecode.Name.Machine,
       InstanceContext
     ): Instance[I, P]
+
 trait Parameter:
   def moduleName: String
   def layers:     Seq[Layer]
