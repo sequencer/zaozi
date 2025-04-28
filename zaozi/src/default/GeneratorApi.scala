@@ -31,7 +31,7 @@ import java.lang.foreign.Arena
 
 given GeneratorApi with
   extension [PARAM <: Parameter, I <: HWInterface[PARAM], P <: DVInterface[PARAM]](generator: Generator[PARAM, I, P])
-    def moduleImpl(
+    def module(
       parameter: PARAM
     )(
       using Arena,
@@ -112,7 +112,7 @@ given GeneratorApi with
       generator.architecture(parameter)
       module
 
-    def instanceImpl(
+    def instance(
       parameter: PARAM
     )(
       using Arena,
