@@ -782,24 +782,28 @@ given PassManagerApi with
     )
     // See inputFilename usage in https://github.com/llvm/circt/blob/ff847edb042541c44c79b59f1a680f641241b485/lib/Firtool/Firtool.cpp#L254
     def populateCHIRRTLToLowFIRRTL(
-      firtoolOptions: FirtoolOptions,
-      inputFilename:  String
+      firtoolOptions: FirtoolOptions
     )(
       using Arena
     ): LogicalResult = LogicalResult(
       circtFirtoolPopulateCHIRRTLToLowFIRRTL(
         summon[Arena],
         pm.segment,
-        firtoolOptions.segment,
-        inputFilename.toStringRef.segment
+        firtoolOptions.segment
       )
     )
     def populateLowFIRRTLToHW(
-      firtoolOptions: FirtoolOptions
+      firtoolOptions: FirtoolOptions,
+      inputFilename:  String
     )(
       using Arena
     ): LogicalResult = LogicalResult(
-      circtFirtoolPopulateLowFIRRTLToHW(summon[Arena], pm.segment, firtoolOptions.segment)
+      circtFirtoolPopulateLowFIRRTLToHW(
+        summon[Arena],
+        pm.segment,
+        firtoolOptions.segment,
+        inputFilename.toStringRef.segment
+      )
     )
     def populateHWToSV(
       firtoolOptions: FirtoolOptions
