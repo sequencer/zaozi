@@ -117,8 +117,8 @@ def verilogTest[PARAM <: Parameter, I <: HWInterface[PARAM], P <: DVInterface[PA
   val out            = new StringBuilder
   val firtoolOptions = summon[FirtoolOptions]
   summon[PassManager].populatePreprocessTransforms(firtoolOptions)
-  summon[PassManager].populateCHIRRTLToLowFIRRTL(firtoolOptions, "")
-  summon[PassManager].populateLowFIRRTLToHW(firtoolOptions)
+  summon[PassManager].populateCHIRRTLToLowFIRRTL(firtoolOptions)
+  summon[PassManager].populateLowFIRRTLToHW(firtoolOptions, "")
   summon[PassManager].populateHWToSV(firtoolOptions)
   // TODO: we need a pass for export verilog on a MLIRModule, not it export empty string.
   summon[PassManager].populateExportVerilog(firtoolOptions, out ++= _)

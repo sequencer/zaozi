@@ -38,21 +38,21 @@ given TypeApi with
   )(
     using arena: Arena,
     context:     Context
-  ): Type = Type(smtTypeGetArray(arena, context.segment, domainType.segment, rangeType.segment))
+  ): Type = Type(mlirSMTTypeGetArray(arena, context.segment, domainType.segment, rangeType.segment))
   inline def getBitVector(
     width:       Int
   )(
     using arena: Arena,
     context:     Context
-  ): Type = Type(smtTypeGetBitVector(arena, context.segment, width))
+  ): Type = Type(mlirSMTTypeGetBitVector(arena, context.segment, width))
   inline def getBool(
     using arena: Arena,
     context:     Context
-  ): Type = Type(smtTypeGetBool(arena, context.segment))
+  ): Type = Type(mlirSMTTypeGetBool(arena, context.segment))
   inline def getInt(
     using arena: Arena,
     context:     Context
-  ): Type = Type(smtTypeGetInt(arena, context.segment))
+  ): Type = Type(mlirSMTTypeGetInt(arena, context.segment))
   inline def getSMTFunc(
     domainTypes: Seq[Type],
     rangeType:   Type
@@ -60,7 +60,7 @@ given TypeApi with
     using arena: Arena,
     context:     Context
   ): Type = Type(
-    smtTypeGetSMTFunc(arena, context.segment, domainTypes.length, domainTypes.toMlirArray, rangeType.segment)
+    mlirSMTTypeGetSMTFunc(arena, context.segment, domainTypes.length, domainTypes.toMlirArray, rangeType.segment)
   )
   inline def getSort(
     identifier:  String,
@@ -69,18 +69,24 @@ given TypeApi with
     using arena: Arena,
     context:     Context
   ): Type = Type(
-    smtTypeGetSort(arena, context.segment, identifier.identifierGet.segment, sortParams.length, sortParams.toMlirArray)
+    mlirSMTTypeGetSort(
+      arena,
+      context.segment,
+      identifier.identifierGet.segment,
+      sortParams.length,
+      sortParams.toMlirArray
+    )
   )
 
   extension (tpe: Type)
-    inline def isAnyNonFuncSMTValueType: Boolean = smtTypeIsAnyNonFuncSMTValueType(tpe.segment)
-    inline def isAnySMTValueType:        Boolean = smtTypeIsAnySMTValueType(tpe.segment)
-    inline def isArray:                  Boolean = smtTypeIsAArray(tpe.segment)
-    inline def isBitVector:              Boolean = smtTypeIsABitVector(tpe.segment)
-    inline def isBool:                   Boolean = smtTypeIsABool(tpe.segment)
-    inline def isInt:                    Boolean = smtTypeIsAInt(tpe.segment)
-    inline def isSMTFunc:                Boolean = smtTypeIsASMTFunc(tpe.segment)
-    inline def isSort:                   Boolean = smtTypeIsASort(tpe.segment)
+    inline def isAnyNonFuncSMTValueType: Boolean = mlirSMTTypeIsAnyNonFuncSMTValueType(tpe.segment)
+    inline def isAnySMTValueType:        Boolean = mlirSMTTypeIsAnySMTValueType(tpe.segment)
+    inline def isArray:                  Boolean = mlirSMTTypeIsAArray(tpe.segment)
+    inline def isBitVector:              Boolean = mlirSMTTypeIsABitVector(tpe.segment)
+    inline def isBool:                   Boolean = mlirSMTTypeIsABool(tpe.segment)
+    inline def isInt:                    Boolean = mlirSMTTypeIsAInt(tpe.segment)
+    inline def isSMTFunc:                Boolean = mlirSMTTypeIsASMTFunc(tpe.segment)
+    inline def isSort:                   Boolean = mlirSMTTypeIsASort(tpe.segment)
 
 end given
 
@@ -89,29 +95,29 @@ given AttributeApi with
     inline def getBVCmpPredicateAttribute(
       using arena: Arena,
       context:     Context
-    ): Attribute = Attribute(smtAttrGetBVCmpPredicate(arena, context.segment, str.toStringRef.segment))
+    ): Attribute = Attribute(mlirSMTAttrGetBVCmpPredicate(arena, context.segment, str.toStringRef.segment))
     inline def getIntPredicateAttribute(
       using arena: Arena,
       context:     Context
-    ): Attribute = Attribute(smtAttrGetIntPredicate(arena, context.segment, str.toStringRef.segment))
+    ): Attribute = Attribute(mlirSMTAttrGetIntPredicate(arena, context.segment, str.toStringRef.segment))
   extension (value: Int)
     inline def getBitVectorAttribute(
       width:       Int
     )(
       using arena: Arena,
       context:     Context
-    ): Attribute = Attribute(smtAttrGetBitVector(arena, context.segment, value, width))
-  extension (attr:  Attribute) inline def isSMTAttribute: Boolean = smtAttrIsASMTAttribute(attr.segment)
+    ): Attribute = Attribute(mlirSMTAttrGetBitVector(arena, context.segment, value, width))
+  extension (attr:  Attribute) inline def isSMTAttribute: Boolean = mlirSMTAttrIsASMTAttribute(attr.segment)
 
   extension (str: String)
     inline def checkBVCmpPredicateAttribute(
       using arena: Arena,
       context:     Context
-    ): Boolean = smtAttrCheckBVCmpPredicate(context.segment, str.toStringRef.segment)
+    ): Boolean = mlirSMTAttrCheckBVCmpPredicate(context.segment, str.toStringRef.segment)
     inline def checkIntPredicateAttribute(
       using arena: Arena,
       context:     Context
-    ): Boolean = smtAttrCheckIntPredicate(context.segment, str.toStringRef.segment)
+    ): Boolean = mlirSMTAttrCheckIntPredicate(context.segment, str.toStringRef.segment)
 end given
 
 given ModuleApi with
@@ -122,6 +128,6 @@ given ModuleApi with
       using arena: Arena
     ): Unit =
       LogicalResult(
-        mlirExportSMTLIB(arena, module.segment, callback.stringToStringCallback.segment, MemorySegment.NULL)
+        mlirTranslateModuleToSMTLIB(arena, module.segment, callback.stringToStringCallback.segment, MemorySegment.NULL, false, false)
       )
 end given
