@@ -34,7 +34,7 @@ trait HasFire[T <: Bundle, R <: Referable[T]]:
       using ctx: Context,
       file:      sourcecode.File,
       line:      sourcecode.Line,
-      valName:   sourcecode.Name
+      valName:   sourcecode.Name.Machine
     )(
       using Arena,
       Block
@@ -54,7 +54,7 @@ given [E <: Bundle, T <: DecoupledIO[E], R <: Referable[T]]: HasFire[T, R] with
       using ctx: Context,
       file:      sourcecode.File,
       line:      sourcecode.Line,
-      valName:   sourcecode.Name
+      valName:   sourcecode.Name.Machine
     )(
       using Arena,
       Block

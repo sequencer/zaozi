@@ -42,7 +42,7 @@ trait ConstructorApi:
     Block,
     sourcecode.File,
     sourcecode.Line,
-    sourcecode.Name
+    sourcecode.Name.Machine
   ): Ref[T]
 
   def smtFunc[T <: Data, U <: Data](
@@ -54,7 +54,7 @@ trait ConstructorApi:
     Block,
     sourcecode.File,
     sourcecode.Line,
-    sourcecode.Name
+    sourcecode.Name.Machine
   ): Ref[SMTFunc[T, U]]
 
   // smt functions
@@ -66,7 +66,7 @@ trait ConstructorApi:
     Block,
     sourcecode.File,
     sourcecode.Line,
-    sourcecode.Name
+    sourcecode.Name.Machine
   ): Ref[Bool]
 
   def smtAssert(
@@ -77,7 +77,7 @@ trait ConstructorApi:
     Block,
     sourcecode.File,
     sourcecode.Line,
-    sourcecode.Name
+    sourcecode.Name.Machine
   ): Ref[Bool]
 
   def smtReset(
@@ -86,7 +86,7 @@ trait ConstructorApi:
     Block,
     sourcecode.File,
     sourcecode.Line,
-    sourcecode.Name
+    sourcecode.Name.Machine
   ): Unit
 
   def smtSetLogic(
@@ -97,7 +97,7 @@ trait ConstructorApi:
     Block,
     sourcecode.File,
     sourcecode.Line,
-    sourcecode.Name
+    sourcecode.Name.Machine
   ): Unit
 
   def smtEq[R <: Referable[?]](
@@ -108,7 +108,7 @@ trait ConstructorApi:
     Block,
     sourcecode.File,
     sourcecode.Line,
-    sourcecode.Name
+    sourcecode.Name.Machine
   ): Ref[Bool]
 
   def smtExists(
@@ -122,7 +122,7 @@ trait ConstructorApi:
     Block,
     sourcecode.File,
     sourcecode.Line,
-    sourcecode.Name
+    sourcecode.Name.Machine
   ): Ref[Bool]
 
   def smtForall(
@@ -136,7 +136,7 @@ trait ConstructorApi:
     Block,
     sourcecode.File,
     sourcecode.Line,
-    sourcecode.Name
+    sourcecode.Name.Machine
   ): Ref[Bool]
 
   def smtIte[T <: Data, COND <: Referable[Bool], THEN <: Referable[T], ELSE <: Referable[T]](
@@ -149,7 +149,7 @@ trait ConstructorApi:
     Block,
     sourcecode.File,
     sourcecode.Line,
-    sourcecode.Name
+    sourcecode.Name.Machine
   ): Ref[T]
 
   def smtPush(
@@ -160,7 +160,7 @@ trait ConstructorApi:
     Block,
     sourcecode.File,
     sourcecode.Line,
-    sourcecode.Name
+    sourcecode.Name.Machine
   ): Unit
 
   def smtPop(
@@ -171,7 +171,7 @@ trait ConstructorApi:
     Block,
     sourcecode.File,
     sourcecode.Line,
-    sourcecode.Name
+    sourcecode.Name.Machine
   ): Unit
 
   def smtCheck(
@@ -180,7 +180,7 @@ trait ConstructorApi:
     Block,
     sourcecode.File,
     sourcecode.Line,
-    sourcecode.Name
+    sourcecode.Name.Machine
   ): Unit
 
   def smtYield[T <: Data, R <: Referable[T]](
@@ -191,7 +191,7 @@ trait ConstructorApi:
     Block,
     sourcecode.File,
     sourcecode.Line,
-    sourcecode.Name
+    sourcecode.Name.Machine
   ): Unit
 
   def solver(
@@ -202,7 +202,7 @@ trait ConstructorApi:
     Block,
     sourcecode.File,
     sourcecode.Line,
-    sourcecode.Name
+    sourcecode.Name.Machine
   ): Unit
 
 end ConstructorApi
@@ -263,7 +263,7 @@ trait Ashr[D <: Data, RET <: Data, R <: Referable[D], THAT <: Referable[SInt]]:
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name
+      sourcecode.Name.Machine
     ): Ref[RET]
 trait Lshr[D <: Data, RET <: Data, R <: Referable[D], THAT <: Referable[SInt]]:
   extension (ref: R)
@@ -275,7 +275,7 @@ trait Lshr[D <: Data, RET <: Data, R <: Referable[D], THAT <: Referable[SInt]]:
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name
+      sourcecode.Name.Machine
     ): Ref[RET]
 trait Shl[D <: Data, RET <: Data, R <: Referable[D], THAT <: Referable[SInt]]:
   extension (ref: R)
@@ -287,7 +287,7 @@ trait Shl[D <: Data, RET <: Data, R <: Referable[D], THAT <: Referable[SInt]]:
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name
+      sourcecode.Name.Machine
     ): Ref[RET]
 
 // int type & bv type
@@ -301,7 +301,7 @@ trait Add[D <: Data, RET <: Data, R <: Referable[D]]:
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name
+      sourcecode.Name.Machine
     ): Ref[RET]
 trait Sub[D <: Data, RET <: Data, R <: Referable[D]]:
   extension (ref: R)
@@ -313,7 +313,7 @@ trait Sub[D <: Data, RET <: Data, R <: Referable[D]]:
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name
+      sourcecode.Name.Machine
     ): Ref[RET]
 trait Mul[D <: Data, RET <: Data, R <: Referable[D]]:
   extension (ref: R)
@@ -325,7 +325,7 @@ trait Mul[D <: Data, RET <: Data, R <: Referable[D]]:
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name
+      sourcecode.Name.Machine
     ): Ref[RET]
 trait Div[D <: Data, RET <: Data, R <: Referable[D]]:
   extension (ref: R)
@@ -337,7 +337,7 @@ trait Div[D <: Data, RET <: Data, R <: Referable[D]]:
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name
+      sourcecode.Name.Machine
     ): Ref[RET]
 trait Rem[D <: Data, RET <: Data, R <: Referable[D]]:
   extension (ref: R)
@@ -349,7 +349,7 @@ trait Rem[D <: Data, RET <: Data, R <: Referable[D]]:
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name
+      sourcecode.Name.Machine
     ): Ref[RET]
 trait Lt[D <: Data, RET <: Data, R <: Referable[D]]:
   extension (ref: R)
@@ -361,7 +361,7 @@ trait Lt[D <: Data, RET <: Data, R <: Referable[D]]:
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name
+      sourcecode.Name.Machine
     ): Ref[RET]
 trait Leq[D <: Data, RET <: Data, R <: Referable[D]]:
   extension (ref: R)
@@ -373,7 +373,7 @@ trait Leq[D <: Data, RET <: Data, R <: Referable[D]]:
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name
+      sourcecode.Name.Machine
     ): Ref[RET]
 trait Gt[D <: Data, RET <: Data, R <: Referable[D]]:
   extension (ref: R)
@@ -385,7 +385,7 @@ trait Gt[D <: Data, RET <: Data, R <: Referable[D]]:
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name
+      sourcecode.Name.Machine
     ): Ref[RET]
 trait Geq[D <: Data, RET <: Data, R <: Referable[D]]:
   extension (ref: R)
@@ -397,7 +397,7 @@ trait Geq[D <: Data, RET <: Data, R <: Referable[D]]:
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name
+      sourcecode.Name.Machine
     ): Ref[RET]
 trait Eq[D <: Data, RET <: Data, R <: Referable[D]]:
   extension (ref: R)
@@ -409,7 +409,7 @@ trait Eq[D <: Data, RET <: Data, R <: Referable[D]]:
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name
+      sourcecode.Name.Machine
     ): Ref[RET]
 trait Neq[D <: Data, RET <: Data, R <: Referable[D]]:
   extension (ref: R)
@@ -421,7 +421,7 @@ trait Neq[D <: Data, RET <: Data, R <: Referable[D]]:
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name
+      sourcecode.Name.Machine
     ): Ref[RET]
 trait And[D <: Data, RET <: Data, R <: Referable[D]]:
   extension (ref: R)
@@ -433,7 +433,7 @@ trait And[D <: Data, RET <: Data, R <: Referable[D]]:
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name
+      sourcecode.Name.Machine
     ): Ref[RET]
 trait Or[D <: Data, RET <: Data, R <: Referable[D]]:
   extension (ref: R)
@@ -445,7 +445,7 @@ trait Or[D <: Data, RET <: Data, R <: Referable[D]]:
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name
+      sourcecode.Name.Machine
     ): Ref[RET]
 
 trait Xor[D <: Data, RET <: Data, R <: Referable[D]]:
@@ -458,7 +458,7 @@ trait Xor[D <: Data, RET <: Data, R <: Referable[D]]:
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name
+      sourcecode.Name.Machine
     ): Ref[RET]
 
 trait Concat[D <: Data, RET <: Data, R <: Referable[D]]:
@@ -471,7 +471,7 @@ trait Concat[D <: Data, RET <: Data, R <: Referable[D]]:
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name
+      sourcecode.Name.Machine
     ): Ref[RET]
 
 trait Extract[D <: Data, RET <: Data, R <: Referable[D]]:
@@ -485,7 +485,7 @@ trait Extract[D <: Data, RET <: Data, R <: Referable[D]]:
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name
+      sourcecode.Name.Machine
     ): Ref[RET]
 
 trait Repeat[D <: Data, RET <: Data, R <: Referable[D]]:
@@ -498,7 +498,7 @@ trait Repeat[D <: Data, RET <: Data, R <: Referable[D]]:
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name
+      sourcecode.Name.Machine
     ): Ref[RET]
 
 trait Neg[D <: Data, RET <: Data, R <: Referable[D]]:
@@ -509,7 +509,7 @@ trait Neg[D <: Data, RET <: Data, R <: Referable[D]]:
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name
+      sourcecode.Name.Machine
     ): Ref[RET]
 
 trait Not[D <: Data, RET <: Data, R <: Referable[D]]:
@@ -520,7 +520,7 @@ trait Not[D <: Data, RET <: Data, R <: Referable[D]]:
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name
+      sourcecode.Name.Machine
     ): Ref[RET]
 
 trait Implies[D <: Data, RET <: Data, R <: Referable[D]]:
@@ -533,7 +533,7 @@ trait Implies[D <: Data, RET <: Data, R <: Referable[D]]:
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name
+      sourcecode.Name.Machine
     ): Ref[RET]
 
 // array type
@@ -547,7 +547,7 @@ trait Apply[T <: Data, U <: Data, R <: Referable[Array[T, U]]]:
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name
+      sourcecode.Name.Machine
     ): Ref[U]
 
 trait Update[T <: Data, U <: Data, R <: Referable[Array[T, U]], S <: Referable[U]]:
@@ -561,7 +561,7 @@ trait Update[T <: Data, U <: Data, R <: Referable[Array[T, U]], S <: Referable[U
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name
+      sourcecode.Name.Machine
     ): Ref[Array[T, U]]
 
 trait BroadCast[T <: Data, U <: Data, R <: Referable[Array[T, U]], S <: Referable[U]]:
@@ -574,7 +574,7 @@ trait BroadCast[T <: Data, U <: Data, R <: Referable[Array[T, U]], S <: Referabl
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name
+      sourcecode.Name.Machine
     ): Ref[Array[T, U]]
 
 // func type
@@ -588,7 +588,7 @@ trait ApplyFunc[T <: Data, U <: Data, R <: Referable[SMTFunc[?, U]], S <: Refera
       Block,
       sourcecode.File,
       sourcecode.Line,
-      sourcecode.Name
+      sourcecode.Name.Machine
     ): Ref[U]
 
 trait ArrayApi[T <: Data, U <: Data, R <: Referable[Array[T, U]], S <: Referable[U]]
