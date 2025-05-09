@@ -2,19 +2,35 @@
 // SPDX-FileCopyrightText: 2025 Jiuyang Liu <liu@jiuyang.me>
 package me.jiuyang.zaozi.default
 
+import scala.util.Try
+import scala.util.chaining.*
+
 import me.jiuyang.zaozi.*
+import me.jiuyang.zaozi.magic.validateCircuit
 import me.jiuyang.zaozi.reftpe.*
 import me.jiuyang.zaozi.valuetpe.*
 
+import org.llvm.circt.scalalib.emit.capi.given_DialectHandleApi
 import org.llvm.circt.scalalib.firrtl.capi.{
+  given_DialectHandleApi,
   given_FirrtlBundleFieldApi,
   given_FirrtlDirectionApi,
+  given_FirtoolOptionsApi,
+  given_ModuleApi,
+  given_PassManagerApi,
   given_TypeApi,
   FirrtlConvention,
-  FirrtlNameKind
+  FirrtlNameKind,
+  FirtoolOptions,
+  FirtoolOptionsApi
 }
 import org.llvm.circt.scalalib.firrtl.operation
+import org.llvm.circt.scalalib.firrtl.operation.given
 import org.llvm.circt.scalalib.firrtl.operation.{
+  given_CircuitApi,
+  given_ModuleApi,
+  Circuit,
+  CircuitApi,
   ConnectApi,
   InstanceApi,
   Module as CirctModule,
@@ -22,10 +38,34 @@ import org.llvm.circt.scalalib.firrtl.operation.{
   OpenSubfieldApi,
   RefDefineApi,
   SubfieldApi,
-  WireApi,
-  given
+  WireApi
 }
-import org.llvm.mlir.scalalib.{Block, Context, LocationApi, Operation, given}
+import org.llvm.circt.scalalib.sv.capi.given_DialectHandleApi
+import org.llvm.mlir.scalalib.{
+  given_AttributeApi,
+  given_BlockApi,
+  given_ContextApi,
+  given_IdentifierApi,
+  given_LocationApi,
+  given_ModuleApi,
+  given_NamedAttributeApi,
+  given_OperationApi,
+  given_PassManagerApi,
+  given_RegionApi,
+  given_TypeApi,
+  given_ValueApi,
+  Block,
+  Context,
+  ContextApi,
+  LocationApi,
+  Module as MlirModule,
+  ModuleApi as MlirModuleApi,
+  NamedAttributeApi,
+  Operation,
+  OperationApi,
+  PassManager,
+  Type
+}
 
 import java.lang.foreign.Arena
 
@@ -177,5 +217,91 @@ given GeneratorApi with
         val _probeWire = new Wire[P]:
           private[zaozi] val _tpe       = probeTpe
           private[zaozi] val _operation = probeWire.operation
+
+    private def mlir(
+      parameter: PARAM
+    )(
+      using Arena,
+      Context
+    ) =
+      given MlirModule = summon[MlirModuleApi].moduleCreateEmpty(summon[LocationApi].locationUnknownGet)
+      given Circuit    = summon[CircuitApi].op(parameter.moduleName)
+      summon[Circuit].appendToModule()
+      generator.module(parameter).appendToCircuit()
+      validateCircuit()
+
+      val out = new StringBuilder
+      summon[MlirModule].getOperation.print(out ++= _)
+
+      out.toString
+
+    def dumpMlir(
+      parameter: PARAM
+    )(
+      using Arena,
+      Context
+    ): Unit =
+      val mlirFile =
+        os.Path(
+          sys.env.getOrElse("ZAOZI_OUTDIR", os.pwd.toString)
+        ) / s"${parameter.moduleName}_${parameter.hashCode.toHexString}.mlir"
+
+      generator.elaborationCache.get(parameter) match
+        case Some(mlir) =>
+          os.write.over(mlirFile, mlir)
+        case None       =>
+          val mlir = generator.mlir(parameter)
+          generator.elaborationCache.put(parameter, mlir)
+          os.write.over(mlirFile, mlir)
+
+    def instantiate(
+      parameter: PARAM
+    )(
+      using Arena,
+      Context,
+      Block,
+      sourcecode.File,
+      sourcecode.Line,
+      sourcecode.Name.Machine,
+      InstanceContext
+    ): Instance[I, P] =
+      generator.dumpMlir(parameter)
+      generator.instance(parameter).tap(_.operation.appendToBlock())
+
+    private def configImpl(
+      parameter:  PARAM,
+      configFile: os.Path
+    )(
+      using upickle.default.Writer[PARAM]
+    ) = os.write.over(configFile, upickle.default.write(parameter))
+
+    private def designImpl(
+      configFile: os.Path
+    )(
+      using upickle.default.Reader[PARAM]
+    ) =
+      given Arena   = Arena.ofConfined()
+      given Context = summon[ContextApi].contextCreate
+      summon[Context].loadFirrtlDialect()
+
+      generator.dumpMlir(upickle.default.read(os.read(configFile)))
+
+      summon[Context].destroy()
+      summon[Arena].close()
+
+    def mainImpl(
+      args: Array[String]
+    )(
+      using upickle.default.ReadWriter[PARAM]
+    ): Unit =
+      args.toList match
+        case subcmd :: configPath :: tail if Try(os.Path(configPath, os.pwd)).isSuccess =>
+          val configFile = os.Path(configPath, os.pwd)
+          subcmd match
+            case "config" => configImpl(generator.parseDesignParameter(tail), configFile)
+            case "design" => designImpl(configFile)
+        case _                                                                          =>
+          println("Need to specify a sub command and provide a config path: config/design <path>")
+          sys.exit(1)
 
 end given
