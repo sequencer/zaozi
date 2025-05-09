@@ -69,7 +69,9 @@ trait Generator[PARAM <: Parameter, I <: HWInterface[PARAM], P <: DVInterface[PA
   def interface(parameter: PARAM): I
   def probe(parameter:     PARAM): P
 
-  private[zaozi] def parseDesignParameter(args: Seq[String]): PARAM
+  private[zaozi] def parseParameter(args: Seq[String]): PARAM
+
+  def main(args: Array[String]): Unit
 
 trait GeneratorApi:
   extension [PARAM <: Parameter, I <: HWInterface[PARAM], P <: DVInterface[PARAM]](generator: Generator[PARAM, I, P])

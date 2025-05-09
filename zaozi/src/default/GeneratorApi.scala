@@ -299,7 +299,7 @@ given GeneratorApi with
         case subcmd :: configPath :: tail if Try(os.Path(configPath, os.pwd)).isSuccess =>
           val configFile = os.Path(configPath, os.pwd)
           subcmd match
-            case "config" => configImpl(generator.parseDesignParameter(tail), configFile)
+            case "config" => configImpl(generator.parseParameter(tail), configFile)
             case "design" => designImpl(configFile)
         case _                                                                          =>
           println("Need to specify a sub command and provide a config path: config/design <path>")
