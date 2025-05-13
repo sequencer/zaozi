@@ -86,9 +86,9 @@ given GeneratorApi with
       val bfs               =
         Seq.tabulate(ioNumFields)(io.toMlirType.getBundleFieldByIndex) ++
           Seq.tabulate(probeNumFields)(probe.toMlirType.getBundleFieldByIndex)
-      given Seq[LayerTree]  = parameter.layerTrees.flatMap(_._dfs)
+      given Seq[LayerTree]  = generator.layers(parameter).toLayerTrees.flatMap(_._dfs)
       val module            = summon[ModuleApi].op(
-        parameter.moduleName,
+        generator.moduleName(parameter),
         unknownLocation,
         FirrtlConvention.Scalarized,
         bfs.map(i => (i, unknownLocation)), // TODO: record location for Bundle?
@@ -173,7 +173,7 @@ given GeneratorApi with
           Seq.tabulate(probeTpe.toMlirType.getBundleNumFields.toInt)(probeTpe.toMlirType.getBundleFieldByIndex)
       // TODO: add layer symbol here? rather than from top to down searching?
       val instanceOp = summon[InstanceApi].op(
-        moduleName = parameter.moduleName,
+        moduleName = generator.moduleName(parameter),
         instanceName = valName,
         nameKind = FirrtlNameKind.Interesting,
         location = locate,
@@ -226,7 +226,7 @@ given GeneratorApi with
       Context
     ) =
       given MlirModule = summon[MlirModuleApi].moduleCreateEmpty(summon[LocationApi].locationUnknownGet)
-      given Circuit    = summon[CircuitApi].op(parameter.moduleName)
+      given Circuit    = summon[CircuitApi].op(generator.moduleName(parameter))
       summon[Circuit].appendToModule()
       generator.module(parameter).appendToCircuit()
       validateCircuit()
@@ -245,7 +245,7 @@ given GeneratorApi with
       val mlirFile =
         os.Path(
           sys.env.getOrElse("ZAOZI_OUTDIR", os.pwd.toString)
-        ) / s"${parameter.moduleName}_${parameter.hashCode.toHexString}.mlir"
+        ) / s"${generator.moduleName(parameter)}.mlir"
 
       generator.elaborationCache.get(parameter) match
         case Some(mlir) =>

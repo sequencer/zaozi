@@ -54,6 +54,11 @@ trait Generator[PARAM <: Parameter, I <: HWInterface[PARAM], P <: DVInterface[PA
   type TINTF  = I
   type TPROBE = P
 
+  def moduleName(parameter: PARAM): String =
+    s"${this.getClass.getSimpleName.stripSuffix("$")}_${parameter.hashCode.toHexString}"
+
+  def layers(parameter: PARAM): Seq[Layer] = Seq.empty
+
   def architecture(parameter: PARAM): (
     Arena,
     Context,
@@ -119,12 +124,7 @@ trait GeneratorApi:
       using upickle.default.ReadWriter[PARAM]
     ): Unit
 
-trait Parameter:
-  def moduleName: String
-  def layers:     Seq[Layer]
-  def layerTrees(
-    using ConstructorApi
-  ): Seq[LayerTree] = layers.map(_.toLayerTree)
+trait Parameter
 
 class HWInterface[P <: Parameter](parameter: P) extends Bundle
 class DVInterface[P <: Parameter](parameter: P) extends ProbeBundle

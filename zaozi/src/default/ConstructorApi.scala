@@ -137,6 +137,7 @@ given ConstructorApi with
         def _name:     String         = layer.name
         def _children: Seq[LayerTree] = layer.children.map(_.toLayerTree)
       ._rebuild
+  extension (layers: Seq[Layer]) def toLayerTrees: Seq[LayerTree] = layers.map(_.toLayerTree)
 
   def Wire[T <: Data](
     refType: T
