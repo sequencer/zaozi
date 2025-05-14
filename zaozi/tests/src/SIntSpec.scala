@@ -18,10 +18,10 @@ import utest.*
 
 import java.lang.foreign.Arena
 
-class SIntSpecIO(
-  using SimpleParameter)
-    extends HWInterface[SimpleParameter]:
-  val parameter  = summon[SimpleParameter]
+case class SIntSpecParameter(width: Int) extends Parameter
+given upickle.default.ReadWriter[SIntSpecParameter] = upickle.default.macroRW
+
+class SIntSpecIO(parameter: SIntSpecParameter) extends HWInterface(parameter):
   val a          = Flipped(SInt(parameter.width.W))
   val b          = Flipped(SInt(parameter.width.W))
   val c          = Flipped(UInt(parameter.width.W))
@@ -32,157 +32,200 @@ class SIntSpecIO(
   val clock      = Flipped(Clock())
   val asyncReset = Flipped(AsyncReset())
 
-class SIntSpecProbe(
-  using SimpleParameter)
-    extends DVInterface[SimpleParameter]
+class SIntSpecProbe(parameter: SIntSpecParameter) extends DVInterface(parameter)
 
 object SIntSpec extends TestSuite:
   val tests = Tests:
-    given SimpleParameter(8, "SIntSpecModule")
-    val out = new StringBuilder
     test("asBits"):
-      verilogTest(new SIntSpecIO, new SIntSpecProbe)(
+      @generator
+      object AsBits extends Generator[SIntSpecParameter, SIntSpecIO, SIntSpecProbe] with HasVerilogTest:
+        def architecture(parameter: SIntSpecParameter) =
+          val io = summon[Interface[SIntSpecIO]]
+          io.sint.dontCare()
+          io.bool.dontCare()
+          io.bits := io.a.asBits
+      AsBits.verilogTest(SIntSpecParameter(8))(
         "assign bits = a;"
-      ):
-        val p  = summon[SimpleParameter]
-        val io = summon[Interface[SIntSpecIO]]
-        io.sint.dontCare()
-        io.bool.dontCare()
-        io.bits := io.a.asBits
+      )
+
     test("+"):
-      verilogTest(new SIntSpecIO, new SIntSpecProbe)(
+      @generator
+      object Plus extends Generator[SIntSpecParameter, SIntSpecIO, SIntSpecProbe] with HasVerilogTest:
+        def architecture(parameter: SIntSpecParameter) =
+          val io = summon[Interface[SIntSpecIO]]
+          io.sint := io.a + io.b
+          io.bool.dontCare()
+          io.bits.dontCare()
+      Plus.verilogTest(SIntSpecParameter(8))(
         "assign sint = {a[7], a} + {b[7], b};"
-      ):
-        val p  = summon[SimpleParameter]
-        val io = summon[Interface[SIntSpecIO]]
-        io.sint := io.a + io.b
-        io.bool.dontCare()
-        io.bits.dontCare()
+      )
+
     test("-"):
-      verilogTest(new SIntSpecIO, new SIntSpecProbe)(
+      @generator
+      object Minus extends Generator[SIntSpecParameter, SIntSpecIO, SIntSpecProbe] with HasVerilogTest:
+        def architecture(parameter: SIntSpecParameter) =
+          val io = summon[Interface[SIntSpecIO]]
+          io.sint := io.a - io.b
+          io.bool.dontCare()
+          io.bits.dontCare()
+      Minus.verilogTest(SIntSpecParameter(8))(
         "assign sint = {a[7], a} - {b[7], b};"
-      ):
-        val p  = summon[SimpleParameter]
-        val io = summon[Interface[SIntSpecIO]]
-        io.sint := io.a - io.b
-        io.bool.dontCare()
-        io.bits.dontCare()
+      )
+
     test("*"):
-      verilogTest(new SIntSpecIO, new SIntSpecProbe)(
-        "wire [15:0] tests = {{8{a[7]}}, a} * {{8{b[7]}}, b};"
-      ):
-        val p  = summon[SimpleParameter]
-        val io = summon[Interface[SIntSpecIO]]
-        io.sint := ((io.a * io.b).asBits >> p.width).asSInt
-        io.bool.dontCare()
-        io.bits.dontCare()
+      @generator
+      object Times extends Generator[SIntSpecParameter, SIntSpecIO, SIntSpecProbe] with HasVerilogTest:
+        def architecture(parameter: SIntSpecParameter) =
+          val io = summon[Interface[SIntSpecIO]]
+          io.sint := ((io.a * io.b).asBits >> parameter.width).asSInt
+          io.bool.dontCare()
+          io.bits.dontCare()
+      Times.verilogTest(SIntSpecParameter(8))(
+        "wire [15:0] _GEN_0 = {{8{a[7]}}, a} * {{8{b[7]}}, b};"
+      )
+
     test("/"):
-      verilogTest(new SIntSpecIO, new SIntSpecProbe)(
+      @generator
+      object Div extends Generator[SIntSpecParameter, SIntSpecIO, SIntSpecProbe] with HasVerilogTest:
+        def architecture(parameter: SIntSpecParameter) =
+          val io = summon[Interface[SIntSpecIO]]
+          io.sint := io.a / io.b
+          io.bool.dontCare()
+          io.bits.dontCare()
+      Div.verilogTest(SIntSpecParameter(8))(
         "assign sint = $signed($signed({a[7], a}) / $signed({b[7], b}));"
-      ):
-        val p  = summon[SimpleParameter]
-        val io = summon[Interface[SIntSpecIO]]
-        io.sint := io.a / io.b
-        io.bool.dontCare()
-        io.bits.dontCare()
+      )
+
     test("%"):
-      verilogTest(new SIntSpecIO, new SIntSpecProbe)(
-        "wire [7:0] tests = $signed($signed(a) % $signed(b));"
-      ):
-        val p  = summon[SimpleParameter]
-        val io = summon[Interface[SIntSpecIO]]
-        io.sint := io.a % io.b
-        io.bool.dontCare()
-        io.bits.dontCare()
+      @generator
+      object Mod extends Generator[SIntSpecParameter, SIntSpecIO, SIntSpecProbe] with HasVerilogTest:
+        def architecture(parameter: SIntSpecParameter) =
+          val io = summon[Interface[SIntSpecIO]]
+          io.sint := io.a % io.b
+          io.bool.dontCare()
+          io.bits.dontCare()
+      Mod.verilogTest(SIntSpecParameter(8))(
+        "wire [7:0] _GEN_0 = $signed($signed(a) % $signed(b));"
+      )
+
     test("<"):
-      verilogTest(new SIntSpecIO, new SIntSpecProbe)(
+      @generator
+      object Less extends Generator[SIntSpecParameter, SIntSpecIO, SIntSpecProbe] with HasVerilogTest:
+        def architecture(parameter: SIntSpecParameter) =
+          val io = summon[Interface[SIntSpecIO]]
+          io.sint.dontCare()
+          io.bool := io.a < io.b
+          io.bits.dontCare()
+      Less.verilogTest(SIntSpecParameter(8))(
         "assign bool = $signed(a) < $signed(b);"
-      ):
-        val p  = summon[SimpleParameter]
-        val io = summon[Interface[SIntSpecIO]]
-        io.sint.dontCare()
-        io.bool := io.a < io.b
-        io.bits.dontCare()
+      )
+
     test("<="):
-      verilogTest(new SIntSpecIO, new SIntSpecProbe)(
+      @generator
+      object LessEqual extends Generator[SIntSpecParameter, SIntSpecIO, SIntSpecProbe] with HasVerilogTest:
+        def architecture(parameter: SIntSpecParameter) =
+          val io = summon[Interface[SIntSpecIO]]
+          io.sint.dontCare()
+          io.bool := io.a <= io.b
+          io.bits.dontCare()
+      LessEqual.verilogTest(SIntSpecParameter(8))(
         "assign bool = $signed(a) <= $signed(b);"
-      ):
-        val p  = summon[SimpleParameter]
-        val io = summon[Interface[SIntSpecIO]]
-        io.sint.dontCare()
-        io.bool := io.a <= io.b
-        io.bits.dontCare()
+      )
+
     test(">"):
-      verilogTest(new SIntSpecIO, new SIntSpecProbe)(
+      @generator
+      object Greater extends Generator[SIntSpecParameter, SIntSpecIO, SIntSpecProbe] with HasVerilogTest:
+        def architecture(parameter: SIntSpecParameter) =
+          val io = summon[Interface[SIntSpecIO]]
+          io.sint.dontCare()
+          io.bool := io.a > io.b
+          io.bits.dontCare()
+      Greater.verilogTest(SIntSpecParameter(8))(
         "assign bool = $signed(a) > $signed(b);"
-      ):
-        val p  = summon[SimpleParameter]
-        val io = summon[Interface[SIntSpecIO]]
-        io.sint.dontCare()
-        io.bool := io.a > io.b
-        io.bits.dontCare()
+      )
+
     test(">="):
-      verilogTest(new SIntSpecIO, new SIntSpecProbe)(
+      @generator
+      object GreaterEqual extends Generator[SIntSpecParameter, SIntSpecIO, SIntSpecProbe] with HasVerilogTest:
+        def architecture(parameter: SIntSpecParameter) =
+          val io = summon[Interface[SIntSpecIO]]
+          io.sint.dontCare()
+          io.bool := io.a >= io.b
+          io.bits.dontCare()
+      GreaterEqual.verilogTest(SIntSpecParameter(8))(
         "assign bool = $signed(a) >= $signed(b);"
-      ):
-        val p  = summon[SimpleParameter]
-        val io = summon[Interface[SIntSpecIO]]
-        io.sint.dontCare()
-        io.bool := io.a >= io.b
-        io.bits.dontCare()
+      )
+
     test("==="):
-      verilogTest(new SIntSpecIO, new SIntSpecProbe)(
+      @generator
+      object TripleEqual extends Generator[SIntSpecParameter, SIntSpecIO, SIntSpecProbe] with HasVerilogTest:
+        def architecture(parameter: SIntSpecParameter) =
+          val io = summon[Interface[SIntSpecIO]]
+          io.sint.dontCare()
+          io.bool := io.a === io.b
+          io.bits.dontCare()
+      TripleEqual.verilogTest(SIntSpecParameter(8))(
         "assign bool = a == b;"
-      ):
-        val p  = summon[SimpleParameter]
-        val io = summon[Interface[SIntSpecIO]]
-        io.sint.dontCare()
-        io.bool := io.a === io.b
-        io.bits.dontCare()
+      )
+
     test("=/="):
-      verilogTest(new SIntSpecIO, new SIntSpecProbe)(
+      @generator
+      object NotEqual extends Generator[SIntSpecParameter, SIntSpecIO, SIntSpecProbe] with HasVerilogTest:
+        def architecture(parameter: SIntSpecParameter) =
+          val io = summon[Interface[SIntSpecIO]]
+          io.sint.dontCare()
+          io.bool := io.a =/= io.b
+          io.bits.dontCare()
+      NotEqual.verilogTest(SIntSpecParameter(8))(
         "assign bool = a != b;"
-      ):
-        val p  = summon[SimpleParameter]
-        val io = summon[Interface[SIntSpecIO]]
-        io.sint.dontCare()
-        io.bool := io.a =/= io.b
-        io.bits.dontCare()
+      )
+
     test("<< int"):
-      verilogTest(new SIntSpecIO, new SIntSpecProbe)(
+      @generator
+      object ShiftLeftInt extends Generator[SIntSpecParameter, SIntSpecIO, SIntSpecProbe] with HasVerilogTest:
+        def architecture(parameter: SIntSpecParameter) =
+          val io = summon[Interface[SIntSpecIO]]
+          io.sint := (io.a << 2).asBits.bits(parameter.width, 0).asSInt
+          io.bool.dontCare()
+          io.bits.dontCare()
+      ShiftLeftInt.verilogTest(SIntSpecParameter(8))(
         "assign sint = {a[6:0], 2'h0};"
-      ):
-        val p  = summon[SimpleParameter]
-        val io = summon[Interface[SIntSpecIO]]
-        io.sint := (io.a << 2).asBits.bits(p.width, 0).asSInt
-        io.bool.dontCare()
-        io.bits.dontCare()
+      )
+
     test("<< uint"):
-      verilogTest(new SIntSpecIO, new SIntSpecProbe)(
-        "wire [262:0] tests = {{255{a[7]}}, a} << c;",
-        "assign sint = tests[8:0];"
-      ):
-        val p  = summon[SimpleParameter]
-        val io = summon[Interface[SIntSpecIO]]
-        io.sint := (io.a << io.c).asBits.bits(p.width, 0).asSInt
-        io.bool.dontCare()
-        io.bits.dontCare()
+      @generator
+      object ShiftLeftUInt extends Generator[SIntSpecParameter, SIntSpecIO, SIntSpecProbe] with HasVerilogTest:
+        def architecture(parameter: SIntSpecParameter) =
+          val io = summon[Interface[SIntSpecIO]]
+          io.sint := (io.a << io.c).asBits.bits(parameter.width, 0).asSInt
+          io.bool.dontCare()
+          io.bits.dontCare()
+      ShiftLeftUInt.verilogTest(SIntSpecParameter(8))(
+        "wire [262:0] _GEN_0 = {{255{a[7]}}, a} << c;",
+        "assign sint = _GEN_0[8:0];"
+      )
+
     test(">> int"):
-      verilogTest(new SIntSpecIO, new SIntSpecProbe)(
+      @generator
+      object ShiftRightInt extends Generator[SIntSpecParameter, SIntSpecIO, SIntSpecProbe] with HasVerilogTest:
+        def architecture(parameter: SIntSpecParameter) =
+          val io = summon[Interface[SIntSpecIO]]
+          io.sint := io.a >> 4
+          io.bool.dontCare()
+          io.bits.dontCare()
+      ShiftRightInt.verilogTest(SIntSpecParameter(8))(
         "assign sint = {{5{a[7]}}, a[7:4]};"
-      ):
-        val p  = summon[SimpleParameter]
-        val io = summon[Interface[SIntSpecIO]]
-        io.sint := io.a >> 4
-        io.bool.dontCare()
-        io.bits.dontCare()
+      )
+
     test(">> uint"):
-      verilogTest(new SIntSpecIO, new SIntSpecProbe)(
-        "wire [7:0] tests = $signed($signed(a) >>> c);",
-        "assign sint = {tests[7], tests};"
-      ):
-        val p  = summon[SimpleParameter]
-        val io = summon[Interface[SIntSpecIO]]
-        io.sint := io.a >> io.c
-        io.bool.dontCare()
-        io.bits.dontCare()
+      @generator
+      object ShiftRightUInt extends Generator[SIntSpecParameter, SIntSpecIO, SIntSpecProbe] with HasVerilogTest:
+        def architecture(parameter: SIntSpecParameter) =
+          val io = summon[Interface[SIntSpecIO]]
+          io.sint := io.a >> io.c
+          io.bool.dontCare()
+          io.bits.dontCare()
+      ShiftRightUInt.verilogTest(SIntSpecParameter(8))(
+        "wire [7:0] _GEN_0 = $signed($signed(a) >>> c);",
+        "assign sint = {_GEN_0[7], _GEN_0};"
+      )

@@ -17,7 +17,8 @@ object `package` extends RootModule with ScalaModule with ScalafmtModule with Za
   def ivyDeps      = Task(Seq(v.mainargs, v.oslib, v.upickle, v.sourcecode))
   def moduleDeps   = Seq(circtlib)
 
-  override def scalacOptions: Target[Seq[String]] = Task(super.scalacOptions() ++ Some("-Xprint-suspension"))
+  // Due to a bug of macro in utest, we have to disable -Xcheck-macros to make dotty happy
+  override def scalacOptions: Target[Seq[String]] = Task(super.scalacOptions() ++ Seq("-Xprint-suspension", "-experimental", "-Xcheck-macros"))
 
   object lit extends ScalaModule with ScalafmtModule {
     def scalaVersion = Task(v.scala)
@@ -38,10 +39,12 @@ object `package` extends RootModule with ScalaModule with ScalafmtModule with Za
   }
 
   object benchmark extends ScalaModule with JmhModule {
+
     def scalaVersion   = Task(v.scala)
     def moduleDeps     = Seq(tests)
     def jmhCoreVersion = Task(v.jmh)
-    def forkArgs: T[Seq[String]] = Task(
+    override def scalacOptions: Target[Seq[String]] = Task(super.scalacOptions() :+ "-experimental")
+    override def forkArgs: T[Seq[String]] = Task(
       super.forkArgs() ++ circtlib.forkArgs()
     )
     def runJmh(args: String*) = Task.Command {
@@ -61,6 +64,8 @@ object `package` extends RootModule with ScalaModule with ScalafmtModule with Za
   }
 
   object tests extends ScalaTests with ScalafmtModule with Utest {
+    override def scalacOptions: Target[Seq[String]] = Task(super.scalacOptions().filterNot(_ == "-Xcheck-macros"))
+
     def ivyDeps = Agg(v.utest)
 
     override def forkArgs: T[Seq[String]] = Task(

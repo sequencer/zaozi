@@ -25,9 +25,10 @@ class SimpleBundleA extends Bundle:
 class SimpleBundleB extends Bundle:
   val b = Aligned(UInt(32.W))
 
-class BundleSpecIO(
-  using SimpleParameter)
-    extends HWInterface[SimpleParameter]:
+case class BundleSpecParameter(width: Int) extends Parameter
+given upickle.default.ReadWriter[BundleSpecParameter] = upickle.default.macroRW
+
+class BundleSpecIO(parameter: BundleSpecParameter) extends HWInterface(parameter):
   val a = Aligned(UInt(32.W))
   val b = Flipped(UInt(32.W))
   val c = Aligned(new Bundle {
@@ -39,78 +40,115 @@ class BundleSpecIO(
   val i = 32
   val j = Aligned(new TypeParamIO(new SimpleBundleA, new SimpleBundleB))
 
-class BundleSpecProbe(
-  using SimpleParameter)
-    extends DVInterface[SimpleParameter]
+class BundleSpecProbe(parameter: BundleSpecParameter) extends DVInterface(parameter)
 
 object BundleSpec extends TestSuite:
   val tests = Tests:
-    given SimpleParameter(8, "BundleSpecModule")
     test("Bundle in Bundle should work"):
-      firrtlTest(new BundleSpecIO, new BundleSpecProbe)(
-        "connect io.a, io.f.g"
-      ):
-        val io = summon[Interface[BundleSpecIO]]
-        io.a := io.f.g
-    test("Bundle with type parameter should work"):
-      firrtlTest(new BundleSpecIO, new BundleSpecProbe)(
-        "connect io.a, io.j.a.a"
-      ):
-        val io = summon[Interface[BundleSpecIO]]
-        io.a := io.j.a.a
-    test("Custom val name"):
-      firrtlTest(new BundleSpecIO, new BundleSpecProbe)(
-        "connect io.a, io.hhh"
-      ):
-        val io = summon[Interface[BundleSpecIO]]
-        io.a := io.h
-    test("Symbol found"):
-      firrtlTest(new BundleSpecIO, new BundleSpecProbe)(
-        "connect io.a, io.b"
-      ):
-        val io = summon[Interface[BundleSpecIO]]
-        io.a := io.b
-    test("failures"):
-      given Arena   = Arena.ofConfined()
-      given Context = summon[ContextApi].contextCreate
-      summon[Context].loadFirrtlDialect()
-      test("Subaccess on non-Bundle type"):
-        summon[ConstructorApi].Module(new BundleSpecIO, new BundleSpecProbe):
+      @generator
+      object BundleInBundleShouldWork
+          extends Generator[BundleSpecParameter, BundleSpecIO, BundleSpecProbe]
+          with HasFirrtlTest:
+        def architecture(parameter: BundleSpecParameter) =
           val io = summon[Interface[BundleSpecIO]]
-          compileError("""io.a.a""").check(
-            "",
-            "Type parameter T must be a subtype of DynamicSubfield, but got me.jiuyang.zaozi.valuetpe.UInt."
-          )
+          io.a := io.f.g
+      BundleInBundleShouldWork.firrtlTest(BundleSpecParameter(32))(
+        "connect io.a, io.f.g"
+      )
+
+    test("Bundle with type parameter should work"):
+      @generator
+      object BundleWithTypeParameterShouldWork
+          extends Generator[BundleSpecParameter, BundleSpecIO, BundleSpecProbe]
+          with HasFirrtlTest:
+        def architecture(parameter: BundleSpecParameter) =
+          val io = summon[Interface[BundleSpecIO]]
+          io.a := io.j.a.a
+      BundleWithTypeParameterShouldWork.firrtlTest(BundleSpecParameter(32))(
+        "connect io.a, io.j.a.a"
+      )
+
+    test("Custom val name"):
+      @generator
+      object CustomValName extends Generator[BundleSpecParameter, BundleSpecIO, BundleSpecProbe] with HasFirrtlTest:
+        def architecture(parameter: BundleSpecParameter) =
+          val io = summon[Interface[BundleSpecIO]]
+          io.a := io.h
+      CustomValName.firrtlTest(BundleSpecParameter(32))(
+        "connect io.a, io.hhh"
+      )
+
+    test("Symbol found"):
+      @generator
+      object SymbolFound extends Generator[BundleSpecParameter, BundleSpecIO, BundleSpecProbe] with HasFirrtlTest:
+        def architecture(parameter: BundleSpecParameter) =
+          val io = summon[Interface[BundleSpecIO]]
+          io.a := io.b
+      SymbolFound.firrtlTest(BundleSpecParameter(32))(
+        "connect io.a, io.b"
+      )
+
+      test("Subaccess on non-Bundle type"):
+        @generator
+        object SubaccessOnNonBundleType
+            extends Generator[BundleSpecParameter, BundleSpecIO, BundleSpecProbe]
+            with HasCompileErrorTest:
+          def architecture(parameter: BundleSpecParameter) =
+            val io = summon[Interface[BundleSpecIO]]
+            compileError("""io.a.a""").check(
+              "",
+              "Type parameter T must be a subtype of DynamicSubfield, but got me.jiuyang.zaozi.valuetpe.UInt."
+            )
+        SubaccessOnNonBundleType.compileErrorTest(BundleSpecParameter(32))
 
       test("Symbol not found"):
-        summon[ConstructorApi].Module(new BundleSpecIO, new BundleSpecProbe):
-          val io = summon[Interface[BundleSpecIO]]
-          compileError("""io.fourzerofour""").check(
-            "",
-            "Field 'fourzerofour' does not exist in type me.jiuyang.zaozi.tests.BundleSpecIO."
-          )
+        @generator
+        object SymbolNotFound
+            extends Generator[BundleSpecParameter, BundleSpecIO, BundleSpecProbe]
+            with HasCompileErrorTest:
+          def architecture(parameter: BundleSpecParameter) =
+            val io = summon[Interface[BundleSpecIO]]
+            compileError("""io.fourzerofour""").check(
+              "",
+              "Field 'fourzerofour' does not exist in type me.jiuyang.zaozi.tests.BundleSpecIO."
+            )
+        SymbolNotFound.compileErrorTest(BundleSpecParameter(32))
 
-      test("Access non Data type"):
-        test("Int"):
-          summon[ConstructorApi].Module(new BundleSpecIO, new BundleSpecProbe):
+      test("Access non Data type - Int"):
+        @generator
+        object AccessNonDataTypeInt
+            extends Generator[BundleSpecParameter, BundleSpecIO, BundleSpecProbe]
+            with HasCompileErrorTest:
+          def architecture(parameter: BundleSpecParameter) =
             val io = summon[Interface[BundleSpecIO]]
             compileError("""io.i""").check(
               "",
               "Field type 'scala.Int' does not conform to the upper bound BundleField."
             )
+        AccessNonDataTypeInt.compileErrorTest(BundleSpecParameter(32))
 
-        test("UInt"):
-          summon[ConstructorApi].Module(new BundleSpecIO, new BundleSpecProbe):
+      test("Access non Data type - UInt"):
+        @generator
+        object AccessNonDataTypeUInt
+            extends Generator[BundleSpecParameter, BundleSpecIO, BundleSpecProbe]
+            with HasCompileErrorTest:
+          def architecture(parameter: BundleSpecParameter) =
             val io = summon[Interface[BundleSpecIO]]
             compileError("""io.e""").check(
               "",
               "Field type 'me.jiuyang.zaozi.valuetpe.UInt' does not conform to the upper bound BundleField."
             )
+        AccessNonDataTypeUInt.compileErrorTest(BundleSpecParameter(32))
 
       test("Structural Type doesn't work"):
-        summon[ConstructorApi].Module(new BundleSpecIO, new BundleSpecProbe):
-          val io = summon[Interface[BundleSpecIO]]
-          compileError("""io.c.d""").check(
-            "",
-            "Field 'd' does not exist in type me.jiuyang.zaozi.valuetpe.Bundle."
-          )
+        @generator
+        object StructuralTypeDoesntWork
+            extends Generator[BundleSpecParameter, BundleSpecIO, BundleSpecProbe]
+            with HasCompileErrorTest:
+          def architecture(parameter: BundleSpecParameter) =
+            val io = summon[Interface[BundleSpecIO]]
+            compileError("""io.c.d""").check(
+              "",
+              "Field 'd' does not exist in type me.jiuyang.zaozi.valuetpe.Bundle."
+            )
+        StructuralTypeDoesntWork.compileErrorTest(BundleSpecParameter(32))
