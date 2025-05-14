@@ -45,107 +45,107 @@ import utest.assert
 
 import java.lang.foreign.Arena
 
-def mlirTest[PARAM <: Parameter, I <: HWInterface[PARAM], P <: DVInterface[PARAM]](
-  io:         I,
-  probe:      P
-)(checkLines: String*
-)(body:       (Arena, Context, Block, Seq[LayerTree]) ?=> (PARAM, Interface[I], Interface[P]) => Unit
-)(
-  using PARAM
-): Unit =
-  given Arena      = Arena.ofConfined()
-  given Context    = summon[ContextApi].contextCreate
-  summon[Context].loadFirrtlDialect()
-  given MlirModule = summon[MlirModuleApi].moduleCreateEmpty(summon[LocationApi].locationUnknownGet)
+trait HasMlirTest:
+  this: Generator[?, ?, ?] =>
+  private val self = this.asInstanceOf[Generator[this.TPARAM, this.TINTF, this.TPROBE]]
 
-  // Then based on the module to construct the circuit.
-  given Circuit = summon[CircuitApi].op(summon[PARAM].moduleName)
-  summon[Circuit].appendToModule()
-  summon[ConstructorApi].Module(io, probe)(body).appendToCircuit()
-  validateCircuit()
+  def mlirTest(
+    parameter:  this.TPARAM
+  )(checkLines: String*
+  ) =
+    given Arena      = Arena.ofConfined()
+    given Context    = summon[ContextApi].contextCreate
+    summon[Context].loadFirrtlDialect()
+    given MlirModule = summon[MlirModuleApi].moduleCreateEmpty(summon[LocationApi].locationUnknownGet)
+    given Circuit    = summon[CircuitApi].op(parameter.moduleName)
+    summon[Circuit].appendToModule()
+    self.module(parameter).appendToCircuit()
+    validateCircuit()
 
-  val out = new StringBuilder
-  summon[MlirModule].getOperation.print(out ++= _)
-  summon[Context].destroy()
-  summon[Arena].close()
-  if (checkLines.isEmpty)
-    assert(out.toString == "Nothing To Check")
-  else checkLines.foreach(l => assert(out.toString.contains(l)))
+    val out = new StringBuilder
+    summon[MlirModule].getOperation.print(out ++= _)
+    summon[Context].destroy()
+    summon[Arena].close()
+    if (checkLines.isEmpty)
+      assert(out.toString == "Nothing To Check")
+    else checkLines.foreach(l => assert(out.toString.contains(l)))
 
-def firrtlTest[PARAM <: Parameter, I <: HWInterface[PARAM], P <: DVInterface[PARAM]](
-  io:         I,
-  probe:      P
-)(checkLines: String*
-)(body:       (Arena, Context, Block, Seq[LayerTree], PARAM, Interface[I], Interface[P]) ?=> Unit
-)(
-  using PARAM
-): Unit =
-  given Arena      = Arena.ofConfined()
-  given Context    = summon[ContextApi].contextCreate
-  summon[Context].loadFirrtlDialect()
-  // Then based on the module to construct the circuit.
-  given MlirModule = summon[MlirModuleApi].moduleCreateEmpty(summon[LocationApi].locationUnknownGet)
-  given Circuit    = summon[CircuitApi].op(summon[PARAM].moduleName)
-  summon[Circuit].appendToModule()
-  summon[ConstructorApi].Module(io, probe)(body).appendToCircuit()
+trait HasFirrtlTest:
+  this: Generator[?, ?, ?] =>
+  private val self = this.asInstanceOf[Generator[this.TPARAM, this.TINTF, this.TPROBE]]
 
-  validateCircuit()
-  val out = new StringBuilder
-  summon[MlirModule].exportFIRRTL(out ++= _)
-  summon[Context].destroy()
-  summon[Arena].close()
-  if (checkLines.isEmpty)
-    assert(out.toString == "Nothing To Check")
-  else checkLines.foreach(l => assert(out.toString.contains(l)))
+  def firrtlTest(
+    parameter:  this.TPARAM
+  )(checkLines: String*
+  ) =
+    given Arena      = Arena.ofConfined()
+    given Context    = summon[ContextApi].contextCreate
+    summon[Context].loadFirrtlDialect()
+    given MlirModule = summon[MlirModuleApi].moduleCreateEmpty(summon[LocationApi].locationUnknownGet)
+    given Circuit    = summon[CircuitApi].op(parameter.moduleName)
+    summon[Circuit].appendToModule()
+    self.module(parameter).appendToCircuit()
 
-def verilogTest[PARAM <: Parameter, I <: HWInterface[PARAM], P <: DVInterface[PARAM]](
-  io:         I,
-  probe:      P
-)(checkLines: String*
-)(body:       (Arena, Context, Block, Seq[LayerTree], PARAM, Interface[I], Interface[P]) ?=> Unit
-)(
-  using PARAM
-): Unit =
-  given Arena          = Arena.ofConfined()
-  given Context        = summon[ContextApi].contextCreate
-  summon[Context].loadFirrtlDialect()
-  summon[Context].loadSvDialect()
-  summon[Context].loadEmitDialect()
-  given FirtoolOptions = summon[FirtoolOptionsApi].createDefault()
+    validateCircuit()
+    val out = new StringBuilder
+    summon[MlirModule].exportFIRRTL(out ++= _)
+    summon[Context].destroy()
+    summon[Arena].close()
+    if (checkLines.isEmpty)
+      assert(out.toString == "Nothing To Check")
+    else checkLines.foreach(l => assert(out.toString.contains(l)))
 
-  given PassManager  = summon[org.llvm.mlir.scalalib.PassManagerApi].passManagerCreate
-  val out            = new StringBuilder
-  val firtoolOptions = summon[FirtoolOptions]
-  summon[PassManager].populatePreprocessTransforms(firtoolOptions)
-  summon[PassManager].populateCHIRRTLToLowFIRRTL(firtoolOptions)
-  summon[PassManager].populateLowFIRRTLToHW(firtoolOptions, "")
-  summon[PassManager].populateHWToSV(firtoolOptions)
-  // TODO: we need a pass for export verilog on a MLIRModule, not it export empty string.
-  summon[PassManager].populateExportVerilog(firtoolOptions, out ++= _)
+trait HasVerilogTest:
+  this: Generator[?, ?, ?] =>
+  private val self = this.asInstanceOf[Generator[this.TPARAM, this.TINTF, this.TPROBE]]
 
-  // Then based on the module to construct the circuit.
-  given MlirModule = summon[MlirModuleApi].moduleCreateEmpty(summon[LocationApi].locationUnknownGet)
-  given Circuit    = summon[CircuitApi].op(summon[PARAM].moduleName)
-  summon[Circuit].appendToModule()
-  summon[ConstructorApi].Module(io, probe)(body).appendToCircuit()
-  validateCircuit()
-  summon[PassManager].runOnOp(summon[MlirModule].getOperation)
-  summon[Context].destroy()
-  summon[Arena].close()
-  if (checkLines.isEmpty)
-    assert(out.toString == "Nothing To Check")
-  else checkLines.foreach(l => assert(out.toString.contains(l)))
+  def verilogTest(
+    parameter:  this.TPARAM
+  )(checkLines: String*
+  ) =
+    given Arena          = Arena.ofConfined()
+    given Context        = summon[ContextApi].contextCreate
+    summon[Context].loadFirrtlDialect()
+    summon[Context].loadSvDialect()
+    summon[Context].loadEmitDialect()
+    given FirtoolOptions = summon[FirtoolOptionsApi].createDefault()
 
-case class SimpleParameter(width: Int, moduleName: String) extends Parameter:
-  def layers: Seq[Layer] = Seq.empty
+    given PassManager  = summon[org.llvm.mlir.scalalib.PassManagerApi].passManagerCreate
+    val out            = new StringBuilder
+    val firtoolOptions = summon[FirtoolOptions]
+    summon[PassManager].populatePreprocessTransforms(firtoolOptions)
+    summon[PassManager].populateCHIRRTLToLowFIRRTL(firtoolOptions)
+    summon[PassManager].populateLowFIRRTLToHW(firtoolOptions, "")
+    summon[PassManager].populateHWToSV(firtoolOptions)
+    // TODO: we need a pass for export verilog on a MLIRModule, not it export empty string.
+    summon[PassManager].populateExportVerilog(firtoolOptions, out ++= _)
 
-class PassthroughIO(
-  using SimpleParameter)
-    extends HWInterface[SimpleParameter]:
-  val parameter = summon[SimpleParameter]
-  val i         = Flipped(UInt(parameter.width.W))
-  val o         = Aligned(UInt(parameter.width.W))
+    given MlirModule = summon[MlirModuleApi].moduleCreateEmpty(summon[LocationApi].locationUnknownGet)
+    given Circuit    = summon[CircuitApi].op(parameter.moduleName)
+    summon[Circuit].appendToModule()
+    self.module(parameter).appendToCircuit()
+    validateCircuit()
+    summon[PassManager].runOnOp(summon[MlirModule].getOperation)
+    summon[Context].destroy()
+    summon[Arena].close()
+    if (checkLines.isEmpty)
+      assert(out.toString == "Nothing To Check")
+    else checkLines.foreach(l => assert(out.toString.contains(l)))
 
-class PassthroughProbe(
-  using SimpleParameter)
-    extends DVInterface[SimpleParameter]
+trait HasCompileErrorTest:
+  this: Generator[?, ?, ?] =>
+  private val self = this.asInstanceOf[Generator[this.TPARAM, this.TINTF, this.TPROBE]]
+
+  def compileErrorTest(
+    parameter: this.TPARAM
+  ) =
+    given Arena      = Arena.ofConfined()
+    given Context    = summon[ContextApi].contextCreate
+    summon[Context].loadFirrtlDialect()
+    given MlirModule = summon[MlirModuleApi].moduleCreateEmpty(summon[LocationApi].locationUnknownGet)
+    given Circuit    = summon[CircuitApi].op(parameter.moduleName)
+    summon[Circuit].appendToModule()
+    self.module(parameter).appendToCircuit()
+
+    summon[Context].destroy()
+    summon[Arena].close()

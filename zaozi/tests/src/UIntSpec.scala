@@ -18,10 +18,10 @@ import utest.*
 
 import java.lang.foreign.Arena
 
-class UIntSpecIO(
-  using SimpleParameter)
-    extends HWInterface[SimpleParameter]:
-  val parameter  = summon[SimpleParameter]
+case class UIntSpecParameter(width: Int) extends Parameter
+given upickle.default.ReadWriter[UIntSpecParameter] = upickle.default.macroRW
+
+class UIntSpecIO(parameter: UIntSpecParameter) extends HWInterface(parameter):
   val a          = Flipped(UInt(parameter.width.W))
   val b          = Flipped(UInt(parameter.width.W))
   val c          = Flipped(UInt(parameter.width.W))
@@ -32,143 +32,199 @@ class UIntSpecIO(
   val clock      = Flipped(Clock())
   val asyncReset = Flipped(AsyncReset())
 
-class UIntSpecProbe(
-  using SimpleParameter)
-    extends DVInterface[SimpleParameter]
+class UIntSpecProbe(parameter: UIntSpecParameter) extends DVInterface(parameter)
 
 object UIntSpec extends TestSuite:
   val tests = Tests:
-    given SimpleParameter(8, "UIntSpecModule")
-    val out = new StringBuilder
     test("asBits"):
-      verilogTest(new UIntSpecIO, new UIntSpecProbe)(
+      @generator
+      object AsBits extends Generator[UIntSpecParameter, UIntSpecIO, UIntSpecProbe] with HasVerilogTest:
+        def architecture(parameter: UIntSpecParameter) =
+          val io = summon[Interface[UIntSpecIO]]
+          io.uint.dontCare()
+          io.bool.dontCare()
+          io.bits := io.a.asBits
+      AsBits.verilogTest(UIntSpecParameter(8))(
         "assign bits = a;"
-      ):
-        val io = summon[Interface[UIntSpecIO]]
-        io.uint.dontCare()
-        io.bool.dontCare()
-        io.bits := io.a.asBits
+      )
+
     test("+"):
-      verilogTest(new UIntSpecIO, new UIntSpecProbe)(
+      @generator
+      object Plus extends Generator[UIntSpecParameter, UIntSpecIO, UIntSpecProbe] with HasVerilogTest:
+        def architecture(parameter: UIntSpecParameter) =
+          val io = summon[Interface[UIntSpecIO]]
+          io.uint := io.a + io.b
+          io.bool.dontCare()
+          io.bits.dontCare()
+      Plus.verilogTest(UIntSpecParameter(8))(
         "assign uint = {1'h0, a} + {1'h0, b};"
-      ):
-        val io = summon[Interface[UIntSpecIO]]
-        io.uint := io.a + io.b
-        io.bool.dontCare()
-        io.bits.dontCare()
+      )
+
     test("-"):
-      verilogTest(new UIntSpecIO, new UIntSpecProbe)(
+      @generator
+      object Minus extends Generator[UIntSpecParameter, UIntSpecIO, UIntSpecProbe] with HasVerilogTest:
+        def architecture(parameter: UIntSpecParameter) =
+          val io = summon[Interface[UIntSpecIO]]
+          io.uint := io.a - io.b
+          io.bool.dontCare()
+          io.bits.dontCare()
+      Minus.verilogTest(UIntSpecParameter(8))(
         "assign uint = {1'h0, a} - {1'h0, b};"
-      ):
-        val io = summon[Interface[UIntSpecIO]]
-        io.uint := io.a - io.b
-        io.bool.dontCare()
-        io.bits.dontCare()
+      )
+
     test("*"):
-      verilogTest(new UIntSpecIO, new UIntSpecProbe)(
+      @generator
+      object Multiplication extends Generator[UIntSpecParameter, UIntSpecIO, UIntSpecProbe] with HasVerilogTest:
+        def architecture(parameter: UIntSpecParameter) =
+          val io = summon[Interface[UIntSpecIO]]
+          io.uint := (io.a * io.b).asBits.bits(parameter.width, 0).asUInt
+          io.bool.dontCare()
+          io.bits.dontCare()
+      Multiplication.verilogTest(UIntSpecParameter(8))(
         "assign uint = {1'h0, a} * {1'h0, b};"
-      ):
-        val p  = summon[SimpleParameter]
-        val io = summon[Interface[UIntSpecIO]]
-        io.uint := (io.a * io.b).asBits.bits(p.width, 0).asUInt
-        io.bool.dontCare()
-        io.bits.dontCare()
+      )
+
     test("/"):
-      verilogTest(new UIntSpecIO, new UIntSpecProbe)(
+      @generator
+      object Divide extends Generator[UIntSpecParameter, UIntSpecIO, UIntSpecProbe] with HasVerilogTest:
+        def architecture(parameter: UIntSpecParameter) =
+          val io = summon[Interface[UIntSpecIO]]
+          io.uint := io.a / io.b
+          io.bool.dontCare()
+          io.bits.dontCare()
+      Divide.verilogTest(UIntSpecParameter(8))(
         "assign uint = {1'h0, a / b};"
-      ):
-        val io = summon[Interface[UIntSpecIO]]
-        io.uint := io.a / io.b
-        io.bool.dontCare()
-        io.bits.dontCare()
+      )
+
     test("%"):
-      verilogTest(new UIntSpecIO, new UIntSpecProbe)(
+      @generator
+      object Modulo extends Generator[UIntSpecParameter, UIntSpecIO, UIntSpecProbe] with HasVerilogTest:
+        def architecture(parameter: UIntSpecParameter) =
+          val io = summon[Interface[UIntSpecIO]]
+          io.uint := io.a % io.b
+          io.bool.dontCare()
+          io.bits.dontCare()
+      Modulo.verilogTest(UIntSpecParameter(8))(
         "assign uint = {1'h0, a % b};"
-      ):
-        val io = summon[Interface[UIntSpecIO]]
-        io.uint := io.a % io.b
-        io.bool.dontCare()
-        io.bits.dontCare()
+      )
+
     test("<"):
-      verilogTest(new UIntSpecIO, new UIntSpecProbe)(
+      @generator
+      object LessThan extends Generator[UIntSpecParameter, UIntSpecIO, UIntSpecProbe] with HasVerilogTest:
+        def architecture(parameter: UIntSpecParameter) =
+          val io = summon[Interface[UIntSpecIO]]
+          io.uint.dontCare()
+          io.bool := io.a < io.b
+          io.bits.dontCare()
+      LessThan.verilogTest(UIntSpecParameter(8))(
         "assign bool = a < b;"
-      ):
-        val io = summon[Interface[UIntSpecIO]]
-        io.uint.dontCare()
-        io.bool := io.a < io.b
-        io.bits.dontCare()
+      )
+
     test("<="):
-      verilogTest(new UIntSpecIO, new UIntSpecProbe)(
+      @generator
+      object LessEqual extends Generator[UIntSpecParameter, UIntSpecIO, UIntSpecProbe] with HasVerilogTest:
+        def architecture(parameter: UIntSpecParameter) =
+          val io = summon[Interface[UIntSpecIO]]
+          io.uint.dontCare()
+          io.bool := io.a <= io.b
+          io.bits.dontCare()
+      LessEqual.verilogTest(UIntSpecParameter(8))(
         "assign bool = a <= b;"
-      ):
-        val io = summon[Interface[UIntSpecIO]]
-        io.uint.dontCare()
-        io.bool := io.a <= io.b
-        io.bits.dontCare()
+      )
+
     test(">"):
-      verilogTest(new UIntSpecIO, new UIntSpecProbe)(
+      @generator
+      object GreaterThan extends Generator[UIntSpecParameter, UIntSpecIO, UIntSpecProbe] with HasVerilogTest:
+        def architecture(parameter: UIntSpecParameter) =
+          val io = summon[Interface[UIntSpecIO]]
+          io.uint.dontCare()
+          io.bool := io.a > io.b
+          io.bits.dontCare()
+      GreaterThan.verilogTest(UIntSpecParameter(8))(
         "assign bool = a > b;"
-      ):
-        val io = summon[Interface[UIntSpecIO]]
-        io.uint.dontCare()
-        io.bool := io.a > io.b
-        io.bits.dontCare()
+      )
+
     test(">="):
-      verilogTest(new UIntSpecIO, new UIntSpecProbe)(
+      @generator
+      object GreaterEqual extends Generator[UIntSpecParameter, UIntSpecIO, UIntSpecProbe] with HasVerilogTest:
+        def architecture(parameter: UIntSpecParameter) =
+          val io = summon[Interface[UIntSpecIO]]
+          io.uint.dontCare()
+          io.bool := io.a >= io.b
+          io.bits.dontCare()
+      GreaterEqual.verilogTest(UIntSpecParameter(8))(
         "assign bool = a >= b;"
-      ):
-        val io = summon[Interface[UIntSpecIO]]
-        io.uint.dontCare()
-        io.bool := io.a >= io.b
-        io.bits.dontCare()
+      )
+
     test("==="):
-      verilogTest(new UIntSpecIO, new UIntSpecProbe)(
+      @generator
+      object EqEqEq extends Generator[UIntSpecParameter, UIntSpecIO, UIntSpecProbe] with HasVerilogTest:
+        def architecture(parameter: UIntSpecParameter) =
+          val io = summon[Interface[UIntSpecIO]]
+          io.uint.dontCare()
+          io.bool := io.a === io.b
+          io.bits.dontCare()
+      EqEqEq.verilogTest(UIntSpecParameter(8))(
         "assign bool = a == b;"
-      ):
-        val io = summon[Interface[UIntSpecIO]]
-        io.uint.dontCare()
-        io.bool := io.a === io.b
-        io.bits.dontCare()
+      )
+
     test("=/="):
-      verilogTest(new UIntSpecIO, new UIntSpecProbe)(
+      @generator
+      object NotEqual extends Generator[UIntSpecParameter, UIntSpecIO, UIntSpecProbe] with HasVerilogTest:
+        def architecture(parameter: UIntSpecParameter) =
+          val io = summon[Interface[UIntSpecIO]]
+          io.uint.dontCare()
+          io.bool := io.a =/= io.b
+          io.bits.dontCare()
+      NotEqual.verilogTest(UIntSpecParameter(8))(
         "assign bool = a != b;"
-      ):
-        val io = summon[Interface[UIntSpecIO]]
-        io.uint.dontCare()
-        io.bool := io.a =/= io.b
-        io.bits.dontCare()
+      )
+
     test("<< int"):
-      verilogTest(new UIntSpecIO, new UIntSpecProbe)(
+      @generator
+      object LeftShiftInt extends Generator[UIntSpecParameter, UIntSpecIO, UIntSpecProbe] with HasVerilogTest:
+        def architecture(parameter: UIntSpecParameter) =
+          val io = summon[Interface[UIntSpecIO]]
+          io.uint := (io.a << 2).asBits.bits(parameter.width, 0).asUInt
+          io.bool.dontCare()
+          io.bits.dontCare()
+      LeftShiftInt.verilogTest(UIntSpecParameter(8))(
         "assign uint = {a[6:0], 2'h0};"
-      ):
-        val p  = summon[SimpleParameter]
-        val io = summon[Interface[UIntSpecIO]]
-        io.uint := (io.a << 2).asBits.bits(p.width, 0).asUInt
-        io.bool.dontCare()
-        io.bits.dontCare()
+      )
+
     test("<< uint"):
-      verilogTest(new UIntSpecIO, new UIntSpecProbe)(
-        "wire [262:0] tests = {255'h0, a} << b;",
-        "assign uint = tests[8:0];"
-      ):
-        val p  = summon[SimpleParameter]
-        val io = summon[Interface[UIntSpecIO]]
-        io.uint := (io.a << io.b).asBits.bits(p.width, 0).asUInt
-        io.bool.dontCare()
-        io.bits.dontCare()
+      @generator
+      object LeftShiftUInt extends Generator[UIntSpecParameter, UIntSpecIO, UIntSpecProbe] with HasVerilogTest:
+        def architecture(parameter: UIntSpecParameter) =
+          val io = summon[Interface[UIntSpecIO]]
+          io.uint := (io.a << io.b).asBits.bits(parameter.width, 0).asUInt
+          io.bool.dontCare()
+          io.bits.dontCare()
+      LeftShiftUInt.verilogTest(UIntSpecParameter(8))(
+        "wire [262:0] _GEN_1 = {255'h0, a} << b;",
+        "assign uint = _GEN_1[8:0];"
+      )
+
     test(">> int"):
-      verilogTest(new UIntSpecIO, new UIntSpecProbe)(
+      @generator
+      object RightShiftInt extends Generator[UIntSpecParameter, UIntSpecIO, UIntSpecProbe] with HasVerilogTest:
+        def architecture(parameter: UIntSpecParameter) =
+          val io = summon[Interface[UIntSpecIO]]
+          io.uint := io.a >> 4
+          io.bool.dontCare()
+          io.bits.dontCare()
+      RightShiftInt.verilogTest(UIntSpecParameter(8))(
         "assign uint = {5'h0, a[7:4]};"
-      ):
-        val io = summon[Interface[UIntSpecIO]]
-        io.uint := io.a >> 4
-        io.bool.dontCare()
-        io.bits.dontCare()
+      )
+
     test(">> uint"):
-      verilogTest(new UIntSpecIO, new UIntSpecProbe)(
+      @generator
+      object RightShiftUInt extends Generator[UIntSpecParameter, UIntSpecIO, UIntSpecProbe] with HasVerilogTest:
+        def architecture(parameter: UIntSpecParameter) =
+          val io = summon[Interface[UIntSpecIO]]
+          io.uint := io.a >> io.b
+          io.bool.dontCare()
+          io.bits.dontCare()
+      RightShiftUInt.verilogTest(UIntSpecParameter(8))(
         "assign uint = {1'h0, a >> b};"
-      ):
-        val io = summon[Interface[UIntSpecIO]]
-        io.uint := io.a >> io.b
-        io.bool.dontCare()
-        io.bits.dontCare()
+      )

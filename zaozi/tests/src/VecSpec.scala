@@ -11,84 +11,110 @@ import org.llvm.mlir.scalalib.{given_ContextApi, Context, ContextApi}
 
 import java.lang.foreign.Arena
 import utest.*
+import org.llvm.mlir.scalalib.Block
+import me.jiuyang.zaozi.magic.macros.generator
 
-case class VecSpecParameter(width: Int, vecCount: Int) extends Parameter:
-  def moduleName: String     = "VecSpecModule"
-  def layers:     Seq[Layer] = Nil
+case class VecSpecParameter(width: Int, vecCount: Int) extends Parameter
+given upickle.default.ReadWriter[VecSpecParameter] = upickle.default.macroRW
 
-class VecSpecIO(
-  using VecSpecParameter)
-    extends HWInterface[VecSpecParameter]:
-  val parameter = summon[VecSpecParameter]
-  val a         = Flipped(Vec(parameter.vecCount, Bits(parameter.width.W)))
-  val idx       = Flipped(UInt(BigInt(parameter.vecCount).bitLength.W))
-  val b         = Aligned(Vec(parameter.vecCount, Bits(parameter.width.W)))
-  val out       = Aligned(Bits(parameter.width.W))
+class VecSpecIO(parameter: VecSpecParameter) extends HWInterface(parameter):
+  val a   = Flipped(Vec(parameter.vecCount, Bits(parameter.width.W)))
+  val idx = Flipped(UInt(BigInt(parameter.vecCount).bitLength.W))
+  val b   = Aligned(Vec(parameter.vecCount, Bits(parameter.width.W)))
+  val out = Aligned(Bits(parameter.width.W))
 
-class VecSpecProbe(
-  using VecSpecParameter)
-    extends DVInterface[VecSpecParameter]
+class VecSpecProbe(parameter: VecSpecParameter) extends DVInterface(parameter)
 
 object VecSpec extends TestSuite:
   val tests = Tests:
-    given VecSpecParameter(8, 4)
     test("Assign"):
-      firrtlTest(new VecSpecIO, new VecSpecProbe)(
+      @generator
+      object Assign extends Generator[VecSpecParameter, VecSpecIO, VecSpecProbe] with HasFirrtlTest:
+        def architecture(parameter: VecSpecParameter) =
+          val io = summon[Interface[VecSpecIO]]
+          io.b := io.a
+          io.out.dontCare()
+      Assign.firrtlTest(VecSpecParameter(8, 4))(
         "connect io.b, io.a"
-      ):
-        val io = summon[Interface[VecSpecIO]]
-        io.b := io.a
-        io.out.dontCare()
-    test("Dynamic index"):
-      firrtlTest(new VecSpecIO, new VecSpecProbe)(
-        "node tests = io.a[io.idx]"
-      ):
-        val io = summon[Interface[VecSpecIO]]
-        io.b.dontCare()
-        io.out := io.a.bit(io.idx)
-    test("Dynamic index apply"):
-      firrtlTest(new VecSpecIO, new VecSpecProbe)(
-        "node tests = io.a[io.idx]"
-      ):
-        val io = summon[Interface[VecSpecIO]]
-        io.b.dontCare()
-        io.out := io.a(io.idx)
-    test("Static index"):
-      firrtlTest(new VecSpecIO, new VecSpecProbe)(
-        "node tests = io.a[3]"
-      ):
-        val io = summon[Interface[VecSpecIO]]
-        io.b.dontCare()
-        io.out := io.a.bit(3)
-    test("Static index apply"):
-      firrtlTest(new VecSpecIO, new VecSpecProbe)(
-        "node tests = io.a[3]"
-      ):
-        val io = summon[Interface[VecSpecIO]]
-        io.b.dontCare()
-        io.out := io.a(3)
-    test("Named static index apply"):
-      firrtlTest(new VecSpecIO, new VecSpecProbe)(
-        "node tests = io.a[3]"
-      ):
-        val io = summon[Interface[VecSpecIO]]
-        io.b.dontCare()
-        io.out := io.a(idx = 3)
+      )
 
-    given Arena   = Arena.ofConfined()
-    given Context = summon[ContextApi].contextCreate
-    summon[Context].loadFirrtlDialect()
+    test("Dynamic index"):
+      @generator
+      object DynamicIndex extends Generator[VecSpecParameter, VecSpecIO, VecSpecProbe] with HasFirrtlTest:
+        def architecture(parameter: VecSpecParameter) =
+          val io = summon[Interface[VecSpecIO]]
+          io.b.dontCare()
+          io.out := io.a.bit(io.idx)
+      DynamicIndex.firrtlTest(VecSpecParameter(8, 4))(
+        "node _GEN_0 = io.a[io.idx]"
+      )
+
+    test("Dynamic index apply"):
+      @generator
+      object DynamicIndexApply extends Generator[VecSpecParameter, VecSpecIO, VecSpecProbe] with HasFirrtlTest:
+        def architecture(parameter: VecSpecParameter) =
+          val io = summon[Interface[VecSpecIO]]
+          io.b.dontCare()
+          io.out := io.a(io.idx)
+      DynamicIndexApply.firrtlTest(VecSpecParameter(8, 4))(
+        "node _GEN_0 = io.a[io.idx]"
+      )
+
+    test("Static index"):
+      @generator
+      object StaticIndex extends Generator[VecSpecParameter, VecSpecIO, VecSpecProbe] with HasFirrtlTest:
+        def architecture(parameter: VecSpecParameter) =
+          val io = summon[Interface[VecSpecIO]]
+          io.b.dontCare()
+          io.out := io.a.bit(3)
+      StaticIndex.firrtlTest(VecSpecParameter(8, 4))(
+        "node _GEN_0 = io.a[3]"
+      )
+
+    test("Static index apply"):
+      @generator
+      object StaticIndexApply extends Generator[VecSpecParameter, VecSpecIO, VecSpecProbe] with HasFirrtlTest:
+        def architecture(parameter: VecSpecParameter) =
+          val io = summon[Interface[VecSpecIO]]
+          io.b.dontCare()
+          io.out := io.a(3)
+      StaticIndexApply.firrtlTest(VecSpecParameter(8, 4))(
+        "node _GEN_0 = io.a[3]"
+      )
+
+    test("Named static index apply"):
+      @generator
+      object NamedStaticIndexApply extends Generator[VecSpecParameter, VecSpecIO, VecSpecProbe] with HasFirrtlTest:
+        def architecture(parameter: VecSpecParameter) =
+          val io = summon[Interface[VecSpecIO]]
+          io.b.dontCare()
+          io.out := io.a(idx = 3)
+      NamedStaticIndexApply.firrtlTest(VecSpecParameter(8, 4))(
+        "node _GEN_0 = io.a[3]"
+      )
+
     test("Apply with incorrect named argument"):
-      summon[ConstructorApi].Module(new VecSpecIO, new VecSpecProbe):
-        val io = summon[Interface[VecSpecIO]]
-        compileError("""io.out := io.a(invalid_name = 3)""").check(
-          "",
-          "missing argument for parameter idx of method vecApplyWrapper in object ApplyHelper"
-        )
+      @generator
+      object IncorrectNamedArgument
+          extends Generator[VecSpecParameter, VecSpecIO, VecSpecProbe]
+          with HasCompileErrorTest:
+        def architecture(parameter: VecSpecParameter) =
+          val io = summon[Interface[VecSpecIO]]
+          compileError("""io.out := io.a(invalid_name = 3)""").check(
+            "",
+            "Unexpected named arguments invalid_name"
+          )
+      IncorrectNamedArgument.compileErrorTest(VecSpecParameter(8, 4))
+
     test("Apply with incorrect number of arguments"):
-      summon[ConstructorApi].Module(new VecSpecIO, new VecSpecProbe):
-        val io = summon[Interface[VecSpecIO]]
-        compileError("""io.out := io.a(1, 2)""").check(
-          "",
-          "Expected 1 args, but got 2"
-        )
+      @generator
+      object IncorrectNumberOfArguments
+          extends Generator[VecSpecParameter, VecSpecIO, VecSpecProbe]
+          with HasCompileErrorTest:
+        def architecture(parameter: VecSpecParameter) =
+          val io = summon[Interface[VecSpecIO]]
+          compileError("""io.out := io.a(1, 2)""").check(
+            "",
+            "Expected 1 args, but got 2"
+          )
+      IncorrectNumberOfArguments.compileErrorTest(VecSpecParameter(8, 4))

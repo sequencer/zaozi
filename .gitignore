@@ -7,6 +7,7 @@
 .envrc
 .direnv/
 .idea/
+.scala-build/
 
 out/
 result*
