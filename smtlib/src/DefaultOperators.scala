@@ -922,6 +922,38 @@ given [R <: Referable[Bool]]: BoolApi[R] with
       new Ref[Bool]:
         val _tpe:       Bool      = new Object with Bool
         val _operation: Operation = op.operation
+
+    def ===(
+      that: R
+    )(
+      using Arena,
+      Context,
+      Block,
+      sourcecode.File,
+      sourcecode.Line,
+      sourcecode.Name.Machine
+    ): Ref[Bool] =
+      val op = summon[EqApi].op(Seq(ref.refer, that.refer), locate)
+      op.operation.appendToBlock()
+      new Ref[Bool]:
+        val _tpe:       Bool      = new Object with Bool
+        val _operation: Operation = op.operation
+
+    def =/=(
+      that: R
+    )(
+      using Arena,
+      Context,
+      Block,
+      sourcecode.File,
+      sourcecode.Line,
+      sourcecode.Name.Machine
+    ): Ref[Bool] =
+      val op = summon[DistinctApi].op(Seq(ref.refer, that.refer), locate)
+      op.operation.appendToBlock()
+      new Ref[Bool]:
+        val _tpe:       Bool      = new Object with Bool
+        val _operation: Operation = op.operation
 end given
 
 given [R <: Referable[SInt]]: SIntApi[R] with

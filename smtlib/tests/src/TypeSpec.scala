@@ -35,6 +35,24 @@ object TypeSpec extends TestSuite:
           solver {
             smtAssert(false.B)
           }
+        smtTest(
+          "(declare-const a Bool)",
+          "(assert (let ((tmp (= a true)))",
+          "        tmp))"
+        ):
+          solver {
+            val a = smtValue(Bool)
+            smtAssert(a === true.B)
+          }
+        smtTest(
+          "(declare-const a Bool)",
+          "(assert (let ((tmp (distinct a true)))",
+          "        tmp))"
+        ):
+          solver {
+            val a = smtValue(Bool)
+            smtAssert(a =/= true.B)
+          }
       test("Int"):
         smtTest(
           "(declare-const a Int)",
