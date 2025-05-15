@@ -650,5 +650,7 @@ trait BoolApi[R <: Referable[Bool]]
     with Neg[Bool, Bool, R]
     with Xor[Bool, Bool, R]
     with Implies[Bool, Bool, R]
+    with Eq[Bool, Bool, R]
+    with Neq[Bool, Bool, R]
 
 trait SMTFuncApi[T <: Data, U <: Data, R <: Referable[SMTFunc[?, U]], S <: Referable[?]] extends ApplyFunc[T, U, R, S]
