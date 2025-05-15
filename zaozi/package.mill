@@ -17,7 +17,7 @@ object `package` extends RootModule with ScalaModule with ScalafmtModule with Za
   def ivyDeps      = Task(Seq(v.mainargs, v.oslib, v.upickle, v.sourcecode))
   def moduleDeps   = Seq(circtlib)
 
-  override def scalacOptions: Target[Seq[String]] = Task(super.scalacOptions() ++ Some("-Xprint-suspension"))
+  override def scalacOptions: Target[Seq[String]] = Task(super.scalacOptions() ++ Seq("-Xprint-suspension", "-experimental") ++ Seq("-Xcheck-macros"))
 
   object lit extends ScalaModule with ScalafmtModule {
     def scalaVersion = Task(v.scala)
