@@ -26,6 +26,7 @@ let
           ./../../build.mill
           ./../../circtlib
           ./../../mlirlib
+          ./../../firtoollib
           ./../../zaozi
         ];
       };
