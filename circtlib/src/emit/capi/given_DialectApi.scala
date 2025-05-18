@@ -2,18 +2,19 @@
 // SPDX-FileCopyrightText: 2025 Jiuyang Liu <liu@jiuyang.me>
 package org.llvm.circt.scalalib.emit.capi
 
-import org.llvm.circt.CAPI.*
-import org.llvm.mlir.scalalib.{Context, DialectHandle, given}
+import org.llvm.circt.CAPI.mlirGetDialectHandle__emit__ as mlirGetDialectHandle
+import org.llvm.mlir.scalalib.given
+import org.llvm.mlir.scalalib.{Context, DialectHandle}
 
 import java.lang.foreign.Arena
 
-given DialectHandleApi with
+given DialectApi with
   extension (context: Context)
-    inline def loadEmitDialect(
+    inline def loadDialect(
     )(
       using arena: Arena
     ): Unit =
-      DialectHandle(mlirGetDialectHandle__emit__(arena)).loadDialect(
+      DialectHandle(mlirGetDialectHandle(arena)).loadDialect(
         using arena,
         context
       )
