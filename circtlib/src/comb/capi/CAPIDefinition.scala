@@ -1,17 +1,18 @@
 // SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2025 Jiuyang Liu <liu@jiuyang.me>
 
-// circt-c/Dialect/SV.h
-package org.llvm.circt.scalalib.sv.capi
+// circt-c/Dialect/Comb.h
+package org.llvm.circt.scalalib.comb.capi
 
 import org.llvm.mlir.scalalib.*
 
 import java.lang.foreign.Arena
 
-/** SV Dialect API
+//
+/** Comb Dialect API
   * {{{
-  * mlirGetDialectHandle__sv__
-  * registerSVPasses
+  * mlirGetDialectHandle__comb__
+  * registerCombPasses
   * }}}
   */
 trait DialectApi:

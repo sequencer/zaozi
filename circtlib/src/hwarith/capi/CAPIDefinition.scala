@@ -1,17 +1,17 @@
 // SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2025 Jiuyang Liu <liu@jiuyang.me>
 
-// circt-c/Dialect/SV.h
-package org.llvm.circt.scalalib.sv.capi
+// circt-c/Dialect/HWArith.h
+package org.llvm.circt.scalalib.hwarith.capi
 
 import org.llvm.mlir.scalalib.*
 
 import java.lang.foreign.Arena
 
-/** SV Dialect API
+/** HWArith Dialect Api
   * {{{
-  * mlirGetDialectHandle__sv__
-  * registerSVPasses
+  * mlirGetDialectHandle__hwarith__
+  * registerHWArithPasses
   * }}}
   */
 trait DialectApi:

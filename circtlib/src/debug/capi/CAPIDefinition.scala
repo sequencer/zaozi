@@ -1,24 +1,23 @@
 // SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2025 Jiuyang Liu <liu@jiuyang.me>
 
-// circt-c/Dialect/SV.h
-package org.llvm.circt.scalalib.sv.capi
+// circt-c/Dialect/Debug.h
+package org.llvm.circt.scalalib.debug.capi
 
 import org.llvm.mlir.scalalib.*
 
 import java.lang.foreign.Arena
 
-/** SV Dialect API
+/** Debug Dialect API
   * {{{
-  * mlirGetDialectHandle__sv__
-  * registerSVPasses
+  * mlirGetDialectHandle__debug__
   * }}}
   */
+
 trait DialectApi:
   extension (context: Context)
     inline def loadDialect(
     )(
       using arena: Arena
     ): Unit
-  def registerPasses(): Unit
 end DialectApi

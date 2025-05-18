@@ -1,20 +1,21 @@
 // SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2025 Jiuyang Liu <liu@jiuyang.me>
-package org.llvm.circt.scalalib.emit.capi
+package org.llvm.circt.scalalib.handshake.capi
 
-import org.llvm.circt.CAPI.*
+import org.llvm.circt.CAPI.{mlirGetDialectHandle__handshake__ as mlirGetDialectHandle, registerHandshakePasses as r}
 import org.llvm.mlir.scalalib.{Context, DialectHandle, given}
 
 import java.lang.foreign.Arena
 
-given DialectHandleApi with
+given DialectApi with
   extension (context: Context)
-    inline def loadEmitDialect(
+    inline def loadDialect(
     )(
       using arena: Arena
     ): Unit =
-      DialectHandle(mlirGetDialectHandle__emit__(arena)).loadDialect(
+      DialectHandle(mlirGetDialectHandle(arena)).loadDialect(
         using arena,
         context
       )
+  def registerPasses(): Unit = r()
 end given

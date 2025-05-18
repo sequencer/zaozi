@@ -2,14 +2,15 @@
 // SPDX-FileCopyrightText: 2025 Jiuyang Liu <liu@jiuyang.me>
 package org.llvm.circt.scalalib.emit.capi
 
+// circt-c/Dialect/Esi.h
 import org.llvm.mlir.scalalib.*
 
 import java.lang.foreign.Arena
 
-trait DialectHandleApi:
+trait DialectApi:
   extension (context: Context)
-    inline def loadEmitDialect(
+    inline def loadDialect(
     )(
       using arena: Arena
     ): Unit
-end DialectHandleApi
+end DialectApi

@@ -1,18 +1,20 @@
 // SPDX-License-Identifier: Apache-2.0
-// SPDX-FileCopyrightText: 2025 Yuhang Zeng <unlsycn@unlsycn.com>
+// SPDX-FileCopyrightText: 2025 Jiuyang Liu <liu@jiuyang.me>
+
+// circt-c/Dialect/OM.h
 package org.llvm.circt.scalalib.om.capi
 
 import org.llvm.mlir.scalalib.*
 
 import java.lang.foreign.{Arena, MemorySegment}
 
-trait DialectHandleApi:
+trait DialectApi:
   extension (context: Context)
-    inline def loadOmDialect(
+    inline def loadDialect(
     )(
       using arena: Arena
     ): Unit
-end DialectHandleApi
+end DialectApi
 
 trait TypeApi:
   extension (tpe: Type)

@@ -8,18 +8,6 @@ import org.llvm.mlir.scalalib.{Attribute, Context, DialectHandle, Identifier, Lo
 
 import java.lang.foreign.{Arena, MemorySegment}
 
-given DialectHandleApi with
-  extension (context: Context)
-    inline def loadOmDialect(
-    )(
-      using arena: Arena
-    ): Unit =
-      DialectHandle(mlirGetDialectHandle__om__(arena)).loadDialect(
-        using arena,
-        context
-      )
-end given
-
 given TypeApi with
   extension (tpe: Type)
     inline def isAnyType:            Boolean = omTypeIsAAnyType(tpe.segment)
@@ -54,7 +42,6 @@ given TypeApi with
   inline def listTypeGetTypeID(
     using arena: Arena
   ): TypeID = TypeID(omListTypeGetTypeID(arena))
-
 end given
 
 given EvaluatorApi with

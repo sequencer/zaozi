@@ -1,19 +1,19 @@
 // SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2025 Jiuyang Liu <liu@jiuyang.me>
-package org.llvm.circt.scalalib.sv.capi
+package org.llvm.circt.scalalib.debug.capi
 
-import org.llvm.circt.CAPI.*
+import org.llvm.circt.CAPI.mlirGetDialectHandle__debug__ as mlirGetDialectHandle
 import org.llvm.mlir.scalalib.{Context, DialectHandle, given}
 
 import java.lang.foreign.Arena
 
-given DialectHandleApi with
+given DialectApi with
   extension (context: Context)
-    inline def loadSvDialect(
+    inline def loadDialect(
     )(
       using arena: Arena
     ): Unit =
-      DialectHandle(mlirGetDialectHandle__sv__(arena)).loadDialect(
+      DialectHandle(mlirGetDialectHandle(arena)).loadDialect(
         using arena,
         context
       )

@@ -2,14 +2,23 @@
 // SPDX-FileCopyrightText: 2025 Jiuyang Liu <liu@jiuyang.me>
 package build.circtlib
 
+import $ivy.`com.goyeau::mill-scalafix::0.5.1`
+
 import mill._
 import mill.scalalib._
 import mill.scalalib.TestModule.Utest
 import mill.scalalib.scalafmt._
+import com.goyeau.mill.scalafix.ScalafixModule
 
 import build.{mlirlib, v, PanamaModule, ZaoziPublishModule}
 
-object `package` extends RootModule with ScalaModule with ScalafmtModule with PanamaModule with ZaoziPublishModule {
+object `package`
+    extends RootModule
+    with ScalaModule
+    with ScalafmtModule
+    with ScalafixModule
+    with PanamaModule
+    with ZaoziPublishModule {
   outer =>
   def scalaVersion = Task(v.scala)
 

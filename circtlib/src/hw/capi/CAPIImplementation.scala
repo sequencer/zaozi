@@ -2,85 +2,81 @@
 // SPDX-FileCopyrightText: 2025 Yuhang Zeng <unlsycn@unlsycn.com>
 package org.llvm.circt.scalalib.hw.capi
 
-import org.llvm.mlir.scalalib.{Attribute, Context, DialectHandle, Identifier, Location, Module, Type, TypeID, given}
-import org.llvm.circt.*
-import org.llvm.circt.CAPI.*
+import org.llvm.circt.CAPI.hwAttrIsAOutputFileAttr
+import org.llvm.circt.CAPI.hwAttrIsAParamDeclAttr
+import org.llvm.circt.CAPI.hwAttrIsAParamDeclRefAttr
+import org.llvm.circt.CAPI.hwAttrIsAParamVerbatimAttr
+import org.llvm.circt.CAPI.hwOutputFileGetFileName
+import org.llvm.circt.CAPI.hwOutputFileGetFromFileName
+import org.llvm.circt.CAPI.hwParamDeclAttrGet
+import org.llvm.circt.CAPI.hwParamDeclAttrGetName
+import org.llvm.circt.CAPI.hwParamDeclAttrGetType
+import org.llvm.circt.CAPI.hwParamDeclAttrGetValue
+import org.llvm.circt.CAPI.hwParamDeclRefAttrGet
+import org.llvm.circt.CAPI.hwParamDeclRefAttrGetName
+import org.llvm.circt.CAPI.hwParamDeclRefAttrGetType
+import org.llvm.circt.CAPI.hwParamVerbatimAttrGet
+import org.llvm.circt.CAPI.{
+  hwAttrIsAInnerRefAttr,
+  hwAttrIsAInnerSymAttr,
+  hwInnerRefAttrGet,
+  hwInnerRefAttrGetModule,
+  hwInnerRefAttrGetName,
+  hwInnerSymAttrGet,
+  hwInnerSymAttrGetEmpty,
+  hwInnerSymAttrGetSymName,
+  hwInstanceGraphDestroy,
+  hwInstanceGraphForEachNode,
+  hwInstanceGraphGet,
+  hwInstanceGraphGetTopLevelNode,
+  hwInstanceGraphNodeEqual,
+  hwInstanceGraphNodeGetModule,
+  hwInstanceGraphNodeGetModuleOp
+}
+import org.llvm.mlir.scalalib.StringRef
+import org.llvm.mlir.scalalib.Type
+import org.llvm.mlir.scalalib.{Module, Operation}
+import org.llvm.mlir.scalalib.{Attribute, Context, given}
 
-import java.lang.foreign.{Arena, MemorySegment}
+import java.lang.foreign.Arena
+import java.lang.foreign.MemorySegment
 
-given AttributeApi with
-  inline def innerSymAttrGet(
-    symName:     Attribute
-  )(
-    using arena: Arena
-  ): Attribute =
-    Attribute(
-      hwInnerSymAttrGet(
-        arena,
-        symName.segment
+given HWModulePortApi with
+  extension (ref: HWModulePort)
+    inline def segment: MemorySegment = ref._segment
+    inline def sizeOf:  Int           = org.llvm.circt.HWModulePort.sizeof().toInt
+end given
+
+given HWStructFieldInfoApi with
+  extension (ref: HWStructFieldInfo)
+    inline def segment: MemorySegment = ref._segment
+    inline def sizeOf:  Int           = org.llvm.circt.HWStructFieldInfo.sizeof().toInt
+end given
+
+given HWInstanceGraphNodeCallbackApi with
+  extension (hwInstanceGraphNodeCallback: HWInstanceGraphNode => Unit)
+    inline def toHWInstanceGraphNodeCallback(
+      using arena: Arena
+    ): InstanceGraphNodeCallback =
+      InstanceGraphNodeCallback(
+        org.llvm.circt.HWInstanceGraphNodeCallback.allocate(
+          (hwInstanceGraphNode: MemorySegment, userData: MemorySegment) =>
+            hwInstanceGraphNodeCallback(HWInstanceGraphNode(hwInstanceGraphNode)),
+          arena
+        )
       )
-    )
-  inline def innerSymAttrGet(
-    symName:     String
-  )(
-    using arena: Arena,
-    context:     Context
-  ): Attribute = innerSymAttrGet(symName.stringAttrGet)
+  extension (hwInstanceGraphNodeCallback: InstanceGraphNodeCallback)
+    inline def segment: MemorySegment = hwInstanceGraphNodeCallback._segment
+end given
 
-  inline def innerSymAttrGetEmpty(
-    using arena: Arena,
-    context:     Context
-  ): Attribute =
-    Attribute(hwInnerSymAttrGetEmpty(arena, context.segment))
+given HWInstanceGraphApi with
+  extension (ref: HWInstanceGraph)
+    inline def segment: MemorySegment = ref._segment
+    inline def sizeOf:  Int           = org.llvm.circt.HWInstanceGraph.sizeof().toInt
+end given
 
-  inline def innerRefAttrGet(
-    moduleName:  Attribute,
-    innerSym:    Attribute
-  )(
-    using arena: Arena,
-    context:     Context
-  ): Attribute =
-    Attribute(
-      hwInnerRefAttrGet(
-        arena,
-        moduleName.segment,
-        innerSym.segment
-      )
-    )
-  inline def innerRefAttrGet(
-    moduleName:  Attribute | String,
-    innerSym:    Attribute | String
-  )(
-    using arena: Arena,
-    context:     Context
-  ): Attribute = innerRefAttrGet(
-    moduleName match
-      case stringAttr: Attribute => stringAttr
-      case string:     String    => string.stringAttrGet
-    ,
-    innerSym match
-      case stringAttr: Attribute => stringAttr
-      case string:     String    => string.stringAttrGet
-  )
-
-  extension (attr: Attribute)
-    inline def isAInnerSymAttr: Boolean =
-      hwAttrIsAInnerSymAttr(attr.segment)
-
-    inline def innerSymAttrGetSymName(
-      using arena: Arena
-    ): Attribute =
-      Attribute(hwInnerSymAttrGetSymName(arena, attr.segment))
-
-    inline def isAInnerRefAttr: Boolean = hwAttrIsAInnerRefAttr(attr.segment)
-
-    inline def innerRefAttrGetName(
-      using arena: Arena
-    ): Attribute =
-      Attribute(hwInnerRefAttrGetName(arena, attr.segment))
-
-    inline def innerRefAttrGetModule(
-      using arena: Arena
-    ): Attribute =
-      Attribute(hwInnerRefAttrGetModule(arena, attr.segment))
+given HWInstanceGraphNodeApi with
+  extension (ref: HWInstanceGraphNode)
+    inline def segment: MemorySegment = ref._segment
+    inline def sizeOf:  Int           = org.llvm.circt.HWInstanceGraphNode.sizeof().toInt
 end given
