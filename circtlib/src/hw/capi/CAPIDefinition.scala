@@ -4,8 +4,7 @@ package org.llvm.circt.scalalib.hw.capi
 
 import org.llvm.mlir.scalalib.*
 
-import java.lang.foreign.Arena
-import java.lang.foreign.MemorySegment
+import java.lang.foreign.{Arena, MemorySegment}
 
 class InstanceGraphNodeCallback(val _segment: MemorySegment)
 trait HWInstanceGraphNodeCallbackApi extends HasSegment[InstanceGraphNodeCallback]:

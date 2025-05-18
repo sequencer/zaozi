@@ -2,23 +2,25 @@
 // SPDX-FileCopyrightText: 2025 Jiuyang Liu <liu@jiuyang.me>
 package org.llvm.circt.scalalib.moore.capi
 
-import org.llvm.circt.CAPI.mooreArrayTypeGet
-import org.llvm.circt.CAPI.mooreAssocArrayTypeGet
-import org.llvm.circt.CAPI.mooreChandleTypeGet
-import org.llvm.circt.CAPI.mooreEventTypeGet
-import org.llvm.circt.CAPI.mooreIntTypeGetInt
-import org.llvm.circt.CAPI.mooreIntTypeGetLogic
-import org.llvm.circt.CAPI.mooreIsFourValuedType
-import org.llvm.circt.CAPI.mooreIsTwoValuedType
-import org.llvm.circt.CAPI.mooreOpenArrayTypeGet
-import org.llvm.circt.CAPI.mooreOpenUnpackedArrayTypeGet
-import org.llvm.circt.CAPI.mooreQueueTypeGet
-import org.llvm.circt.CAPI.mooreRealTypeGet
-import org.llvm.circt.CAPI.mooreStringTypeGet
-import org.llvm.circt.CAPI.mooreUnpackedArrayTypeGet
-import org.llvm.circt.CAPI.mooreVoidTypeGet
-import org.llvm.mlir.scalalib.Type
-import org.llvm.mlir.scalalib.{Context, DialectHandle, given}
+import org.llvm.circt.CAPI.{
+  mooreArrayTypeGet,
+  mooreAssocArrayTypeGet,
+  mooreChandleTypeGet,
+  mooreEventTypeGet,
+  mooreIntTypeGetInt,
+  mooreIntTypeGetLogic,
+  mooreIsFourValuedType,
+  mooreIsTwoValuedType,
+  mooreOpenArrayTypeGet,
+  mooreOpenUnpackedArrayTypeGet,
+  mooreQueueTypeGet,
+  mooreRealTypeGet,
+  mooreStringTypeGet,
+  mooreUnpackedArrayTypeGet,
+  mooreVoidTypeGet
+}
+import org.llvm.mlir.scalalib.given
+import org.llvm.mlir.scalalib.{Context, Type}
 
 import java.lang.foreign.Arena
 

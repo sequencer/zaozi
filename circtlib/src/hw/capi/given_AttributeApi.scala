@@ -2,44 +2,34 @@
 // SPDX-FileCopyrightText: 2025 Jiuyang Liu <liu@jiuyang.me>
 package org.llvm.circt.scalalib.hw.capi
 
-import org.llvm.circt.CAPI.hwAttrIsAOutputFileAttr
-import org.llvm.circt.CAPI.hwAttrIsAParamDeclAttr
-import org.llvm.circt.CAPI.hwAttrIsAParamDeclRefAttr
-import org.llvm.circt.CAPI.hwAttrIsAParamVerbatimAttr
-import org.llvm.circt.CAPI.hwOutputFileGetFileName
-import org.llvm.circt.CAPI.hwOutputFileGetFromFileName
-import org.llvm.circt.CAPI.hwParamDeclAttrGet
-import org.llvm.circt.CAPI.hwParamDeclAttrGetName
-import org.llvm.circt.CAPI.hwParamDeclAttrGetType
-import org.llvm.circt.CAPI.hwParamDeclAttrGetValue
-import org.llvm.circt.CAPI.hwParamDeclRefAttrGet
-import org.llvm.circt.CAPI.hwParamDeclRefAttrGetName
-import org.llvm.circt.CAPI.hwParamDeclRefAttrGetType
-import org.llvm.circt.CAPI.hwParamVerbatimAttrGet
 import org.llvm.circt.CAPI.{
   hwAttrIsAInnerRefAttr,
   hwAttrIsAInnerSymAttr,
+  hwAttrIsAOutputFileAttr,
+  hwAttrIsAParamDeclAttr,
+  hwAttrIsAParamDeclRefAttr,
+  hwAttrIsAParamVerbatimAttr,
   hwInnerRefAttrGet,
   hwInnerRefAttrGetModule,
   hwInnerRefAttrGetName,
   hwInnerSymAttrGet,
   hwInnerSymAttrGetEmpty,
   hwInnerSymAttrGetSymName,
-  hwInstanceGraphDestroy,
-  hwInstanceGraphForEachNode,
-  hwInstanceGraphGet,
-  hwInstanceGraphGetTopLevelNode,
-  hwInstanceGraphNodeEqual,
-  hwInstanceGraphNodeGetModule,
-  hwInstanceGraphNodeGetModuleOp
+  hwOutputFileGetFileName,
+  hwOutputFileGetFromFileName,
+  hwParamDeclAttrGet,
+  hwParamDeclAttrGetName,
+  hwParamDeclAttrGetType,
+  hwParamDeclAttrGetValue,
+  hwParamDeclRefAttrGet,
+  hwParamDeclRefAttrGetName,
+  hwParamDeclRefAttrGetType,
+  hwParamVerbatimAttrGet
 }
-import org.llvm.mlir.scalalib.StringRef
-import org.llvm.mlir.scalalib.Type
-import org.llvm.mlir.scalalib.{Module, Operation}
-import org.llvm.mlir.scalalib.{Attribute, Context, given}
+import org.llvm.mlir.scalalib.given
+import org.llvm.mlir.scalalib.{Attribute, Context, StringRef, Type}
 
-import java.lang.foreign.Arena
-import java.lang.foreign.MemorySegment
+import java.lang.foreign.{Arena, MemorySegment}
 
 given AttributeApi with
   extension (attr: Attribute)
@@ -129,7 +119,7 @@ given AttributeApi with
     value:       Attribute
   )(
     using arena: Arena
-  ) =
+  ): Attribute =
     Attribute(hwParamDeclAttrGet(arena, name.toStringRef.segment, tpe.segment, value.segment))
   def paramDeclAttrGetName(
     decl:        Attribute

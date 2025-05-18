@@ -2,9 +2,7 @@
 // SPDX-FileCopyrightText: 2025 Jiuyang Liu <liu@jiuyang.me>
 package org.llvm.circt.scalalib.firrtl.operation
 
-import org.llvm.mlir.scalalib.{Block, Context, HasOperation, Location, Operation, Value}
-
-import java.lang.foreign.Arena
+import org.llvm.mlir.scalalib.{HasOperation, Operation}
 
 class Assert(val _operation: Operation)
 class Assume(val _operation: Operation)

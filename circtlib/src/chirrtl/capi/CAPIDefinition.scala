@@ -4,11 +4,12 @@
 // circt-c/Dialect/Chirrtl.h
 package org.llvm.circt.scalalib.chirrtl.capi
 
-import org.llvm.mlir.scalalib.*
+import org.llvm.mlir.scalalib.{Context, Type}
 
 import java.lang.foreign.Arena
 
 /** Chirrtl Dialect API
+  *
   * {{{
   * mlirGetDialectHandle__chirrtl__
   * }}}
@@ -22,6 +23,7 @@ trait DialectApi:
 end DialectApi
 
 /** Chirrtl Type API
+  *
   * {{{
   * chirrtlTypeGetCMemory
   * chirrtlTypeGetCMemoryPort

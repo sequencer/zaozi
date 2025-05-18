@@ -4,7 +4,7 @@
 // circt-c/Dialect/DC.h
 package org.llvm.circt.scalalib.dc.capi
 
-import org.llvm.mlir.scalalib.*
+import org.llvm.mlir.scalalib.Context
 
 import java.lang.foreign.Arena
 

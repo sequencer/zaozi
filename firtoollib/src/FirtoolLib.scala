@@ -5,6 +5,7 @@ package me.jiuyang.firtoollib
 import org.llvm.mlir.scalalib.Context
 import os.Path
 import org.llvm.mlir.scalalib.Module as MlirModule
+import org.llvm.mlir.scalalib.Type
 
 import java.lang.foreign.Arena
 
@@ -30,7 +31,7 @@ end PortDirection
   * @note
   *   see ::circt::hw::PortInfo
   */
-case class Port(name: String, width: Int, dir: PortDirection)
+case class Port(name: String, tpe: Type, dir: PortDirection)
 
 trait FirtoolApi:
   /** Parse mlir or mlirbc into [[MLIRModule]]. */

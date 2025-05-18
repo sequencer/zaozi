@@ -2,10 +2,9 @@
 // SPDX-FileCopyrightText: 2025 Jiuyang Liu <liu@jiuyang.me>
 package org.llvm.circt.scalalib.chirrtl.capi
 
-import org.llvm.circt.CAPI.chirrtlTypeGetCMemory
-import org.llvm.circt.CAPI.chirrtlTypeGetCMemoryPort
-import org.llvm.mlir.scalalib.Type
-import org.llvm.mlir.scalalib.{Context, given}
+import org.llvm.circt.CAPI.{chirrtlTypeGetCMemory, chirrtlTypeGetCMemoryPort}
+import org.llvm.mlir.scalalib.given
+import org.llvm.mlir.scalalib.{Context, Type}
 
 import java.lang.foreign.Arena
 

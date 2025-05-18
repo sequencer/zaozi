@@ -3,7 +3,8 @@
 package org.llvm.circt.scalalib.handshake.capi
 
 import org.llvm.circt.CAPI.{mlirGetDialectHandle__handshake__ as mlirGetDialectHandle, registerHandshakePasses as r}
-import org.llvm.mlir.scalalib.{Context, DialectHandle, given}
+import org.llvm.mlir.scalalib.given
+import org.llvm.mlir.scalalib.{Context, DialectHandle}
 
 import java.lang.foreign.Arena
 

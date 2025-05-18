@@ -3,7 +3,7 @@
 package org.llvm.circt.scalalib.emit.capi
 
 // circt-c/Dialect/Esi.h
-import org.llvm.mlir.scalalib.*
+import org.llvm.mlir.scalalib.Context
 
 import java.lang.foreign.Arena
 

@@ -3,7 +3,8 @@
 package org.llvm.circt.scalalib.sv.capi
 
 import org.llvm.circt.CAPI.{mlirGetDialectHandle__sv__ as mlirGetDialectHandle, registerSVPasses as r}
-import org.llvm.mlir.scalalib.{Context, DialectHandle, given}
+import org.llvm.mlir.scalalib.given
+import org.llvm.mlir.scalalib.{Context, DialectHandle}
 
 import java.lang.foreign.Arena
 

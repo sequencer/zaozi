@@ -2,16 +2,16 @@
 // SPDX-FileCopyrightText: 2025 Jiuyang Liu <liu@jiuyang.me>
 package org.llvm.circt.scalalib.llhd.capi
 
-import org.llvm.circt.CAPI.llhdAttrIsATimeAttr
-import org.llvm.circt.CAPI.llhdTimeAttrGet
-import org.llvm.circt.CAPI.llhdTimeAttrGetDelta
-import org.llvm.circt.CAPI.llhdTimeAttrGetEpsilon
-import org.llvm.circt.CAPI.llhdTimeAttrGetSeconds
-import org.llvm.circt.CAPI.llhdTimeAttrGetTimeUnit
-import org.llvm.circt.CAPI.mlirGetDialectHandle__llhd__ as mlirGetDialectHandle
-import org.llvm.mlir.scalalib.Attribute
-import org.llvm.mlir.scalalib.StringRef
-import org.llvm.mlir.scalalib.{Context, DialectHandle, given}
+import org.llvm.circt.CAPI.{
+  llhdAttrIsATimeAttr,
+  llhdTimeAttrGet,
+  llhdTimeAttrGetDelta,
+  llhdTimeAttrGetEpsilon,
+  llhdTimeAttrGetSeconds,
+  llhdTimeAttrGetTimeUnit
+}
+import org.llvm.mlir.scalalib.given
+import org.llvm.mlir.scalalib.{Attribute, Context, StringRef}
 
 import java.lang.foreign.Arena
 

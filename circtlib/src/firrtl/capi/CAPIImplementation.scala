@@ -3,20 +3,9 @@
 package org.llvm.circt.scalalib.firrtl.capi
 
 import org.llvm.circt.*
-import org.llvm.circt.CAPI.{mlirGetDialectHandle__firrtl__ as mlirGetDialectHandle, *}
-import org.llvm.mlir.scalalib.{
-  given_AttributeApi,
-  Attribute,
-  Context,
-  DialectHandle,
-  Identifier,
-  LogicalResult,
-  Module,
-  PassManager,
-  Type,
-  Value,
-  given
-}
+import org.llvm.circt.CAPI.{mlirGetDialectHandle__firrtl__ as _, *}
+import org.llvm.mlir.scalalib.given
+import org.llvm.mlir.scalalib.{Context, Identifier, Type}
 
 import java.lang.foreign.{Arena, MemorySegment}
 

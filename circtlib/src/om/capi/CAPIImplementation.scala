@@ -4,7 +4,8 @@ package org.llvm.circt.scalalib.om.capi
 
 import org.llvm.circt.*
 import org.llvm.circt.CAPI.*
-import org.llvm.mlir.scalalib.{Attribute, Context, DialectHandle, Identifier, Location, Module, Type, TypeID, given}
+import org.llvm.mlir.scalalib.given
+import org.llvm.mlir.scalalib.{Attribute, Context, Identifier, Location, Module, Type, TypeID}
 
 import java.lang.foreign.{Arena, MemorySegment}
 

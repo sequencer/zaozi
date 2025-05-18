@@ -4,11 +4,10 @@
 // circt-c/Dialect/Comb.h
 package org.llvm.circt.scalalib.comb.capi
 
-import org.llvm.mlir.scalalib.*
+import org.llvm.mlir.scalalib.Context
 
 import java.lang.foreign.Arena
 
-//
 /** Comb Dialect API
   * {{{
   * mlirGetDialectHandle__comb__

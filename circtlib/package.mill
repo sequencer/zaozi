@@ -22,6 +22,8 @@ object `package`
   outer =>
   def scalaVersion = Task(v.scala)
 
+  override def scalacOptions: T[Seq[String]] = T(super.scalacOptions() ++ Seq("-Wunused:imports"))
+
   override def dumpIncludes() = Task.Command {
     super.dumpIncludes()()
     includeFiles().foreach { file =>

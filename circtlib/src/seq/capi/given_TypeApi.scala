@@ -2,13 +2,15 @@
 // SPDX-FileCopyrightText: 2025 Jiuyang Liu <liu@jiuyang.me>
 package org.llvm.circt.scalalib.seq.capi
 
-import org.llvm.circt.CAPI.seqClockTypeGet
-import org.llvm.circt.CAPI.seqImmutableTypeGet
-import org.llvm.circt.CAPI.seqImmutableTypeGetInnerType
-import org.llvm.circt.CAPI.seqTypeIsAClock
-import org.llvm.circt.CAPI.seqTypeIsAImmutable
-import org.llvm.mlir.scalalib.Type
-import org.llvm.mlir.scalalib.{Context, DialectHandle, given}
+import org.llvm.circt.CAPI.{
+  seqClockTypeGet,
+  seqImmutableTypeGet,
+  seqImmutableTypeGetInnerType,
+  seqTypeIsAClock,
+  seqTypeIsAImmutable
+}
+import org.llvm.mlir.scalalib.given
+import org.llvm.mlir.scalalib.{Context, Type}
 
 import java.lang.foreign.Arena
 

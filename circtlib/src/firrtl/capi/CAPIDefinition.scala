@@ -3,7 +3,18 @@
 package org.llvm.circt.scalalib.firrtl.capi
 
 // circt-c/Dialect/Firrtl.h
-import org.llvm.mlir.scalalib.*
+import org.llvm.mlir.scalalib.{
+  Attribute,
+  Context,
+  EnumHasToNative,
+  HasSegment,
+  HasSizeOf,
+  LogicalResult,
+  Module,
+  PassManager,
+  Type,
+  Value
+}
 
 import java.lang.foreign.{Arena, MemorySegment}
 

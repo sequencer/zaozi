@@ -3,7 +3,8 @@
 package org.llvm.circt.scalalib.chirrtl.capi
 
 import org.llvm.circt.CAPI.mlirGetDialectHandle__chirrtl__ as mlirGetDialectHandle
-import org.llvm.mlir.scalalib.{Context, DialectHandle, given}
+import org.llvm.mlir.scalalib.given
+import org.llvm.mlir.scalalib.{Context, DialectHandle}
 
 import java.lang.foreign.Arena
 

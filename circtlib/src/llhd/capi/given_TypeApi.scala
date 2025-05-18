@@ -2,15 +2,17 @@
 // SPDX-FileCopyrightText: 2025 Jiuyang Liu <liu@jiuyang.me>
 package org.llvm.circt.scalalib.llhd.capi
 
-import org.llvm.circt.CAPI.llhdPointerTypeGet
-import org.llvm.circt.CAPI.llhdPointerTypeGetElementType
-import org.llvm.circt.CAPI.llhdSignalTypeGet
-import org.llvm.circt.CAPI.llhdSignalTypeGetElementType
-import org.llvm.circt.CAPI.llhdTypeIsAPointerType
-import org.llvm.circt.CAPI.llhdTypeIsASignalType
-import org.llvm.circt.CAPI.llhdTypeIsATimeType
+import org.llvm.circt.CAPI.{
+  llhdPointerTypeGet,
+  llhdPointerTypeGetElementType,
+  llhdSignalTypeGet,
+  llhdSignalTypeGetElementType,
+  llhdTypeIsAPointerType,
+  llhdTypeIsASignalType,
+  llhdTypeIsATimeType
+}
 import org.llvm.mlir.scalalib.Type
-import org.llvm.mlir.scalalib.{Context, DialectHandle, given}
+import org.llvm.mlir.scalalib.given
 
 import java.lang.foreign.Arena
 
