@@ -46,7 +46,7 @@ class generator extends MacroAnnotation:
             Some(Select.unique(New(resultType), "<init>").appliedTo(argss.head.head.asExpr.asTerm))
         )
 
-        def makeParseParameterDef =
+        def parseParameterDef =
           val tpsParam = tpiParam.tpe.typeSymbol
           Seq(selfOpt.get.tpt, tpiParam, tpsParam.companionModule.tree.asInstanceOf[ValDef].tpt)
             .map(_.tpe.asType) match
@@ -151,7 +151,7 @@ class generator extends MacroAnnotation:
                   )
               )
 
-        def makeMainDef = DefDef(
+        def mainDef = DefDef(
           Symbol.newMethod(
             objSym,
             "main",
@@ -178,14 +178,19 @@ class generator extends MacroAnnotation:
                 )
         )
 
-        def defOpt[D <: Definition](definition: D) =
+        def defOpt[D <: Definition](definition: D)  =
           Option.unless(definition.symbol.overridingSymbol(objSym).exists)(definition)
-        val layersDefOpt                           = makeInterfaceDef("layers", tpiL).pipe(defOpt)
-        val interfaceDefOpt                        = makeInterfaceDef("interface", tpiI).pipe(defOpt)
-        val probeDefOpt                            = makeInterfaceDef("probe", tpiP).pipe(defOpt)
+        def defSome[D <: Definition](definition: D) =
+          if (definition.symbol.overridingSymbol(objSym).exists)
+            report.errorAndAbort(s"Overriding ${definition.symbol.name} is forbidden")
+          Some(definition)
 
-        val parseParameterDefOpt = makeParseParameterDef.pipe(defOpt)
-        val mainDefOpt           = makeMainDef.pipe(defOpt)
+        val layersDefOpt    = makeInterfaceDef("layers", tpiL).pipe(defSome)
+        val interfaceDefOpt = makeInterfaceDef("interface", tpiI).pipe(defSome)
+        val probeDefOpt     = makeInterfaceDef("probe", tpiP).pipe(defSome)
+
+        val parseParameterDefOpt = parseParameterDef.pipe(defOpt)
+        val mainDefOpt           = mainDef.pipe(defOpt)
 
         val newBody = List(layersDefOpt, interfaceDefOpt, probeDefOpt, parseParameterDefOpt, mainDefOpt).flatten ++ body
         List(ClassDef.copy(definition)(name, constr, parents, selfOpt, newBody))
