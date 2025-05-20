@@ -22,3 +22,4 @@ jobs:
       - uses: DeterminateSystems/nix-installer-action@main
       - uses: DeterminateSystems/magic-nix-cache-action@main
       - run: nix develop -c mill -i '__.test'
+      - run: nix develop -c mill -i 'zaozi.lit.tests.run'
