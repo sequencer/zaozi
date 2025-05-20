@@ -15,6 +15,8 @@ import me.jiuyang.zaozi.magic.macros.generator
 case class BitsSpecParameter(width: Int) extends Parameter
 given upickle.default.ReadWriter[BitsSpecParameter] = upickle.default.macroRW
 
+class BitsSpecLayers(parameter: BitsSpecParameter) extends LayerInterface(parameter)
+
 class BitsSpecIO(
   parameter: BitsSpecParameter)
     extends HWInterface[BitsSpecParameter](parameter):
@@ -30,15 +32,13 @@ class BitsSpecIO(
   val clock      = Flipped(Clock())
   val asyncReset = Flipped(AsyncReset())
 
-class BitsSpecProbe(
-  parameter: BitsSpecParameter)
-    extends DVInterface[BitsSpecParameter](parameter)
+class BitsSpecProbe(parameter: BitsSpecParameter) extends DVInterface[BitsSpecParameter, BitsSpecLayers](parameter)
 
 object BitsSpec extends TestSuite:
   val tests = Tests:
     test("AsSInt"):
       @generator
-      object AsSInt extends Generator[BitsSpecParameter, BitsSpecIO, BitsSpecProbe] with HasVerilogTest:
+      object AsSInt extends Generator[BitsSpecParameter, BitsSpecLayers, BitsSpecIO, BitsSpecProbe] with HasVerilogTest:
         def architecture(parameter: BitsSpecParameter) =
           val io = summon[Interface[BitsSpecIO]]
           io.sint.dontCare()
@@ -53,7 +53,7 @@ object BitsSpec extends TestSuite:
 
     test("AsUInt"):
       @generator
-      object AsUInt extends Generator[BitsSpecParameter, BitsSpecIO, BitsSpecProbe] with HasVerilogTest:
+      object AsUInt extends Generator[BitsSpecParameter, BitsSpecLayers, BitsSpecIO, BitsSpecProbe] with HasVerilogTest:
         def architecture(parameter: BitsSpecParameter) =
           val io = summon[Interface[BitsSpecIO]]
           io.sint.dontCare()
@@ -68,7 +68,7 @@ object BitsSpec extends TestSuite:
 
     test("~"):
       @generator
-      object Not extends Generator[BitsSpecParameter, BitsSpecIO, BitsSpecProbe] with HasVerilogTest:
+      object Not extends Generator[BitsSpecParameter, BitsSpecLayers, BitsSpecIO, BitsSpecProbe] with HasVerilogTest:
         def architecture(parameter: BitsSpecParameter) =
           val io = summon[Interface[BitsSpecIO]]
           io.sint.dontCare()
@@ -83,7 +83,7 @@ object BitsSpec extends TestSuite:
 
     test("& (reduce)"):
       @generator
-      object AndR extends Generator[BitsSpecParameter, BitsSpecIO, BitsSpecProbe] with HasVerilogTest:
+      object AndR extends Generator[BitsSpecParameter, BitsSpecLayers, BitsSpecIO, BitsSpecProbe] with HasVerilogTest:
         def architecture(parameter: BitsSpecParameter) =
           val io = summon[Interface[BitsSpecIO]]
           io.sint.dontCare()
@@ -98,7 +98,7 @@ object BitsSpec extends TestSuite:
 
     test("OrR"):
       @generator
-      object OrR extends Generator[BitsSpecParameter, BitsSpecIO, BitsSpecProbe] with HasVerilogTest:
+      object OrR extends Generator[BitsSpecParameter, BitsSpecLayers, BitsSpecIO, BitsSpecProbe] with HasVerilogTest:
         def architecture(parameter: BitsSpecParameter) =
           val io = summon[Interface[BitsSpecIO]]
           io.sint.dontCare()
@@ -113,7 +113,7 @@ object BitsSpec extends TestSuite:
 
     test("XorR"):
       @generator
-      object XorR extends Generator[BitsSpecParameter, BitsSpecIO, BitsSpecProbe] with HasVerilogTest:
+      object XorR extends Generator[BitsSpecParameter, BitsSpecLayers, BitsSpecIO, BitsSpecProbe] with HasVerilogTest:
         def architecture(parameter: BitsSpecParameter) =
           val io = summon[Interface[BitsSpecIO]]
           io.sint.dontCare()
@@ -128,7 +128,7 @@ object BitsSpec extends TestSuite:
 
     test("==="):
       @generator
-      object Eq extends Generator[BitsSpecParameter, BitsSpecIO, BitsSpecProbe] with HasVerilogTest:
+      object Eq extends Generator[BitsSpecParameter, BitsSpecLayers, BitsSpecIO, BitsSpecProbe] with HasVerilogTest:
         def architecture(parameter: BitsSpecParameter) =
           val io = summon[Interface[BitsSpecIO]]
           io.sint.dontCare()
@@ -143,7 +143,7 @@ object BitsSpec extends TestSuite:
 
     test("=/="):
       @generator
-      object Neq extends Generator[BitsSpecParameter, BitsSpecIO, BitsSpecProbe] with HasVerilogTest:
+      object Neq extends Generator[BitsSpecParameter, BitsSpecLayers, BitsSpecIO, BitsSpecProbe] with HasVerilogTest:
         def architecture(parameter: BitsSpecParameter) =
           val io = summon[Interface[BitsSpecIO]]
           io.sint.dontCare()
@@ -158,7 +158,7 @@ object BitsSpec extends TestSuite:
 
     test("&"):
       @generator
-      object And extends Generator[BitsSpecParameter, BitsSpecIO, BitsSpecProbe] with HasVerilogTest:
+      object And extends Generator[BitsSpecParameter, BitsSpecLayers, BitsSpecIO, BitsSpecProbe] with HasVerilogTest:
         def architecture(parameter: BitsSpecParameter) =
           val io = summon[Interface[BitsSpecIO]]
           io.sint.dontCare()
@@ -173,7 +173,7 @@ object BitsSpec extends TestSuite:
 
     test("|"):
       @generator
-      object Or extends Generator[BitsSpecParameter, BitsSpecIO, BitsSpecProbe] with HasVerilogTest:
+      object Or extends Generator[BitsSpecParameter, BitsSpecLayers, BitsSpecIO, BitsSpecProbe] with HasVerilogTest:
         def architecture(parameter: BitsSpecParameter) =
           val io = summon[Interface[BitsSpecIO]]
           io.sint.dontCare()
@@ -188,7 +188,7 @@ object BitsSpec extends TestSuite:
 
     test("^"):
       @generator
-      object Xor extends Generator[BitsSpecParameter, BitsSpecIO, BitsSpecProbe] with HasVerilogTest:
+      object Xor extends Generator[BitsSpecParameter, BitsSpecLayers, BitsSpecIO, BitsSpecProbe] with HasVerilogTest:
         def architecture(parameter: BitsSpecParameter) =
           val io = summon[Interface[BitsSpecIO]]
           io.sint.dontCare()
@@ -203,7 +203,7 @@ object BitsSpec extends TestSuite:
 
     test("Cat"):
       @generator
-      object Cat extends Generator[BitsSpecParameter, BitsSpecIO, BitsSpecProbe] with HasVerilogTest:
+      object Cat extends Generator[BitsSpecParameter, BitsSpecLayers, BitsSpecIO, BitsSpecProbe] with HasVerilogTest:
         def architecture(parameter: BitsSpecParameter) =
           val io = summon[Interface[BitsSpecIO]]
           io.sint.dontCare()
@@ -218,7 +218,9 @@ object BitsSpec extends TestSuite:
 
     test("<< int"):
       @generator
-      object ShiftLeftInt extends Generator[BitsSpecParameter, BitsSpecIO, BitsSpecProbe] with HasVerilogTest:
+      object ShiftLeftInt
+          extends Generator[BitsSpecParameter, BitsSpecLayers, BitsSpecIO, BitsSpecProbe]
+          with HasVerilogTest:
         def architecture(parameter: BitsSpecParameter) =
           val io = summon[Interface[BitsSpecIO]]
           val p  = parameter
@@ -234,7 +236,9 @@ object BitsSpec extends TestSuite:
 
     test("<< uint"):
       @generator
-      object ShiftLeftUInt extends Generator[BitsSpecParameter, BitsSpecIO, BitsSpecProbe] with HasVerilogTest:
+      object ShiftLeftUInt
+          extends Generator[BitsSpecParameter, BitsSpecLayers, BitsSpecIO, BitsSpecProbe]
+          with HasVerilogTest:
         def architecture(parameter: BitsSpecParameter) =
           val io = summon[Interface[BitsSpecIO]]
           val p  = parameter
@@ -251,7 +255,9 @@ object BitsSpec extends TestSuite:
 
     test(">> int"):
       @generator
-      object ShiftRightInt extends Generator[BitsSpecParameter, BitsSpecIO, BitsSpecProbe] with HasVerilogTest:
+      object ShiftRightInt
+          extends Generator[BitsSpecParameter, BitsSpecLayers, BitsSpecIO, BitsSpecProbe]
+          with HasVerilogTest:
         def architecture(parameter: BitsSpecParameter) =
           val io = summon[Interface[BitsSpecIO]]
           io.sint.dontCare()
@@ -266,7 +272,9 @@ object BitsSpec extends TestSuite:
 
     test(">> uint"):
       @generator
-      object ShiftRightUInt extends Generator[BitsSpecParameter, BitsSpecIO, BitsSpecProbe] with HasVerilogTest:
+      object ShiftRightUInt
+          extends Generator[BitsSpecParameter, BitsSpecLayers, BitsSpecIO, BitsSpecProbe]
+          with HasVerilogTest:
         def architecture(parameter: BitsSpecParameter) =
           val io = summon[Interface[BitsSpecIO]]
           io.sint.dontCare()
@@ -281,7 +289,7 @@ object BitsSpec extends TestSuite:
 
     test("Head"):
       @generator
-      object Head extends Generator[BitsSpecParameter, BitsSpecIO, BitsSpecProbe] with HasVerilogTest:
+      object Head extends Generator[BitsSpecParameter, BitsSpecLayers, BitsSpecIO, BitsSpecProbe] with HasVerilogTest:
         def architecture(parameter: BitsSpecParameter) =
           val io = summon[Interface[BitsSpecIO]]
           io.sint.dontCare()
@@ -296,7 +304,7 @@ object BitsSpec extends TestSuite:
 
     test("Tail"):
       @generator
-      object Tail extends Generator[BitsSpecParameter, BitsSpecIO, BitsSpecProbe] with HasVerilogTest:
+      object Tail extends Generator[BitsSpecParameter, BitsSpecLayers, BitsSpecIO, BitsSpecProbe] with HasVerilogTest:
         def architecture(parameter: BitsSpecParameter) =
           val io = summon[Interface[BitsSpecIO]]
           io.sint.dontCare()
@@ -311,7 +319,7 @@ object BitsSpec extends TestSuite:
 
     test("Pad"):
       @generator
-      object Pad1 extends Generator[BitsSpecParameter, BitsSpecIO, BitsSpecProbe] with HasVerilogTest:
+      object Pad1 extends Generator[BitsSpecParameter, BitsSpecLayers, BitsSpecIO, BitsSpecProbe] with HasVerilogTest:
         def architecture(parameter: BitsSpecParameter) =
           val io = summon[Interface[BitsSpecIO]]
           io.sint.dontCare()
@@ -326,7 +334,7 @@ object BitsSpec extends TestSuite:
 
     test("Pad"):
       @generator
-      object Pad2 extends Generator[BitsSpecParameter, BitsSpecIO, BitsSpecProbe] with HasVerilogTest:
+      object Pad2 extends Generator[BitsSpecParameter, BitsSpecLayers, BitsSpecIO, BitsSpecProbe] with HasVerilogTest:
         def architecture(parameter: BitsSpecParameter) =
           val io = summon[Interface[BitsSpecIO]]
           io.sint.dontCare()
@@ -341,7 +349,9 @@ object BitsSpec extends TestSuite:
 
     test("ExtractRange"):
       @generator
-      object ExtractRange extends Generator[BitsSpecParameter, BitsSpecIO, BitsSpecProbe] with HasVerilogTest:
+      object ExtractRange
+          extends Generator[BitsSpecParameter, BitsSpecLayers, BitsSpecIO, BitsSpecProbe]
+          with HasVerilogTest:
         def architecture(parameter: BitsSpecParameter) =
           val io = summon[Interface[BitsSpecIO]]
           io.sint.dontCare()
@@ -356,7 +366,9 @@ object BitsSpec extends TestSuite:
 
     test("ExtractRange apply"):
       @generator
-      object ExtractRangeApply extends Generator[BitsSpecParameter, BitsSpecIO, BitsSpecProbe] with HasVerilogTest:
+      object ExtractRangeApply
+          extends Generator[BitsSpecParameter, BitsSpecLayers, BitsSpecIO, BitsSpecProbe]
+          with HasVerilogTest:
         def architecture(parameter: BitsSpecParameter) =
           val io = summon[Interface[BitsSpecIO]]
           io.sint.dontCare()
@@ -371,7 +383,9 @@ object BitsSpec extends TestSuite:
 
     test("Named ExtractRange apply"):
       @generator
-      object NamedExtractRangeApply extends Generator[BitsSpecParameter, BitsSpecIO, BitsSpecProbe] with HasVerilogTest:
+      object NamedExtractRangeApply
+          extends Generator[BitsSpecParameter, BitsSpecLayers, BitsSpecIO, BitsSpecProbe]
+          with HasVerilogTest:
         def architecture(parameter: BitsSpecParameter) =
           val io = summon[Interface[BitsSpecIO]]
           io.sint.dontCare()
@@ -386,7 +400,9 @@ object BitsSpec extends TestSuite:
 
     test("ExtractElement"):
       @generator
-      object ExtractElement extends Generator[BitsSpecParameter, BitsSpecIO, BitsSpecProbe] with HasVerilogTest:
+      object ExtractElement
+          extends Generator[BitsSpecParameter, BitsSpecLayers, BitsSpecIO, BitsSpecProbe]
+          with HasVerilogTest:
         def architecture(parameter: BitsSpecParameter) =
           val io = summon[Interface[BitsSpecIO]]
           io.sint.dontCare()
@@ -401,7 +417,9 @@ object BitsSpec extends TestSuite:
 
     test("ExtractElement apply"):
       @generator
-      object ExtractElementApply extends Generator[BitsSpecParameter, BitsSpecIO, BitsSpecProbe] with HasVerilogTest:
+      object ExtractElementApply
+          extends Generator[BitsSpecParameter, BitsSpecLayers, BitsSpecIO, BitsSpecProbe]
+          with HasVerilogTest:
         def architecture(parameter: BitsSpecParameter) =
           val io = summon[Interface[BitsSpecIO]]
           io.sint.dontCare()
@@ -417,7 +435,7 @@ object BitsSpec extends TestSuite:
     test("Named ExtractElement apply"):
       @generator
       object NamedExtractElementApply
-          extends Generator[BitsSpecParameter, BitsSpecIO, BitsSpecProbe]
+          extends Generator[BitsSpecParameter, BitsSpecLayers, BitsSpecIO, BitsSpecProbe]
           with HasVerilogTest:
         def architecture(parameter: BitsSpecParameter) =
           val io = summon[Interface[BitsSpecIO]]
@@ -434,7 +452,7 @@ object BitsSpec extends TestSuite:
     test("Apply with wrong data type"):
       @generator
       object ApplyWithWrongDataType
-          extends Generator[BitsSpecParameter, BitsSpecIO, BitsSpecProbe]
+          extends Generator[BitsSpecParameter, BitsSpecLayers, BitsSpecIO, BitsSpecProbe]
           with HasCompileErrorTest:
         def architecture(parameter: BitsSpecParameter) =
           val io = summon[Interface[BitsSpecIO]]
@@ -447,7 +465,7 @@ object BitsSpec extends TestSuite:
     test("Apply with incorrect named argument"):
       @generator
       object ApplyWithIncorrectNamedArgument
-          extends Generator[BitsSpecParameter, BitsSpecIO, BitsSpecProbe]
+          extends Generator[BitsSpecParameter, BitsSpecLayers, BitsSpecIO, BitsSpecProbe]
           with HasCompileErrorTest:
         def architecture(parameter: BitsSpecParameter) =
           val io = summon[Interface[BitsSpecIO]]
@@ -464,7 +482,7 @@ object BitsSpec extends TestSuite:
     test("Apply with incorrect number of arguments"):
       @generator
       object ApplyWithIncorrectNumberOfArguments
-          extends Generator[BitsSpecParameter, BitsSpecIO, BitsSpecProbe]
+          extends Generator[BitsSpecParameter, BitsSpecLayers, BitsSpecIO, BitsSpecProbe]
           with HasCompileErrorTest:
         def architecture(parameter: BitsSpecParameter) =
           val io = summon[Interface[BitsSpecIO]]

@@ -55,6 +55,9 @@ class ValidIO[T <: Data](_bits: T) extends Bundle:
   val bits:  BundleField[T]    = Aligned(_bits)
 
 case class GCDParameter(width: Int, useAsyncReset: Boolean) extends Parameter
+given upickle.default.ReadWriter[GCDParameter] = upickle.default.macroRW
+
+class GCDLayers(parameter: GCDParameter) extends LayerInterface(parameter)
 
 class GCDInput(parameter: GCDParameter) extends Bundle:
   val x: BundleField[UInt] = Aligned(UInt(parameter.width.W))
@@ -69,9 +72,12 @@ class GCDIO(parameter: GCDParameter) extends HWInterface(parameter):
   val input:  BundleField[DecoupledIO[GCDInput]] = Flipped(Decoupled(new GCDInput(parameter)))
   val output: BundleField[ValidIO[GCDOutput]]    = Aligned(Valid(GCDOutput(parameter)))
 
-class GCDProbe(parameter: GCDParameter) extends DVInterface(parameter)
+class GCDProbe(parameter: GCDParameter) extends DVInterface[GCDParameter, GCDLayers](parameter)
 
 case class SubtractorParameter(width: Int) extends Parameter
+given upickle.default.ReadWriter[SubtractorParameter] = upickle.default.macroRW
+
+class SubtractorLayers(parameter: SubtractorParameter) extends LayerInterface(parameter)
 
 class SubtractorIO(
   parameter: SubtractorParameter)
@@ -80,21 +86,17 @@ class SubtractorIO(
   val b = Flipped(UInt(parameter.width.W))
   val z = Aligned(UInt(parameter.width.W))
 
-class SubtractorProbe(
-  parameter: SubtractorParameter)
-    extends DVInterface(parameter)
-
-given upickle.default.ReadWriter[GCDParameter]        = upickle.default.macroRW
-given upickle.default.ReadWriter[SubtractorParameter] = upickle.default.macroRW
+class SubtractorProbe(parameter: SubtractorParameter)
+    extends DVInterface[SubtractorParameter, SubtractorLayers](parameter)
 
 @generator
-object Subtractor extends Generator[SubtractorParameter, SubtractorIO, SubtractorProbe]:
+object Subtractor extends Generator[SubtractorParameter, SubtractorLayers, SubtractorIO, SubtractorProbe]:
   def architecture(parameter: SubtractorParameter) =
     val io = summon[Interface[SubtractorIO]]
     io.z := io.a - io.b
 
 @generator
-object GCD extends Generator[GCDParameter, GCDIO, GCDProbe]:
+object GCD extends Generator[GCDParameter, GCDLayers, GCDIO, GCDProbe]:
   def architecture(parameter: GCDParameter) =
     val io           = summon[Interface[GCDIO]]
     given Ref[Clock] = io.clock

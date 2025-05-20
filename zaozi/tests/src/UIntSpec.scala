@@ -14,6 +14,8 @@ import java.lang.foreign.Arena
 case class UIntSpecParameter(width: Int) extends Parameter
 given upickle.default.ReadWriter[UIntSpecParameter] = upickle.default.macroRW
 
+class UIntSpecLayers(parameter: UIntSpecParameter) extends LayerInterface(parameter)
+
 class UIntSpecIO(parameter: UIntSpecParameter) extends HWInterface(parameter):
   val a          = Flipped(UInt(parameter.width.W))
   val b          = Flipped(UInt(parameter.width.W))
@@ -25,13 +27,13 @@ class UIntSpecIO(parameter: UIntSpecParameter) extends HWInterface(parameter):
   val clock      = Flipped(Clock())
   val asyncReset = Flipped(AsyncReset())
 
-class UIntSpecProbe(parameter: UIntSpecParameter) extends DVInterface(parameter)
+class UIntSpecProbe(parameter: UIntSpecParameter) extends DVInterface[UIntSpecParameter, UIntSpecLayers](parameter)
 
 object UIntSpec extends TestSuite:
   val tests = Tests:
     test("asBits"):
       @generator
-      object AsBits extends Generator[UIntSpecParameter, UIntSpecIO, UIntSpecProbe] with HasVerilogTest:
+      object AsBits extends Generator[UIntSpecParameter, UIntSpecLayers, UIntSpecIO, UIntSpecProbe] with HasVerilogTest:
         def architecture(parameter: UIntSpecParameter) =
           val io = summon[Interface[UIntSpecIO]]
           io.uint.dontCare()
@@ -43,7 +45,7 @@ object UIntSpec extends TestSuite:
 
     test("+"):
       @generator
-      object Plus extends Generator[UIntSpecParameter, UIntSpecIO, UIntSpecProbe] with HasVerilogTest:
+      object Plus extends Generator[UIntSpecParameter, UIntSpecLayers, UIntSpecIO, UIntSpecProbe] with HasVerilogTest:
         def architecture(parameter: UIntSpecParameter) =
           val io = summon[Interface[UIntSpecIO]]
           io.uint := io.a + io.b
@@ -55,7 +57,7 @@ object UIntSpec extends TestSuite:
 
     test("-"):
       @generator
-      object Minus extends Generator[UIntSpecParameter, UIntSpecIO, UIntSpecProbe] with HasVerilogTest:
+      object Minus extends Generator[UIntSpecParameter, UIntSpecLayers, UIntSpecIO, UIntSpecProbe] with HasVerilogTest:
         def architecture(parameter: UIntSpecParameter) =
           val io = summon[Interface[UIntSpecIO]]
           io.uint := io.a - io.b
@@ -67,7 +69,9 @@ object UIntSpec extends TestSuite:
 
     test("*"):
       @generator
-      object Multiplication extends Generator[UIntSpecParameter, UIntSpecIO, UIntSpecProbe] with HasVerilogTest:
+      object Multiplication
+          extends Generator[UIntSpecParameter, UIntSpecLayers, UIntSpecIO, UIntSpecProbe]
+          with HasVerilogTest:
         def architecture(parameter: UIntSpecParameter) =
           val io = summon[Interface[UIntSpecIO]]
           io.uint := (io.a * io.b).asBits.bits(parameter.width, 0).asUInt
@@ -79,7 +83,7 @@ object UIntSpec extends TestSuite:
 
     test("/"):
       @generator
-      object Divide extends Generator[UIntSpecParameter, UIntSpecIO, UIntSpecProbe] with HasVerilogTest:
+      object Divide extends Generator[UIntSpecParameter, UIntSpecLayers, UIntSpecIO, UIntSpecProbe] with HasVerilogTest:
         def architecture(parameter: UIntSpecParameter) =
           val io = summon[Interface[UIntSpecIO]]
           io.uint := io.a / io.b
@@ -91,7 +95,7 @@ object UIntSpec extends TestSuite:
 
     test("%"):
       @generator
-      object Modulo extends Generator[UIntSpecParameter, UIntSpecIO, UIntSpecProbe] with HasVerilogTest:
+      object Modulo extends Generator[UIntSpecParameter, UIntSpecLayers, UIntSpecIO, UIntSpecProbe] with HasVerilogTest:
         def architecture(parameter: UIntSpecParameter) =
           val io = summon[Interface[UIntSpecIO]]
           io.uint := io.a % io.b
@@ -103,7 +107,9 @@ object UIntSpec extends TestSuite:
 
     test("<"):
       @generator
-      object LessThan extends Generator[UIntSpecParameter, UIntSpecIO, UIntSpecProbe] with HasVerilogTest:
+      object LessThan
+          extends Generator[UIntSpecParameter, UIntSpecLayers, UIntSpecIO, UIntSpecProbe]
+          with HasVerilogTest:
         def architecture(parameter: UIntSpecParameter) =
           val io = summon[Interface[UIntSpecIO]]
           io.uint.dontCare()
@@ -115,7 +121,9 @@ object UIntSpec extends TestSuite:
 
     test("<="):
       @generator
-      object LessEqual extends Generator[UIntSpecParameter, UIntSpecIO, UIntSpecProbe] with HasVerilogTest:
+      object LessEqual
+          extends Generator[UIntSpecParameter, UIntSpecLayers, UIntSpecIO, UIntSpecProbe]
+          with HasVerilogTest:
         def architecture(parameter: UIntSpecParameter) =
           val io = summon[Interface[UIntSpecIO]]
           io.uint.dontCare()
@@ -127,7 +135,9 @@ object UIntSpec extends TestSuite:
 
     test(">"):
       @generator
-      object GreaterThan extends Generator[UIntSpecParameter, UIntSpecIO, UIntSpecProbe] with HasVerilogTest:
+      object GreaterThan
+          extends Generator[UIntSpecParameter, UIntSpecLayers, UIntSpecIO, UIntSpecProbe]
+          with HasVerilogTest:
         def architecture(parameter: UIntSpecParameter) =
           val io = summon[Interface[UIntSpecIO]]
           io.uint.dontCare()
@@ -139,7 +149,9 @@ object UIntSpec extends TestSuite:
 
     test(">="):
       @generator
-      object GreaterEqual extends Generator[UIntSpecParameter, UIntSpecIO, UIntSpecProbe] with HasVerilogTest:
+      object GreaterEqual
+          extends Generator[UIntSpecParameter, UIntSpecLayers, UIntSpecIO, UIntSpecProbe]
+          with HasVerilogTest:
         def architecture(parameter: UIntSpecParameter) =
           val io = summon[Interface[UIntSpecIO]]
           io.uint.dontCare()
@@ -151,7 +163,7 @@ object UIntSpec extends TestSuite:
 
     test("==="):
       @generator
-      object EqEqEq extends Generator[UIntSpecParameter, UIntSpecIO, UIntSpecProbe] with HasVerilogTest:
+      object EqEqEq extends Generator[UIntSpecParameter, UIntSpecLayers, UIntSpecIO, UIntSpecProbe] with HasVerilogTest:
         def architecture(parameter: UIntSpecParameter) =
           val io = summon[Interface[UIntSpecIO]]
           io.uint.dontCare()
@@ -163,7 +175,9 @@ object UIntSpec extends TestSuite:
 
     test("=/="):
       @generator
-      object NotEqual extends Generator[UIntSpecParameter, UIntSpecIO, UIntSpecProbe] with HasVerilogTest:
+      object NotEqual
+          extends Generator[UIntSpecParameter, UIntSpecLayers, UIntSpecIO, UIntSpecProbe]
+          with HasVerilogTest:
         def architecture(parameter: UIntSpecParameter) =
           val io = summon[Interface[UIntSpecIO]]
           io.uint.dontCare()
@@ -175,7 +189,9 @@ object UIntSpec extends TestSuite:
 
     test("<< int"):
       @generator
-      object LeftShiftInt extends Generator[UIntSpecParameter, UIntSpecIO, UIntSpecProbe] with HasVerilogTest:
+      object LeftShiftInt
+          extends Generator[UIntSpecParameter, UIntSpecLayers, UIntSpecIO, UIntSpecProbe]
+          with HasVerilogTest:
         def architecture(parameter: UIntSpecParameter) =
           val io = summon[Interface[UIntSpecIO]]
           io.uint := (io.a << 2).asBits.bits(parameter.width, 0).asUInt
@@ -187,7 +203,9 @@ object UIntSpec extends TestSuite:
 
     test("<< uint"):
       @generator
-      object LeftShiftUInt extends Generator[UIntSpecParameter, UIntSpecIO, UIntSpecProbe] with HasVerilogTest:
+      object LeftShiftUInt
+          extends Generator[UIntSpecParameter, UIntSpecLayers, UIntSpecIO, UIntSpecProbe]
+          with HasVerilogTest:
         def architecture(parameter: UIntSpecParameter) =
           val io = summon[Interface[UIntSpecIO]]
           io.uint := (io.a << io.b).asBits.bits(parameter.width, 0).asUInt
@@ -200,7 +218,9 @@ object UIntSpec extends TestSuite:
 
     test(">> int"):
       @generator
-      object RightShiftInt extends Generator[UIntSpecParameter, UIntSpecIO, UIntSpecProbe] with HasVerilogTest:
+      object RightShiftInt
+          extends Generator[UIntSpecParameter, UIntSpecLayers, UIntSpecIO, UIntSpecProbe]
+          with HasVerilogTest:
         def architecture(parameter: UIntSpecParameter) =
           val io = summon[Interface[UIntSpecIO]]
           io.uint := io.a >> 4
@@ -212,7 +232,9 @@ object UIntSpec extends TestSuite:
 
     test(">> uint"):
       @generator
-      object RightShiftUInt extends Generator[UIntSpecParameter, UIntSpecIO, UIntSpecProbe] with HasVerilogTest:
+      object RightShiftUInt
+          extends Generator[UIntSpecParameter, UIntSpecLayers, UIntSpecIO, UIntSpecProbe]
+          with HasVerilogTest:
         def architecture(parameter: UIntSpecParameter) =
           val io = summon[Interface[UIntSpecIO]]
           io.uint := io.a >> io.b

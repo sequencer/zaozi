@@ -19,8 +19,12 @@ import org.llvm.mlir.scalalib.{
 import utest.*
 
 import java.lang.foreign.Arena
+import scala.annotation.meta.param
 
-case class LayerSpecParameter(width: Int) extends Parameter:
+case class LayerSpecParameter(width: Int) extends Parameter
+given upickle.default.ReadWriter[LayerSpecParameter] = upickle.default.macroRW
+
+class LayerSpecLayers(parameter: LayerSpecParameter) extends LayerInterface(parameter):
   override def layers = Seq(
     Layer(
       "A0",
@@ -42,29 +46,30 @@ case class LayerSpecParameter(width: Int) extends Parameter:
     ),
     Layer("A1")
   )
-given upickle.default.ReadWriter[LayerSpecParameter] = upickle.default.macroRW
 
-class LayerSpecIO(parameter: LayerSpecParameter) extends HWInterface[LayerSpecParameter](parameter):
+class LayerSpecIO(parameter: LayerSpecParameter) extends HWInterface(parameter):
   val a0     = Flipped(UInt(parameter.width.W))
   val a0b0   = Flipped(UInt(parameter.width.W))
   val a0b0c0 = Flipped(UInt(parameter.width.W))
   val a0b1   = Flipped(UInt(parameter.width.W))
 
-class LayerSpecProbe(parameter: LayerSpecParameter) extends DVInterface[LayerSpecParameter](parameter):
-  val a0     = ProbeRead(UInt(parameter.width.W), parameter.layerTrees("A0"))
-  val a0b0   = ProbeRead(UInt(parameter.width.W), parameter.layerTrees("A0")("A0B0"))
-  val a0b0c0 = ProbeRead(UInt(parameter.width.W), parameter.layerTrees("A0")("A0B0")("A0B0C0"))
-  val a0b1   = ProbeRead(UInt(parameter.width.W), parameter.layerTrees("A0")("A0B1"))
+class LayerSpecProbe(parameter: LayerSpecParameter) extends DVInterface[LayerSpecParameter, LayerSpecLayers](parameter):
+  val a0     = ProbeRead(UInt(parameter.width.W), layers("A0"))
+  val a0b0   = ProbeRead(UInt(parameter.width.W), layers("A0")("A0B0"))
+  val a0b0c0 = ProbeRead(UInt(parameter.width.W), layers("A0")("A0B0")("A0B0C0"))
+  val a0b1   = ProbeRead(UInt(parameter.width.W), layers("A0")("A0B1"))
 
 object LayerSpec extends TestSuite:
   val tests = Tests:
     test("Simple Layer"):
       @generator
-      object SimpleLayer extends Generator[LayerSpecParameter, LayerSpecIO, LayerSpecProbe] with HasVerilogTest:
+      object SimpleLayer
+          extends Generator[LayerSpecParameter, LayerSpecLayers, LayerSpecIO, LayerSpecProbe]
+          with HasVerilogTest:
         def architecture(parameter: LayerSpecParameter) =
           val io               = summon[Interface[LayerSpecIO]]
           val probe            = summon[Interface[LayerSpecProbe]]
-          given Seq[LayerTree] = parameter.layerTrees
+          given Seq[LayerTree] = this.layers(parameter)
           layer("A0"):
             probe.a0 <== io.a0
             layer("A0B0"):
@@ -75,7 +80,7 @@ object LayerSpec extends TestSuite:
               probe.a0b1 <== io.a0b1
 
       val parameter  = LayerSpecParameter(32)
-      val moduleName = parameter.moduleName
+      val moduleName = SimpleLayer.moduleName(parameter)
       SimpleLayer.verilogTest(parameter)(
         s"bind ${moduleName} ${moduleName}_A0_A0B1 a0_a0B1",
         s"bind ${moduleName} ${moduleName}_A0_A0B0_A0B0C0 a0_a0B0_a0B0C0",

@@ -8,7 +8,7 @@ import org.llvm.mlir.scalalib.{Operation, Value}
 
 import java.lang.foreign.Arena
 
-trait Interface[T <: HWInterface[?] | DVInterface[?]] extends Referable[T] with HasOperation:
+trait Interface[T <: HWInterface[?] | DVInterface[?, ?]] extends Referable[T] with HasOperation:
   private[zaozi] val _tpe:       T
   private[zaozi] val _operation: Operation
   def operation(

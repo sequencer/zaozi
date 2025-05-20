@@ -14,6 +14,8 @@ import java.lang.foreign.Arena
 case class SIntSpecParameter(width: Int) extends Parameter
 given upickle.default.ReadWriter[SIntSpecParameter] = upickle.default.macroRW
 
+class SIntSpecLayers(parameter: SIntSpecParameter) extends LayerInterface(parameter)
+
 class SIntSpecIO(parameter: SIntSpecParameter) extends HWInterface(parameter):
   val a          = Flipped(SInt(parameter.width.W))
   val b          = Flipped(SInt(parameter.width.W))
@@ -25,13 +27,13 @@ class SIntSpecIO(parameter: SIntSpecParameter) extends HWInterface(parameter):
   val clock      = Flipped(Clock())
   val asyncReset = Flipped(AsyncReset())
 
-class SIntSpecProbe(parameter: SIntSpecParameter) extends DVInterface(parameter)
+class SIntSpecProbe(parameter: SIntSpecParameter) extends DVInterface[SIntSpecParameter, SIntSpecLayers](parameter)
 
 object SIntSpec extends TestSuite:
   val tests = Tests:
     test("asBits"):
       @generator
-      object AsBits extends Generator[SIntSpecParameter, SIntSpecIO, SIntSpecProbe] with HasVerilogTest:
+      object AsBits extends Generator[SIntSpecParameter, SIntSpecLayers, SIntSpecIO, SIntSpecProbe] with HasVerilogTest:
         def architecture(parameter: SIntSpecParameter) =
           val io = summon[Interface[SIntSpecIO]]
           io.sint.dontCare()
@@ -43,7 +45,7 @@ object SIntSpec extends TestSuite:
 
     test("+"):
       @generator
-      object Plus extends Generator[SIntSpecParameter, SIntSpecIO, SIntSpecProbe] with HasVerilogTest:
+      object Plus extends Generator[SIntSpecParameter, SIntSpecLayers, SIntSpecIO, SIntSpecProbe] with HasVerilogTest:
         def architecture(parameter: SIntSpecParameter) =
           val io = summon[Interface[SIntSpecIO]]
           io.sint := io.a + io.b
@@ -55,7 +57,7 @@ object SIntSpec extends TestSuite:
 
     test("-"):
       @generator
-      object Minus extends Generator[SIntSpecParameter, SIntSpecIO, SIntSpecProbe] with HasVerilogTest:
+      object Minus extends Generator[SIntSpecParameter, SIntSpecLayers, SIntSpecIO, SIntSpecProbe] with HasVerilogTest:
         def architecture(parameter: SIntSpecParameter) =
           val io = summon[Interface[SIntSpecIO]]
           io.sint := io.a - io.b
@@ -67,7 +69,7 @@ object SIntSpec extends TestSuite:
 
     test("*"):
       @generator
-      object Times extends Generator[SIntSpecParameter, SIntSpecIO, SIntSpecProbe] with HasVerilogTest:
+      object Times extends Generator[SIntSpecParameter, SIntSpecLayers, SIntSpecIO, SIntSpecProbe] with HasVerilogTest:
         def architecture(parameter: SIntSpecParameter) =
           val io = summon[Interface[SIntSpecIO]]
           io.sint := ((io.a * io.b).asBits >> parameter.width).asSInt
@@ -79,7 +81,7 @@ object SIntSpec extends TestSuite:
 
     test("/"):
       @generator
-      object Div extends Generator[SIntSpecParameter, SIntSpecIO, SIntSpecProbe] with HasVerilogTest:
+      object Div extends Generator[SIntSpecParameter, SIntSpecLayers, SIntSpecIO, SIntSpecProbe] with HasVerilogTest:
         def architecture(parameter: SIntSpecParameter) =
           val io = summon[Interface[SIntSpecIO]]
           io.sint := io.a / io.b
@@ -91,7 +93,7 @@ object SIntSpec extends TestSuite:
 
     test("%"):
       @generator
-      object Mod extends Generator[SIntSpecParameter, SIntSpecIO, SIntSpecProbe] with HasVerilogTest:
+      object Mod extends Generator[SIntSpecParameter, SIntSpecLayers, SIntSpecIO, SIntSpecProbe] with HasVerilogTest:
         def architecture(parameter: SIntSpecParameter) =
           val io = summon[Interface[SIntSpecIO]]
           io.sint := io.a % io.b
@@ -103,7 +105,7 @@ object SIntSpec extends TestSuite:
 
     test("<"):
       @generator
-      object Less extends Generator[SIntSpecParameter, SIntSpecIO, SIntSpecProbe] with HasVerilogTest:
+      object Less extends Generator[SIntSpecParameter, SIntSpecLayers, SIntSpecIO, SIntSpecProbe] with HasVerilogTest:
         def architecture(parameter: SIntSpecParameter) =
           val io = summon[Interface[SIntSpecIO]]
           io.sint.dontCare()
@@ -115,7 +117,9 @@ object SIntSpec extends TestSuite:
 
     test("<="):
       @generator
-      object LessEqual extends Generator[SIntSpecParameter, SIntSpecIO, SIntSpecProbe] with HasVerilogTest:
+      object LessEqual
+          extends Generator[SIntSpecParameter, SIntSpecLayers, SIntSpecIO, SIntSpecProbe]
+          with HasVerilogTest:
         def architecture(parameter: SIntSpecParameter) =
           val io = summon[Interface[SIntSpecIO]]
           io.sint.dontCare()
@@ -127,7 +131,9 @@ object SIntSpec extends TestSuite:
 
     test(">"):
       @generator
-      object Greater extends Generator[SIntSpecParameter, SIntSpecIO, SIntSpecProbe] with HasVerilogTest:
+      object Greater
+          extends Generator[SIntSpecParameter, SIntSpecLayers, SIntSpecIO, SIntSpecProbe]
+          with HasVerilogTest:
         def architecture(parameter: SIntSpecParameter) =
           val io = summon[Interface[SIntSpecIO]]
           io.sint.dontCare()
@@ -139,7 +145,9 @@ object SIntSpec extends TestSuite:
 
     test(">="):
       @generator
-      object GreaterEqual extends Generator[SIntSpecParameter, SIntSpecIO, SIntSpecProbe] with HasVerilogTest:
+      object GreaterEqual
+          extends Generator[SIntSpecParameter, SIntSpecLayers, SIntSpecIO, SIntSpecProbe]
+          with HasVerilogTest:
         def architecture(parameter: SIntSpecParameter) =
           val io = summon[Interface[SIntSpecIO]]
           io.sint.dontCare()
@@ -151,7 +159,9 @@ object SIntSpec extends TestSuite:
 
     test("==="):
       @generator
-      object TripleEqual extends Generator[SIntSpecParameter, SIntSpecIO, SIntSpecProbe] with HasVerilogTest:
+      object TripleEqual
+          extends Generator[SIntSpecParameter, SIntSpecLayers, SIntSpecIO, SIntSpecProbe]
+          with HasVerilogTest:
         def architecture(parameter: SIntSpecParameter) =
           val io = summon[Interface[SIntSpecIO]]
           io.sint.dontCare()
@@ -163,7 +173,9 @@ object SIntSpec extends TestSuite:
 
     test("=/="):
       @generator
-      object NotEqual extends Generator[SIntSpecParameter, SIntSpecIO, SIntSpecProbe] with HasVerilogTest:
+      object NotEqual
+          extends Generator[SIntSpecParameter, SIntSpecLayers, SIntSpecIO, SIntSpecProbe]
+          with HasVerilogTest:
         def architecture(parameter: SIntSpecParameter) =
           val io = summon[Interface[SIntSpecIO]]
           io.sint.dontCare()
@@ -175,7 +187,9 @@ object SIntSpec extends TestSuite:
 
     test("<< int"):
       @generator
-      object ShiftLeftInt extends Generator[SIntSpecParameter, SIntSpecIO, SIntSpecProbe] with HasVerilogTest:
+      object ShiftLeftInt
+          extends Generator[SIntSpecParameter, SIntSpecLayers, SIntSpecIO, SIntSpecProbe]
+          with HasVerilogTest:
         def architecture(parameter: SIntSpecParameter) =
           val io = summon[Interface[SIntSpecIO]]
           io.sint := (io.a << 2).asBits.bits(parameter.width, 0).asSInt
@@ -187,7 +201,9 @@ object SIntSpec extends TestSuite:
 
     test("<< uint"):
       @generator
-      object ShiftLeftUInt extends Generator[SIntSpecParameter, SIntSpecIO, SIntSpecProbe] with HasVerilogTest:
+      object ShiftLeftUInt
+          extends Generator[SIntSpecParameter, SIntSpecLayers, SIntSpecIO, SIntSpecProbe]
+          with HasVerilogTest:
         def architecture(parameter: SIntSpecParameter) =
           val io = summon[Interface[SIntSpecIO]]
           io.sint := (io.a << io.c).asBits.bits(parameter.width, 0).asSInt
@@ -200,7 +216,9 @@ object SIntSpec extends TestSuite:
 
     test(">> int"):
       @generator
-      object ShiftRightInt extends Generator[SIntSpecParameter, SIntSpecIO, SIntSpecProbe] with HasVerilogTest:
+      object ShiftRightInt
+          extends Generator[SIntSpecParameter, SIntSpecLayers, SIntSpecIO, SIntSpecProbe]
+          with HasVerilogTest:
         def architecture(parameter: SIntSpecParameter) =
           val io = summon[Interface[SIntSpecIO]]
           io.sint := io.a >> 4
@@ -212,7 +230,9 @@ object SIntSpec extends TestSuite:
 
     test(">> uint"):
       @generator
-      object ShiftRightUInt extends Generator[SIntSpecParameter, SIntSpecIO, SIntSpecProbe] with HasVerilogTest:
+      object ShiftRightUInt
+          extends Generator[SIntSpecParameter, SIntSpecLayers, SIntSpecIO, SIntSpecProbe]
+          with HasVerilogTest:
         def architecture(parameter: SIntSpecParameter) =
           val io = summon[Interface[SIntSpecIO]]
           io.sint := io.a >> io.c

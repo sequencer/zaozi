@@ -14,19 +14,21 @@ import org.llvm.circt.scalalib.capi.dialect.firrtl.given_DialectApi
 import org.llvm.mlir.scalalib.{given_ContextApi, given_PassManagerApi, Context, ContextApi, PassManager, PassManagerApi}
 import java.lang.foreign.Arena
 
-case class PassthroughParameter(width: Int) extends Parameter:
-  override def moduleName = "PassthroughModule"
+case class PassthroughParameter(width: Int) extends Parameter
 given upickle.default.ReadWriter[PassthroughParameter] = upickle.default.macroRW
+
+class PassthroughLayers(parameter: PassthroughParameter) extends LayerInterface(parameter)
 
 class PassthroughIO(parameter: PassthroughParameter) extends HWInterface(parameter):
   val i = Flipped(UInt(parameter.width.W))
   val o = Aligned(UInt(parameter.width.W))
 
-class PassthroughProbe(parameter: PassthroughParameter) extends DVInterface(parameter)
+class PassthroughProbe(parameter: PassthroughParameter)
+    extends DVInterface[PassthroughParameter, PassthroughLayers](parameter)
 
 @generator
-object PassthroughModule extends Generator[PassthroughParameter, PassthroughIO, PassthroughProbe]:
-  // VERILOG-LABEL: module PassthroughModule(
+object PassthroughModule extends Generator[PassthroughParameter, PassthroughLayers, PassthroughIO, PassthroughProbe]:
+  // VERILOG-LABEL: module PassthroughModule_e88425e0(
   def architecture(parameter: PassthroughParameter) =
     // VERILOG-NEXT:   input  [31:0] i,
     // VERILOG-NEXT:   output [31:0] o

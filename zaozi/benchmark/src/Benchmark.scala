@@ -33,7 +33,7 @@ import org.openjdk.jmh.annotations.*
 import org.openjdk.jmh.infra.Blackhole
 
 @generator
-object GCD extends Generator[GCDParameter, GCDIO, GCDProbe]:
+object GCD extends Generator[GCDParameter, GCDLayers, GCDIO, GCDProbe]:
   def architecture(parameter: GCDParameter) =
     val io           = summon[Interface[GCDIO]]
     given Ref[Clock] = io.clock
@@ -87,7 +87,7 @@ class ZaoziBenchmark {
     summon[FirrtlDialectApi].loadDialect
 
     given MlirModule = summon[MlirModuleApi].moduleCreateEmpty(summon[LocationApi].locationUnknownGet)
-    given Circuit    = summon[CircuitApi].op(parameter.moduleName)
+    given Circuit    = summon[CircuitApi].op(GCD.moduleName(parameter))
     summon[Circuit].appendToModule()
     GCD.module(parameter).appendToCircuit()
     validateCircuit()

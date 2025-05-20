@@ -27,6 +27,8 @@ class SimpleBundleB extends Bundle:
 case class BundleSpecParameter(width: Int) extends Parameter
 given upickle.default.ReadWriter[BundleSpecParameter] = upickle.default.macroRW
 
+class BundleSpecLayers(parameter: BundleSpecParameter) extends LayerInterface(parameter)
+
 class BundleSpecIO(parameter: BundleSpecParameter) extends HWInterface(parameter):
   val a = Aligned(UInt(32.W))
   val b = Flipped(UInt(32.W))
@@ -39,14 +41,15 @@ class BundleSpecIO(parameter: BundleSpecParameter) extends HWInterface(parameter
   val i = 32
   val j = Aligned(new TypeParamIO(new SimpleBundleA, new SimpleBundleB))
 
-class BundleSpecProbe(parameter: BundleSpecParameter) extends DVInterface(parameter)
+class BundleSpecProbe(parameter: BundleSpecParameter)
+    extends DVInterface[BundleSpecParameter, BundleSpecLayers](parameter)
 
 object BundleSpec extends TestSuite:
   val tests = Tests:
     test("Bundle in Bundle should work"):
       @generator
       object BundleInBundleShouldWork
-          extends Generator[BundleSpecParameter, BundleSpecIO, BundleSpecProbe]
+          extends Generator[BundleSpecParameter, BundleSpecLayers, BundleSpecIO, BundleSpecProbe]
           with HasFirrtlTest:
         def architecture(parameter: BundleSpecParameter) =
           val io = summon[Interface[BundleSpecIO]]
@@ -58,7 +61,7 @@ object BundleSpec extends TestSuite:
     test("Bundle with type parameter should work"):
       @generator
       object BundleWithTypeParameterShouldWork
-          extends Generator[BundleSpecParameter, BundleSpecIO, BundleSpecProbe]
+          extends Generator[BundleSpecParameter, BundleSpecLayers, BundleSpecIO, BundleSpecProbe]
           with HasFirrtlTest:
         def architecture(parameter: BundleSpecParameter) =
           val io = summon[Interface[BundleSpecIO]]
@@ -69,7 +72,9 @@ object BundleSpec extends TestSuite:
 
     test("Custom val name"):
       @generator
-      object CustomValName extends Generator[BundleSpecParameter, BundleSpecIO, BundleSpecProbe] with HasFirrtlTest:
+      object CustomValName
+          extends Generator[BundleSpecParameter, BundleSpecLayers, BundleSpecIO, BundleSpecProbe]
+          with HasFirrtlTest:
         def architecture(parameter: BundleSpecParameter) =
           val io = summon[Interface[BundleSpecIO]]
           io.a := io.h
@@ -79,7 +84,9 @@ object BundleSpec extends TestSuite:
 
     test("Symbol found"):
       @generator
-      object SymbolFound extends Generator[BundleSpecParameter, BundleSpecIO, BundleSpecProbe] with HasFirrtlTest:
+      object SymbolFound
+          extends Generator[BundleSpecParameter, BundleSpecLayers, BundleSpecIO, BundleSpecProbe]
+          with HasFirrtlTest:
         def architecture(parameter: BundleSpecParameter) =
           val io = summon[Interface[BundleSpecIO]]
           io.a := io.b
@@ -90,7 +97,7 @@ object BundleSpec extends TestSuite:
       test("Subaccess on non-Bundle type"):
         @generator
         object SubaccessOnNonBundleType
-            extends Generator[BundleSpecParameter, BundleSpecIO, BundleSpecProbe]
+            extends Generator[BundleSpecParameter, BundleSpecLayers, BundleSpecIO, BundleSpecProbe]
             with HasCompileErrorTest:
           def architecture(parameter: BundleSpecParameter) =
             val io = summon[Interface[BundleSpecIO]]
@@ -103,7 +110,7 @@ object BundleSpec extends TestSuite:
       test("Symbol not found"):
         @generator
         object SymbolNotFound
-            extends Generator[BundleSpecParameter, BundleSpecIO, BundleSpecProbe]
+            extends Generator[BundleSpecParameter, BundleSpecLayers, BundleSpecIO, BundleSpecProbe]
             with HasCompileErrorTest:
           def architecture(parameter: BundleSpecParameter) =
             val io = summon[Interface[BundleSpecIO]]
@@ -116,7 +123,7 @@ object BundleSpec extends TestSuite:
       test("Access non Data type - Int"):
         @generator
         object AccessNonDataTypeInt
-            extends Generator[BundleSpecParameter, BundleSpecIO, BundleSpecProbe]
+            extends Generator[BundleSpecParameter, BundleSpecLayers, BundleSpecIO, BundleSpecProbe]
             with HasCompileErrorTest:
           def architecture(parameter: BundleSpecParameter) =
             val io = summon[Interface[BundleSpecIO]]
@@ -129,7 +136,7 @@ object BundleSpec extends TestSuite:
       test("Access non Data type - UInt"):
         @generator
         object AccessNonDataTypeUInt
-            extends Generator[BundleSpecParameter, BundleSpecIO, BundleSpecProbe]
+            extends Generator[BundleSpecParameter, BundleSpecLayers, BundleSpecIO, BundleSpecProbe]
             with HasCompileErrorTest:
           def architecture(parameter: BundleSpecParameter) =
             val io = summon[Interface[BundleSpecIO]]
@@ -142,7 +149,7 @@ object BundleSpec extends TestSuite:
       test("Structural Type doesn't work"):
         @generator
         object StructuralTypeDoesntWork
-            extends Generator[BundleSpecParameter, BundleSpecIO, BundleSpecProbe]
+            extends Generator[BundleSpecParameter, BundleSpecLayers, BundleSpecIO, BundleSpecProbe]
             with HasCompileErrorTest:
           def architecture(parameter: BundleSpecParameter) =
             val io = summon[Interface[BundleSpecIO]]

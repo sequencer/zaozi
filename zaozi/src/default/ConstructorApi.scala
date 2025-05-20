@@ -130,13 +130,6 @@ given ConstructorApi with
       op0.block,
       summon[Seq[LayerTree]](layerName)._children
     )
-  extension (layer: Layer)
-    def toLayerTree:         LayerTree =
-      new LayerTree:
-        la =>
-        def _name:     String         = layer.name
-        def _children: Seq[LayerTree] = layer.children.map(_.toLayerTree)
-      ._rebuild
 
   def Wire[T <: Data](
     refType: T
