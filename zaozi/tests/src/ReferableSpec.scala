@@ -23,6 +23,8 @@ class SyncDomain extends Bundle:
 case class ReferableSpecParameter(width: Int) extends Parameter
 given upickle.default.ReadWriter[ReferableSpecParameter] = upickle.default.macroRW
 
+class ReferableSpecLayers(parameter: ReferableSpecParameter) extends LayerInterface(parameter)
+
 class PassthroughIO(parameter: ReferableSpecParameter) extends HWInterface(parameter):
   val i = Flipped(UInt(parameter.width.W))
   val o = Aligned(UInt(parameter.width.W))
@@ -32,14 +34,15 @@ class ReferableSpecIO(parameter: ReferableSpecParameter) extends HWInterface(par
   val syncDomain  = Flipped(new SyncDomain)
   val passthrough = Aligned(new PassthroughIO(parameter))
 
-class ReferableSpecProbe(parameter: ReferableSpecParameter) extends DVInterface(parameter)
+class ReferableSpecProbe(parameter: ReferableSpecParameter)
+    extends DVInterface[ReferableSpecParameter, ReferableSpecLayers](parameter)
 
 object ReferableSpec extends TestSuite:
   val tests = Tests:
     test("Wire"):
       @generator
       object WireTest
-          extends Generator[ReferableSpecParameter, ReferableSpecIO, ReferableSpecProbe]
+          extends Generator[ReferableSpecParameter, ReferableSpecLayers, ReferableSpecIO, ReferableSpecProbe]
           with HasVerilogTest:
         def architecture(parameter: ReferableSpecParameter) =
           val io   = summon[Interface[ReferableSpecIO]]
@@ -53,7 +56,7 @@ object ReferableSpec extends TestSuite:
     test("Register without reset"):
       @generator
       object RegisterWithoutReset
-          extends Generator[ReferableSpecParameter, ReferableSpecIO, ReferableSpecProbe]
+          extends Generator[ReferableSpecParameter, ReferableSpecLayers, ReferableSpecIO, ReferableSpecProbe]
           with HasVerilogTest:
         def architecture(parameter: ReferableSpecParameter) =
           val io           = summon[Interface[ReferableSpecIO]]
@@ -69,7 +72,7 @@ object ReferableSpec extends TestSuite:
     test("Register with SyncReset"):
       @generator
       object RegisterWithSyncReset
-          extends Generator[ReferableSpecParameter, ReferableSpecIO, ReferableSpecProbe]
+          extends Generator[ReferableSpecParameter, ReferableSpecLayers, ReferableSpecIO, ReferableSpecProbe]
           with HasVerilogTest:
         def architecture(parameter: ReferableSpecParameter) =
           val io           = summon[Interface[ReferableSpecIO]]
@@ -86,7 +89,7 @@ object ReferableSpec extends TestSuite:
     test("Register with ASyncReset"):
       @generator
       object RegisterWithASyncReset
-          extends Generator[ReferableSpecParameter, ReferableSpecIO, ReferableSpecProbe]
+          extends Generator[ReferableSpecParameter, ReferableSpecLayers, ReferableSpecIO, ReferableSpecProbe]
           with HasVerilogTest:
         def architecture(parameter: ReferableSpecParameter) =
           val io           = summon[Interface[ReferableSpecIO]]

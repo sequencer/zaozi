@@ -18,13 +18,16 @@ class generator extends MacroAnnotation:
       case ClassDef(name, constr, parents, selfOpt, body)
           // a bit of dirty but quotes does not expose the SingletonTypeTree
           if selfOpt.exists(_.tpt.toString().startsWith("SingletonTypeTree")) =>
-        val objSym                 = definition.symbol
-        val (tpiParam, tpiI, tpiP) = parents
+        val objSym                       = definition.symbol
+        val (tpiParam, tpiL, tpiI, tpiP) = parents
           .map(parent =>
             parent match
-              case Applied(generatorName, List(param: TypeIdent, i: TypeIdent, p: TypeIdent)) =>
-                Some(param, i, p)
-              case _                                                                          => None
+              case Applied(
+                    generatorName,
+                    List(param: TypeIdent, l: TypeIdent, i: TypeIdent, p: TypeIdent)
+                  ) =>
+                Some(param, l, i, p)
+              case _ => None
           )
           .flatten
           .headOption
@@ -160,7 +163,7 @@ class generator extends MacroAnnotation:
                 Some(
                   Select
                     .unique(Ref(Symbol.requiredModule("me.jiuyang.zaozi.default.given_GeneratorApi")), "mainImpl")
-                    .appliedToTypeTrees(List(tpiParam, tpiI, tpiP))
+                    .appliedToTypeTrees(List(tpiParam, tpiL, tpiI, tpiP))
                     .appliedTo(This(objSym))
                     .appliedTo(argss.head.head.asExpr.asTerm)
                     .appliedTo(
@@ -177,15 +180,33 @@ class generator extends MacroAnnotation:
 
         def defOpt[D <: Definition](definition: D) =
           Option.unless(definition.symbol.overridingSymbol(objSym).exists)(definition)
-
-        val interfaceDefOpt = makeInterfaceDef("interface", tpiI).pipe(defOpt)
-        val probeDefOpt     = makeInterfaceDef("probe", tpiP).pipe(defOpt)
+        val layersDefOpt                           = makeInterfaceDef("layers", tpiL).pipe(defOpt)
+        val interfaceDefOpt                        = makeInterfaceDef("interface", tpiI).pipe(defOpt)
+        val probeDefOpt                            = makeInterfaceDef("probe", tpiP).pipe(defOpt)
 
         val parseParameterDefOpt = makeParseParameterDef.pipe(defOpt)
         val mainDefOpt           = makeMainDef.pipe(defOpt)
 
-        val newBody = List(interfaceDefOpt, probeDefOpt, parseParameterDefOpt, mainDefOpt).flatten ++ body
+        val newBody = List(layersDefOpt, interfaceDefOpt, probeDefOpt, parseParameterDefOpt, mainDefOpt).flatten ++ body
         List(ClassDef.copy(definition)(name, constr, parents, selfOpt, newBody))
       case _ =>
         report.error("@generator should only annotate an object")
         List(definition)
+
+def summonLayersImpl(
+  using Quotes
+): Expr[me.jiuyang.zaozi.LayerInterface[?]] =
+  import quotes.reflect.*
+  def findOwner(owner: Symbol, cond: Symbol => Boolean): Symbol =
+    if (cond(owner)) owner else findOwner(owner.owner, cond)
+
+  val invoker       = findOwner(Symbol.spliceOwner, _.isClassDef)
+  val layerIntfType = invoker.typeRef.baseType(invoker.typeRef.baseClasses.find(_.name == "DVInterface").getOrElse {
+    report.errorAndAbort("summonLayers should only be called in a DVInterface definition")
+  }) match
+    case AppliedType(_, List(_, t)) => t
+
+  Select
+    .unique(New(TypeTree.ref(layerIntfType.typeSymbol)), "<init>")
+    .appliedTo(Select.unique(This(invoker), "parameter"))
+    .asExprOf[me.jiuyang.zaozi.LayerInterface[?]]

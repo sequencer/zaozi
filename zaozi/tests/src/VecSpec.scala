@@ -16,19 +16,21 @@ import me.jiuyang.zaozi.magic.macros.generator
 case class VecSpecParameter(width: Int, vecCount: Int) extends Parameter
 given upickle.default.ReadWriter[VecSpecParameter] = upickle.default.macroRW
 
+class VecSpecLayers(parameter: VecSpecParameter) extends LayerInterface(parameter)
+
 class VecSpecIO(parameter: VecSpecParameter) extends HWInterface(parameter):
   val a   = Flipped(Vec(parameter.vecCount, Bits(parameter.width.W)))
   val idx = Flipped(UInt(BigInt(parameter.vecCount).bitLength.W))
   val b   = Aligned(Vec(parameter.vecCount, Bits(parameter.width.W)))
   val out = Aligned(Bits(parameter.width.W))
 
-class VecSpecProbe(parameter: VecSpecParameter) extends DVInterface(parameter)
+class VecSpecProbe(parameter: VecSpecParameter) extends DVInterface[VecSpecParameter, VecSpecLayers](parameter)
 
 object VecSpec extends TestSuite:
   val tests = Tests:
     test("Assign"):
       @generator
-      object Assign extends Generator[VecSpecParameter, VecSpecIO, VecSpecProbe] with HasFirrtlTest:
+      object Assign extends Generator[VecSpecParameter, VecSpecLayers, VecSpecIO, VecSpecProbe] with HasFirrtlTest:
         def architecture(parameter: VecSpecParameter) =
           val io = summon[Interface[VecSpecIO]]
           io.b := io.a
@@ -39,7 +41,9 @@ object VecSpec extends TestSuite:
 
     test("Dynamic index"):
       @generator
-      object DynamicIndex extends Generator[VecSpecParameter, VecSpecIO, VecSpecProbe] with HasFirrtlTest:
+      object DynamicIndex
+          extends Generator[VecSpecParameter, VecSpecLayers, VecSpecIO, VecSpecProbe]
+          with HasFirrtlTest:
         def architecture(parameter: VecSpecParameter) =
           val io = summon[Interface[VecSpecIO]]
           io.b.dontCare()
@@ -50,7 +54,9 @@ object VecSpec extends TestSuite:
 
     test("Dynamic index apply"):
       @generator
-      object DynamicIndexApply extends Generator[VecSpecParameter, VecSpecIO, VecSpecProbe] with HasFirrtlTest:
+      object DynamicIndexApply
+          extends Generator[VecSpecParameter, VecSpecLayers, VecSpecIO, VecSpecProbe]
+          with HasFirrtlTest:
         def architecture(parameter: VecSpecParameter) =
           val io = summon[Interface[VecSpecIO]]
           io.b.dontCare()
@@ -61,7 +67,7 @@ object VecSpec extends TestSuite:
 
     test("Static index"):
       @generator
-      object StaticIndex extends Generator[VecSpecParameter, VecSpecIO, VecSpecProbe] with HasFirrtlTest:
+      object StaticIndex extends Generator[VecSpecParameter, VecSpecLayers, VecSpecIO, VecSpecProbe] with HasFirrtlTest:
         def architecture(parameter: VecSpecParameter) =
           val io = summon[Interface[VecSpecIO]]
           io.b.dontCare()
@@ -72,7 +78,9 @@ object VecSpec extends TestSuite:
 
     test("Static index apply"):
       @generator
-      object StaticIndexApply extends Generator[VecSpecParameter, VecSpecIO, VecSpecProbe] with HasFirrtlTest:
+      object StaticIndexApply
+          extends Generator[VecSpecParameter, VecSpecLayers, VecSpecIO, VecSpecProbe]
+          with HasFirrtlTest:
         def architecture(parameter: VecSpecParameter) =
           val io = summon[Interface[VecSpecIO]]
           io.b.dontCare()
@@ -83,7 +91,9 @@ object VecSpec extends TestSuite:
 
     test("Named static index apply"):
       @generator
-      object NamedStaticIndexApply extends Generator[VecSpecParameter, VecSpecIO, VecSpecProbe] with HasFirrtlTest:
+      object NamedStaticIndexApply
+          extends Generator[VecSpecParameter, VecSpecLayers, VecSpecIO, VecSpecProbe]
+          with HasFirrtlTest:
         def architecture(parameter: VecSpecParameter) =
           val io = summon[Interface[VecSpecIO]]
           io.b.dontCare()
@@ -95,7 +105,7 @@ object VecSpec extends TestSuite:
     test("Apply with incorrect named argument"):
       @generator
       object IncorrectNamedArgument
-          extends Generator[VecSpecParameter, VecSpecIO, VecSpecProbe]
+          extends Generator[VecSpecParameter, VecSpecLayers, VecSpecIO, VecSpecProbe]
           with HasCompileErrorTest:
         def architecture(parameter: VecSpecParameter) =
           val io = summon[Interface[VecSpecIO]]
@@ -108,7 +118,7 @@ object VecSpec extends TestSuite:
     test("Apply with incorrect number of arguments"):
       @generator
       object IncorrectNumberOfArguments
-          extends Generator[VecSpecParameter, VecSpecIO, VecSpecProbe]
+          extends Generator[VecSpecParameter, VecSpecLayers, VecSpecIO, VecSpecProbe]
           with HasCompileErrorTest:
         def architecture(parameter: VecSpecParameter) =
           val io = summon[Interface[VecSpecIO]]

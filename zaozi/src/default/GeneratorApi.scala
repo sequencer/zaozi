@@ -11,11 +11,11 @@ import me.jiuyang.zaozi.valuetpe.*
 
 import org.llvm.circt.scalalib.capi.dialect.emit.given_DialectApi as EmitDialectApi
 import org.llvm.circt.scalalib.capi.dialect.firrtl.{
-  DialectApi as FirrtlDialectApi,
   given_DialectApi,
   given_FirrtlBundleFieldApi,
   given_FirrtlDirectionApi,
   given_TypeApi,
+  DialectApi as FirrtlDialectApi,
   FirrtlConvention,
   FirrtlNameKind
 }
@@ -63,10 +63,13 @@ import org.llvm.mlir.scalalib.{
 
 import java.lang.foreign.Arena
 
+export given_GeneratorApi.*
 export me.jiuyang.zaozi.magic.macros.generator
 
 given GeneratorApi with
-  extension [PARAM <: Parameter, I <: HWInterface[PARAM], P <: DVInterface[PARAM]](generator: Generator[PARAM, I, P])
+  extension [PARAM <: Parameter, L <: LayerInterface[PARAM], I <: HWInterface[PARAM], P <: DVInterface[PARAM, L]](
+    generator: Generator[PARAM, L, I, P]
+  )
     def module(
       parameter: PARAM
     )(
@@ -81,9 +84,9 @@ given GeneratorApi with
       val bfs               =
         Seq.tabulate(ioNumFields)(io.toMlirType.getBundleFieldByIndex) ++
           Seq.tabulate(probeNumFields)(probe.toMlirType.getBundleFieldByIndex)
-      given Seq[LayerTree]  = parameter.layerTrees.flatMap(_._dfs)
+      given Seq[LayerTree]  = generator.layers(parameter).flatMap(_._dfs)
       val module            = summon[ModuleApi].op(
-        parameter.moduleName,
+        generator.moduleName(parameter),
         unknownLocation,
         FirrtlConvention.Scalarized,
         bfs.map(i => (i, unknownLocation)), // TODO: record location for Bundle?
@@ -168,7 +171,7 @@ given GeneratorApi with
           Seq.tabulate(probeTpe.toMlirType.getBundleNumFields.toInt)(probeTpe.toMlirType.getBundleFieldByIndex)
       // TODO: add layer symbol here? rather than from top to down searching?
       val instanceOp = summon[InstanceApi].op(
-        moduleName = parameter.moduleName,
+        moduleName = generator.moduleName(parameter),
         instanceName = valName,
         nameKind = FirrtlNameKind.Interesting,
         location = locate,
@@ -221,7 +224,7 @@ given GeneratorApi with
       Context
     ) =
       given MlirModule = summon[MlirModuleApi].moduleCreateEmpty(summon[LocationApi].locationUnknownGet)
-      given Circuit    = summon[CircuitApi].op(parameter.moduleName)
+      given Circuit    = summon[CircuitApi].op(generator.moduleName(parameter))
       summon[Circuit].appendToModule()
       generator.module(parameter).appendToCircuit()
       validateCircuit()
@@ -241,7 +244,7 @@ given GeneratorApi with
         os.Path(
           sys.env.getOrElse("ZAOZI_OUTDIR", ""),
           os.pwd
-        ) / s"${parameter.moduleName}.mlirbc"
+        ) / s"${generator.moduleName(parameter)}.mlirbc"
 
       generator.elaborationCache.get(parameter) match
         case Some(mlirbc) =>

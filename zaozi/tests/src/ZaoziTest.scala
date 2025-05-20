@@ -47,8 +47,8 @@ import utest.assert
 import java.lang.foreign.Arena
 
 trait HasMlirTest:
-  this: Generator[?, ?, ?] =>
-  private val self = this.asInstanceOf[Generator[this.TPARAM, this.TINTF, this.TPROBE]]
+  this: Generator[?, ?, ?, ?] =>
+  private val self = this.asInstanceOf[Generator[this.TPARAM, this.TLAYER, this.TINTF, this.TPROBE]]
 
   def mlirTest(
     parameter:  this.TPARAM
@@ -58,7 +58,7 @@ trait HasMlirTest:
     given Context    = summon[ContextApi].contextCreate
     summon[FirrtlDialectApi].loadDialect
     given MlirModule = summon[MlirModuleApi].moduleCreateEmpty(summon[LocationApi].locationUnknownGet)
-    given Circuit    = summon[CircuitApi].op(parameter.moduleName)
+    given Circuit    = summon[CircuitApi].op(self.moduleName(parameter))
     summon[Circuit].appendToModule()
     self.module(parameter).appendToCircuit()
     validateCircuit()
@@ -72,8 +72,8 @@ trait HasMlirTest:
     else checkLines.foreach(l => assert(out.toString.contains(l)))
 
 trait HasFirrtlTest:
-  this: Generator[?, ?, ?] =>
-  private val self = this.asInstanceOf[Generator[this.TPARAM, this.TINTF, this.TPROBE]]
+  this: Generator[?, ?, ?, ?] =>
+  private val self = this.asInstanceOf[Generator[this.TPARAM, this.TLAYER, this.TINTF, this.TPROBE]]
 
   def firrtlTest(
     parameter:  this.TPARAM
@@ -83,7 +83,7 @@ trait HasFirrtlTest:
     given Context    = summon[ContextApi].contextCreate
     summon[FirrtlDialectApi].loadDialect
     given MlirModule = summon[MlirModuleApi].moduleCreateEmpty(summon[LocationApi].locationUnknownGet)
-    given Circuit    = summon[CircuitApi].op(parameter.moduleName)
+    given Circuit    = summon[CircuitApi].op(self.moduleName(parameter))
     summon[Circuit].appendToModule()
     self.module(parameter).appendToCircuit()
 
@@ -97,8 +97,8 @@ trait HasFirrtlTest:
     else checkLines.foreach(l => assert(out.toString.contains(l)))
 
 trait HasVerilogTest:
-  this: Generator[?, ?, ?] =>
-  private val self = this.asInstanceOf[Generator[this.TPARAM, this.TINTF, this.TPROBE]]
+  this: Generator[?, ?, ?, ?] =>
+  private val self = this.asInstanceOf[Generator[this.TPARAM, this.TLAYER, this.TINTF, this.TPROBE]]
 
   def verilogTest(
     parameter:  this.TPARAM
@@ -123,7 +123,7 @@ trait HasVerilogTest:
     summon[PassManager].exportVerilog(firtoolOptions, out ++= _)
 
     given MlirModule = summon[MlirModuleApi].moduleCreateEmpty(summon[LocationApi].locationUnknownGet)
-    given Circuit    = summon[CircuitApi].op(parameter.moduleName)
+    given Circuit    = summon[CircuitApi].op(self.moduleName(parameter))
     summon[Circuit].appendToModule()
     self.module(parameter).appendToCircuit()
     validateCircuit()
@@ -135,8 +135,8 @@ trait HasVerilogTest:
     else checkLines.foreach(l => assert(out.toString.contains(l)))
 
 trait HasCompileErrorTest:
-  this: Generator[?, ?, ?] =>
-  private val self = this.asInstanceOf[Generator[this.TPARAM, this.TINTF, this.TPROBE]]
+  this: Generator[?, ?, ?, ?] =>
+  private val self = this.asInstanceOf[Generator[this.TPARAM, this.TLAYER, this.TINTF, this.TPROBE]]
 
   def compileErrorTest(
     parameter: this.TPARAM
@@ -145,7 +145,7 @@ trait HasCompileErrorTest:
     given Context    = summon[ContextApi].contextCreate
     summon[FirrtlDialectApi].loadDialect
     given MlirModule = summon[MlirModuleApi].moduleCreateEmpty(summon[LocationApi].locationUnknownGet)
-    given Circuit    = summon[CircuitApi].op(parameter.moduleName)
+    given Circuit    = summon[CircuitApi].op(self.moduleName(parameter))
     summon[Circuit].appendToModule()
     self.module(parameter).appendToCircuit()
 
