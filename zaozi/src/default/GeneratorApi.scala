@@ -9,23 +9,18 @@ import me.jiuyang.zaozi.magic.validateCircuit
 import me.jiuyang.zaozi.reftpe.*
 import me.jiuyang.zaozi.valuetpe.*
 
-import org.llvm.circt.scalalib.emit.capi.given_DialectHandleApi
-import org.llvm.circt.scalalib.firrtl.capi.{
-  given_DialectHandleApi,
+import org.llvm.circt.scalalib.capi.dialect.emit.given_DialectApi as EmitDialectApi
+import org.llvm.circt.scalalib.capi.dialect.firrtl.{
+  DialectApi as FirrtlDialectApi,
+  given_DialectApi,
   given_FirrtlBundleFieldApi,
   given_FirrtlDirectionApi,
-  given_FirtoolOptionsApi,
-  given_ModuleApi,
-  given_PassManagerApi,
   given_TypeApi,
   FirrtlConvention,
-  FirrtlNameKind,
-  FirtoolOptions,
-  FirtoolOptionsApi
+  FirrtlNameKind
 }
-import org.llvm.circt.scalalib.firrtl.operation
-import org.llvm.circt.scalalib.firrtl.operation.given
-import org.llvm.circt.scalalib.firrtl.operation.{
+import org.llvm.circt.scalalib.dialect.firrtl.operation.given
+import org.llvm.circt.scalalib.dialect.firrtl.operation.{
   given_CircuitApi,
   given_ModuleApi,
   Circuit,
@@ -39,7 +34,7 @@ import org.llvm.circt.scalalib.firrtl.operation.{
   SubfieldApi,
   WireApi
 }
-import org.llvm.circt.scalalib.sv.capi.given_DialectHandleApi
+import org.llvm.circt.scalalib.capi.dialect.sv.given_DialectApi as SvDialectApi
 import org.llvm.mlir.scalalib.{
   given_AttributeApi,
   given_BlockApi,
@@ -284,7 +279,7 @@ given GeneratorApi with
     ) =
       given Arena   = Arena.ofConfined()
       given Context = summon[ContextApi].contextCreate
-      summon[Context].loadFirrtlDialect()
+      summon[FirrtlDialectApi].loadDialect
 
       generator.dumpMlirbc(upickle.default.read(os.read(configFile)))
 

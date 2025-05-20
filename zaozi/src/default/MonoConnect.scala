@@ -6,7 +6,7 @@ import me.jiuyang.zaozi.MonoConnect
 import me.jiuyang.zaozi.reftpe.Referable
 import me.jiuyang.zaozi.valuetpe.Data
 
-import org.llvm.circt.scalalib.firrtl.operation.{ConnectApi, InvalidValueApi, given}
+import org.llvm.circt.scalalib.dialect.firrtl.operation.{ConnectApi, InvalidValueApi, given}
 import org.llvm.mlir.scalalib.{Block, Context, given}
 
 import java.lang.foreign.Arena

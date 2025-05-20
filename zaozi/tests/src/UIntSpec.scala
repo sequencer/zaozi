@@ -6,13 +6,6 @@ import me.jiuyang.zaozi.default.{*, given}
 import me.jiuyang.zaozi.*
 import me.jiuyang.zaozi.reftpe.*
 import me.jiuyang.zaozi.valuetpe.*
-import org.llvm.circt.scalalib.firrtl.capi.{
-  given_DialectHandleApi,
-  given_FirtoolOptionsApi,
-  given_PassManagerApi,
-  FirtoolOptions,
-  FirtoolOptionsApi
-}
 import org.llvm.mlir.scalalib.{given_ContextApi, given_PassManagerApi, Context, ContextApi, PassManager, PassManagerApi}
 import utest.*
 

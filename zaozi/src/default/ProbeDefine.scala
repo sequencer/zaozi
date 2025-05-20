@@ -6,7 +6,7 @@ import me.jiuyang.zaozi.ProbeDefine
 import me.jiuyang.zaozi.reftpe.Referable
 import me.jiuyang.zaozi.valuetpe.{CanProbe, Data, RProbe, RWProbe}
 
-import org.llvm.circt.scalalib.firrtl.operation.{RefDefineApi, RefSendApi, given}
+import org.llvm.circt.scalalib.dialect.firrtl.operation.{RefDefineApi, RefSendApi, given}
 import org.llvm.mlir.scalalib.{Block, Context, given}
 
 import java.lang.foreign.Arena

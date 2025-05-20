@@ -6,8 +6,10 @@ import me.jiuyang.zaozi.*
 import me.jiuyang.zaozi.reftpe.*
 import me.jiuyang.zaozi.valuetpe.*
 
-import org.llvm.circt.scalalib.firrtl.capi.given
-import org.llvm.circt.scalalib.firrtl.operation.{OpenSubfieldApi, SubfieldApi, given}
+import org.llvm.circt.scalalib.capi.dialect.firrtl.given
+import org.llvm.circt.scalalib.capi.dialect.firrtl.FirrtlBundleFieldApi
+import org.llvm.circt.scalalib.dialect.firrtl.operation.{OpenSubfieldApi, SubfieldApi, given}
+import org.llvm.circt.scalalib.capi.dialect.firrtl.TypeApi as FirrtlTypeApi
 import org.llvm.mlir.scalalib.{Block, Context, LocationApi, Operation, Type, Value, given}
 
 import java.lang.foreign.Arena
@@ -55,7 +57,7 @@ given TypeImpl with
     ): Type =
       val mlirType =
         if (ref._isAsync)
-          summon[org.llvm.circt.scalalib.firrtl.capi.TypeApi].getAsyncReset
+          summon[FirrtlTypeApi].getAsyncReset
         else
           1.getUInt
       mlirType
@@ -64,7 +66,7 @@ given TypeImpl with
       using Arena,
       Context
     ): Type =
-      val mlirType = summon[org.llvm.circt.scalalib.firrtl.capi.TypeApi].getClock
+      val mlirType = summon[FirrtlTypeApi].getClock
       mlirType
   extension (ref: UInt)
     def toMlirTypeImpl(
@@ -112,7 +114,7 @@ given TypeImpl with
       ref.instantiating = false
       val mlirType = elements
         .map(f =>
-          summon[org.llvm.circt.scalalib.firrtl.capi.FirrtlBundleFieldApi]
+          summon[FirrtlBundleFieldApi]
             .createFirrtlBundleField(f._name, f._isFlip, f._tpe.toMlirType)
         )
         .getBundle
@@ -163,7 +165,7 @@ given TypeImpl with
       ref.instantiating = false
       val mlirType = elements
         .map(f =>
-          summon[org.llvm.circt.scalalib.firrtl.capi.FirrtlBundleFieldApi]
+          summon[FirrtlBundleFieldApi]
             .createFirrtlBundleField(f._name, f._isFlip, f._tpe.toMlirType)
         )
         .getBundle

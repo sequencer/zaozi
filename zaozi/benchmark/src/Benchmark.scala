@@ -9,9 +9,9 @@ import me.jiuyang.zaozi.reftpe.*
 import me.jiuyang.zaozi.tests.{*, given}
 import me.jiuyang.zaozi.valuetpe.*
 
-import org.llvm.circt.scalalib.firrtl.capi.given_DialectHandleApi
-import org.llvm.circt.scalalib.firrtl.operation.{given_CircuitApi, given_ModuleApi, Circuit, CircuitApi}
-import org.llvm.circt.scalalib.sv.capi.given_DialectHandleApi
+import org.llvm.circt.scalalib.capi.dialect.firrtl.given_DialectApi
+import org.llvm.circt.scalalib.capi.dialect.firrtl.DialectApi as FirrtlDialectApi
+import org.llvm.circt.scalalib.dialect.firrtl.operation.{given_CircuitApi, given_ModuleApi, Circuit, CircuitApi}
 import org.llvm.mlir.scalalib.{
   given_ContextApi,
   given_LocationApi,
@@ -84,7 +84,7 @@ class ZaoziBenchmark {
     val parameter = GCDParameter(32, false)
     given Arena   = Arena.ofConfined()
     given Context = summon[ContextApi].contextCreate
-    summon[Context].loadFirrtlDialect()
+    summon[FirrtlDialectApi].loadDialect
 
     given MlirModule = summon[MlirModuleApi].moduleCreateEmpty(summon[LocationApi].locationUnknownGet)
     given Circuit    = summon[CircuitApi].op(parameter.moduleName)

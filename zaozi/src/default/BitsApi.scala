@@ -7,8 +7,8 @@ import me.jiuyang.zaozi.InstanceContext
 import me.jiuyang.zaozi.reftpe.*
 import me.jiuyang.zaozi.valuetpe.*
 
-import org.llvm.circt.scalalib.firrtl.capi.{given_FirrtlBundleFieldApi, given_TypeApi, FirrtlNameKind}
-import org.llvm.circt.scalalib.firrtl.operation.{
+import org.llvm.circt.scalalib.capi.dialect.firrtl.{given_FirrtlBundleFieldApi, given_TypeApi, FirrtlNameKind}
+import org.llvm.circt.scalalib.dialect.firrtl.operation.{
   AndPrimApi,
   AndRPrimApi,
   AsSIntPrimApi,

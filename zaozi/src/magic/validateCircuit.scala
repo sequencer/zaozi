@@ -5,21 +5,15 @@ package me.jiuyang.zaozi.magic
 import me.jiuyang.zaozi.*
 import me.jiuyang.zaozi.default.{*, given}
 import me.jiuyang.zaozi.reftpe.*
-import org.llvm.circt.scalalib.firrtl.capi.{
+import org.llvm.circt.scalalib.capi.dialect.firrtl.{
   given_AttributeApi,
-  given_DialectHandleApi,
+  given_DialectApi,
   given_FirrtlDirectionApi,
-  given_FirtoolOptionsApi,
-  given_ModuleApi,
-  given_PassManagerApi,
   FirrtlConvention,
   FirrtlDirection,
-  FirrtlLayerConvention,
-  FirtoolOptions,
-  FirtoolOptionsApi,
-  PassManagerApi
+  FirrtlLayerConvention
 }
-import org.llvm.circt.scalalib.firrtl.operation.{
+import org.llvm.circt.scalalib.dialect.firrtl.operation.{
   given_CircuitApi,
   given_ExtModuleApi,
   given_LayerApi,

@@ -8,13 +8,9 @@ import me.jiuyang.zaozi.default.{*, given}
 import me.jiuyang.zaozi.*
 import me.jiuyang.zaozi.reftpe.*
 import me.jiuyang.zaozi.valuetpe.*
-import org.llvm.circt.scalalib.firrtl.capi.{
-  given_DialectHandleApi,
-  given_FirtoolOptionsApi,
-  given_PassManagerApi,
-  FirtoolOptions,
-  FirtoolOptionsApi
-}
+import org.llvm.circt.scalalib.capi.dialect.firrtl.DialectApi as FirrtlDialectApi
+import org.llvm.circt.scalalib.capi.dialect.firrtl.given_DialectApi
+
 import org.llvm.mlir.scalalib.{given_ContextApi, given_PassManagerApi, Context, ContextApi, PassManager, PassManagerApi}
 import java.lang.foreign.Arena
 
@@ -42,7 +38,7 @@ object PassthroughModule extends Generator[PassthroughParameter, PassthroughIO, 
 
 given Arena   = Arena.ofConfined()
 given Context = summon[ContextApi].contextCreate
-summon[Context].loadFirrtlDialect()
+summon[FirrtlDialectApi].loadDialect
 
 PassthroughModule.dumpMlirbc(PassthroughParameter(32))
 

@@ -2,24 +2,23 @@
 // SPDX-FileCopyrightText: 2025 Yuhang Zeng <unlsycn@unlsycn.com>
 package me.jiuyang.zaozi.circtlib.tests
 
-import org.llvm.circt.scalalib.emit.capi.given_DialectHandleApi
-import org.llvm.circt.scalalib.firrtl.capi.given_DialectHandleApi
-import org.llvm.circt.scalalib.hw.capi.given_AttributeApi
-import org.llvm.circt.scalalib.om.capi.{*, given}
+import org.llvm.circt.scalalib.capi.dialect.emit.{given_DialectApi, DialectApi as EmitDialectApi}
+import org.llvm.circt.scalalib.capi.dialect.firrtl.{given_DialectApi, DialectApi as FirrtlDialectApi}
+import org.llvm.circt.scalalib.capi.dialect.hw.{given_AttributeApi, given_DialectApi, DialectApi as HWDialectApi}
+import org.llvm.circt.scalalib.capi.dialect.om.{*, given}
 import org.llvm.mlir.scalalib.{Module as MlirModule, ModuleApi as MlirModuleApi, *, given}
-
-import java.lang.foreign.Arena
 import utest.*
 
+import java.lang.foreign.Arena
+
 object OmSmoke extends TestSuite:
-  val tests = Tests:
+  val tests: Tests = Tests:
     val arena     = Arena.ofConfined()
     given Arena   = arena
     val context   = summon[ContextApi].contextCreate
-    context.loadOmDialect()
-    // for mlirbc parsing
-    context.loadFirrtlDialect()
-    context.loadEmitDialect()
+    summon[EmitDialectApi].loadDialect
+    summon[FirrtlDialectApi].loadDialect
+    summon[HWDialectApi].loadDialect
     context.allowUnregisteredDialects(true)
     given Context = context
     test("Load OM from mlirbc"):
@@ -33,9 +32,9 @@ object OmSmoke extends TestSuite:
       val module     =
         summon[MlirModuleApi].moduleCreateParse(os.read.bytes(mlirbcFile))
       val evaluator  = summon[EvaluatorApi].evaluatorNew(module)
-      val gcdClass   = evaluator.instantiate("GCD_Class", summon[EvaluatorValueApi].basePathGetEmpty)
+      val gcdClass   = evaluator.instantiate("GCD_Class", summon[EvaluatorApi].basePathGetEmpty)
       val width      = gcdClass
-        .objectGetField(gcdClass.objectGetFieldNames.arrayAttrGetElement((0)))
+        .objectGetField(gcdClass.objectGetFieldNames.arrayAttrGetElement((0)).stringAttrGetValue)
         .objectGetField("width")
 
       width.isPrimitive ==> true
@@ -134,7 +133,8 @@ object OmSmoke extends TestSuite:
 
       test("Integer Constant"):
         val intClass = evaluator.instantiate("IntegerConstant")
-        val intAttr  = intClass.objectGetField(intClass.objectGetFieldNames.arrayAttrGetElement(0)).getPrimitive
+        val intAttr  =
+          intClass.objectGetField(intClass.objectGetFieldNames.arrayAttrGetElement(0).stringAttrGetValue).getPrimitive
 
         intAttr.isIntegerAttr ==> true
         intAttr.integerAttrGetInt.integerAttrGetValueInt ==> 8428132854L
@@ -203,7 +203,7 @@ object OmSmoke extends TestSuite:
         tuple.tupleGetElement(1).getPrimitive.stringAttrGetValue ==> value.getPrimitive.stringAttrGetValue
 
       test("FrozenPath"):
-        val pathClass = evaluator.instantiate("FrozenPath", summon[EvaluatorValueApi].basePathGetEmpty)
+        val pathClass = evaluator.instantiate("FrozenPath", summon[EvaluatorApi].basePathGetEmpty)
         test("FrozenPath"):
           val path      = pathClass.objectGetField("path")
           val pathEmpty = pathClass.objectGetField("path_empty")

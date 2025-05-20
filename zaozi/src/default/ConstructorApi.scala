@@ -6,15 +6,15 @@ import me.jiuyang.zaozi.*
 import me.jiuyang.zaozi.reftpe.*
 import me.jiuyang.zaozi.valuetpe.*
 
-import org.llvm.circt.scalalib.firrtl.capi.{
+import org.llvm.circt.scalalib.capi.dialect.firrtl.{
   given_FirrtlBundleFieldApi,
   given_FirrtlDirectionApi,
   given_TypeApi,
   FirrtlConvention,
   FirrtlNameKind
 }
-import org.llvm.circt.scalalib.firrtl.operation
-import org.llvm.circt.scalalib.firrtl.operation.{
+import org.llvm.circt.scalalib.dialect.firrtl.operation
+import org.llvm.circt.scalalib.dialect.firrtl.operation.{
   ConnectApi,
   ConstantApi,
   InstanceApi,

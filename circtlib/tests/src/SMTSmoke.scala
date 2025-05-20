@@ -2,17 +2,16 @@
 // SPDX-FileCopyrightText: 2025 Jianhao Ye <Clo91eaf@qq.com>
 package me.jiuyang.zaozi.circtlib.tests
 
+import org.llvm.mlir.scalalib.dialect.func.{Func, FuncApi, *, given}
 import org.llvm.mlir.scalalib.dialect.smt.capi.{*, given}
 import org.llvm.mlir.scalalib.dialect.smt.operation.{*, given}
-import org.llvm.mlir.scalalib.{Module as MlirModule, ModuleApi as MlirModuleApi, TypeApi as MlirTypeApi, *, given}
-import org.llvm.mlir.scalalib.dialect.func.{Func, FuncApi, *, given}
-
+import org.llvm.mlir.scalalib.{Module as MlirModule, ModuleApi as MlirModuleApi, TypeApi as _, *, given}
 import utest.*
 
 import java.lang.foreign.Arena
 
 object SMTSmoke extends TestSuite:
-  val tests = Tests:
+  val tests: Tests = Tests:
     test("Load Panama Context"):
       val arena   = Arena.ofConfined()
       given Arena = arena
