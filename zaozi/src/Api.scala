@@ -4,7 +4,7 @@ package me.jiuyang.zaozi
 
 import me.jiuyang.zaozi.reftpe.*
 import me.jiuyang.zaozi.valuetpe.*
-import org.llvm.circt.scalalib.firrtl.operation.{Module as CirctModule, When}
+import org.llvm.circt.scalalib.dialect.firrtl.operation.{Module as CirctModule, When}
 import org.llvm.mlir.scalalib.{Block, Context, Operation, Type, Value}
 
 import java.lang.foreign.Arena

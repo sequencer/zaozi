@@ -6,17 +6,18 @@ import me.jiuyang.zaozi.*
 import me.jiuyang.zaozi.default.{*, given}
 import me.jiuyang.zaozi.magic.validateCircuit
 import me.jiuyang.zaozi.reftpe.*
-import org.llvm.circt.scalalib.firrtl.capi.{
-  given_DialectHandleApi,
-  given_FirtoolOptionsApi,
-  given_ModuleApi,
-  given_PassManagerApi,
-  FirtoolOptions,
-  FirtoolOptionsApi
-}
-import org.llvm.circt.scalalib.firrtl.operation.{given_CircuitApi, given_ModuleApi, Circuit, CircuitApi}
-import org.llvm.circt.scalalib.emit.capi.given_DialectHandleApi
-import org.llvm.circt.scalalib.sv.capi.given_DialectHandleApi
+import org.llvm.circt.scalalib.capi.dialect.firrtl.DialectApi as FirrtlDialectApi
+import org.llvm.circt.scalalib.capi.dialect.sv.DialectApi as SvDialectApi
+import org.llvm.circt.scalalib.capi.dialect.emit.DialectApi as EmitDialectApi
+import org.llvm.circt.scalalib.capi.dialect.firrtl.given_DialectApi
+import org.llvm.circt.scalalib.capi.firtool.given_FirtoolOptionsApi
+import org.llvm.circt.scalalib.dialect.firrtl.operation.{given_CircuitApi, given_ModuleApi, Circuit, CircuitApi}
+import org.llvm.circt.scalalib.capi.dialect.emit.given_DialectApi
+import org.llvm.circt.scalalib.capi.dialect.sv.given_DialectApi
+import org.llvm.circt.scalalib.capi.firtool.FirtoolApi
+import org.llvm.circt.scalalib.capi.firtool.given
+import org.llvm.circt.scalalib.capi.firtool.FirtoolOptions
+import org.llvm.circt.scalalib.capi.exportfirrtl.given_ExportFirrtlApi
 import org.llvm.mlir.scalalib.{
   given_AttributeApi,
   given_BlockApi,
@@ -55,7 +56,7 @@ trait HasMlirTest:
   ) =
     given Arena      = Arena.ofConfined()
     given Context    = summon[ContextApi].contextCreate
-    summon[Context].loadFirrtlDialect()
+    summon[FirrtlDialectApi].loadDialect
     given MlirModule = summon[MlirModuleApi].moduleCreateEmpty(summon[LocationApi].locationUnknownGet)
     given Circuit    = summon[CircuitApi].op(parameter.moduleName)
     summon[Circuit].appendToModule()
@@ -80,7 +81,7 @@ trait HasFirrtlTest:
   ) =
     given Arena      = Arena.ofConfined()
     given Context    = summon[ContextApi].contextCreate
-    summon[Context].loadFirrtlDialect()
+    summon[FirrtlDialectApi].loadDialect
     given MlirModule = summon[MlirModuleApi].moduleCreateEmpty(summon[LocationApi].locationUnknownGet)
     given Circuit    = summon[CircuitApi].op(parameter.moduleName)
     summon[Circuit].appendToModule()
@@ -105,20 +106,21 @@ trait HasVerilogTest:
   ) =
     given Arena          = Arena.ofConfined()
     given Context        = summon[ContextApi].contextCreate
-    summon[Context].loadFirrtlDialect()
-    summon[Context].loadSvDialect()
-    summon[Context].loadEmitDialect()
-    given FirtoolOptions = summon[FirtoolOptionsApi].createDefault()
+    summon[FirrtlDialectApi].loadDialect
+    summon[SvDialectApi].loadDialect
+    summon[EmitDialectApi].loadDialect
+    given FirtoolOptions = summon[FirtoolApi].firtoolOptionsCreateDefault
 
     given PassManager  = summon[org.llvm.mlir.scalalib.PassManagerApi].passManagerCreate
     val out            = new StringBuilder
     val firtoolOptions = summon[FirtoolOptions]
-    summon[PassManager].populatePreprocessTransforms(firtoolOptions)
-    summon[PassManager].populateCHIRRTLToLowFIRRTL(firtoolOptions)
-    summon[PassManager].populateLowFIRRTLToHW(firtoolOptions, "")
-    summon[PassManager].populateHWToSV(firtoolOptions)
+
+    summon[PassManager].preprocessTransforms(firtoolOptions)
+    summon[PassManager].chirrtlToLowFIRRTL(firtoolOptions)
+    summon[PassManager].lowFIRRTLToHW(firtoolOptions, "")
+    summon[PassManager].hwToSV(firtoolOptions)
     // TODO: we need a pass for export verilog on a MLIRModule, not it export empty string.
-    summon[PassManager].populateExportVerilog(firtoolOptions, out ++= _)
+    summon[PassManager].exportVerilog(firtoolOptions, out ++= _)
 
     given MlirModule = summon[MlirModuleApi].moduleCreateEmpty(summon[LocationApi].locationUnknownGet)
     given Circuit    = summon[CircuitApi].op(parameter.moduleName)
@@ -141,7 +143,7 @@ trait HasCompileErrorTest:
   ) =
     given Arena      = Arena.ofConfined()
     given Context    = summon[ContextApi].contextCreate
-    summon[Context].loadFirrtlDialect()
+    summon[FirrtlDialectApi].loadDialect
     given MlirModule = summon[MlirModuleApi].moduleCreateEmpty(summon[LocationApi].locationUnknownGet)
     given Circuit    = summon[CircuitApi].op(parameter.moduleName)
     summon[Circuit].appendToModule()

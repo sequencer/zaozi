@@ -8,7 +8,6 @@ import me.jiuyang.zaozi.magic.macros.generator
 import me.jiuyang.zaozi.reftpe.*
 import me.jiuyang.zaozi.valuetpe.*
 
-import org.llvm.circt.scalalib.firrtl.capi.FirtoolOptions
 import org.llvm.mlir.scalalib.{Block, Context, Module as MlirModule}
 
 import java.lang.foreign.Arena

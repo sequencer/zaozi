@@ -2,17 +2,18 @@
 // SPDX-FileCopyrightText: 2025 Jiuyang Liu <liu@jiuyang.me>
 package me.jiuyang.zaozi.circtlib.tests
 
-import org.llvm.circt.scalalib.firrtl.capi.{
-  given_DialectHandleApi,
+import org.llvm.circt.scalalib.capi.dialect.firrtl.{
+  given_DialectApi,
   given_FirrtlBundleFieldApi,
   given_FirrtlDirectionApi,
   given_TypeApi,
+  DialectApi as FirrtlDialect,
   FirrtlBundleFieldApi,
   FirrtlConvention,
   FirrtlNameKind,
-  TypeApi
+  TypeApi as FirrtlTypeApi
 }
-import org.llvm.circt.scalalib.firrtl.operation.{*, given}
+import org.llvm.circt.scalalib.dialect.firrtl.operation.{*, given}
 import org.llvm.mlir.scalalib.{given_ModuleApi, Module as MlirModule, ModuleApi as MlirModuleApi, *, given}
 import utest.*
 
@@ -32,13 +33,13 @@ inline def blockCheck(
   else checkLines.foreach(l => assert(blockString.contains(l)))
 
 object Smoke extends TestSuite:
-  val tests = Tests:
+  val tests: Tests = Tests:
     test("Load Panama Context"):
       val arena   = Arena.ofConfined()
       given Arena = arena
       test("Load Dialect"):
         val context         = summon[ContextApi].contextCreate
-        context.loadFirrtlDialect()
+        summon[FirrtlDialect].loadDialect
         given Context       = context
         val unknownLocation = summon[LocationApi].locationUnknownGet
         test("Create MlirModule"):
@@ -111,7 +112,7 @@ object Smoke extends TestSuite:
                 name = "clock",
                 location = unknownLocation,
                 nameKind = FirrtlNameKind.Droppable,
-                tpe = summon[TypeApi].getClock
+                tpe = summon[FirrtlTypeApi].getClock
               )
               clock.operation.appendToBlock()
               summon[RegApi]
@@ -131,7 +132,7 @@ object Smoke extends TestSuite:
                 name = "clock",
                 location = unknownLocation,
                 nameKind = FirrtlNameKind.Droppable,
-                tpe = summon[TypeApi].getClock
+                tpe = summon[FirrtlTypeApi].getClock
               )
               clock.operation.appendToBlock()
               val reset                          = summon[WireApi].op(

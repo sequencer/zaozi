@@ -4,9 +4,9 @@ package me.jiuyang.omlib
 
 import scala.collection.mutable.LinkedHashMap
 
-import org.llvm.circt.scalalib.om.capi.{_, given}
-import org.llvm.circt.scalalib.hw.capi.given_AttributeApi
-import org.llvm.mlir.scalalib.{_, given}
+import org.llvm.circt.scalalib.capi.dialect.om.{*, given}
+import org.llvm.circt.scalalib.capi.dialect.hw.given_AttributeApi
+import org.llvm.mlir.scalalib.{*, given}
 
 import java.lang.foreign.Arena
 import upickle.default._
@@ -93,7 +93,7 @@ case class OMTuple(value: Tuple2[OMValue, OMValue])     extends OMValue
 case class OMRef(value: Tuple2[String, String])         extends OMValue
 case class OMPath(value: String)                        extends OMValue
 
-extension (evaluatorValue: EvaluatorValue)
+extension (evaluatorValue: OMEvaluatorValue)
   def toScala(
     using Arena,
     Context
@@ -105,7 +105,7 @@ extension (evaluatorValue: EvaluatorValue)
           Seq
             .tabulate(fieldNames.arrayAttrGetNumElements)(i => fieldNames.arrayAttrGetElement(i).stringAttrGetValue)
             .zipWithIndex
-            .map((fieldName, i) => (fieldName, obj.objectGetField(fieldName.stringAttrGet).toScala))
+            .map((fieldName, i) => (fieldName, obj.objectGetField(fieldName).toScala))
         )
       )
     case primitive if primitive.isPrimitive =>
