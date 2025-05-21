@@ -1,17 +1,17 @@
 // SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2025 Jiuyang Liu <liu@jiuyang.me>
 
-// RUN: scala-cli --server=false --java-home=%JAVAHOME --extra-jars=%RUNCLASSPATH --scala-version=%SCALAVERSION -O="-experimental" --java-opt="--enable-native-access=ALL-UNNAMED" --java-opt="--enable-preview" --java-opt="-Djava.library.path=%JAVALIBRARYPATH" %s && firtool Passthrough*.mlirbc | FileCheck %s -check-prefix=VERILOG
-// RUN: rm *.mlirbc
+// DEFINE: %{test} = scala-cli --server=false --java-home=%JAVAHOME --extra-jars=%RUNCLASSPATH --scala-version=%SCALAVERSION -O="-experimental" --java-opt="--enable-native-access=ALL-UNNAMED" --java-opt="--enable-preview" --java-opt="-Djava.library.path=%JAVALIBRARYPATH" %s --
+// RUN: %{test} config config.json --width 32
+// RUN: %{test} design config.json
+// RUN: firtool Passthrough*.mlirbc | FileCheck %s -check-prefix=VERILOG
+// RUN: rm *.json *.mlirbc
 
-import me.jiuyang.zaozi.default.{*, given}
 import me.jiuyang.zaozi.*
 import me.jiuyang.zaozi.reftpe.*
 import me.jiuyang.zaozi.valuetpe.*
-import org.llvm.circt.scalalib.capi.dialect.firrtl.DialectApi as FirrtlDialectApi
-import org.llvm.circt.scalalib.capi.dialect.firrtl.given_DialectApi
+import me.jiuyang.zaozi.default.{*, given}
 
-import org.llvm.mlir.scalalib.{given_ContextApi, given_PassManagerApi, Context, ContextApi, PassManager, PassManagerApi}
 import java.lang.foreign.Arena
 
 case class PassthroughParameter(width: Int) extends Parameter
@@ -37,12 +37,3 @@ object PassthroughModule extends Generator[PassthroughParameter, PassthroughLaye
     val io = summon[Interface[PassthroughIO]]
     io.o := io.i
   // VERILOG: endmodule
-
-given Arena   = Arena.ofConfined()
-given Context = summon[ContextApi].contextCreate
-summon[FirrtlDialectApi].loadDialect
-
-PassthroughModule.dumpMlirbc(PassthroughParameter(32))
-
-summon[Context].destroy()
-summon[Arena].close()
