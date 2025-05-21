@@ -8,6 +8,7 @@
 .direnv/
 .idea/
 .scala-build/
+__pycache__/
 
 out/
 result*
