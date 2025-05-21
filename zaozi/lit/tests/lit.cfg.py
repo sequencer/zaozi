@@ -3,9 +3,12 @@ import lit.formats
 from lit.llvm import llvm_config
 from lit.llvm.subst import ToolSubst
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from ScalaCliTest import ScalaCliTest
+
 config.name = 'ZAOZI'
-config.test_format = lit.formats.ShTest(True)
-config.suffixes = [".sc"]
+config.test_format = ScalaCliTest(True)
+config.suffixes = [".scala", ".sc"]
 config.substitutions = [
     ('%SCALAVERSION', config.scala_version),
     ('%RUNCLASSPATH', ':'.join(config.run_classpath)),
