@@ -3,44 +3,46 @@ from z3 import *
 import re
 from string import Template
 
-def solve_and_replace(file_path):
+def solve_and_replace(file_path, template_path):
     with open(file_path, 'r') as f:
         content = f.read()
 
-    # Split the content into two parts: before and after "========="
-    parts = content.split('====================')
-    if len(parts) != 2:
-        raise ValueError("File format is incorrect. Missing '====================' separator.")
+    with open(template_path, 'r') as f:
+        template = f.read()
 
-    before, after = parts
-    smtlib_expr = after.strip()
-
-    # Parse the SMT-LIB expression using Z3
+    # # Parse the SMT-LIB expression using Z3
     solver = Solver()
-    solver.from_string(smtlib_expr)
+    solver.from_string(content)
+
+    print("Parsed SMT-LIB expression:", content)
 
     # Check satisfiability and get the model
     if solver.check() == sat:
         model = solver.model()
+        print(model.decls())
         # Extract the values of all declared constants
         assignments = {str(d): model[d] for d in model.decls()}
     else:
-        # If unsatisfiable, set all variables to default value 0
-        assignments = {}
+        # If unsatisfiable, print the log and return
+        print("Unsatisfiable")
+        return
+    
+    print("Assignments:", assignments)
 
     # Use a string template to replace placeholders
-    template = Template(before)
-    # Replace variables with their solved values or default to 0
-    resolved_before = template.safe_substitute(assignments)
-    # Replace any unresolved placeholders with 0
-    resolved_before = re.sub(r'x\$\w+', '0', resolved_before)
+    template = Template(template)
 
-    print(resolved_before)
+    resolved = template.safe_substitute(assignments)
+
+    resolved = re.sub(r"x-1 ", "", resolved)
+
+    print(resolved)
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Solve SMT-LIB expressions and replace placeholders.")
     parser.add_argument("-f", "--file", required=True, help="Path to the SMT-LIB file.")
+    parser.add_argument("-t", "--template", required=True, help="Path to the template file.")
     args = parser.parse_args()
 
-    solve_and_replace(args.file)
+    solve_and_replace(args.file, args.template)

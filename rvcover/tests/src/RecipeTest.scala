@@ -6,34 +6,40 @@ import me.jiuyang.smtlib.default.{*, given}
 import me.jiuyang.smtlib.tpe.*
 import me.jiuyang.rvcover.*
 
-import utest.*
-
-import org.chipsalliance.rvdecoderdb.*
-
+import os.Path
 import java.io.{File, FileWriter}
 
-import java.lang.foreign.Arena
+import utest.*
 
 object RecipeTest extends TestSuite:
   val tests = Tests:
     test("TestRecipe"):
       rvcoverTest {
-        val recipe = Recipe("TestRecipe")
+        val r = recipe("TestRecipe") {
+          index(0) {
+            isAddi()
+            rdRange(1, 2)
+            rs1Range(1, 32)
+            immRange(0, 1024)
+          }
+          index(1) {
+            isAddi()
+            rdRange(1, 2)
+            rs1Range(1, 32)
+            immRange(0, 1024)
+          }
+          index(2) {
+            isAddi()
+            rdRange(1, 2)
+            rs1Range(1, 32)
+            immRange(0, 1024)
+          }
+        }
 
-        val rs1 = Rs1()
+        assert(r.name == "TestRecipe")
+        println(r)
 
-        rs1.addConstraint(rs1.value > 4.S)
-
-        val add = Inst("add", List(Rd(), rs1, Rs2()))
-
-        recipe.addInstruction(add)
-
-        println(recipe.toString())
-
-        // output file
-        val writer = new FileWriter(new File("./output.smt2"), false)
-        writer.write(recipe.toString + "\n" + "====================\n")
+        val writer = new FileWriter(new File("./output.template"), true)
+        writer.write(r.toString())
         writer.close()
-
-        recipe.cook()
       }
