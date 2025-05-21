@@ -35,7 +35,6 @@ import org.llvm.mlir.scalalib.{Block, Context, LocationApi, Operation, given}
 import java.lang.foreign.Arena
 
 // When Import the default, all method in ConstructorApi should be exported
-val constructorApi = summon[ConstructorApi]
 export given_ConstructorApi.*
 
 given ConstructorApi with
