@@ -20,19 +20,19 @@ object RecipeTest extends TestSuite:
             isAddi()
             rdRange(1, 2)
             rs1Range(1, 32)
-            immRange(0, 1024)
+            imm20Range(0, 1024)
           }
           index(1) {
             isAddi()
             rdRange(1, 2)
             rs1Range(1, 32)
-            immRange(0, 1024)
+            imm20Range(0, 1024)
           }
           index(2) {
             isAddi()
             rdRange(1, 2)
             rs1Range(1, 32)
-            immRange(0, 1024)
+            imm20Range(0, 1024)
           }
         }
 
