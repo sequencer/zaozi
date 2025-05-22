@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2025 Jianhao Ye <Clo91eaf@qq.com>
-package me.jiuyang.zaozi.circtlib.tests
+package me.jiuyang.zaozi.mlirlib.tests
 
 import org.llvm.mlir.scalalib.dialect.func.{Func, FuncApi, *, given}
 import org.llvm.mlir.scalalib.dialect.smt.capi.{*, given}
