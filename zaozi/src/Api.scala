@@ -100,7 +100,7 @@ trait Generator[PARAM <: Parameter, L <: LayerInterface[PARAM], I <: HWInterface
   def interface(parameter: PARAM): I
   def probe(parameter:     PARAM): P
 
-  private[zaozi] def parseParameter(args: Seq[String]): PARAM
+  def parseParameter(args: Seq[String]): PARAM
 
   def main(args: Array[String]): Unit
 
