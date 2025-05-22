@@ -2,10 +2,10 @@
 // SPDX-FileCopyrightText: 2025 Jiuyang Liu <liu@jiuyang.me>
 
 // DEFINE: %{test} = scala-cli --server=false --java-home=%JAVAHOME --extra-jars=%RUNCLASSPATH --scala-version=%SCALAVERSION -O="-experimental" --java-opt="--enable-native-access=ALL-UNNAMED" --java-opt="--enable-preview" --java-opt="-Djava.library.path=%JAVALIBRARYPATH" %s --
-// RUN: %{test} config config.json --width 32
-// RUN: %{test} design config.json
+// RUN: %{test} config %t.json --width 32
+// RUN: %{test} design %t.json
 // RUN: firtool Passthrough*.mlirbc | FileCheck %s -check-prefix=VERILOG
-// RUN: rm *.json *.mlirbc
+// RUN: rm %t.json *.mlirbc -f
 
 import me.jiuyang.zaozi.*
 import me.jiuyang.zaozi.reftpe.*
