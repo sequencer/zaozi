@@ -47,53 +47,88 @@ class generator extends MacroAnnotation:
         )
 
         def parseParameterDef =
-          val tpsParam = tpiParam.tpe.typeSymbol
-          Seq(selfOpt.get.tpt, tpiParam, tpsParam.companionModule.tree.asInstanceOf[ValDef].tpt)
+          val tpsParam     = tpiParam.symbol
+          val paramCompObj = tpsParam.companionClass
+          if (
+            !(tpiParam.tpe <:< TypeRepr.of[java.io.Serializable]
+              && paramCompObj.typeRef <:< TypeRepr.of[java.lang.Object])
+          )
+            report.errorAndAbort(s"${tpiParam.show} should be a case class")
+
+          Seq(
+            selfOpt.get.tpt,
+            tpiParam,
+            tpsParam.companionModule.tree.asInstanceOf[ValDef].tpt /* type of module class */
+          )
             .map(_.tpe.asType) match
-            case Seq('[tObj], '[tParam], '[tCompanion]) =>
+            case Seq('[tObj], '[tParam], '[tParamCompModule]) =>
               def parseParameterImpl(
                 args:        Expr[Seq[String]]
               )(
                 using owner: Quotes
               ) =
                 // Ref: https://github.com/com-lihaoyi/mainargs/blob/e815520df9762111643208d57898441d87105811/mainargs/src-3/Macros.scala#L41
-                val paramConstructor = tpsParam.companionModule
-                  .memberMethod("apply")
-                  .filter(p =>
-                    p.paramSymss.flatten.corresponds(tpsParam.primaryConstructor.paramSymss.flatten): (p1, p2) =>
-                      p1.name == p2.name
-                  )
-                  .headOption
-                  .getOrElse {
-                    report.errorAndAbort(
-                      s"Cannot find apply method in companion object of ${tpiParam.tpe.show}",
-                      tpsParam.companionModule.pos.getOrElse(Position.ofMacroExpansion)
+                val paramConstructor =
+                  paramCompObj
+                    .memberMethod("apply")
+                    .find(
+                      _.paramSymss.flatten.map(_.name) == tpsParam.primaryConstructor.paramSymss.flatten.map(_.name)
                     )
-                  }
-                val argSigs          = Expr.ofList(
-                  tpiParam.symbol.declaredFields
-                    .map: param =>
-                      param.tree.asInstanceOf[ValDef].tpt.tpe.asType match
-                        case '[t] =>
-                          val tokensReader = Expr
-                            .summon[mainargs.TokensReader[t]]
-                            .getOrElse:
-                              report.errorAndAbort(
-                                s"No TokensReader[${Type.show[t]}] found for parameter ${param.name}"
-                              )
+                    .getOrElse {
+                      report.errorAndAbort(
+                        s"Cannot find apply method in companion object of ${tpiParam.tpe.show}",
+                        paramCompObj.pos.getOrElse(Position.ofMacroExpansion)
+                      )
+                    }
+                if (paramConstructor.paramSymss.length > 1)
+                  report.errorAndAbort("Multiple parameter lists not supported")
 
-                          '{
-                            mainargs.ArgSig
-                              .create[t, tObj](
-                                ${ Expr(param.name) },
-                                new mainargs.arg,
-                                None // TODO: support default value
-                              )(
-                                using ${ tokensReader }
+                val argSigs = paramConstructor.paramSymss.flatten
+                  .zip(LazyList.from(1))
+                  .map: (param, idx) =>
+                    param.tree.asInstanceOf[ValDef].tpt.tpe.asType match
+                      case '[t] =>
+                        val tokensReader = Expr
+                          .summon[mainargs.TokensReader[t]]
+                          .getOrElse:
+                            report.errorAndAbort(
+                              s"No TokensReader[${Type.show[t]}] found for parameter ${param.name}"
+                            )
+
+                        val defaultMethodPattern = """\$lessinit\$greater\$default\$(\d+)""".r
+                        val defaultOpt           = paramCompObj.tree
+                          .asInstanceOf[ClassDef]
+                          .body
+                          .collectFirst:
+                            case d @ DefDef(defaultMethodPattern(nameIdx), _, _, _)
+                                if param.flags.is(Flags.HasDefault) && nameIdx.toInt == idx =>
+                              d
+                        match
+                          case Some(defaultMethod) =>
+                            '{
+                              Some((owner: tParamCompModule) =>
+                                ${
+                                  Select('{ owner }.asTerm, defaultMethod.symbol).asExpr match
+                                    case '{ $value: `t` } => value
+                                    case expr             => expr.asExprOf[t]
+                                }
                               )
-                          }
-                )
-                val invokeRaw        =
+                            }
+                          case None => '{ None }
+
+                        '{
+                          mainargs.ArgSig
+                            .create[t, tParamCompModule](
+                              ${ Expr(param.name) },
+                              new mainargs.arg,
+                              ${ defaultOpt }
+                            )(
+                              using ${ tokensReader }
+                            )
+                        }
+                  .pipe(Expr.ofList)
+
+                val invokeRaw =
                   def callOf(
                     methodOwner: Expr[Any],
                     args:        Expr[Seq[Any]]
@@ -109,17 +144,18 @@ class generator extends MacroAnnotation:
                       )
                       .asExprOf[tParam]
 
-                  '{ (b: tCompanion, params: Seq[Any]) => ${ callOf('b, 'params) } }
+                  '{ (b: tParamCompModule, params: Seq[Any]) => ${ callOf('b, 'params) } }
 
                 val mainData = '{
                   mainargs.MainData
-                    .create[tParam, tCompanion](
+                    .create[tParam, tParamCompModule](
                       "apply",
                       new mainargs.main,
                       ${ argSigs },
                       ${ invokeRaw }
                     )
                 }
+
                 '{
                   (new mainargs.ParserForClass[tParam](
                     $mainData.asInstanceOf[mainargs.MainData[tParam, Any]],
