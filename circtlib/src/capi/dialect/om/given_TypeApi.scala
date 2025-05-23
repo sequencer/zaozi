@@ -20,8 +20,9 @@ import org.llvm.circt.CAPI.{
   omTypeIsAMapType,
   omTypeIsAStringType
 }
-import org.llvm.mlir.scalalib.given
-import org.llvm.mlir.scalalib.{Identifier, Type, TypeID}
+
+import org.llvm.mlir.scalalib.capi.support.{*, given}
+import org.llvm.mlir.scalalib.capi.ir.{Identifier, Type, given}
 
 import java.lang.foreign.Arena
 

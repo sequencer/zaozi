@@ -19,8 +19,8 @@ import org.llvm.circt.CAPI.{
   mooreUnpackedArrayTypeGet,
   mooreVoidTypeGet
 }
-import org.llvm.mlir.scalalib.given
-import org.llvm.mlir.scalalib.{Context, Type}
+import org.llvm.mlir.scalalib.capi.support.{*, given}
+import org.llvm.mlir.scalalib.capi.ir.{Context, Type, given}
 
 import java.lang.foreign.Arena
 

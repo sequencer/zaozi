@@ -2,7 +2,8 @@
 // SPDX-FileCopyrightText: 2025 Jiuyang Liu <liu@jiuyang.me>
 package org.llvm.circt.scalalib.dialect.firrtl.operation
 
-import org.llvm.mlir.scalalib.{HasOperation, Operation}
+import org.llvm.mlir.scalalib.capi.support.HasOperation
+import org.llvm.mlir.scalalib.capi.ir.Operation
 
 class AddPrim(val _operation: Operation)
 trait AddPrimApi extends HasOperation[AddPrim]

@@ -5,7 +5,7 @@ package me.jiuyang.zaozi.valuetpe
 import me.jiuyang.zaozi.TypeImpl
 import me.jiuyang.zaozi.magic.DynamicSubfield
 import me.jiuyang.zaozi.reftpe.Ref
-import org.llvm.mlir.scalalib.{Block, Context, Type, Value}
+import org.llvm.mlir.scalalib.capi.ir.{Block, Context, Type, Value}
 
 import java.lang.foreign.Arena
 

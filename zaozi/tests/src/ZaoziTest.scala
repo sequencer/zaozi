@@ -18,7 +18,7 @@ import org.llvm.circt.scalalib.capi.firtool.FirtoolApi
 import org.llvm.circt.scalalib.capi.firtool.given
 import org.llvm.circt.scalalib.capi.firtool.FirtoolOptions
 import org.llvm.circt.scalalib.capi.exportfirrtl.given_ExportFirrtlApi
-import org.llvm.mlir.scalalib.{
+import org.llvm.mlir.scalalib.capi.ir.{
   given_AttributeApi,
   given_BlockApi,
   given_ContextApi,
@@ -27,7 +27,6 @@ import org.llvm.mlir.scalalib.{
   given_ModuleApi,
   given_NamedAttributeApi,
   given_OperationApi,
-  given_PassManagerApi,
   given_RegionApi,
   given_TypeApi,
   given_ValueApi,
@@ -39,9 +38,9 @@ import org.llvm.mlir.scalalib.{
   ModuleApi as MlirModuleApi,
   NamedAttributeApi,
   OperationApi,
-  PassManager,
   Type
 }
+import org.llvm.mlir.scalalib.capi.pass.{given_PassManagerApi, PassManager, PassManagerApi}
 import utest.assert
 
 import java.lang.foreign.Arena
@@ -111,7 +110,7 @@ trait HasVerilogTest:
     summon[EmitDialectApi].loadDialect
     given FirtoolOptions = summon[FirtoolApi].firtoolOptionsCreateDefault
 
-    given PassManager  = summon[org.llvm.mlir.scalalib.PassManagerApi].passManagerCreate
+    given PassManager  = summon[PassManagerApi].passManagerCreate
     val out            = new StringBuilder
     val firtoolOptions = summon[FirtoolOptions]
 

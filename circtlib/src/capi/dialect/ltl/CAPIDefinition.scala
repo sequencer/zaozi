@@ -4,7 +4,7 @@
 // circt-c/Dialect/LTL.h
 package org.llvm.circt.scalalib.capi.dialect.ltl
 
-import org.llvm.mlir.scalalib.*
+import org.llvm.mlir.scalalib.capi.ir.Context
 
 import java.lang.foreign.Arena
 

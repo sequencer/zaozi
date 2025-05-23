@@ -4,8 +4,8 @@ package org.llvm.circt.scalalib.capi.dialect.firrtl
 
 import org.llvm.circt.*
 import org.llvm.circt.CAPI.{mlirGetDialectHandle__firrtl__ as _, *}
-import org.llvm.mlir.scalalib.given
-import org.llvm.mlir.scalalib.{Context, Identifier, Type}
+import org.llvm.mlir.scalalib.capi.support.{*, given}
+import org.llvm.mlir.scalalib.capi.ir.{Context, Identifier, Type, given}
 
 import java.lang.foreign.{Arena, MemorySegment}
 

@@ -8,7 +8,7 @@ import me.jiuyang.zaozi.magic.macros.generator
 import me.jiuyang.zaozi.reftpe.*
 import me.jiuyang.zaozi.valuetpe.*
 
-import org.llvm.mlir.scalalib.{Block, Context, Module as MlirModule}
+import org.llvm.mlir.scalalib.capi.ir.{Block, Context, Module as MlirModule}
 
 import java.lang.foreign.Arena
 import mainargs.TokensReader

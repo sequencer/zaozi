@@ -6,7 +6,7 @@ import me.jiuyang.zaozi.reftpe.Ref
 import me.jiuyang.zaozi.valuetpe.Data
 import me.jiuyang.zaozi.TypeImpl
 import org.llvm.circt.scalalib.dialect.firrtl.operation.Module as CirctModule
-import org.llvm.mlir.scalalib.{Block, Context, Operation, Type, Value}
+import org.llvm.mlir.scalalib.capi.ir.{Block, Context, Operation, Type, Value}
 
 import java.lang.foreign.Arena
 import scala.language.dynamics

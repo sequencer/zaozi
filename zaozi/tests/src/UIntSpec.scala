@@ -6,7 +6,8 @@ import me.jiuyang.zaozi.default.{*, given}
 import me.jiuyang.zaozi.*
 import me.jiuyang.zaozi.reftpe.*
 import me.jiuyang.zaozi.valuetpe.*
-import org.llvm.mlir.scalalib.{given_ContextApi, given_PassManagerApi, Context, ContextApi, PassManager, PassManagerApi}
+import org.llvm.mlir.scalalib.capi.ir.{given_ContextApi, Context, ContextApi}
+import org.llvm.mlir.scalalib.capi.pass.{given_PassManagerApi, PassManager, PassManagerApi}
 import utest.*
 
 import java.lang.foreign.Arena

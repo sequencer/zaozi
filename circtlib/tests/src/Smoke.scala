@@ -14,7 +14,7 @@ import org.llvm.circt.scalalib.capi.dialect.firrtl.{
   TypeApi as FirrtlTypeApi
 }
 import org.llvm.circt.scalalib.dialect.firrtl.operation.{*, given}
-import org.llvm.mlir.scalalib.{given_ModuleApi, Module as MlirModule, ModuleApi as MlirModuleApi, *, given}
+import org.llvm.mlir.scalalib.capi.ir.{given_ModuleApi, Module as MlirModule, ModuleApi as MlirModuleApi, *, given}
 import utest.*
 
 import java.lang.foreign.Arena
@@ -107,8 +107,8 @@ object Smoke extends TestSuite:
                 .appendToBlock()
 
             test("Reg"):
-              given org.llvm.mlir.scalalib.Block = module.block
-              val clock                          = summon[WireApi].op(
+              given org.llvm.mlir.scalalib.capi.ir.Block = module.block
+              val clock                                  = summon[WireApi].op(
                 name = "clock",
                 location = unknownLocation,
                 nameKind = FirrtlNameKind.Droppable,
@@ -127,22 +127,22 @@ object Smoke extends TestSuite:
                 .appendToBlock()
 
             test("RegReset"):
-              given org.llvm.mlir.scalalib.Block = module.block
-              val clock                          = summon[WireApi].op(
+              given org.llvm.mlir.scalalib.capi.ir.Block = module.block
+              val clock                                  = summon[WireApi].op(
                 name = "clock",
                 location = unknownLocation,
                 nameKind = FirrtlNameKind.Droppable,
                 tpe = summon[FirrtlTypeApi].getClock
               )
               clock.operation.appendToBlock()
-              val reset                          = summon[WireApi].op(
+              val reset                                  = summon[WireApi].op(
                 name = "reset",
                 location = unknownLocation,
                 nameKind = FirrtlNameKind.Droppable,
                 tpe = 1.getUInt
               )
               reset.operation.appendToBlock()
-              val resetValue                     = summon[ConstantApi].op(
+              val resetValue                             = summon[ConstantApi].op(
                 input = BigInt(19890604),
                 width = 64,
                 signed = false,
@@ -163,7 +163,7 @@ object Smoke extends TestSuite:
                 .appendToBlock()
 
             test("Node"):
-              given org.llvm.mlir.scalalib.Block = module.block
+              given org.llvm.mlir.scalalib.capi.ir.Block = module.block
               summon[NodeApi]
                 .op(
                   name = "someReg",

@@ -6,7 +6,7 @@ import scala.collection.mutable.LinkedHashMap
 
 import org.llvm.circt.scalalib.capi.dialect.om.{*, given}
 import org.llvm.circt.scalalib.capi.dialect.hw.given_AttributeApi
-import org.llvm.mlir.scalalib.{*, given}
+import org.llvm.mlir.scalalib.capi.ir.{*, given}
 
 import java.lang.foreign.Arena
 import upickle.default._

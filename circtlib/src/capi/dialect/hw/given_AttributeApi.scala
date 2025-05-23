@@ -26,8 +26,8 @@ import org.llvm.circt.CAPI.{
   hwParamDeclRefAttrGetType,
   hwParamVerbatimAttrGet
 }
-import org.llvm.mlir.scalalib.given
-import org.llvm.mlir.scalalib.{Attribute, Context, StringRef, Type}
+import org.llvm.mlir.scalalib.capi.support.{*, given}
+import org.llvm.mlir.scalalib.capi.ir.{Attribute, Context, Type, given}
 
 import java.lang.foreign.{Arena, MemorySegment}
 

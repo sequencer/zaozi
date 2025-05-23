@@ -4,8 +4,8 @@ package org.llvm.circt.scalalib.capi.dialect.firrtl
 
 import org.llvm.circt.*
 import org.llvm.circt.CAPI.{firrtlImportAnnotationsFromJSONRaw, firrtlValueFoldFlow}
-import org.llvm.mlir.scalalib.given
-import org.llvm.mlir.scalalib.{given_AttributeApi, Attribute, AttributeApi as MlirAttributeApi, Context, Value}
+import org.llvm.mlir.scalalib.capi.support.{*, given}
+import org.llvm.mlir.scalalib.capi.ir.{Attribute, AttributeApi as MlirAttributeApi, Context, Value, given}
 
 import java.lang.foreign.Arena
 

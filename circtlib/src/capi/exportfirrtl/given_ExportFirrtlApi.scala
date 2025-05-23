@@ -3,8 +3,8 @@
 package org.llvm.circt.scalalib.capi.exportfirrtl
 
 import org.llvm.circt.CAPI.mlirExportFIRRTL
-import org.llvm.mlir.scalalib.given
-import org.llvm.mlir.scalalib.{LogicalResult, Module}
+import org.llvm.mlir.scalalib.capi.support.{*, given}
+import org.llvm.mlir.scalalib.capi.ir.{Module, given}
 
 import java.lang.foreign.{Arena, MemorySegment}
 

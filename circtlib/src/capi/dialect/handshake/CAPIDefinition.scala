@@ -4,7 +4,7 @@
 // circt-c/Dialect/Handshake.h
 package org.llvm.circt.scalalib.capi.dialect.handshake
 
-import org.llvm.mlir.scalalib.*
+import org.llvm.mlir.scalalib.capi.ir.Context
 
 import java.lang.foreign.Arena
 

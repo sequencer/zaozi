@@ -2,7 +2,8 @@
 // SPDX-FileCopyrightText: 2025 Jiuyang Liu <liu@jiuyang.me>
 package org.llvm.circt.scalalib.capi.exportverilog
 
-import org.llvm.mlir.scalalib.{LogicalResult, Module}
+import org.llvm.mlir.scalalib.capi.support.LogicalResult
+import org.llvm.mlir.scalalib.capi.ir.Module
 
 import java.lang.foreign.Arena
 

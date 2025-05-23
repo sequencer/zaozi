@@ -7,7 +7,7 @@ import me.jiuyang.zaozi.reftpe.Referable
 import me.jiuyang.zaozi.valuetpe.Data
 
 import org.llvm.circt.scalalib.dialect.firrtl.operation.{ConnectApi, InvalidValueApi, given}
-import org.llvm.mlir.scalalib.{Block, Context, given}
+import org.llvm.mlir.scalalib.capi.ir.{Block, Context, given}
 
 import java.lang.foreign.Arena
 

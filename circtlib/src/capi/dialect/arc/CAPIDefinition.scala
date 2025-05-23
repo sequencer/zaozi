@@ -4,7 +4,7 @@
 // circt-c/Dialect/Arc.h
 package org.llvm.circt.scalalib.capi.dialect.arc
 
-import org.llvm.mlir.scalalib.*
+import org.llvm.mlir.scalalib.capi.ir.Context
 
 import java.lang.foreign.Arena
 

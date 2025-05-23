@@ -9,8 +9,7 @@ import org.llvm.circt.CAPI.{
   seqTypeIsAClock,
   seqTypeIsAImmutable
 }
-import org.llvm.mlir.scalalib.given
-import org.llvm.mlir.scalalib.{Context, Type}
+import org.llvm.mlir.scalalib.capi.ir.{Context, Type, given}
 
 import java.lang.foreign.Arena
 

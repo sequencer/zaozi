@@ -16,10 +16,10 @@ private def summonContextualParameters(
   val typeImpl        = Expr.summon[me.jiuyang.zaozi.TypeImpl].getOrElse {
     report.errorAndAbort("No implicit value found for Arena.")
   }
-  val context         = Expr.summon[org.llvm.mlir.scalalib.Context].getOrElse {
+  val context         = Expr.summon[org.llvm.mlir.scalalib.capi.ir.Context].getOrElse {
     report.errorAndAbort("No implicit value found for Context.")
   }
-  val block           = Expr.summon[org.llvm.mlir.scalalib.Block].getOrElse {
+  val block           = Expr.summon[org.llvm.mlir.scalalib.capi.ir.Block].getOrElse {
     report.errorAndAbort("No implicit value found for Block.")
   }
   val file            = Expr.summon[sourcecode.File].getOrElse {
@@ -112,14 +112,14 @@ def referableSelectDynamic[T <: me.jiuyang.zaozi.valuetpe.Data: Type](
   fieldDataType.asType match {
     case tpe @ '[fieldDataType] =>
       '{
-        given java.lang.foreign.Arena          = $arena
-        given me.jiuyang.zaozi.TypeImpl        = $typeImpl
-        given org.llvm.mlir.scalalib.Context   = $context
-        given org.llvm.mlir.scalalib.Block     = $block
-        given sourcecode.File                  = $file
-        given sourcecode.Line                  = $line
-        given sourcecode.Name.Machine          = $valName
-        given me.jiuyang.zaozi.InstanceContext = $instanceContext
+        given java.lang.foreign.Arena                = $arena
+        given me.jiuyang.zaozi.TypeImpl              = $typeImpl
+        given org.llvm.mlir.scalalib.capi.ir.Context = $context
+        given org.llvm.mlir.scalalib.capi.ir.Block   = $block
+        given sourcecode.File                        = $file
+        given sourcecode.Line                        = $line
+        given sourcecode.Name.Machine                = $valName
+        given me.jiuyang.zaozi.InstanceContext       = $instanceContext
         $ref._tpe
           .asInstanceOf[me.jiuyang.zaozi.magic.DynamicSubfield]
           // Hack with union type

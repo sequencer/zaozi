@@ -17,8 +17,7 @@ import org.llvm.circt.CAPI.{
   omMapAttrGetNumElements,
   omReferenceAttrGetInnerRef
 }
-import org.llvm.mlir.scalalib.given
-import org.llvm.mlir.scalalib.{Attribute, Identifier}
+import org.llvm.mlir.scalalib.capi.ir.{Attribute, Identifier, given}
 
 import java.lang.foreign.Arena
 

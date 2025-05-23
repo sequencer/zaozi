@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: 2025 Jianhao Ye <Clo91eaf@qq.com>
 package me.jiuyang.smtlib
 
-import org.llvm.mlir.scalalib.{Block, Context, Operation, Type, Value, given}
+import org.llvm.mlir.scalalib.capi.ir.{Block, Context, Operation, Type, Value, given}
 import me.jiuyang.smtlib.tpe.*
 
 import java.lang.foreign.Arena
