@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: 2025 Jianhao Ye <Clo91eaf@qq.com>
 package org.llvm.mlir.scalalib.dialect.smt.operation
 
-import org.llvm.mlir.scalalib.{
+import org.llvm.mlir.scalalib.capi.ir.{
   AttributeApi,
   Block,
   Context,
