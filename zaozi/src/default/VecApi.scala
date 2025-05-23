@@ -9,7 +9,7 @@ import me.jiuyang.zaozi.valuetpe.*
 
 import org.llvm.circt.scalalib.capi.dialect.firrtl.{given_FirrtlBundleFieldApi, given_TypeApi, FirrtlNameKind}
 import org.llvm.circt.scalalib.dialect.firrtl.operation.{NodeApi, SubaccessApi, SubindexApi, given}
-import org.llvm.mlir.scalalib.{Block, Context, LocationApi, Operation, given}
+import org.llvm.mlir.scalalib.capi.ir.{Block, Context, LocationApi, Operation, given}
 
 import java.lang.foreign.Arena
 

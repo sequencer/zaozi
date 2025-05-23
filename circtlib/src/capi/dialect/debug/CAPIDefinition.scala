@@ -4,7 +4,7 @@
 // circt-c/Dialect/Debug.h
 package org.llvm.circt.scalalib.capi.dialect.debug
 
-import org.llvm.mlir.scalalib.Context
+import org.llvm.mlir.scalalib.capi.ir.Context
 
 import java.lang.foreign.Arena
 

@@ -4,7 +4,7 @@
 // circt-c/Dialect/Moore.h
 package org.llvm.circt.scalalib.capi.dialect.moore
 
-import org.llvm.mlir.scalalib.*
+import org.llvm.mlir.scalalib.capi.ir.{Context, Type}
 
 import java.lang.foreign.Arena
 

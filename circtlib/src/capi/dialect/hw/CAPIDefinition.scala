@@ -2,7 +2,8 @@
 // SPDX-FileCopyrightText: 2025 Jiuyang Liu <liu@jiuyang.me>
 package org.llvm.circt.scalalib.capi.dialect.hw
 
-import org.llvm.mlir.scalalib.*
+import org.llvm.mlir.scalalib.capi.support.{*, given}
+import org.llvm.mlir.scalalib.capi.ir.{Context, Module, Operation, given}
 
 import java.lang.foreign.{Arena, MemorySegment}
 
@@ -130,13 +131,13 @@ trait InstanceGraphApi:
   extension (operation:           Operation)
     inline def instanceGraphGet(
       using arena: Arena
-    ):     HWInstanceGraph
+    ): HWInstanceGraph
   extension (hwInstanceGraphNode: HWInstanceGraphNode)
     inline def equal(that: HWInstanceGraphNode): Boolean
     inline def getModule(
       using arena: Arena
-    ):                                           Module
+    ): Module
     inline def getModuleOp(
       using arena: Arena
-    ):                                           Operation
+    ): Operation
 end InstanceGraphApi

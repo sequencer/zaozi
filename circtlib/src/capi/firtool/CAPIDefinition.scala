@@ -2,9 +2,9 @@
 // SPDX-FileCopyrightText: 2025 Jiuyang Liu <liu@jiuyang.me>
 package org.llvm.circt.scalalib.capi.firtool
 
-import org.llvm.mlir.scalalib.LogicalResult
-import org.llvm.mlir.scalalib.PassManager
-import org.llvm.mlir.scalalib.{EnumHasToNative, HasSegment, HasSizeOf}
+import org.llvm.mlir.scalalib.*
+import org.llvm.mlir.scalalib.capi.support.{*, given}
+import org.llvm.mlir.scalalib.capi.pass.PassManager
 
 import java.lang.foreign.Arena
 import java.lang.foreign.MemorySegment

@@ -4,7 +4,7 @@ package me.jiuyang.zaozi.reftpe
 
 import me.jiuyang.zaozi.TypeImpl
 import me.jiuyang.zaozi.valuetpe.*
-import org.llvm.mlir.scalalib.{Operation, Value}
+import org.llvm.mlir.scalalib.capi.ir.{Operation, Value}
 
 import java.lang.foreign.Arena
 

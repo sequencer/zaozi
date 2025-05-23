@@ -3,8 +3,7 @@
 package org.llvm.circt.scalalib.capi.dialect.chirrtl
 
 import org.llvm.circt.CAPI.{chirrtlTypeGetCMemory, chirrtlTypeGetCMemoryPort}
-import org.llvm.mlir.scalalib.given
-import org.llvm.mlir.scalalib.{Context, Type}
+import org.llvm.mlir.scalalib.capi.ir.{Context, Type, given}
 
 import java.lang.foreign.Arena
 

@@ -6,7 +6,7 @@ import org.llvm.circt.scalalib.capi.dialect.emit.{given_DialectApi, DialectApi a
 import org.llvm.circt.scalalib.capi.dialect.firrtl.{given_DialectApi, DialectApi as FirrtlDialectApi}
 import org.llvm.circt.scalalib.capi.dialect.hw.{given_AttributeApi, given_DialectApi, DialectApi as HWDialectApi}
 import org.llvm.circt.scalalib.capi.dialect.om.{*, given}
-import org.llvm.mlir.scalalib.{Module as MlirModule, ModuleApi as MlirModuleApi, *, given}
+import org.llvm.mlir.scalalib.capi.ir.{Module as MlirModule, ModuleApi as MlirModuleApi, *, given}
 import utest.*
 
 import java.lang.foreign.Arena

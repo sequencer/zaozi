@@ -3,7 +3,8 @@
 package org.llvm.circt.scalalib.dialect.firrtl.operation
 
 import org.llvm.circt.scalalib.capi.dialect.firrtl.{FirrtlBundleField, FirrtlConvention, FirrtlLayerConvention}
-import org.llvm.mlir.scalalib.{Block, Context, HasOperation, Location, Module as MlirModule, Operation, Value}
+import org.llvm.mlir.scalalib.capi.support.{*, given}
+import org.llvm.mlir.scalalib.capi.ir.{Block, Context, Location, Module as MlirModule, Operation, Value}
 
 import java.lang.foreign.Arena
 

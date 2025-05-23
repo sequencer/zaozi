@@ -3,7 +3,8 @@
 package org.llvm.circt.scalalib.capi.dialect.firrtl
 
 // circt-c/Dialect/Firrtl.h
-import org.llvm.mlir.scalalib.{Attribute, Context, EnumHasToNative, HasSegment, HasSizeOf, Type, Value}
+import org.llvm.mlir.scalalib.capi.support.{*, given}
+import org.llvm.mlir.scalalib.capi.ir.{Attribute, Context, Type, Value}
 
 import java.lang.foreign.{Arena, MemorySegment}
 
@@ -123,29 +124,29 @@ trait AttributeApi:
     inline def toAttribute(
       using arena: Arena,
       context:     Context
-    ):      Attribute
+    ): Attribute
   extension (ref:                   FirrtlEventControl)
     inline def attrGetEventControl(
       using arena: Arena,
       context:     Context
-    ):      Attribute
+    ): Attribute
   extension (bigInt:                BigInt)
     inline def attrGetIntegerFromString(
       tpe:         Type,
       width:       Option[Int] = None
     )(
       using arena: Arena
-    ):      Attribute
+    ): Attribute
   extension (firrtlLayerConvention: FirrtlLayerConvention)
     inline def toAttribute(
       using arena: Arena,
       context:     Context
-    ):      Attribute
+    ): Attribute
   extension (memDir:                FirrtlMemDir)
     inline def toAttribute(
       using arena: Arena,
       context:     Context
-    ):      MemorySegment
+    ): MemorySegment
   inline def getMemInit(
     filename:    String,
     isBinary:    Boolean,
@@ -153,12 +154,12 @@ trait AttributeApi:
   )(
     using arena: Arena,
     context:     Context
-  ):        Attribute
+  ): Attribute
   extension (ref:                   FirrtlNameKind)
     inline def attrGetNameKind(
       using arena: Arena,
       context:     Context
-    ):      Attribute
+    ): Attribute
   extension (value:                 String)
     inline def getParamDeclAttribute(
       name:        String,
@@ -166,7 +167,7 @@ trait AttributeApi:
     )(
       using arena: Arena,
       context:     Context
-    ):      Attribute
+    ): Attribute
   extension (value:                 BigInt)
     inline def getParamDeclAttribute(
       name:        String,
@@ -174,7 +175,7 @@ trait AttributeApi:
     )(
       using arena: Arena,
       context:     Context
-    ):      Attribute
+    ): Attribute
   extension (value:                 Double)
     inline def getParamDeclAttribute(
       name:        String,
@@ -182,17 +183,17 @@ trait AttributeApi:
     )(
       using arena: Arena,
       context:     Context
-    ):      Attribute
+    ): Attribute
   extension (portDirections:        Seq[FirrtlDirection])
     inline def attrGetPortDirs(
       using arena: Arena,
       context:     Context
-    ):      Attribute
+    ): Attribute
   extension (ruw:                   FirrtlRUW)
     inline def toAttribute(
       using arena: Arena,
       context:     Context
-    ):      MemorySegment
+    ): MemorySegment
 end AttributeApi
 
 /** Firrtl Type Api
@@ -248,25 +249,25 @@ trait TypeApi:
     inline def getAnalog(
       using arena: Arena,
       context:     Context
-    ):                                                                              Type
+    ): Type
   inline def getAnyRef(
     using arena: Arena,
     context:     Context
-  ):                                                                                Type
+  ): Type
   inline def getAsyncReset(
     using arena: Arena,
     context:     Context
-  ):                                                                                Type
+  ): Type
   extension (tpe:                Type) inline def getBitWidth(ignoreFlip: Boolean): Long
   inline def getBoolean(
     using arena: Arena,
     context:     Context
-  ):                                                                                Type
+  ): Type
   extension (firrtlBundleFields: Seq[FirrtlBundleField])
     inline def getBundle(
       using arena: Arena,
       context:     Context
-    ):                                                                              Type
+    ): Type
   extension (tpe:                Type)
     inline def getBundleFieldByIndex(
       idx:         Int
@@ -285,37 +286,37 @@ trait TypeApi:
   )(
     using arena:         Arena,
     context:             Context
-  ):                                                                                Type
+  ): Type
   inline def getClock(
     using arena: Arena,
     context:     Context
-  ):                                                                                Type
+  ): Type
   extension (tpe:                Type)
     inline def getConstType(
       using arena: Arena
-    ):                                                                              Type
+    ): Type
   inline def getDouble(
     using arena: Arena,
     context:     Context
-  ):                                                                                Type
+  ): Type
   inline def getInteger(
     using arena: Arena,
     context:     Context
-  ):                                                                                Type
+  ): Type
   inline def getList(
     element:     Type
   )(
     using arena: Arena,
     context:     Context
-  ):                                                                                Type
+  ): Type
   inline def getMaskType(
     using arena: Arena,
     context:     Context
-  ):                                                                                Type
+  ): Type
   inline def getPath(
     using arena: Arena,
     context:     Context
-  ):                                                                                Type
+  ): Type
   extension (tpe:                Type)
     inline def getRef(
       forceable:   Boolean,
@@ -323,25 +324,25 @@ trait TypeApi:
     )(
       using arena: Arena,
       context:     Context
-    ):                                                                              Type
+    ): Type
   inline def getReset(
     using arena: Arena,
     context:     Context
-  ):                                                                                Type
+  ): Type
   extension (width:              Int)
     inline def getSInt(
       using arena: Arena,
       context:     Context
-    ):                                                                              Type
+    ): Type
   inline def getString(
     using arena: Arena,
     context:     Context
-  ):                                                                                Type
+  ): Type
   extension (width:              Int)
     inline def getUInt(
       using arena: Arena,
       context:     Context
-    ):                                                                              Type
+    ): Type
   extension (tpe:                Type)
     inline def getVector(
       count:       Int
@@ -387,6 +388,6 @@ trait UtilityApi:
   )(
     using arena:    Arena,
     context:        Context
-  ):                                                             Attribute
+  ): Attribute
   inline def valueFoldFlow(value: Value, flow: FirrtlValueFlow): FirrtlValueFlow
 end UtilityApi

@@ -4,7 +4,7 @@
 // circt-c/Dialect/Chirrtl.h
 package org.llvm.circt.scalalib.capi.dialect.chirrtl
 
-import org.llvm.mlir.scalalib.{Context, Type}
+import org.llvm.mlir.scalalib.capi.ir.{Context, Type}
 
 import java.lang.foreign.Arena
 

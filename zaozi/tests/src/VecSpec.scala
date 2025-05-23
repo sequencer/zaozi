@@ -6,11 +6,10 @@ import me.jiuyang.zaozi.*
 import me.jiuyang.zaozi.default.{*, given}
 import me.jiuyang.zaozi.reftpe.Interface
 
-import org.llvm.mlir.scalalib.{given_ContextApi, Context, ContextApi}
+import org.llvm.mlir.scalalib.capi.ir.{given_ContextApi, Block, Context, ContextApi}
 
 import java.lang.foreign.Arena
 import utest.*
-import org.llvm.mlir.scalalib.Block
 import me.jiuyang.zaozi.magic.macros.generator
 
 case class VecSpecParameter(width: Int, vecCount: Int) extends Parameter

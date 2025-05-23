@@ -4,8 +4,8 @@ package org.llvm.circt.scalalib.capi.dialect.firrtl
 
 import org.llvm.circt.*
 import org.llvm.circt.CAPI.{mlirGetDialectHandle__firrtl__ as _, *}
-import org.llvm.mlir.scalalib.given
-import org.llvm.mlir.scalalib.{given_AttributeApi, Attribute, Context, Type}
+import org.llvm.mlir.scalalib.capi.support.{*, given}
+import org.llvm.mlir.scalalib.capi.ir.{Attribute, Context, Type, TypeApi, given}
 
 import java.lang.foreign.{Arena, MemorySegment}
 
@@ -117,7 +117,7 @@ given AttributeApi with
           context.segment,
           name.identifierGet.segment,
           tpe.segment,
-          value.floatAttrDoubleGet(summon[org.llvm.mlir.scalalib.TypeApi].f64TypeGet).segment
+          value.floatAttrDoubleGet(summon[TypeApi].f64TypeGet).segment
         )
       )
   extension (portDirections:        Seq[FirrtlDirection])

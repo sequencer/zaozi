@@ -4,7 +4,8 @@
 // circt-c/Dialect/OM.h
 package org.llvm.circt.scalalib.capi.dialect.om
 
-import org.llvm.mlir.scalalib.*
+import org.llvm.mlir.scalalib.capi.support.{*, given}
+import org.llvm.mlir.scalalib.capi.ir.{Attribute, Context, Identifier, Location, Module, Type, given}
 
 import java.lang.foreign.{Arena, MemorySegment}
 
@@ -48,27 +49,27 @@ end DialectApi
 trait TypeApi:
   inline def anyTypeGetTypeID(
     using arena: Arena
-  ):   TypeID
+  ): TypeID
   extension (tpe: Type)
     inline def classTypeGetName(
       using arena: Arena
     ): Identifier
   inline def classTypeGetTypeID(
     using arena: Arena
-  ):   TypeID
+  ): TypeID
   inline def frozenBasePathTypeGetTypeID(
     using arena: Arena
-  ):   TypeID
+  ): TypeID
   inline def frozenPathTypeGetTypeID(
     using arena: Arena
-  ):   TypeID
+  ): TypeID
   extension (tpe: Type)
     inline def listTypeGetElementType(
       using arena: Arena
     ): Type
   inline def listTypeGetTypeID(
     using arena: Arena
-  ):   TypeID
+  ): TypeID
   extension (tpe: Type)
     inline def mapTypeGetKeyType(
       using arena: Arena
@@ -159,23 +160,23 @@ trait EvaluatorApi:
     module:      Module
   )(
     using arena: Arena
-  ):   OMEvaluator
+  ): OMEvaluator
   extension (omObject:       OMEvaluatorValue)
     inline def objectGetField(
       name:        String
     )(
       using arena: Arena,
       context:     Context
-    ):                                              OMEvaluatorValue
+    ):                        OMEvaluatorValue
     inline def objectGetFieldNames(
       using arena: Arena
-    ):                                              Attribute
-    inline def objectGetHash:                       Int
+    ):                        Attribute
+    inline def objectGetHash: Int
     inline def objectGetType(
       using arena: Arena
-    ):                                              Type
+    ):                        Type
     inline def objectIsEq(other: OMEvaluatorValue): Boolean
-    inline def objectIsNull:                        Boolean
+    inline def objectIsNull: Boolean
   extension (evaluatorValue: OMEvaluatorValue)
     inline def pathGetAsString(
       using arena: Arena
@@ -190,7 +191,7 @@ trait EvaluatorApi:
     primitive:   Attribute
   )(
     using arena: Arena
-  ):   OMEvaluatorValue
+  ): OMEvaluatorValue
   extension (primitive:      Attribute)
     /** wrapper to [[fromPrimitive]] */
     inline def toEvaluatorValue(

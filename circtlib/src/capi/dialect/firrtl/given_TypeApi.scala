@@ -49,8 +49,8 @@ import org.llvm.circt.CAPI.{
   firrtlTypeIsAVector,
   firrtlTypeIsConst
 }
-import org.llvm.mlir.scalalib.given
-import org.llvm.mlir.scalalib.{Context, Type}
+import org.llvm.mlir.scalalib.capi.support.{*, given}
+import org.llvm.mlir.scalalib.capi.ir.{Context, DialectHandle, Type, given}
 
 import java.lang.foreign.Arena
 

@@ -11,8 +11,7 @@ import org.llvm.circt.CAPI.{
   llhdTypeIsASignalType,
   llhdTypeIsATimeType
 }
-import org.llvm.mlir.scalalib.Type
-import org.llvm.mlir.scalalib.given
+import org.llvm.mlir.scalalib.capi.ir.{Type, given}
 
 import java.lang.foreign.Arena
 

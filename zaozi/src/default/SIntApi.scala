@@ -28,7 +28,7 @@ import org.llvm.circt.scalalib.dialect.firrtl.operation.{
   SubPrimApi,
   given
 }
-import org.llvm.mlir.scalalib.{Block, Context, LocationApi, Operation, given}
+import org.llvm.mlir.scalalib.capi.ir.{Block, Context, LocationApi, Operation, given}
 
 import java.lang.foreign.Arena
 

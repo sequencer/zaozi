@@ -11,8 +11,7 @@ import org.llvm.circt.CAPI.{
   hwInstanceGraphNodeGetModule,
   hwInstanceGraphNodeGetModuleOp
 }
-import org.llvm.mlir.scalalib.given
-import org.llvm.mlir.scalalib.{Module, Operation}
+import org.llvm.mlir.scalalib.capi.ir.{Module, Operation, given}
 
 import java.lang.foreign.{Arena, MemorySegment}
 

@@ -57,8 +57,8 @@ import org.llvm.circt.CAPI.{
   circtFirtoolPopulateLowFIRRTLToHW,
   circtFirtoolPopulatePreprocessTransforms
 }
-import org.llvm.mlir.scalalib.given
-import org.llvm.mlir.scalalib.{LogicalResult, PassManager}
+import org.llvm.mlir.scalalib.capi.support.{*, given}
+import org.llvm.mlir.scalalib.capi.pass.{PassManager, given}
 
 import java.lang.foreign.{Arena, MemorySegment}
 

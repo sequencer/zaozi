@@ -12,7 +12,7 @@ import me.jiuyang.zaozi.valuetpe.*
 import org.llvm.circt.scalalib.capi.dialect.firrtl.given_DialectApi
 import org.llvm.circt.scalalib.capi.dialect.firrtl.DialectApi as FirrtlDialectApi
 import org.llvm.circt.scalalib.dialect.firrtl.operation.{given_CircuitApi, given_ModuleApi, Circuit, CircuitApi}
-import org.llvm.mlir.scalalib.{
+import org.llvm.mlir.scalalib.capi.ir.{
   given_ContextApi,
   given_LocationApi,
   given_ModuleApi,

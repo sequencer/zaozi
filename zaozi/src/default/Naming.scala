@@ -2,13 +2,13 @@
 // SPDX-FileCopyrightText: 2025 Jiuyang Liu <liu@jiuyang.me>
 package me.jiuyang.zaozi.default
 
-import org.llvm.mlir.scalalib.{given_LocationApi, Context, Location, LocationApi}
+import org.llvm.mlir.scalalib.capi.ir.{given_LocationApi, Context, Location, LocationApi}
 
 import java.lang.foreign.Arena
 import me.jiuyang.zaozi.Parameter
 import me.jiuyang.zaozi.HWInterface
 import me.jiuyang.zaozi.DVInterface
-import org.llvm.mlir.scalalib.Block
+import org.llvm.mlir.scalalib.capi.ir.Block
 import me.jiuyang.zaozi.reftpe.Interface
 import me.jiuyang.zaozi.ConstructorApi
 import me.jiuyang.zaozi.InstanceContext

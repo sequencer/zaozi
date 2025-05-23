@@ -3,7 +3,8 @@
 package me.jiuyang.smtlib.tpe
 
 import me.jiuyang.smtlib.TypeImpl
-import org.llvm.mlir.scalalib.{Context, Operation, Type, Value}
+import org.llvm.mlir.scalalib.capi.support.{*, given}
+import org.llvm.mlir.scalalib.capi.ir.{Context, Operation, Type, Value}
 
 import java.lang.foreign.Arena
 import scala.language.dynamics

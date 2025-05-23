@@ -3,8 +3,7 @@
 package org.llvm.circt.scalalib.capi.dialect.hwarith
 
 import org.llvm.circt.CAPI.{mlirGetDialectHandle__hwarith__ as mlirGetDialectHandle, registerHWArithPasses as r}
-import org.llvm.mlir.scalalib.given
-import org.llvm.mlir.scalalib.{Context, DialectHandle}
+import org.llvm.mlir.scalalib.capi.ir.{Context, DialectHandle, given}
 
 import java.lang.foreign.Arena
 

@@ -36,8 +36,8 @@ import org.llvm.circt.CAPI.{
   omEvaluatorValueIsATuple,
   omEvaluatorValueIsNull
 }
-import org.llvm.mlir.scalalib.given
-import org.llvm.mlir.scalalib.{Attribute, Context, Location, Module, Type}
+import org.llvm.mlir.scalalib.capi.support.{*, given}
+import org.llvm.mlir.scalalib.capi.ir.{Attribute, Context, Location, Module, Type, given}
 
 import java.lang.foreign.Arena
 

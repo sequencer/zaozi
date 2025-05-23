@@ -4,7 +4,7 @@
 // circt-c/Dialect/Seq.h
 package org.llvm.circt.scalalib.capi.dialect.seq
 
-import org.llvm.mlir.scalalib.*
+import org.llvm.mlir.scalalib.capi.ir.{Context, Type}
 
 import java.lang.foreign.Arena
 

@@ -10,7 +10,7 @@ import org.llvm.circt.scalalib.capi.dialect.firrtl.{
   FirrtlNameKind,
   given
 }
-import org.llvm.mlir.scalalib.{
+import org.llvm.mlir.scalalib.capi.ir.{
   Block,
   Context,
   Location,

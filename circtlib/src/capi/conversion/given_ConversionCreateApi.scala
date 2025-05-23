@@ -48,7 +48,7 @@ import org.llvm.circt.CAPI.{
   mlirCreateCIRCTConversionSCFToCalyx,
   mlirCreateCIRCTConversionTestApplyLoweringOption
 }
-import org.llvm.mlir.scalalib.Pass
+import org.llvm.mlir.scalalib.capi.pass.Pass
 
 import java.lang.foreign.Arena
 

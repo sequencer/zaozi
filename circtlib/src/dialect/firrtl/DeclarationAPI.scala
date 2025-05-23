@@ -3,7 +3,8 @@
 package org.llvm.circt.scalalib.dialect.firrtl.operation
 
 import org.llvm.circt.scalalib.capi.dialect.firrtl.{FirrtlBundleField, FirrtlNameKind}
-import org.llvm.mlir.scalalib.{Context, HasOperation, Location, Operation, Type, Value}
+import org.llvm.mlir.scalalib.capi.support.{*, given}
+import org.llvm.mlir.scalalib.capi.ir.{Context, Location, Operation, Type, Value}
 
 import java.lang.foreign.Arena
 
@@ -42,7 +43,7 @@ trait WireApi     extends HasOperation[Wire]:
   )(
     using arena: Arena,
     context:     Context
-  ):   Wire
+  ): Wire
   extension (ref: Wire)
     def result(
       using Arena

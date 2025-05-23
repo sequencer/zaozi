@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: 2025 Jiuyang Liu <liu@jiuyang.me>
 package org.llvm.circt.scalalib.capi.conversion
 
-import org.llvm.mlir.scalalib.Pass
+import org.llvm.mlir.scalalib.capi.pass.Pass
 
 import java.lang.foreign.Arena
 

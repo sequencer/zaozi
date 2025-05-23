@@ -7,7 +7,7 @@ import me.jiuyang.smtlib.default.{*, given}
 
 import org.llvm.mlir.scalalib.dialect.func.{Func, FuncApi, given}
 import org.llvm.mlir.scalalib.dialect.smt.capi.{given_DialectHandleApi, given_ModuleApi}
-import org.llvm.mlir.scalalib.{Block, Context, ContextApi, LocationApi, Module, ModuleApi, Value, given}
+import org.llvm.mlir.scalalib.capi.ir.{Block, Context, ContextApi, LocationApi, Module, ModuleApi, Value, given}
 
 import java.io.{File, FileWriter}
 

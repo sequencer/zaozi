@@ -4,7 +4,7 @@
 // circt-c/Dialect/LLHD.h
 package org.llvm.circt.scalalib.capi.dialect.llhd
 
-import org.llvm.mlir.scalalib.*
+import org.llvm.mlir.scalalib.capi.ir.{Attribute, Context, Type, given}
 
 import java.lang.foreign.Arena
 
@@ -42,7 +42,7 @@ trait AttributeApi:
   )(
     using arena: Arena,
     context:     Context
-  ):                                                 Attribute
+  ): Attribute
   extension (attribute: Attribute)
     def TimeAttrGetDelta():   BigInt
     def TimeAttrGetEpsilon(): BigInt
