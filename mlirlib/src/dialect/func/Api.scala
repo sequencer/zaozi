@@ -2,7 +2,8 @@
 // SPDX-FileCopyrightText: 2025 Jianhao Ye <Clo91eaf@qq.com>
 package org.llvm.mlir.scalalib.dialect.func
 
-import org.llvm.mlir.scalalib.{Block, Context, HasOperation, Location, Module as MlirModule, Operation, Value, given}
+import org.llvm.mlir.scalalib.capi.support.{*, given}
+import org.llvm.mlir.scalalib.capi.ir.{Block, Context, Location, Module as MlirModule, Operation, Value, given}
 
 import java.lang.foreign.Arena
 

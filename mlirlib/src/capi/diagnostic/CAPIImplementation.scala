@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2025 Jiuyang Liu <liu@jiuyang.me>
-package org.llvm.mlir.scalalib
+package org.llvm.mlir.scalalib.capi.diagnostic
 
 import org.llvm.mlir.*
-import org.llvm.mlir.CAPI.*
+import org.llvm.mlir.CAPI.{MlirDiagnosticError, MlirDiagnosticNote, MlirDiagnosticRemark, MlirDiagnosticWarning}
 
 import java.lang.foreign.MemorySegment
 

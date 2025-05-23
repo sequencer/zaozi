@@ -2,7 +2,8 @@
 // SPDX-FileCopyrightText: 2025 Jianhao Ye <Clo91eaf@qq.com>
 package org.llvm.mlir.scalalib.dialect.smt.operation
 
-import org.llvm.mlir.scalalib.{HasOperation, Operation}
+import org.llvm.mlir.scalalib.capi.support.{*, given}
+import org.llvm.mlir.scalalib.capi.ir.{*, given}
 
 class And(val _operation: Operation)
 trait AndApi extends HasOperation[And]

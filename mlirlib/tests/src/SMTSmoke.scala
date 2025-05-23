@@ -5,10 +5,11 @@ package me.jiuyang.zaozi.mlirlib.tests
 import org.llvm.mlir.scalalib.dialect.func.{Func, FuncApi, *, given}
 import org.llvm.mlir.scalalib.dialect.smt.capi.{*, given}
 import org.llvm.mlir.scalalib.dialect.smt.operation.{*, given}
-import org.llvm.mlir.scalalib.{Module as MlirModule, ModuleApi as MlirModuleApi, TypeApi as _, *, given}
+import org.llvm.mlir.scalalib.capi.ir.{Module as MlirModule, ModuleApi as MlirModuleApi, TypeApi as _, *, given}
 import utest.*
 
 import java.lang.foreign.Arena
+import org.llvm.mlir.scalalib.capi.ir.given
 
 object SMTSmoke extends TestSuite:
   val tests: Tests = Tests:

@@ -2,9 +2,19 @@
 // SPDX-FileCopyrightText: 2025 Jianhao Ye <Clo91eaf@qq.com>
 package org.llvm.mlir.scalalib.dialect.func
 
-import org.llvm.mlir.scalalib.{Block, Context, LocationApi, Module, NamedAttributeApi, Operation, OperationApi, given}
+import org.llvm.mlir.scalalib.capi.ir.{
+  Block,
+  Context,
+  LocationApi,
+  Module,
+  NamedAttributeApi,
+  Operation,
+  OperationApi,
+  given
+}
 
 import java.lang.foreign.Arena
+import org.llvm.mlir.scalalib.capi.ir.given
 
 // Structure
 given FuncApi with

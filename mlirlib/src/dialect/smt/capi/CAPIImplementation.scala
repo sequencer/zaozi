@@ -3,21 +3,35 @@
 package org.llvm.mlir.scalalib.dialect.smt.capi
 
 import org.llvm.mlir.*
-import org.llvm.mlir.CAPI.*
-import org.llvm.mlir.scalalib.{
-  given_AttributeApi,
-  Attribute,
-  Context,
-  DialectHandle,
-  Identifier,
-  LogicalResult,
-  Module,
-  PassManager,
-  Type,
-  given
+import org.llvm.mlir.CAPI.{
+  mlirGetDialectHandle__smt__,
+  mlirSMTAttrCheckBVCmpPredicate,
+  mlirSMTAttrCheckIntPredicate,
+  mlirSMTAttrGetBVCmpPredicate,
+  mlirSMTAttrGetBitVector,
+  mlirSMTAttrGetIntPredicate,
+  mlirSMTAttrIsASMTAttribute,
+  mlirSMTTypeGetArray,
+  mlirSMTTypeGetBitVector,
+  mlirSMTTypeGetBool,
+  mlirSMTTypeGetInt,
+  mlirSMTTypeGetSMTFunc,
+  mlirSMTTypeGetSort,
+  mlirSMTTypeIsAArray,
+  mlirSMTTypeIsABitVector,
+  mlirSMTTypeIsABool,
+  mlirSMTTypeIsAInt,
+  mlirSMTTypeIsASMTFunc,
+  mlirSMTTypeIsASort,
+  mlirSMTTypeIsAnyNonFuncSMTValueType,
+  mlirSMTTypeIsAnySMTValueType,
+  mlirTranslateModuleToSMTLIB
 }
+import org.llvm.mlir.scalalib.capi.support.{*, given}
+import org.llvm.mlir.scalalib.capi.ir.{Attribute, Block, Context, DialectHandle, Module, Type, given}
 
 import java.lang.foreign.{Arena, MemorySegment}
+import org.llvm.mlir.scalalib.capi.ir.given
 
 given DialectHandleApi with
   extension (context: Context)
@@ -128,6 +142,13 @@ given ModuleApi with
       using arena: Arena
     ): Unit =
       LogicalResult(
-        mlirTranslateModuleToSMTLIB(arena, module.segment, callback.stringToStringCallback.segment, MemorySegment.NULL, false, false)
+        mlirTranslateModuleToSMTLIB(
+          arena,
+          module.segment,
+          callback.stringToStringCallback.segment,
+          MemorySegment.NULL,
+          false,
+          false
+        )
       )
 end given

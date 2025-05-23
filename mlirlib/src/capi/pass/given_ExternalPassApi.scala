@@ -1,48 +1,51 @@
 // SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2025 Jiuyang Liu <liu@jiuyang.me>
-package org.llvm.mlir.scalalib
+package org.llvm.mlir.scalalib.capi.pass
 
 import org.llvm.mlir.*
-import org.llvm.mlir.CAPI.mlirExternalPassSignalFailure
+import org.llvm.mlir.CAPI.{mlirCreateExternalPass, mlirExternalPassSignalFailure}
+import org.llvm.mlir.scalalib.capi.support.{*, given}
+import org.llvm.mlir.scalalib.capi.ir.{*, given}
 
 import java.lang.foreign.{Arena, MemorySegment}
 
-given StringCallbackApi with
-  extension (stringCallBack: String => Unit)
-    inline def stringToStringCallback(
-      using arena: Arena
-    ): StringCallback =
-      StringCallback(
-        MlirStringCallback.allocate(
-          (message: MemorySegment, userData: MemorySegment) => stringCallBack(StringRef(message).toScalaString),
-          arena
-        )
+given PassApi with
+  inline def createExternalPass(
+    passId:            TypeID,
+    name:              String,
+    argument:          String,
+    description:       String,
+    opName:            String,
+    dependentDialects: Seq[DialectHandle],
+    callbacks:         ExternalPassCallbacks
+  )(
+    using arena:       Arena
+  ): Pass =
+    Pass(
+      mlirCreateExternalPass(
+        arena,
+        passId.segment,
+        name.toStringRef.segment,
+        argument.toStringRef.segment,
+        description.toStringRef.segment,
+        opName.toStringRef.segment,
+        dependentDialects.size,
+        dependentDialects.toMlirArray,
+        callbacks.segment,
+        MemorySegment.NULL
       )
-  extension (bytesCallBack:  Array[Byte] => Unit)
-    inline def bytesToStringCallback(
-      using arena: Arena
-    ): StringCallback =
-      StringCallback(
-        MlirStringCallback.allocate(
-          (message: MemorySegment, userData: MemorySegment) => bytesCallBack(StringRef(message).toBytes),
-          arena
-        )
-      )
-  extension (stringCallBack: StringCallback) inline def segment: MemorySegment = stringCallBack._segment
+    )
+
+  extension (pass: Pass)
+    inline def segment: MemorySegment = pass._segment
+    inline def sizeOf:  Int           = MlirPass.sizeof().toInt
 end given
 
-given OperationWalkCallbackApi with
-  extension (operationCallBack: Operation => WalkResultEnum)
-    inline def toOperationWalkCallback(
-      using arena: Arena
-    ): OperationWalkCallback =
-      OperationWalkCallback(
-        MlirOperationWalkCallback.allocate(
-          (operation: MemorySegment, userData: MemorySegment) => operationCallBack(Operation(operation)).toNative,
-          arena
-        )
-      )
-  extension (operationCallBack: OperationWalkCallback) inline def segment: MemorySegment = operationCallBack._segment
+given ExternalPassApi with
+  extension (pass: ExternalPass)
+    inline def signalFailure(): Unit          = mlirExternalPassSignalFailure(pass.segment)
+    inline def segment:         MemorySegment = pass._segment
+    inline def sizeOf:          Int           = MlirExternalPass.sizeof().toInt
 end given
 
 given ExternalPassCallbacksApi with
