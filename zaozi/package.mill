@@ -100,7 +100,8 @@ trait LitModule extends Module {
     ) / "bin" / "lit"
   )
   def run(args: String*) = Task.Command(
-    os.proc(litBinary().toString(), litConfig().path, "-a")
+    // Due to a data race in https://github.com/VirtusLab/scala-cli/blob/8ab834ab3832ab680e72dcf85c685bf01516a97c/modules/build/src/main/scala/scala/build/LocalRepo.scala#L78, we disable parallelism to work around it for now
+    os.proc(litBinary().toString(), litConfig().path, "-a", "-j 1")
       .call(Task.dest, stdout = os.ProcessOutput.Readlines(line => Task.ctx().log.info("[lit] " + line)))
   )
 }
