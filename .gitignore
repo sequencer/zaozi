@@ -12,9 +12,6 @@ __pycache__/
 
 out/
 result*
-gcd-sim-result/
-/dependencies/
-target/
 
 *.vcd
 *.fst
