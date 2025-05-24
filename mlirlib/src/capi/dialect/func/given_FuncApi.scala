@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2025 Jianhao Ye <Clo91eaf@qq.com>
-package org.llvm.mlir.scalalib.dialect.func
+package org.llvm.mlir.scalalib.capi.dialect.func
 
 import org.llvm.mlir.scalalib.capi.ir.{
   Block,
@@ -14,7 +14,6 @@ import org.llvm.mlir.scalalib.capi.ir.{
 }
 
 import java.lang.foreign.Arena
-import org.llvm.mlir.scalalib.capi.ir.given
 
 // Structure
 given FuncApi with

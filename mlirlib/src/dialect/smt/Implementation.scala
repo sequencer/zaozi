@@ -16,7 +16,7 @@ import org.llvm.mlir.scalalib.capi.ir.{
   Value,
   given
 }
-import org.llvm.mlir.scalalib.dialect.smt.capi.{*, given}
+import org.llvm.mlir.scalalib.capi.dialect.smt.{*, given}
 
 import java.lang.foreign.Arena
 

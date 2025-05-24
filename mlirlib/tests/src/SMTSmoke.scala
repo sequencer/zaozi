@@ -2,9 +2,13 @@
 // SPDX-FileCopyrightText: 2025 Jianhao Ye <Clo91eaf@qq.com>
 package me.jiuyang.zaozi.mlirlib.tests
 
-import org.llvm.mlir.scalalib.dialect.func.{Func, FuncApi, *, given}
-import org.llvm.mlir.scalalib.dialect.smt.capi.{*, given}
+import org.llvm.mlir.scalalib.capi.dialect.func.{Func, FuncApi, given}
+import org.llvm.mlir.scalalib.capi.dialect.smt.{*, given}
 import org.llvm.mlir.scalalib.dialect.smt.operation.{*, given}
+import org.llvm.mlir.scalalib.capi.dialect.smt.DialectApi as SmtDialect
+import org.llvm.mlir.scalalib.capi.dialect.smt.given_DialectApi
+import org.llvm.mlir.scalalib.capi.dialect.func.DialectApi as FuncDialect
+import org.llvm.mlir.scalalib.capi.dialect.func.given_DialectApi
 import org.llvm.mlir.scalalib.capi.ir.{Module as MlirModule, ModuleApi as MlirModuleApi, TypeApi as _, *, given}
 import utest.*
 
@@ -17,10 +21,9 @@ object SMTSmoke extends TestSuite:
       val arena   = Arena.ofConfined()
       given Arena = arena
       test("Load Dialect"):
-        val context         = summon[ContextApi].contextCreate
-        context.loadSmtDialect()
-        context.loadFuncDialect()
-        given Context       = context
+        given Context       = summon[ContextApi].contextCreate
+        summon[SmtDialect].loadDialect()
+        summon[FuncDialect].loadDialect()
         val unknownLocation = summon[LocationApi].locationUnknownGet
         test("Smt"):
           given MlirModule = summon[MlirModuleApi].moduleCreateEmpty(unknownLocation)

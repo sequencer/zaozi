@@ -5,8 +5,12 @@ package me.jiuyang.smtlib.tests
 import me.jiuyang.smtlib.{*, given}
 import me.jiuyang.smtlib.default.{*, given}
 
-import org.llvm.mlir.scalalib.dialect.func.{Func, FuncApi, given}
-import org.llvm.mlir.scalalib.dialect.smt.capi.{given_DialectHandleApi, given_ModuleApi}
+import org.llvm.mlir.scalalib.capi.dialect.func.{Func, FuncApi, given}
+import org.llvm.mlir.scalalib.capi.dialect.smt.DialectApi as SmtDialect
+import org.llvm.mlir.scalalib.capi.dialect.smt.given_DialectApi
+import org.llvm.mlir.scalalib.capi.dialect.func.DialectApi as FuncDialect
+import org.llvm.mlir.scalalib.capi.dialect.func.given_DialectApi
+import org.llvm.mlir.scalalib.capi.target.exportsmtlib.given_ExportSmtlibApi
 import org.llvm.mlir.scalalib.capi.ir.{Block, Context, ContextApi, LocationApi, Module, ModuleApi, Value, given}
 
 import java.io.{File, FileWriter}
@@ -16,8 +20,8 @@ import java.lang.foreign.Arena
 def smtTest(checkLines: String*)(body: (Arena, Context, Block) ?=> Unit): Unit =
   given Arena   = Arena.ofConfined()
   given Context = summon[ContextApi].contextCreate
-  summon[Context].loadSmtDialect()
-  summon[Context].loadFuncDialect()
+  summon[SmtDialect].loadDialect()
+  summon[FuncDialect].loadDialect()
 
   // Then based on the module to construct the Func.func .
   given Module = summon[ModuleApi].moduleCreateEmpty(summon[LocationApi].locationUnknownGet)
