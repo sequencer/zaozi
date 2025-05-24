@@ -143,12 +143,9 @@ def validateCircuit(
                     namedAttributeApi.namedAttributeGet(
                       "layers".identifierGet,
                       Seq.empty.arrayAttrGet
-                    ),
-                    // ::mlir::ArrayAttr
-                    namedAttributeApi.namedAttributeGet(
-                      "internalPaths".identifierGet,
-                      Seq.empty.arrayAttrGet
                     )
+                    // Zaozi doesn't support XMR and all the probe IO should be connected internally within the module
+                    // thus we don't need internalPaths
                   )
                 ,
                 regionBlockTypeLocations = Seq(Seq())
