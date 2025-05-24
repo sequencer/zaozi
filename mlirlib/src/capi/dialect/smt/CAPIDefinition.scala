@@ -1,18 +1,18 @@
 // SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2025 Jianhao Ye <Clo91eaf@qq.com>
-package org.llvm.mlir.scalalib.dialect.smt.capi
+package org.llvm.mlir.scalalib.capi.dialect.smt
 
-import org.llvm.mlir.scalalib.capi.ir.{Attribute, Block, Context, Module, Type, given}
+import org.llvm.mlir.scalalib.capi.ir.{Attribute, Context, Type, given}
 
-import java.lang.foreign.{Arena, MemorySegment}
+import java.lang.foreign.Arena
 
-trait DialectHandleApi:
-  extension (context: Context)
-    inline def loadSmtDialect(
-    )(
-      using arena: Arena
-    ): Unit
-end DialectHandleApi
+trait DialectApi:
+  inline def loadDialect(
+  )(
+    using arena: Arena,
+    context:     Context
+  ): Unit
+end DialectApi
 
 trait TypeApi:
   inline def getArray(
@@ -89,12 +89,3 @@ trait AttributeApi:
       context:     Context
     ): Boolean
 end AttributeApi
-
-trait ModuleApi:
-  extension (module: Module)
-    inline def exportSMTLIB(
-      callBack:    String => Unit
-    )(
-      using arena: Arena
-    ): Unit
-end ModuleApi

@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: 2025 Jianhao Ye <Clo91eaf@qq.com>
 package me.jiuyang.smtlib.default
 
-import org.llvm.mlir.scalalib.dialect.smt.capi.{given_TypeApi, TypeApi}
+import org.llvm.mlir.scalalib.capi.dialect.smt.{given_TypeApi, TypeApi}
 import org.llvm.mlir.scalalib.dialect.smt.operation.{*, given}
 import org.llvm.mlir.scalalib.capi.ir.{Block, Context, Location, LocationApi, Operation, Type, Value, given}
 import me.jiuyang.smtlib.*

@@ -1,11 +1,19 @@
 // SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2025 Jianhao Ye <Clo91eaf@qq.com>
-package org.llvm.mlir.scalalib.dialect.func
+package org.llvm.mlir.scalalib.capi.dialect.func
 
 import org.llvm.mlir.scalalib.capi.support.{*, given}
-import org.llvm.mlir.scalalib.capi.ir.{Block, Context, Location, Module as MlirModule, Operation, Value, given}
+import org.llvm.mlir.scalalib.capi.ir.{Block, Context, Module, Operation, given}
 
 import java.lang.foreign.Arena
+
+trait DialectApi:
+  inline def loadDialect(
+  )(
+    using arena: Arena,
+    context:     Context
+  ): Unit
+end DialectApi
 
 class Func(val _operation: Operation)
 trait FuncApi extends HasOperation[Func]:
@@ -28,6 +36,6 @@ trait FuncApi extends HasOperation[Func]:
     inline def appendToModule(
     )(
       using arena: Arena,
-      module:      MlirModule
+      module:      Module
     ): Unit
 end FuncApi
