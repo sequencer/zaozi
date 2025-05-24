@@ -112,7 +112,7 @@ trait LocationApi extends HasSegment[Location] with HasSizeOf[Location]:
       using arena: Arena
     ): Context
     inline def print(
-      callback:    StringCallback
+      callback:    String => Unit
     )(
       using arena: Arena
     ): Unit
