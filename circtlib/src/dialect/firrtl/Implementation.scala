@@ -303,7 +303,8 @@ given InstanceApi with
     instanceName: String,
     nameKind:     FirrtlNameKind,
     location:     Location,
-    interface:    Seq[FirrtlBundleField]
+    interface:    Seq[FirrtlBundleField],
+    layers:       Seq[Seq[String]]
   )(
     using arena:  Arena,
     context:      Context
@@ -342,7 +343,12 @@ given InstanceApi with
               interface.map(_ => Seq.empty.arrayAttrGet).arrayAttrGet
             ),
             // ::mlir::ArrayAttr
-            namedAttributeApi.namedAttributeGet("layers".identifierGet, Seq.empty.arrayAttrGet)
+            namedAttributeApi.namedAttributeGet(
+              "layers".identifierGet,
+              layers
+                .map(path => path.reverse.last.symbolRefAttrGet(path.drop(1).map(_.flatSymbolRefAttrGet)))
+                .arrayAttrGet
+            )
             // ::mlir::UnitAttr
             // namedAttributeApi.namedAttributeGet("lowerToBind".identifierGet, ???),
             // ::circt::hw::InnerSymAttr
