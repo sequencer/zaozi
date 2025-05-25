@@ -16,7 +16,8 @@ trait InstanceApi extends HasOperation[Instance]:
     instanceName: String,
     nameKind:     FirrtlNameKind,
     location:     Location,
-    interface:    Seq[FirrtlBundleField]
+    interface:    Seq[FirrtlBundleField],
+    layers:       Seq[Seq[String]]
   )(
     using arena:  Arena,
     context:      Context

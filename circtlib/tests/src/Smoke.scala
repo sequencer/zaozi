@@ -90,7 +90,8 @@ object Smoke extends TestSuite:
                   Seq(
                     api.createFirrtlBundleField("i", true, 32.getUInt),
                     api.createFirrtlBundleField("o", true, 32.getUInt)
-                  )
+                  ),
+                  Seq.empty
                 )
                 .operation
                 .appendToBlock()

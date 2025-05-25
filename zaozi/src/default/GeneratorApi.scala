@@ -19,6 +19,7 @@ import org.llvm.circt.scalalib.capi.dialect.firrtl.{
   FirrtlConvention,
   FirrtlNameKind
 }
+import org.llvm.circt.scalalib.capi.dialect.sv.given_DialectApi as SvDialectApi
 import org.llvm.circt.scalalib.dialect.firrtl.operation.given
 import org.llvm.circt.scalalib.dialect.firrtl.operation.{
   given_CircuitApi,
@@ -34,7 +35,6 @@ import org.llvm.circt.scalalib.dialect.firrtl.operation.{
   SubfieldApi,
   WireApi
 }
-import org.llvm.circt.scalalib.capi.dialect.sv.given_DialectApi as SvDialectApi
 import org.llvm.mlir.scalalib.capi.ir.{
   given_AttributeApi,
   given_BlockApi,
@@ -83,25 +83,24 @@ given GeneratorApi with
       val bfs               =
         Seq.tabulate(ioNumFields)(io.toMlirType.getBundleFieldByIndex) ++
           Seq.tabulate(probeNumFields)(probe.toMlirType.getBundleFieldByIndex)
-      given Seq[LayerTree]  = generator.layers(parameter).flatMap(_._dfs)
       val module            = summon[ModuleApi].op(
         generator.moduleName(parameter),
         unknownLocation,
         FirrtlConvention.Scalarized,
         bfs.map(i => (i, unknownLocation)), // TODO: record location for Bundle?
-        summon[Seq[LayerTree]].filter(_._children.isEmpty).map(_._hierarchy.map(_._name))
+        generator.layers(parameter).nameHierarchy
       )
       given Block           = module.block
       val ioWire            = summon[WireApi].op(
         "io",
-        summon[LocationApi].locationUnknownGet,
+        unknownLocation,
         FirrtlNameKind.Droppable,
         io.toMlirType
       )
       ioWire.operation.appendToBlock()
       val probeWire         = summon[WireApi].op(
         "probe",
-        summon[LocationApi].locationUnknownGet,
+        unknownLocation,
         FirrtlNameKind.Droppable,
         probe.toMlirType
       )
@@ -172,7 +171,8 @@ given GeneratorApi with
         instanceName = valName,
         nameKind = FirrtlNameKind.Interesting,
         location = locate,
-        interface = ioFields ++ probeFields
+        interface = ioFields ++ probeFields,
+        layers = generator.layers(parameter).nameHierarchy
       )
       instanceOp.operation.appendToBlock()
       val ioWire      = summon[WireApi].op(

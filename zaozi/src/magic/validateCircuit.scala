@@ -2,9 +2,12 @@
 // SPDX-FileCopyrightText: 2025 Jiuyang Liu <liu@jiuyang.me>
 package me.jiuyang.zaozi.magic
 
+import scala.util.chaining.*
+
 import me.jiuyang.zaozi.*
 import me.jiuyang.zaozi.default.{*, given}
 import me.jiuyang.zaozi.reftpe.*
+
 import org.llvm.circt.scalalib.capi.dialect.firrtl.{
   given_AttributeApi,
   given_DialectApi,
@@ -65,18 +68,8 @@ def validateCircuit(
         op.getName.str match
           // Find all instance and create an extmodule for it, which is a placeholder for linking at circt time.
           case i if i == "firrtl.instance" =>
-            val moduleName: String = op.getInherentAttributeByName("moduleName").flatSymbolRefAttrGetValue
-            val name:       String = op.getInherentAttributeByName("name").stringAttrGetValue
-            val portDirections = Seq
-              .tabulate(op.getNumResults.toInt)(i =>
-                op.getInherentAttributeByName("portDirections").denseBoolArrayGetElement(i)
-              )
-              .map(if (_) FirrtlDirection.Out else FirrtlDirection.In)
-              .attrGetPortDirs
-            val portNames: Seq[String] = Seq.tabulate(op.getNumResults.toInt)(i =>
-              op.getInherentAttributeByName("portNames").arrayAttrGetElement(i).stringAttrGetValue
-            )
-            val types:     Seq[Type]   = Seq.tabulate(op.getNumResults.toInt)(i => op.getResult(i).getType)
+            val moduleName: String    = op.getInherentAttributeByName("moduleName").flatSymbolRefAttrGetValue
+            val portTypes:  Seq[Type] = Seq.tabulate(op.getNumResults.toInt)(i => op.getResult(i).getType)
             val extmoduleOp = ExtModule(
               summon[OperationApi].operationCreate(
                 name = "firrtl.extmodule",
@@ -107,7 +100,7 @@ def validateCircuit(
                     // ::mlir::DenseBoolArrayAttr
                     namedAttributeApi.namedAttributeGet(
                       "portDirections".identifierGet,
-                      portDirections
+                      op.getInherentAttributeByName("portDirections")
                     ),
                     // ::mlir::ArrayAttr
                     namedAttributeApi.namedAttributeGet(
@@ -127,12 +120,12 @@ def validateCircuit(
                     // ::mlir::ArrayAttr
                     namedAttributeApi.namedAttributeGet(
                       "portNames".identifierGet,
-                      portNames.map(_.stringAttrGet).arrayAttrGet
+                      op.getInherentAttributeByName("portNames")
                     ),
                     // ::mlir::ArrayAttr
                     namedAttributeApi.namedAttributeGet(
                       "portTypes".identifierGet,
-                      types.map(_.typeAttrGet).arrayAttrGet
+                      portTypes.map(_.typeAttrGet).arrayAttrGet
                     ),
                     // ::mlir::ArrayAttr
                     namedAttributeApi.namedAttributeGet(
@@ -142,7 +135,7 @@ def validateCircuit(
                     // ::mlir::ArrayAttr
                     namedAttributeApi.namedAttributeGet(
                       "layers".identifierGet,
-                      Seq.empty.arrayAttrGet
+                      op.getInherentAttributeByName("layers")
                     )
                     // Zaozi doesn't support XMR and all the probe IO should be connected internally within the module
                     // thus we don't need internalPaths

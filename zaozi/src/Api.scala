@@ -43,6 +43,9 @@ case class Layer(name: String, children: Seq[Layer] = Seq.empty):
       def _children: Seq[LayerTree] = children.map(_.toLayerTree)
     ._rebuild
 extension (layers: Seq[Layer]) def toLayerTrees: Seq[LayerTree] = layers.map(_.toLayerTree)
+extension (layers: Seq[LayerTree])
+  def nameHierarchy: Seq[Seq[String]] =
+    layers.flatMap(_._dfs).filter(_._children.isEmpty).map(_._hierarchy.map(_._name))
 
 class Parameter
 class LayerInterface[P <: Parameter](parameter: P) extends Seq[LayerTree]:
