@@ -1,6 +1,12 @@
 // SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2025 <liu@jiuyang.me>
-package me.jiuyang.zaozi.tests
+
+// DEFINE: %{test} = scala-cli --server=false --java-home=%JAVAHOME --extra-jars=%RUNCLASSPATH --scala-version=%SCALAVERSION -O="-experimental" --java-opt="--enable-native-access=ALL-UNNAMED" --java-opt="--enable-preview" --java-opt="-Djava.library.path=%JAVALIBRARYPATH" --main-class GCD %s --
+// RUN: %{test} config %t.json --width 32 --use-async-reset false
+// RUN: %{test} design %t.json
+// RUN: firtool GCD*.mlirbc | FileCheck %s -check-prefix=GCD
+// RUN: firtool Subtractor*.mlirbc | FileCheck %s -check-prefix=SUB
+// RUN: rm %t.json *.mlirbc -f
 
 import me.jiuyang.zaozi.*
 import me.jiuyang.zaozi.default.{*, given}
@@ -89,12 +95,27 @@ class SubtractorIO(
 class SubtractorProbe(parameter: SubtractorParameter)
     extends DVInterface[SubtractorParameter, SubtractorLayers](parameter)
 
+// SUB:      module Subtractor_f34dfd42(
+// SUB-NEXT:   input [31:0] a,
+// SUB-NEXT:   b,
+// SUB-NEXT:   output [31:0] z
+// SUB-NEXT: );
 @generator
 object Subtractor extends Generator[SubtractorParameter, SubtractorLayers, SubtractorIO, SubtractorProbe]:
   def architecture(parameter: SubtractorParameter) =
     val io = summon[Interface[SubtractorIO]]
-    io.z := io.a - io.b
+    io.z := (io.a - io.b).asBits.tail(parameter.width).asUInt
 
+// GCD:      module GCD_35bf2066(
+// GCD-NEXT:   output        output_valid,
+// GCD-NEXT:   output [31:0] output_bits_z,
+// GCD-NEXT:   input         input_valid,
+// GCD-NEXT:   output        input_ready,
+// GCD-NEXT:   input  [31:0] input_bits_x,
+// GCD-NEXT:                 input_bits_y,
+// GCD-NEXT:   input         reset,
+// GCD-NEXT:                 clock
+// GCD-NEXT: );
 @generator
 object GCD extends Generator[GCDParameter, GCDLayers, GCDIO, GCDProbe]:
   def architecture(parameter: GCDParameter) =
@@ -111,15 +132,28 @@ object GCD extends Generator[GCDParameter, GCDLayers, GCDIO, GCDProbe]:
     io.output.bits.z := x
     io.output.valid  := !busy & startupFlag
 
-    val sub = Subtractor.instantiate(SubtractorParameter(x._tpe._width))
-    sub.io.a := x
-    sub.io.b := y
-    val a = sub.io.z
+    // GCD:      Subtractor_f34dfd42 sub1 (
+    // GCD-NEXT:   .a (x),
+    // GCD-NEXT:   .b (y),
+    // GCD-NEXT:   .z (_sub1_z)
+    // GCD-NEXT: );
+    val sub1 = Subtractor.instantiate(SubtractorParameter(parameter.width))
+    sub1.io.a := x
+    sub1.io.b := y
+
+    // GCD:      Subtractor_f34dfd42 sub2 (
+    // GCD-NEXT:   .a (y),
+    // GCD-NEXT:   .b (x),
+    // GCD-NEXT:   .z (_sub2_z)
+    // GCD-NEXT: );
+    val sub2 = Subtractor.instantiate(SubtractorParameter(parameter.width))
+    sub2.io.a := y
+    sub2.io.b := x
 
     x := io.input.fire ? (
       io.input.bits.x,
       (x > y) ? (
-        a.asBits.tail(parameter.width).asUInt,
+        sub1.io.z,
         x
       )
     )
@@ -128,7 +162,7 @@ object GCD extends Generator[GCDParameter, GCDLayers, GCDIO, GCDProbe]:
       io.input.bits.y,
       (x > y) ? (
         y,
-        (y - x).asBits.tail(parameter.width).asUInt
+        sub2.io.z
       )
     )
 

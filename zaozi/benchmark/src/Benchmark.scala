@@ -6,11 +6,9 @@ import me.jiuyang.zaozi.*
 import me.jiuyang.zaozi.default.{*, given}
 import me.jiuyang.zaozi.magic.validateCircuit
 import me.jiuyang.zaozi.reftpe.*
-import me.jiuyang.zaozi.tests.{*, given}
 import me.jiuyang.zaozi.valuetpe.*
 
-import org.llvm.circt.scalalib.capi.dialect.firrtl.given_DialectApi
-import org.llvm.circt.scalalib.capi.dialect.firrtl.DialectApi as FirrtlDialectApi
+import org.llvm.circt.scalalib.capi.dialect.firrtl.{given_DialectApi, DialectApi as FirrtlDialectApi}
 import org.llvm.circt.scalalib.dialect.firrtl.operation.{given_CircuitApi, given_ModuleApi, Circuit, CircuitApi}
 import org.llvm.mlir.scalalib.capi.ir.{
   given_ContextApi,
@@ -20,6 +18,7 @@ import org.llvm.mlir.scalalib.capi.ir.{
   given_RegionApi,
   given_TypeApi,
   given_ValueApi,
+  Block,
   Context,
   ContextApi,
   LocationApi,
@@ -29,8 +28,70 @@ import org.llvm.mlir.scalalib.capi.ir.{
 }
 
 import java.lang.foreign.Arena
+import mainargs.TokensReader
 import org.openjdk.jmh.annotations.*
 import org.openjdk.jmh.infra.Blackhole
+
+trait HasFire[T <: Bundle, R <: Referable[T]]:
+  extension (ref: R)
+    def fire(
+      using ctx: Context,
+      file:      sourcecode.File,
+      line:      sourcecode.Line,
+      valName:   sourcecode.Name.Machine,
+      instCtx:   InstanceContext
+    )(
+      using Arena,
+      Block
+    ): Node[Bool]
+
+object Decoupled:
+  def apply[T <: Bundle](bits: T) = new DecoupledIO[T](bits)
+
+class DecoupledIO[T <: Bundle](_bits: T) extends Bundle:
+  val ready: BundleField[Bool] = Flipped(Bool())
+  val valid: BundleField[Bool] = Aligned(Bool())
+  val bits:  BundleField[T]    = Aligned(_bits)
+
+given [E <: Bundle, T <: DecoupledIO[E], R <: Referable[T]]: HasFire[T, R] with
+  extension (ref: R)
+    def fire(
+      using ctx: Context,
+      file:      sourcecode.File,
+      line:      sourcecode.Line,
+      valName:   sourcecode.Name.Machine,
+      instCtx:   InstanceContext
+    )(
+      using Arena,
+      Block
+    ): Node[Bool] = ref.valid & ref.ready
+
+object Valid:
+  def apply[T <: Data](bits: T): ValidIO[T] = new ValidIO[T](bits)
+
+class ValidIO[T <: Data](_bits: T) extends Bundle:
+  val valid: BundleField[Bool] = Aligned(Bool())
+  val bits:  BundleField[T]    = Aligned(_bits)
+
+case class GCDParameter(width: Int, useAsyncReset: Boolean) extends Parameter
+given upickle.default.ReadWriter[GCDParameter] = upickle.default.macroRW
+
+class GCDLayers(parameter: GCDParameter) extends LayerInterface(parameter)
+
+class GCDInput(parameter: GCDParameter) extends Bundle:
+  val x: BundleField[UInt] = Aligned(UInt(parameter.width.W))
+  val y: BundleField[UInt] = Aligned(UInt(parameter.width.W))
+
+class GCDOutput(parameter: GCDParameter) extends Bundle:
+  val z: BundleField[UInt] = Aligned(UInt(parameter.width.W))
+
+class GCDIO(parameter: GCDParameter) extends HWInterface(parameter):
+  val clock:  BundleField[Clock]                 = Flipped(Clock())
+  val reset:  BundleField[Reset]                 = Flipped(if (parameter.useAsyncReset) AsyncReset() else Reset())
+  val input:  BundleField[DecoupledIO[GCDInput]] = Flipped(Decoupled(new GCDInput(parameter)))
+  val output: BundleField[ValidIO[GCDOutput]]    = Aligned(Valid(GCDOutput(parameter)))
+
+class GCDProbe(parameter: GCDParameter) extends DVInterface[GCDParameter, GCDLayers](parameter)
 
 @generator
 object GCD extends Generator[GCDParameter, GCDLayers, GCDIO, GCDProbe]:
