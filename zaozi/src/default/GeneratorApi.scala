@@ -61,6 +61,7 @@ import org.llvm.mlir.scalalib.capi.ir.{
 import org.llvm.mlir.scalalib.capi.pass.{given_PassManagerApi, PassManager}
 
 import java.lang.foreign.Arena
+import java.nio.file.StandardOpenOption.*
 
 export given_GeneratorApi.*
 export me.jiuyang.zaozi.magic.macros.generator
@@ -216,30 +217,13 @@ given GeneratorApi with
           private[zaozi] val _tpe       = probeTpe
           private[zaozi] val _operation = probeWire.operation
 
-    private def mlirbc(
-      parameter: PARAM
-    )(
-      using Arena,
-      Context
-    ) =
-      given MlirModule = summon[MlirModuleApi].moduleCreateEmpty(summon[LocationApi].locationUnknownGet)
-      given Circuit    = summon[CircuitApi].op(generator.moduleName(parameter))
-      summon[Circuit].appendToModule()
-      generator.module(parameter).appendToCircuit()
-      validateCircuit()
-
-      val out = new StringBuilder
-      summon[MlirModule].getOperation.print(out ++= _)
-
-      out.toString.getBytes()
-
     def dumpMlirbc(
       parameter: PARAM
     )(
       using Arena,
       Context
     ): Unit =
-      val mlirFile =
+      val mlirbcFile =
         os.Path(
           sys.env.getOrElse("ZAOZI_OUTDIR", ""),
           os.pwd
@@ -247,11 +231,17 @@ given GeneratorApi with
 
       generator.elaborationCache.get(parameter) match
         case Some(mlirbc) =>
-          os.write.over(mlirFile, mlirbc)
+          os.write.over(mlirbcFile, mlirbc)
         case None         =>
-          val mlirbc = generator.mlirbc(parameter)
-          generator.elaborationCache.put(parameter, mlirbc)
-          os.write.over(mlirFile, mlirbc)
+          given MlirModule = summon[MlirModuleApi].moduleCreateEmpty(summon[LocationApi].locationUnknownGet)
+          given Circuit    = summon[CircuitApi].op(generator.moduleName(parameter))
+          summon[Circuit].appendToModule()
+          generator.module(parameter).appendToCircuit()
+          validateCircuit()
+
+          val out = os.write.outputStream(mlirbcFile, openOptions = Seq(WRITE, CREATE, TRUNCATE_EXISTING))
+          summon[MlirModule].getOperation.writeBytecode(bc => out.write(bc))
+          generator.elaborationCache.put(parameter, os.read.bytes(mlirbcFile))
 
     def instantiate(
       parameter: PARAM
