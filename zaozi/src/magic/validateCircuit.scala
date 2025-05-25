@@ -55,96 +55,99 @@ import org.llvm.mlir.scalalib.capi.pass.{given_PassManagerApi, PassManager}
 import java.lang.foreign.Arena
 
 // Find all instantiated instance and insert to circuit
-// TODO: fix duplications: analyse multiple module in function and merge and append in another function
 def validateCircuit(
 )(
   using Arena,
   Context,
   Circuit
 ): Unit =
+  val declaredModules = scala.collection.mutable.Set.empty[String]
   summon[Circuit].block.getFirstOperation
     .walk(
       op =>
         op.getName.str match
           // Find all instance and create an extmodule for it, which is a placeholder for linking at circt time.
           case i if i == "firrtl.instance" =>
-            val moduleName: String    = op.getInherentAttributeByName("moduleName").flatSymbolRefAttrGetValue
-            val portTypes:  Seq[Type] = Seq.tabulate(op.getNumResults.toInt)(i => op.getResult(i).getType)
-            val extmoduleOp = ExtModule(
-              summon[OperationApi].operationCreate(
-                name = "firrtl.extmodule",
-                location = op.getLocation,
-                namedAttributes =
-                  val namedAttributeApi = summon[NamedAttributeApi]
-                  Seq(
-                    // ::mlir::StringAttr
-                    namedAttributeApi.namedAttributeGet(
-                      "sym_name".identifierGet,
-                      moduleName.stringAttrGet
-                    ),
-                    // ::mlir::StringAttr
-                    namedAttributeApi.namedAttributeGet(
-                      "defname".identifierGet,
-                      moduleName.stringAttrGet
-                    ),
-                    // ::mlir::StringAttr
-                    namedAttributeApi.namedAttributeGet(
-                      "parameters".identifierGet,
-                      Seq.empty.arrayAttrGet
-                    ),
-                    // ::circt::firrtl::ConventionAttr
-                    namedAttributeApi.namedAttributeGet(
-                      "convention".identifierGet,
-                      FirrtlConvention.Internal.toAttribute
-                    ),
-                    // ::mlir::DenseBoolArrayAttr
-                    namedAttributeApi.namedAttributeGet(
-                      "portDirections".identifierGet,
-                      op.getInherentAttributeByName("portDirections")
-                    ),
-                    // ::mlir::ArrayAttr
-                    namedAttributeApi.namedAttributeGet(
-                      "portLocations".identifierGet,
-                      Seq.fill(op.getNumResults.toInt)(summon[LocationApi].locationUnknownGet.getAttribute).arrayAttrGet
-                    ),
-                    // ::mlir::ArrayAttr
-                    namedAttributeApi.namedAttributeGet(
-                      "portAnnotations".identifierGet,
-                      Seq.empty.arrayAttrGet
-                    ),
-                    // ::mlir::ArrayAttr
-                    namedAttributeApi.namedAttributeGet(
-                      "portSymbols".identifierGet,
-                      Seq.empty.arrayAttrGet
-                    ),
-                    // ::mlir::ArrayAttr
-                    namedAttributeApi.namedAttributeGet(
-                      "portNames".identifierGet,
-                      op.getInherentAttributeByName("portNames")
-                    ),
-                    // ::mlir::ArrayAttr
-                    namedAttributeApi.namedAttributeGet(
-                      "portTypes".identifierGet,
-                      portTypes.map(_.typeAttrGet).arrayAttrGet
-                    ),
-                    // ::mlir::ArrayAttr
-                    namedAttributeApi.namedAttributeGet(
-                      "annotations".identifierGet,
-                      Seq.empty.arrayAttrGet
-                    ),
-                    // ::mlir::ArrayAttr
-                    namedAttributeApi.namedAttributeGet(
-                      "layers".identifierGet,
-                      op.getInherentAttributeByName("layers")
+            val moduleName: String = op.getInherentAttributeByName("moduleName").flatSymbolRefAttrGetValue
+            if (declaredModules.add(moduleName))
+              val portTypes: Seq[Type] = Seq.tabulate(op.getNumResults.toInt)(i => op.getResult(i).getType)
+              val extmoduleOp = ExtModule(
+                summon[OperationApi].operationCreate(
+                  name = "firrtl.extmodule",
+                  location = op.getLocation,
+                  namedAttributes =
+                    val namedAttributeApi = summon[NamedAttributeApi]
+                    Seq(
+                      // ::mlir::StringAttr
+                      namedAttributeApi.namedAttributeGet(
+                        "sym_name".identifierGet,
+                        moduleName.stringAttrGet
+                      ),
+                      // ::mlir::StringAttr
+                      namedAttributeApi.namedAttributeGet(
+                        "defname".identifierGet,
+                        moduleName.stringAttrGet
+                      ),
+                      // ::mlir::StringAttr
+                      namedAttributeApi.namedAttributeGet(
+                        "parameters".identifierGet,
+                        Seq.empty.arrayAttrGet
+                      ),
+                      // ::circt::firrtl::ConventionAttr
+                      namedAttributeApi.namedAttributeGet(
+                        "convention".identifierGet,
+                        FirrtlConvention.Internal.toAttribute
+                      ),
+                      // ::mlir::DenseBoolArrayAttr
+                      namedAttributeApi.namedAttributeGet(
+                        "portDirections".identifierGet,
+                        op.getInherentAttributeByName("portDirections")
+                      ),
+                      // ::mlir::ArrayAttr
+                      namedAttributeApi.namedAttributeGet(
+                        "portLocations".identifierGet,
+                        Seq
+                          .fill(op.getNumResults.toInt)(summon[LocationApi].locationUnknownGet.getAttribute)
+                          .arrayAttrGet
+                      ),
+                      // ::mlir::ArrayAttr
+                      namedAttributeApi.namedAttributeGet(
+                        "portAnnotations".identifierGet,
+                        Seq.empty.arrayAttrGet
+                      ),
+                      // ::mlir::ArrayAttr
+                      namedAttributeApi.namedAttributeGet(
+                        "portSymbols".identifierGet,
+                        Seq.empty.arrayAttrGet
+                      ),
+                      // ::mlir::ArrayAttr
+                      namedAttributeApi.namedAttributeGet(
+                        "portNames".identifierGet,
+                        op.getInherentAttributeByName("portNames")
+                      ),
+                      // ::mlir::ArrayAttr
+                      namedAttributeApi.namedAttributeGet(
+                        "portTypes".identifierGet,
+                        portTypes.map(_.typeAttrGet).arrayAttrGet
+                      ),
+                      // ::mlir::ArrayAttr
+                      namedAttributeApi.namedAttributeGet(
+                        "annotations".identifierGet,
+                        Seq.empty.arrayAttrGet
+                      ),
+                      // ::mlir::ArrayAttr
+                      namedAttributeApi.namedAttributeGet(
+                        "layers".identifierGet,
+                        op.getInherentAttributeByName("layers")
+                      )
+                      // Zaozi doesn't support XMR and all the probe IO should be connected internally within the module
+                      // thus we don't need internalPaths
                     )
-                    // Zaozi doesn't support XMR and all the probe IO should be connected internally within the module
-                    // thus we don't need internalPaths
-                  )
-                ,
-                regionBlockTypeLocations = Seq(Seq())
+                  ,
+                  regionBlockTypeLocations = Seq(Seq())
+                )
               )
-            )
-            summon[Circuit].block.appendOwnedOperation(extmoduleOp.operation)
+              summon[Circuit].block.appendOwnedOperation(extmoduleOp.operation)
           // get layers from module, append it to circuit to create symbol table.
           case i if i == "firrtl.module"   =>
             val layersAttrs = op.getInherentAttributeByName("layers")
