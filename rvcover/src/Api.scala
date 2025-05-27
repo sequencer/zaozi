@@ -9,21 +9,27 @@ import org.llvm.mlir.scalalib.capi.ir.{Block, Context, Location, LocationApi, Op
 
 import java.lang.foreign.Arena
 
-class Recipe(val name: String) {
-  private val indices = scala.collection.mutable.Map[Int, Index]()
-
-  def addIndex(idx: Index): Index = {
-    indices.getOrElseUpdate(idx.idx, idx)
-  }
-
-  override def toString(): String = {
-    val indexStrings = indices.values.map(_.toString).mkString("\n")
-    s"Recipe: $name\nIndices:\n$indexStrings"
-  }
-}
-
-def recipe(name: String)(block: Recipe ?=> Unit): Recipe = {
+def recipe(
+  name:  String,
+  sets:  Recipe ?=> Ref[Bool]*
+)(
+  using Arena,
+  Context,
+  Block
+)(block: Recipe ?=> Unit
+): Recipe = {
   given Recipe = new Recipe(name)
+  
+  // assert sets are valid
+  val includedSets: List[Ref[Bool]] = sets.toList.map(f => f(using summon[Recipe]))
+  includedSets.foreach { set =>
+    smtAssert(set)
+  }
+  // assert that sets are mutually exclusive
+  val excludedSets = summon[Recipe].allSets.diff(includedSets)
+  excludedSets.foreach { set =>
+    smtAssert(!set)
+  }
 
   block
 
@@ -37,12 +43,12 @@ def index(
   Context,
   Block,
   Recipe
-)(block: Index ?=> Unit
+)(block: Index ?=> Ref[Bool]
 ): Unit = {
   val index = new Index(idx)
   summon[Recipe].addIndex(index)
 
   given Index = index
 
-  block
+  smtAssert(block)
 }
