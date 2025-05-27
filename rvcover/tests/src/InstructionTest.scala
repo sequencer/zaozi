@@ -65,7 +65,8 @@ def getExtensions(): Seq[String] =
   org.chipsalliance.rvdecoderdb
     .instructions(riscvOpcodesPath)
     .toSeq
-    .map(_.instructionSet.name)
+    .map(_.instructionSets)
+    .flatMap(_.map(_.name))
     .distinct
     .sorted
 
