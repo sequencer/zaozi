@@ -20,5 +20,4 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: DeterminateSystems/nix-installer-action@main
-      - uses: DeterminateSystems/magic-nix-cache-action@main
       - run: nix develop -c bash -c "mill -i --disable-prompt zaozi.benchmark.runJmh 2>&1 | sed 's/^\[[0-9]*\] //' | grep -E '^Iteration|^Benchmark|^ZaoziBenchmark' > $GITHUB_STEP_SUMMARY"
