@@ -105,15 +105,14 @@ object GenerateConstraints extends TestSuite:
     // ======================================================================================================
     val instructionsAttributes = parseJson(s"${sys.env.get("MILL_TEST_RESOURCE_DIR").get}/instruction.json")
     instructionsAttributes.foreach { case (instructionName, attributes) =>
-      // Check if the instruction has the "vector" attribute
-      val yes = attributes.filter { case (value, _) => value }.map("is" + _._2 + "()").toList
-      val no = attributes.filter { case (value, _) => !value }.map("!is" + _._2 + "()").toList
-      val yesConstraints = if (yes.nonEmpty) yes.mkString("(", " | ", ")") else ""
-      val noConstraints = if (no.nonEmpty) no.mkString("(", " | ", ")") else ""
-      val dilemma = if (yesConstraints.nonEmpty && noConstraints.nonEmpty) " & " else ""
+      val positiveAttributes  = attributes._1.map(attr => s"is${attr}()").toList
+      val negativeAttributes  = attributes._2.map(attr => s"!is${attr}()").toList
+      val positiveConstraint  = if (positiveAttributes.nonEmpty) positiveAttributes.mkString("(", " | ", ")") else ""
+      val negativeConstraint  = if (negativeAttributes.nonEmpty) negativeAttributes.mkString("(", " | ", ")") else ""
+      val conjunctionOperator = if (positiveConstraint.nonEmpty && negativeConstraint.nonEmpty) " & " else ""
 
       writer.write(
-        s"def ${instructionName}()(using Arena, Context, Block, Index, Recipe): Ref[Bool] = ${yesConstraints + dilemma + noConstraints}\n"
+        s"def ${instructionName}()(using Arena, Context, Block, Index, Recipe): Ref[Bool] = ${positiveConstraint + conjunctionOperator + negativeConstraint}\n"
       )
     }
 
