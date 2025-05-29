@@ -1,6 +1,5 @@
 import argparse
 from z3 import *
-import re
 from string import Template
 
 def parse_instruction_map(inst_path: str):
