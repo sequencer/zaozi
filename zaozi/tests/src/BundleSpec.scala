@@ -30,16 +30,17 @@ given upickle.default.ReadWriter[BundleSpecParameter] = upickle.default.macroRW
 class BundleSpecLayers(parameter: BundleSpecParameter) extends LayerInterface(parameter)
 
 class BundleSpecIO(parameter: BundleSpecParameter) extends HWInterface(parameter):
-  val a = Aligned(UInt(32.W))
-  val b = Flipped(UInt(32.W))
+  val a = Aligned(UInt(parameter.width.W))
+  val b = Flipped(UInt(parameter.width.W))
   val c = Aligned(new Bundle {
-    val d = Aligned(UInt(32.W))
+    val d = Aligned(UInt(parameter.width.W))
   })
   val f = Flipped(new SimpleBundle)
-  val h = Flipped("hhh", UInt(32.W))
-  val e = UInt(32.W)
-  val i = 32
+  val h = Flipped("hhh", UInt(parameter.width.W))
+  val e = UInt(parameter.width.W)
+  val i = parameter.width
   val j = Aligned(new TypeParamIO(new SimpleBundleA, new SimpleBundleB))
+  val k = Option.when(parameter.width >= 16)(Aligned(UInt(parameter.width.W)))
 
 class BundleSpecProbe(parameter: BundleSpecParameter)
     extends DVInterface[BundleSpecParameter, BundleSpecLayers](parameter)
@@ -93,6 +94,19 @@ object BundleSpec extends TestSuite:
       SymbolFound.firrtlTest(BundleSpecParameter(32))(
         "connect io.a, io.b"
       )
+
+    test("Optional field"):
+      @generator
+      object OptionalField
+          extends Generator[BundleSpecParameter, BundleSpecLayers, BundleSpecIO, BundleSpecProbe]
+          with HasFirrtlTest:
+        def architecture(parameter: BundleSpecParameter) =
+          val io = summon[Interface[BundleSpecIO]]
+          io.k.foreach(_ := io.b)
+      OptionalField.firrtlTest(BundleSpecParameter(32))(
+        "connect io.k, io.b"
+      )
+      OptionalField.firrtlTest(BundleSpecParameter(8))(out => !out.contains("connect io.k, io.b"))
 
     test("Subaccess on non-Bundle type"):
       @generator
