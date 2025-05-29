@@ -94,67 +94,67 @@ object BundleSpec extends TestSuite:
         "connect io.a, io.b"
       )
 
-      test("Subaccess on non-Bundle type"):
-        @generator
-        object SubaccessOnNonBundleType
-            extends Generator[BundleSpecParameter, BundleSpecLayers, BundleSpecIO, BundleSpecProbe]
-            with HasCompileErrorTest:
-          def architecture(parameter: BundleSpecParameter) =
-            val io = summon[Interface[BundleSpecIO]]
-            compileError("""io.a.a""").check(
-              "",
-              "Type parameter T must be a subtype of DynamicSubfield, but got me.jiuyang.zaozi.valuetpe.UInt."
-            )
-        SubaccessOnNonBundleType.compileErrorTest(BundleSpecParameter(32))
+    test("Subaccess on non-Bundle type"):
+      @generator
+      object SubaccessOnNonBundleType
+          extends Generator[BundleSpecParameter, BundleSpecLayers, BundleSpecIO, BundleSpecProbe]
+          with HasCompileErrorTest:
+        def architecture(parameter: BundleSpecParameter) =
+          val io = summon[Interface[BundleSpecIO]]
+          compileError("""io.a.a""").check(
+            "",
+            "Type parameter T must be a subtype of DynamicSubfield, but got me.jiuyang.zaozi.valuetpe.UInt."
+          )
+      SubaccessOnNonBundleType.compileErrorTest(BundleSpecParameter(32))
 
-      test("Symbol not found"):
-        @generator
-        object SymbolNotFound
-            extends Generator[BundleSpecParameter, BundleSpecLayers, BundleSpecIO, BundleSpecProbe]
-            with HasCompileErrorTest:
-          def architecture(parameter: BundleSpecParameter) =
-            val io = summon[Interface[BundleSpecIO]]
-            compileError("""io.fourzerofour""").check(
-              "",
-              "Field 'fourzerofour' does not exist in type me.jiuyang.zaozi.tests.BundleSpecIO."
-            )
-        SymbolNotFound.compileErrorTest(BundleSpecParameter(32))
+    test("Symbol not found"):
+      @generator
+      object SymbolNotFound
+          extends Generator[BundleSpecParameter, BundleSpecLayers, BundleSpecIO, BundleSpecProbe]
+          with HasCompileErrorTest:
+        def architecture(parameter: BundleSpecParameter) =
+          val io = summon[Interface[BundleSpecIO]]
+          compileError("""io.fourzerofour""").check(
+            "",
+            "Field 'fourzerofour' does not exist in type me.jiuyang.zaozi.tests.BundleSpecIO."
+          )
+      SymbolNotFound.compileErrorTest(BundleSpecParameter(32))
 
-      test("Access non Data type - Int"):
-        @generator
-        object AccessNonDataTypeInt
-            extends Generator[BundleSpecParameter, BundleSpecLayers, BundleSpecIO, BundleSpecProbe]
-            with HasCompileErrorTest:
-          def architecture(parameter: BundleSpecParameter) =
-            val io = summon[Interface[BundleSpecIO]]
-            compileError("""io.i""").check(
-              "",
-              "Field type 'scala.Int' does not conform to the upper bound BundleField."
-            )
-        AccessNonDataTypeInt.compileErrorTest(BundleSpecParameter(32))
+    test("Access non Data type - Int"):
+      @generator
+      object AccessNonDataTypeInt
+          extends Generator[BundleSpecParameter, BundleSpecLayers, BundleSpecIO, BundleSpecProbe]
+          with HasCompileErrorTest:
+        def architecture(parameter: BundleSpecParameter) =
+          val io = summon[Interface[BundleSpecIO]]
+          compileError("""io.i""").check(
+            "",
+            "Field type 'scala.Int' does not conform to the upper bound BundleField."
+          )
+      AccessNonDataTypeInt.compileErrorTest(BundleSpecParameter(32))
 
-      test("Access non Data type - UInt"):
-        @generator
-        object AccessNonDataTypeUInt
-            extends Generator[BundleSpecParameter, BundleSpecLayers, BundleSpecIO, BundleSpecProbe]
-            with HasCompileErrorTest:
-          def architecture(parameter: BundleSpecParameter) =
-            val io = summon[Interface[BundleSpecIO]]
-            compileError("""io.e""").check(
-              "",
-              "Field type 'me.jiuyang.zaozi.valuetpe.UInt' does not conform to the upper bound BundleField."
-            )
-        AccessNonDataTypeUInt.compileErrorTest(BundleSpecParameter(32))
+    test("Access non Data type - UInt"):
+      @generator
+      object AccessNonDataTypeUInt
+          extends Generator[BundleSpecParameter, BundleSpecLayers, BundleSpecIO, BundleSpecProbe]
+          with HasCompileErrorTest:
+        def architecture(parameter: BundleSpecParameter) =
+          val io = summon[Interface[BundleSpecIO]]
+          compileError("""io.e""").check(
+            "",
+            "Field type 'me.jiuyang.zaozi.valuetpe.UInt' does not conform to the upper bound BundleField."
+          )
+      AccessNonDataTypeUInt.compileErrorTest(BundleSpecParameter(32))
 
-      test("Structural Type doesn't work"):
-        @generator
-        object StructuralTypeDoesntWork
-            extends Generator[BundleSpecParameter, BundleSpecLayers, BundleSpecIO, BundleSpecProbe]
-            with HasCompileErrorTest:
-          def architecture(parameter: BundleSpecParameter) =
-            val io = summon[Interface[BundleSpecIO]]
-            compileError("""io.c.d""").check(
-              "",
-              "Field 'd' does not exist in type me.jiuyang.zaozi.valuetpe.Bundle."
-            )
-        StructuralTypeDoesntWork.compileErrorTest(BundleSpecParameter(32))
+    test("Structural Type doesn't work"):
+      @generator
+      object StructuralTypeDoesntWork
+          extends Generator[BundleSpecParameter, BundleSpecLayers, BundleSpecIO, BundleSpecProbe]
+          with HasCompileErrorTest:
+        def architecture(parameter: BundleSpecParameter) =
+          val io = summon[Interface[BundleSpecIO]]
+          compileError("""io.c.d""").check(
+            "",
+            "Field 'd' does not exist in type me.jiuyang.zaozi.valuetpe.Bundle."
+          )
+      StructuralTypeDoesntWork.compileErrorTest(BundleSpecParameter(32))
