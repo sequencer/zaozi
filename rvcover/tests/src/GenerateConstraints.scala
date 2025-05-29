@@ -57,6 +57,16 @@ object GenerateConstraints extends TestSuite:
     )
 
     // ======================================================================================================
+    // def isRVA()(using Arena, Context, Block, Recipe): Ref[Bool] = summon[Recipe].rv_a
+    // ======================================================================================================
+    getExtensions().foreach { ext =>
+      val extName = ext.replace("_", "").toUpperCase()
+      writer.write(
+        s"def is$extName()(using Arena, Context, Block, Recipe): Ref[Bool] = summon[Recipe].$ext\n"
+      )
+    }
+
+    // ======================================================================================================
     // def isAdd()(using Arena, Context, Block, Index): Ref[Bool] = nameId(0) & hasRd() & hasRs1() & hasRs2() & isRVI()
     // ======================================================================================================
     getInstructions().zipWithIndex.foreach { case (instruction, idx) =>
@@ -87,24 +97,32 @@ object GenerateConstraints extends TestSuite:
 
       writer.write(s" & ${s}\n")
     }
-    
+
     writer.write("\n")
 
     // ======================================================================================================
-    // def isRVA()(using Arena, Context, Block, Recipe): Ref[Bool] = summon[Recipe].rv_a
+    // def isVector()(using Arena, Context, Block, Index, Recipe): Ref[Bool]
     // ======================================================================================================
-    getExtensions().foreach { ext =>
-      val extName = ext.replace("_", "").toUpperCase()
+    val instructionsAttributes = parseJson(s"${sys.env.get("MILL_TEST_RESOURCE_DIR").get}/instruction.json")
+    instructionsAttributes.foreach { case (instructionName, attributes) =>
+      // Check if the instruction has the "vector" attribute
+      val yes = attributes.filter { case (value, _) => value }.map("is" + _._2 + "()").toList
+      val no = attributes.filter { case (value, _) => !value }.map("!is" + _._2 + "()").toList
+      val yesConstraints = if (yes.nonEmpty) yes.mkString("(", " | ", ")") else ""
+      val noConstraints = if (no.nonEmpty) no.mkString("(", " | ", ")") else ""
+      val dilemma = if (yesConstraints.nonEmpty && noConstraints.nonEmpty) " & " else ""
+
       writer.write(
-        s"def is$extName()(using Arena, Context, Block, Recipe): Ref[Bool] = summon[Recipe].$ext\n"
+        s"def ${instructionName}()(using Arena, Context, Block, Index, Recipe): Ref[Bool] = ${yesConstraints + dilemma + noConstraints}\n"
       )
     }
+
+    writer.write("\n")
 
     // ======================================================================================================
     // case class Recipe(val name: String)(using Arena, Context, Block)
     // ======================================================================================================
-    writer.write("""
-case class Recipe(val name: String)(using Arena, Context, Block) {
+    writer.write("""case class Recipe(val name: String)(using Arena, Context, Block) {
   private val indices = scala.collection.mutable.Map[Int, Index]()
 """)
 
@@ -130,8 +148,7 @@ case class Recipe(val name: String)(using Arena, Context, Block) {
     // ======================================================================================================
     // case class Index(val idx: Int)(using Arena, Context, Block)
     // ======================================================================================================
-    writer.write("""
-case class Index(val idx: Int)(using Arena, Context, Block) {
+    writer.write("""case class Index(val idx: Int)(using Arena, Context, Block) {
   val nameId = smtValue(s"nameId_${idx}", SInt)
 """)
 
@@ -150,8 +167,6 @@ case class Index(val idx: Int)(using Arena, Context, Block) {
 
     writer.write(s"""
   override def toString: String = s\"$${idx}, $$$${nameId_$${idx}}, $s\"
-}
-
-    """)
+}\n""")
 
     writer.close()
