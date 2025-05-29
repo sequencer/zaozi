@@ -930,6 +930,19 @@ trait TypeImpl:
     )(
       using TypeImpl
     ): Ref[E]
+    def getOptionRefViaFieldValNameImpl[E <: Data](
+      refer:        Value,
+      fieldValName: String
+    )(
+      using Arena,
+      Block,
+      Context,
+      sourcecode.File,
+      sourcecode.Line,
+      sourcecode.Name.Machine
+    )(
+      using TypeImpl
+    ): Option[Ref[E]]
   extension (ref: Bundle)
     def getRefViaFieldValNameImpl[E <: Data](
       refer:        Value,
@@ -944,3 +957,16 @@ trait TypeImpl:
     )(
       using TypeImpl
     ): Ref[E]
+    def getOptionRefViaFieldValNameImpl[E <: Data](
+      refer:        Value,
+      fieldValName: String
+    )(
+      using Arena,
+      Block,
+      Context,
+      sourcecode.File,
+      sourcecode.Line,
+      sourcecode.Name.Machine
+    )(
+      using TypeImpl
+    ): Option[Ref[E]]

@@ -98,39 +98,51 @@ def referableSelectDynamic[T <: me.jiuyang.zaozi.valuetpe.Data: Type](
     case _                           => report.errorAndAbort(s"Unable to determine the type of field '$fieldNameStr'.")
   }
 
+  val (arena, typeImpl, context, block, file, line, valName, _) = summonContextualParameters
+
   // Ensure the field type conforms to Data
-  val bundleFieldType = TypeRepr.of[me.jiuyang.zaozi.valuetpe.BundleField[?]]
-  if (!(fieldType <:< bundleFieldType)) {
+  val bundleFieldType       = TypeRepr.of[me.jiuyang.zaozi.valuetpe.BundleField[?]]
+  val optionBundleFieldType = TypeRepr.of[Option[me.jiuyang.zaozi.valuetpe.BundleField[?]]]
+  if (fieldType <:< bundleFieldType)
+    fieldType.typeArgs.head.asType match
+      case '[tpe] =>
+        '{
+          given java.lang.foreign.Arena                = $arena
+          given me.jiuyang.zaozi.TypeImpl              = $typeImpl
+          given org.llvm.mlir.scalalib.capi.ir.Context = $context
+          given org.llvm.mlir.scalalib.capi.ir.Block   = $block
+          given sourcecode.File                        = $file
+          given sourcecode.Line                        = $line
+          given sourcecode.Name.Machine                = $valName
+          $ref._tpe
+            .asInstanceOf[me.jiuyang.zaozi.magic.DynamicSubfield]
+            // Hack with union type
+            .getRefViaFieldValName[tpe & me.jiuyang.zaozi.valuetpe.Data](
+              $ref.refer,
+              $fieldName
+            )
+        }
+  else if (fieldType <:< optionBundleFieldType)
+    fieldType.typeArgs.head.typeArgs.head.asType match
+      case '[tpe] =>
+        '{
+          given java.lang.foreign.Arena                = $arena
+          given me.jiuyang.zaozi.TypeImpl              = $typeImpl
+          given org.llvm.mlir.scalalib.capi.ir.Context = $context
+          given org.llvm.mlir.scalalib.capi.ir.Block   = $block
+          given sourcecode.File                        = $file
+          given sourcecode.Line                        = $line
+          given sourcecode.Name.Machine                = $valName
+          $ref._tpe
+            .asInstanceOf[me.jiuyang.zaozi.magic.DynamicSubfield]
+            // Hack with union type
+            .getOptionRefViaFieldValName[tpe & me.jiuyang.zaozi.valuetpe.Data](
+              $ref.refer,
+              $fieldName
+            )
+        }
+  else
     report.errorAndAbort(s"Field type '${fieldType.show}' does not conform to the upper bound BundleField.")
-  }
-
-  val (arena, typeImpl, context, block, file, line, valName, instanceContext) = summonContextualParameters
-
-  val fieldDataType = fieldType.typeArgs.head
-
-  // Construct and return the expression ref.field(fieldName)
-  fieldDataType.asType match {
-    case tpe @ '[fieldDataType] =>
-      '{
-        given java.lang.foreign.Arena                = $arena
-        given me.jiuyang.zaozi.TypeImpl              = $typeImpl
-        given org.llvm.mlir.scalalib.capi.ir.Context = $context
-        given org.llvm.mlir.scalalib.capi.ir.Block   = $block
-        given sourcecode.File                        = $file
-        given sourcecode.Line                        = $line
-        given sourcecode.Name.Machine                = $valName
-        given me.jiuyang.zaozi.InstanceContext       = $instanceContext
-        $ref._tpe
-          .asInstanceOf[me.jiuyang.zaozi.magic.DynamicSubfield]
-          // Hack with union type
-          .getRefViaFieldValName[fieldDataType & me.jiuyang.zaozi.valuetpe.Data](
-            $ref.refer,
-            $fieldName
-          )
-      }
-    case _                      =>
-      report.errorAndAbort(s"Field type '${fieldType.show}' does not conform to the upper bound Data.")
-  }
 
 private def getTypeParameters(
   fieldValueExpr: Expr[Any]

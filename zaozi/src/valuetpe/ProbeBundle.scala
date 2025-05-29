@@ -52,6 +52,23 @@ trait ProbeBundle extends Data with DynamicSubfield:
     fieldValName
   )
 
+  def getOptionRefViaFieldValName[E <: Data](
+    refer:        Value,
+    fieldValName: String
+  )(
+    using Arena,
+    Block,
+    Context,
+    sourcecode.File,
+    sourcecode.Line,
+    sourcecode.Name.Machine
+  )(
+    using TypeImpl
+  ): Option[Ref[E]] = this.getOptionRefViaFieldValNameImpl(
+    refer,
+    fieldValName
+  )
+
   def toMlirType(
     using Arena,
     Context,
