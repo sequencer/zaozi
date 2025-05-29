@@ -30,3 +30,17 @@ trait DynamicSubfield:
   )(
     using TypeImpl
   ): Ref[E]
+
+  def getOptionRefViaFieldValName[E <: Data](
+    refer:        Value,
+    fieldValName: String
+  )(
+    using Arena,
+    Block,
+    Context,
+    sourcecode.File,
+    sourcecode.Line,
+    sourcecode.Name.Machine
+  )(
+    using TypeImpl
+  ): Option[Ref[E]]

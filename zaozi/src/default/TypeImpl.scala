@@ -235,23 +235,34 @@ given TypeImpl with
       sourcecode.Name.Machine
     )(
       using TypeImpl
-    ): Ref[E] =
-      def valNameToRefName(valName: String):        String =
-        ref._elements
-          .getOrElse(valName, throw new Exception(s"$valName not found in ${ref._elements.keys}"))
-          ._name
-      def valNameToTpe[T <: Data](valName: String): T      =
-        ref._elements(valName)._tpe.asInstanceOf[T]
-      val openSubfieldOp = summon[OpenSubfieldApi]
-        .op(
-          input = refer,
-          fieldIndex = ref.toMlirType.getBundleFieldIndex(valNameToRefName(fieldValName)),
-          location = locate
-        )
-      openSubfieldOp.operation.appendToBlock()
-      new Ref[E]:
-        val _tpe:       E         = valNameToTpe(fieldValName)
-        val _operation: Operation = openSubfieldOp.operation
+    ): Ref[E] = getOptionRefViaFieldValNameImpl(refer, fieldValName).getOrElse:
+      throw new Exception(s"$fieldValName not found in ${ref._elements.keys}")
+    def getOptionRefViaFieldValNameImpl[E <: Data](
+      refer:        Value,
+      fieldValName: String
+    )(
+      using Arena,
+      Block,
+      Context,
+      sourcecode.File,
+      sourcecode.Line,
+      sourcecode.Name.Machine
+    )(
+      using TypeImpl
+    ): Option[Ref[E]] = ref._elements
+      .get(fieldValName)
+      .map: field =>
+        val openSubfieldOp = summon[OpenSubfieldApi]
+          .op(
+            input = refer,
+            fieldIndex = ref.toMlirType.getBundleFieldIndex(field._name),
+            location = locate
+          )
+        openSubfieldOp.operation.appendToBlock()
+        new Ref[E]:
+          val _tpe:       E         = field._tpe.asInstanceOf[E]
+          val _operation: Operation = openSubfieldOp.operation
+
   extension (ref: Bundle)
     def getRefViaFieldValNameImpl[E <: Data](
       refer:        Value,
@@ -265,21 +276,31 @@ given TypeImpl with
       sourcecode.Name.Machine
     )(
       using TypeImpl
-    ): Ref[E] =
-      def valNameToRefName(valName: String):        String =
-        ref._elements
-          .getOrElse(valName, throw new Exception(s"$valName not found in ${ref._elements.keys}"))
-          ._name
-      def valNameToTpe[T <: Data](valName: String): T      =
-        ref._elements(valName)._tpe.asInstanceOf[T]
-      val subfieldOp = summon[SubfieldApi]
-        .op(
-          input = refer,
-          fieldIndex = ref.toMlirType.getBundleFieldIndex(valNameToRefName(fieldValName)),
-          location = locate
-        )
-      subfieldOp.operation.appendToBlock()
-      new Ref[E]:
-        val _tpe:       E         = valNameToTpe(fieldValName)
-        val _operation: Operation = subfieldOp.operation
+    ): Ref[E] = getOptionRefViaFieldValNameImpl(refer, fieldValName).getOrElse:
+      throw new Exception(s"$fieldValName not found in ${ref._elements.keys}")
+    def getOptionRefViaFieldValNameImpl[E <: Data](
+      refer:        Value,
+      fieldValName: String
+    )(
+      using Arena,
+      Block,
+      Context,
+      sourcecode.File,
+      sourcecode.Line,
+      sourcecode.Name.Machine
+    )(
+      using TypeImpl
+    ): Option[Ref[E]] = ref._elements
+      .get(fieldValName)
+      .map: field =>
+        val subfieldOp = summon[SubfieldApi]
+          .op(
+            input = refer,
+            fieldIndex = ref.toMlirType.getBundleFieldIndex(field._name),
+            location = locate
+          )
+        subfieldOp.operation.appendToBlock()
+        new Ref[E]:
+          val _tpe:       E         = field._tpe.asInstanceOf[E]
+          val _operation: Operation = subfieldOp.operation
 end given
