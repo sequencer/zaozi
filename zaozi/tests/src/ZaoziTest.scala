@@ -50,9 +50,9 @@ trait HasMlirTest:
   private val self = this.asInstanceOf[Generator[this.TPARAM, this.TLAYER, this.TINTF, this.TPROBE]]
 
   def mlirTest(
-    parameter:  this.TPARAM
-  )(checkLines: String*
-  ) =
+    parameter: this.TPARAM
+  )(predicate: String => Boolean
+  ): Unit =
     given Arena      = Arena.ofConfined()
     given Context    = summon[ContextApi].contextCreate
     summon[FirrtlDialectApi].loadDialect
@@ -66,18 +66,22 @@ trait HasMlirTest:
     summon[MlirModule].getOperation.print(out ++= _)
     summon[Context].destroy()
     summon[Arena].close()
-    if (checkLines.isEmpty)
-      assert(out.toString == "Nothing To Check")
-    else checkLines.foreach(l => assert(out.toString.contains(l)))
+
+    assert(predicate(out.toString))
+
+  def mlirTest(
+    parameter:  this.TPARAM
+  )(checkLines: String*
+  ): Unit = mlirTest(parameter)(out => checkLines.forall(l => out.contains(l)))
 
 trait HasFirrtlTest:
   this: Generator[?, ?, ?, ?] =>
   private val self = this.asInstanceOf[Generator[this.TPARAM, this.TLAYER, this.TINTF, this.TPROBE]]
 
   def firrtlTest(
-    parameter:  this.TPARAM
-  )(checkLines: String*
-  ) =
+    parameter: this.TPARAM
+  )(predicate: String => Boolean
+  ): Unit =
     given Arena      = Arena.ofConfined()
     given Context    = summon[ContextApi].contextCreate
     summon[FirrtlDialectApi].loadDialect
@@ -91,18 +95,22 @@ trait HasFirrtlTest:
     summon[MlirModule].exportFIRRTL(out ++= _)
     summon[Context].destroy()
     summon[Arena].close()
-    if (checkLines.isEmpty)
-      assert(out.toString == "Nothing To Check")
-    else checkLines.foreach(l => assert(out.toString.contains(l)))
+
+    assert(predicate(out.toString))
+
+  def firrtlTest(
+    parameter:  this.TPARAM
+  )(checkLines: String*
+  ): Unit = firrtlTest(parameter)(out => checkLines.forall(l => out.contains(l)))
 
 trait HasVerilogTest:
   this: Generator[?, ?, ?, ?] =>
   private val self = this.asInstanceOf[Generator[this.TPARAM, this.TLAYER, this.TINTF, this.TPROBE]]
 
   def verilogTest(
-    parameter:  this.TPARAM
-  )(checkLines: String*
-  ) =
+    parameter: this.TPARAM
+  )(predicate: String => Boolean
+  ): Unit =
     given Arena          = Arena.ofConfined()
     given Context        = summon[ContextApi].contextCreate
     summon[FirrtlDialectApi].loadDialect
@@ -129,10 +137,13 @@ trait HasVerilogTest:
     summon[PassManager].runOnOp(summon[MlirModule].getOperation)
     summon[Context].destroy()
     summon[Arena].close()
-    if (checkLines.isEmpty)
-      assert(out.toString == "Nothing To Check")
-    else checkLines.foreach(l => assert(out.toString.contains(l)))
 
+    assert(predicate(out.toString))
+
+  def verilogTest(
+    parameter:  this.TPARAM
+  )(checkLines: String*
+  ): Unit = verilogTest(parameter)(out => checkLines.forall(l => out.contains(l)))
 trait HasCompileErrorTest:
   this: Generator[?, ?, ?, ?] =>
   private val self = this.asInstanceOf[Generator[this.TPARAM, this.TLAYER, this.TINTF, this.TPROBE]]
