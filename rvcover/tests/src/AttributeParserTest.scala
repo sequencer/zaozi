@@ -5,7 +5,7 @@ package me.jiuyang.rvcover.tests
 import ujson.*
 import utest.*
 
-def parseJson(filePath: String): Map[String, List[(Boolean, String)]] = {
+def parseJson(filePath: String): Map[String, (List[String], List[String])] = {
   val jsonString = os.read(os.Path(filePath))
   val json       = ujson.read(jsonString)
 
@@ -13,27 +13,36 @@ def parseJson(filePath: String): Map[String, List[(Boolean, String)]] = {
   json.obj("instructions").arr.length > 0 ==> true
   json.obj("instructions").arr.head.obj("attributes").arr.length > 0 ==> true
 
-  json.obj("instructions").arr.foldLeft(Map.empty[String, List[(Boolean, String)]]) { (globalAcc, instruction) =>
-    val name     = instruction.obj("instructionName").str.replace(".", "_")
-    val localMap =
-      instruction.obj("attributes").arr.foldLeft(Map.empty[String, List[(Boolean, String)]]) { (acc, attr) =>
+  // Helper to merge two (List[String], List[String]) tuples
+  def mergeTuples(a: (List[String], List[String]), b: (List[String], List[String])): (List[String], List[String]) =
+    (a._1 ++ b._1, a._2 ++ b._2)
+
+  json.obj("instructions").arr.foldLeft(Map.empty[String, (List[String], List[String])]) { (globalAcc, instruction) =>
+    val name = instruction.obj("instructionName").str.replace(".", "_")
+    val camelName = translateToCamelCase(name)
+
+    val localMap = instruction.obj("attributes").arr.foldLeft(Map.empty[String, (List[String], List[String])]) {
+      (acc, attr) =>
         val identifier = attr.obj("identifier").str
         attr.obj.get("value") match {
           case Some(v) =>
             v.str match {
-              case "Y"  =>
-                acc.updated(identifier, acc.getOrElse(identifier, List()) :+ (true, s"${translateToCamelCase(name)}"))
-              case "N"  =>
-                acc.updated(identifier, acc.getOrElse(identifier, List()) :+ (false, s"${translateToCamelCase(name)}"))
+              case "Y" =>
+                val (yesList, noList) = acc.getOrElse(identifier, (List(), List()))
+                acc.updated(identifier, (yesList :+ camelName, noList))
+              case "N" =>
+                val (yesList, noList) = acc.getOrElse(identifier, (List(), List()))
+                acc.updated(identifier, (yesList, noList :+ camelName))
               case "DC" => acc
               case _    => throw new RuntimeException(s"Unknown value for attribute $identifier: ${v.str}")
             }
-          case None    => throw new RuntimeException(s"Attribute $identifier has no value")
+          case None => throw new RuntimeException(s"Attribute $identifier has no value")
         }
-      }
+    }
+
     // Merge localMap into globalAcc
-    localMap.foldLeft(globalAcc) { case (acc, (k, vList)) =>
-      acc.updated(k, acc.getOrElse(k, List()) ++ vList)
+    localMap.foldLeft(globalAcc) { case (acc, (k, vTuple)) =>
+      acc.updated(k, mergeTuples(acc.getOrElse(k, (List(), List())), vTuple))
     }
   }
 }
