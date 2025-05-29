@@ -15,12 +15,9 @@ object RecipeTest extends TestSuite:
   val tests = Tests:
     test("TestRecipe"):
       rvcoverTest {
-        val r = recipe("TestRecipe", isRVI()) {
+        val r = recipe("TestRecipe") {
           index(0) {
-            isAddi()
-              & rdRange(1, 2)
-              & rs1Range(1, 32)
-              & imm20Range(0, 1024)
+            rdRange(1, 2)
           }
         }
 
