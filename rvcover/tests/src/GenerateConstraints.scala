@@ -7,9 +7,6 @@ import os.Path
 import java.io.{File, FileWriter}
 import utest.*
 
-// TODO:move to package.mill in the future(but here are some runtime information)
-// TODO:use json to organize the output files
-
 object GenerateConstraints extends TestSuite:
   val tests = Tests:
     val writer = new FileWriter(new File("./ConstraintsGenerated.scala"))
@@ -96,24 +93,6 @@ object GenerateConstraints extends TestSuite:
         else sets.mkString("(", " | ", ")")        // If there are multiple extensions, join them with "( | )"
 
       writer.write(s" & ${s}\n")
-    }
-
-    writer.write("\n")
-
-    // ======================================================================================================
-    // def isVector()(using Arena, Context, Block, Index, Recipe): Ref[Bool]
-    // ======================================================================================================
-    val instructionsAttributes = parseJson(s"${sys.env.get("MILL_TEST_RESOURCE_DIR").get}/instruction.json")
-    instructionsAttributes.foreach { case (instructionName, attributes) =>
-      val positiveAttributes  = attributes._1.map(attr => s"is${attr}()").toList
-      val negativeAttributes  = attributes._2.map(attr => s"!is${attr}()").toList
-      val positiveConstraint  = if (positiveAttributes.nonEmpty) positiveAttributes.mkString("(", " | ", ")") else ""
-      val negativeConstraint  = if (negativeAttributes.nonEmpty) negativeAttributes.mkString("(", " | ", ")") else ""
-      val conjunctionOperator = if (positiveConstraint.nonEmpty && negativeConstraint.nonEmpty) " & " else ""
-
-      writer.write(
-        s"def ${instructionName}()(using Arena, Context, Block, Index, Recipe): Ref[Bool] = ${positiveConstraint + conjunctionOperator + negativeConstraint}\n"
-      )
     }
 
     writer.write("\n")
