@@ -19,8 +19,6 @@ object `package` extends RootModule with ScalaModule with ScalafmtModule { m =>
 
   def generatedConstraintsPath: Target[Path] = millSourcePath / "src" / "GeneratedConstraints.scala"
 
-  def jsonPath: Target[Path] = millSourcePath / "tests" / "resources" / "instruction.json"
-
   def license: Target[Seq[String]] = Seq(
     "// SPDX-License-Identifier: Apache-2.0",
     "// SPDX-FileCopyrightText: 2025 Jianhao Ye <Clo91eaf@qq.com>",
@@ -81,9 +79,10 @@ object `package` extends RootModule with ScalaModule with ScalafmtModule { m =>
     }
   }
 
-  def generateConstraints() = Task.Command {
-    println(jsonPath())
-
+  // generateConstraints by passing absolute path as arg
+  // json format should match the "instruction schema"
+  // e.g. mill -i rvcover.generateConstraints --jsonPath /path/to/xx.json
+  def generateConstraints(jsonPath: String) = T.command {
     // license
     os.write.over(generatedConstraintsPath(), license().mkString("\n") + "\n\n")
 
@@ -91,7 +90,7 @@ object `package` extends RootModule with ScalaModule with ScalafmtModule { m =>
     os.write.append(generatedConstraintsPath(), fileHeader().mkString("\n"))
 
     // Parse the JSON file and generate constraints
-    val instructionsAttributes = parseJson(jsonPath())
+    val instructionsAttributes = parseJson(os.Path(jsonPath))
     instructionsAttributes.foreach { case (instructionName, attributes) =>
       val positiveAttributes  = attributes._1.map(attr => s"is${attr}()").toList
       val negativeAttributes  = attributes._2.map(attr => s"!is${attr}()").toList
