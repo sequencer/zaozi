@@ -84,18 +84,18 @@ object `package` extends RootModule with ScalaModule with ScalafmtModule { m =>
   // e.g. mill -i rvcover.generateConstraints --jsonPath /path/to/xx.json
   def generateConstraints(jsonPath: String) = T.command {
     // license
-    os.write.over(generatedConstraintsPath(), license().mkString("\n") + "\n\n")
+    os.write.over(generatedConstraintsPath(), license().mkString("\n"))
 
     // file header
-    os.write.append(generatedConstraintsPath(), fileHeader().mkString("\n"))
+    os.write.append(generatedConstraintsPath(), fileHeader().mkString("\n", "\n" , "\n"))
 
     // Parse the JSON file and generate constraints
     val instructionsAttributes = parseJson(os.Path(jsonPath))
     instructionsAttributes.foreach { case (instructionName, attributes) =>
       val positiveAttributes  = attributes._1.map(attr => s"is${attr}()").toList
-      val negativeAttributes  = attributes._2.map(attr => s"!is${attr}()").toList
-      val positiveConstraint  = if (positiveAttributes.nonEmpty) positiveAttributes.mkString("(", " | ", ")") else ""
-      val negativeConstraint  = if (negativeAttributes.nonEmpty) negativeAttributes.mkString("(", " | ", ")") else ""
+      val negativeAttributes  = attributes._2.map(attr => s"is${attr}()").toList
+      val positiveConstraint  = if (positiveAttributes.length > 1) positiveAttributes.mkString("smtOr(", ", ", ")") else if (positiveAttributes.length == 1) positiveAttributes.last else ""
+      val negativeConstraint  = if (negativeAttributes.length > 1) negativeAttributes.mkString("!smtOr(", ", ", ")") else if (negativeAttributes.length == 1) negativeAttributes.last else ""
       val conjunctionOperator = if (positiveConstraint.nonEmpty && negativeConstraint.nonEmpty) " & " else ""
 
       os.write.append(generatedConstraintsPath(),
