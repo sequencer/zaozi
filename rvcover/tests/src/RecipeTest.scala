@@ -15,13 +15,17 @@ object RecipeTest extends TestSuite:
   val tests = Tests:
     test("TestRecipe"):
       rvcoverTest {
+        val instructionCount = 100
         val r = recipe("TestRecipe", isRVI()) {
-          index(0) {
-            isAddi() & 
-              rs1Range(1, 31) &
-              rdRange(1, 31) &
-              imm12Range(0, 32)
+          (0 until instructionCount).foreach { i =>
+            index(i) {
+              isAddi() & 
+                rs1Range(1, 32) &
+                rdRange(1, 32) &
+                imm12Range(0, 100)
+            }
           }
+          distinct(0 until instructionCount)(_.imm12)
         }
 
         assert(r.name == "TestRecipe")
