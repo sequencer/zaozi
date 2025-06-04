@@ -52,3 +52,12 @@ def index(
 
   smtAssert(block)
 }
+
+def distinct[D <: Data, R <: Referable[D]](
+  indices: Iterable[Int]
+)(
+  field: Index => R
+)(using Recipe, Arena, Context, Block): Unit =
+  val recipe = summon[Recipe]
+  val indexObjs = indices.map(recipe.getIndex)
+  smtAssert(smtDistinct(indexObjs.map(field).toSeq*))
