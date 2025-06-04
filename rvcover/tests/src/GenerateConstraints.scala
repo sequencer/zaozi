@@ -111,14 +111,10 @@ object GenerateConstraints extends TestSuite:
     writer.write(s"  val allSets: List[Ref[Bool]] = List(${getExtensions().mkString(", ")})\n")
 
     writer.write("""
-  def addIndex(idx: Index): Index = {
-    indices.getOrElseUpdate(idx.idx, idx)
-  }
+  def addIndex(idx: Index): Index = indices.getOrElseUpdate(idx.idx, idx)
+  def getIndex(idx: Int): Index = indices(idx)
 
-  override def toString(): String = {
-    val indexStrings = indices.values.map(_.toString).mkString("\n")
-    s"Recipe: $name\nIndices:\n$indexStrings"
-  }
+  override def toString(): String = s"Recipe: $name\nIndices:\n${indices.values.map(_.toString).mkString("\n")}"
 }
 
 """)
