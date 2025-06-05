@@ -19,30 +19,14 @@ trait Bundle extends Data with DynamicSubfield:
   )(
     using TypeImpl,
     sourcecode.Name.Machine
-  ): BundleField[T] = this.FlippedImpl(None, tpe)
+  ): BundleField[T] = this.FlippedImpl(tpe)
 
   def Aligned[T <: Data](
     tpe: T
   )(
     using TypeImpl,
     sourcecode.Name.Machine
-  ): BundleField[T] = this.AlignedImpl(None, tpe)
-
-  def Flipped[T <: Data](
-    name: String,
-    tpe:  T
-  )(
-    using TypeImpl,
-    sourcecode.Name.Machine
-  ): BundleField[T] = this.FlippedImpl(Some(name), tpe)
-
-  def Aligned[T <: Data](
-    name: String,
-    tpe:  T
-  )(
-    using TypeImpl,
-    sourcecode.Name.Machine
-  ): BundleField[T] = this.AlignedImpl(Some(name), tpe)
+  ): BundleField[T] = this.AlignedImpl(tpe)
 
   def getRefViaFieldValName[E <: Data](
     refer:        Value,

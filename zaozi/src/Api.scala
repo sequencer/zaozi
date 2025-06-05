@@ -866,14 +866,12 @@ trait TypeImpl:
       Context
     ):            Type
     def ReadProbeImpl[T <: Data & CanProbe](
-      name:  Option[String],
       tpe:   T,
       layer: LayerTree
     )(
       using sourcecode.Name.Machine
     ):            BundleField[RProbe[T]]
     def ReadWriteProbeImpl[T <: Data & CanProbe](
-      name:  Option[String],
       tpe:   T,
       layer: LayerTree
     )(
@@ -886,14 +884,12 @@ trait TypeImpl:
       Context
     ):            Type
     def FlippedImpl[T <: Data](
-      name: Option[String],
-      tpe:  T
+      tpe: T
     )(
       using sourcecode.Name.Machine
     ):            BundleField[T]
     def AlignedImpl[T <: Data](
-      name: Option[String],
-      tpe:  T
+      tpe: T
     )(
       using sourcecode.Name.Machine
     ):            BundleField[T]

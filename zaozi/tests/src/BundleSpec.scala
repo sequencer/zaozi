@@ -36,7 +36,6 @@ class BundleSpecIO(parameter: BundleSpecParameter) extends HWInterface(parameter
     val d = Aligned(UInt(parameter.width.W))
   })
   val f = Flipped(new SimpleBundle)
-  val h = Flipped("hhh", UInt(parameter.width.W))
   val e = UInt(parameter.width.W)
   val i = parameter.width
   val j = Aligned(new TypeParamIO(new SimpleBundleA, new SimpleBundleB))
@@ -69,18 +68,6 @@ object BundleSpec extends TestSuite:
           io.a := io.j.a.a
       BundleWithTypeParameterShouldWork.firrtlTest(BundleSpecParameter(32))(
         "connect io.a, io.j.a.a"
-      )
-
-    test("Custom val name"):
-      @generator
-      object CustomValName
-          extends Generator[BundleSpecParameter, BundleSpecLayers, BundleSpecIO, BundleSpecProbe]
-          with HasFirrtlTest:
-        def architecture(parameter: BundleSpecParameter) =
-          val io = summon[Interface[BundleSpecIO]]
-          io.a := io.h
-      CustomValName.firrtlTest(BundleSpecParameter(32))(
-        "connect io.a, io.hhh"
       )
 
     test("Symbol found"):
