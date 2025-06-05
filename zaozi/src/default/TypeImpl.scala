@@ -120,7 +120,6 @@ given TypeImpl with
         .getBundle
       mlirType
     def ReadProbeImpl[T <: Data & CanProbe](
-      name:  Option[String],
       tpe:   T,
       layer: LayerTree
     )(
@@ -128,7 +127,7 @@ given TypeImpl with
     ): BundleField[RProbe[T]] =
       require(ref.instantiating)
       val bf = new BundleField[RProbe[T]]:
-        val _name:   String    = name.getOrElse(bundleFieldName)
+        val _name:   String    = bundleFieldName
         val _isFlip: Boolean   = false
         val _tpe:    RProbe[T] = new RProbe[T]:
           val _baseType: T         = tpe
@@ -137,7 +136,6 @@ given TypeImpl with
       ref._elements += (bundleFieldName -> bf)
       bf
     def ReadWriteProbeImpl[T <: Data & CanProbe](
-      name:  Option[String],
       tpe:   T,
       layer: LayerTree
     )(
@@ -145,7 +143,7 @@ given TypeImpl with
     ): BundleField[RWProbe[T]] =
       require(ref.instantiating)
       val bf = new BundleField[RWProbe[T]]:
-        val _name:   String     = name.getOrElse(bundleFieldName)
+        val _name:   String     = bundleFieldName
         val _isFlip: Boolean    = false
         val _tpe:    RWProbe[T] = new RWProbe[T]:
           val _baseType: T         = tpe
@@ -171,28 +169,26 @@ given TypeImpl with
         .getBundle
       mlirType
     def FlippedImpl[T <: Data](
-      name: Option[String],
-      tpe:  T
+      tpe: T
     )(
       using sourcecode.Name.Machine
     ): BundleField[T] =
       require(ref.instantiating)
       val bf = new BundleField[T]:
-        val _name:   String  = name.getOrElse(bundleFieldName)
+        val _name:   String  = bundleFieldName
         val _isFlip: Boolean = true
         val _tpe:    T       = tpe
       ref._elements += (bundleFieldName -> bf)
       bf
 
     def AlignedImpl[T <: Data](
-      name: Option[String],
-      tpe:  T
+      tpe: T
     )(
       using sourcecode.Name.Machine
     ): BundleField[T] =
       require(ref.instantiating)
       val bf = new BundleField[T]:
-        val _name:   String  = name.getOrElse(bundleFieldName)
+        val _name:   String  = bundleFieldName
         val _isFlip: Boolean = false
         val _tpe:    T       = tpe
       ref._elements += (bundleFieldName -> bf)
