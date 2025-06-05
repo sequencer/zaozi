@@ -11,9 +11,9 @@ import java.lang.foreign.Arena
 
 trait Bundle extends Data with DynamicSubfield:
   private[zaozi] var instantiating = true
-  // valName -> BundleField
-  private[zaozi] val _elements: collection.mutable.Map[String, BundleField[?]] =
-    collection.mutable.Map[String, BundleField[?]]()
+
+  private[zaozi] val _elements = collection.mutable.Buffer.empty[BundleField[?]]
+
   def Flipped[T <: Data](
     tpe: T
   )(

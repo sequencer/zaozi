@@ -13,6 +13,7 @@ import org.llvm.circt.scalalib.capi.dialect.firrtl.TypeApi as FirrtlTypeApi
 import org.llvm.mlir.scalalib.capi.ir.{Block, Context, LocationApi, Operation, Type, Value, given}
 
 import java.lang.foreign.Arena
+import scala.collection.immutable.SeqMap
 
 given TypeImpl with
   extension (ref: Interface[?])
@@ -106,7 +107,7 @@ given TypeImpl with
   extension (ref: ProbeBundle)
     def elements: Seq[BundleField[?]] =
       require(!ref.instantiating)
-      ref._elements.values.toSeq
+      ref._elements.toSeq
     def toMlirTypeImpl(
       using Arena,
       Context
@@ -133,7 +134,7 @@ given TypeImpl with
           val _baseType: T         = tpe
           val _color:    LayerTree = layer
 
-      ref._elements += (bundleFieldName -> bf)
+      ref._elements += bf
       bf
     def ReadWriteProbeImpl[T <: Data & CanProbe](
       tpe:   T,
@@ -149,23 +150,24 @@ given TypeImpl with
           val _baseType: T         = tpe
           val _color:    LayerTree = layer
 
-      ref._elements += (bundleFieldName -> bf)
+      ref._elements += bf
       bf
 
   extension (ref: Bundle)
     def elements: Seq[BundleField[?]] =
       require(!ref.instantiating)
-      ref._elements.values.toSeq
+      ref._elements.toSeq
     def toMlirTypeImpl(
       using Arena,
       Context
     ): Type =
       ref.instantiating = false
-      val mlirType = elements
+      val mlirType = ref._elements
         .map(f =>
           summon[FirrtlBundleFieldApi]
             .createFirrtlBundleField(f._name, f._isFlip, f._tpe.toMlirType)
         )
+        .toSeq // to immutable Seq
         .getBundle
       mlirType
     def FlippedImpl[T <: Data](
@@ -178,7 +180,7 @@ given TypeImpl with
         val _name:   String  = bundleFieldName
         val _isFlip: Boolean = true
         val _tpe:    T       = tpe
-      ref._elements += (bundleFieldName -> bf)
+      ref._elements += bf
       bf
 
     def AlignedImpl[T <: Data](
@@ -191,7 +193,7 @@ given TypeImpl with
         val _name:   String  = bundleFieldName
         val _isFlip: Boolean = false
         val _tpe:    T       = tpe
-      ref._elements += (bundleFieldName -> bf)
+      ref._elements += bf
       bf
   extension (ref: RProbe[?])
     def toMlirTypeImpl(
@@ -232,7 +234,7 @@ given TypeImpl with
     )(
       using TypeImpl
     ): Ref[E] = getOptionRefViaFieldValNameImpl(refer, fieldValName).getOrElse:
-      throw new Exception(s"$fieldValName not found in ${ref._elements.keys}")
+      throw new Exception(s"$fieldValName not found in ${ref._elements.map(_._name)}")
     def getOptionRefViaFieldValNameImpl[E <: Data](
       refer:        Value,
       fieldValName: String
@@ -245,19 +247,21 @@ given TypeImpl with
       sourcecode.Name.Machine
     )(
       using TypeImpl
-    ): Option[Ref[E]] = ref._elements
-      .get(fieldValName)
-      .map: field =>
-        val openSubfieldOp = summon[OpenSubfieldApi]
-          .op(
-            input = refer,
-            fieldIndex = ref.toMlirType.getBundleFieldIndex(field._name),
-            location = locate
-          )
-        openSubfieldOp.operation.appendToBlock()
-        new Ref[E]:
-          val _tpe:       E         = field._tpe.asInstanceOf[E]
-          val _operation: Operation = openSubfieldOp.operation
+    ): Option[Ref[E]] =
+      require(!ref.instantiating)
+      ref._elements
+        .find(_._name == fieldValName)
+        .map: field =>
+          val openSubfieldOp = summon[OpenSubfieldApi]
+            .op(
+              input = refer,
+              fieldIndex = ref.toMlirType.getBundleFieldIndex(field._name),
+              location = locate
+            )
+          openSubfieldOp.operation.appendToBlock()
+          new Ref[E]:
+            val _tpe:       E         = field._tpe.asInstanceOf[E]
+            val _operation: Operation = openSubfieldOp.operation
 
   extension (ref: Bundle)
     def getRefViaFieldValNameImpl[E <: Data](
@@ -273,7 +277,7 @@ given TypeImpl with
     )(
       using TypeImpl
     ): Ref[E] = getOptionRefViaFieldValNameImpl(refer, fieldValName).getOrElse:
-      throw new Exception(s"$fieldValName not found in ${ref._elements.keys}")
+      throw new Exception(s"$fieldValName not found in ${ref._elements.map(_._name)}")
     def getOptionRefViaFieldValNameImpl[E <: Data](
       refer:        Value,
       fieldValName: String
@@ -286,17 +290,19 @@ given TypeImpl with
       sourcecode.Name.Machine
     )(
       using TypeImpl
-    ): Option[Ref[E]] = ref._elements
-      .get(fieldValName)
-      .map: field =>
-        val subfieldOp = summon[SubfieldApi]
-          .op(
-            input = refer,
-            fieldIndex = ref.toMlirType.getBundleFieldIndex(field._name),
-            location = locate
-          )
-        subfieldOp.operation.appendToBlock()
-        new Ref[E]:
-          val _tpe:       E         = field._tpe.asInstanceOf[E]
-          val _operation: Operation = subfieldOp.operation
+    ): Option[Ref[E]] =
+      require(!ref.instantiating)
+      ref._elements
+        .find(_._name == fieldValName)
+        .map: field =>
+          val subfieldOp = summon[SubfieldApi]
+            .op(
+              input = refer,
+              fieldIndex = ref.toMlirType.getBundleFieldIndex(field._name),
+              location = locate
+            )
+          subfieldOp.operation.appendToBlock()
+          new Ref[E]:
+            val _tpe:       E         = field._tpe.asInstanceOf[E]
+            val _operation: Operation = subfieldOp.operation
 end given
