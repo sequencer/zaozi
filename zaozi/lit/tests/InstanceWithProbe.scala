@@ -89,7 +89,7 @@ object Outer extends Generator[OuterParameter, OuterLayers, OuterIO, OuterProbe]
     val io    = summon[Interface[OuterIO]]
     val probe = summon[Interface[OuterProbe]]
 
-    // MLIR: %inner_a0b0, %inner_a0b1, %inner_a0b0c0, %inner_a0, %inner_a0b0_0, %inner_a0b1_1, %inner_a0b0c0_2, %inner_a0_3 = firrtl.instance inner interesting_name {layers = [@A0::@A0B0::@A0B0C0, @A0::@A0B0::@A0B0C1, @A0::@A0B1, @A0::@A0B2, @A1]} @Inner_7b2bb635(in a0b0: !firrtl.uint<32>, in a0b1: !firrtl.uint<32>, in a0b0c0: !firrtl.uint<32>, in a0: !firrtl.uint<32>, out a0b0: !firrtl.probe<uint<32>>, out a0b1: !firrtl.probe<uint<32>>, out a0b0c0: !firrtl.probe<uint<32>>, out a0: !firrtl.probe<uint<32>>)
+    // MLIR: %inner_a0, %inner_a0b0, %inner_a0b0c0, %inner_a0b1, %inner_a0_0, %inner_a0b0_1, %inner_a0b0c0_2, %inner_a0b1_3 = firrtl.instance inner interesting_name {layers = [@A0::@A0B0::@A0B0C0, @A0::@A0B0::@A0B0C1, @A0::@A0B1, @A0::@A0B2, @A1]} @Inner_7b2bb635(in a0: !firrtl.uint<32>, in a0b0: !firrtl.uint<32>, in a0b0c0: !firrtl.uint<32>, in a0b1: !firrtl.uint<32>, out a0: !firrtl.probe<uint<32>>, out a0b0: !firrtl.probe<uint<32>>, out a0b0c0: !firrtl.probe<uint<32>>, out a0b1: !firrtl.probe<uint<32>>)
     val inner = Inner.instantiate(InnerParameter(parameter.width))
     inner.io.a0     := io.a0
     inner.io.a0b0   := io.a0b0
