@@ -54,6 +54,7 @@ def rvcoverTest(body: (Arena, Context, Block) ?=> Unit): Unit =
 
   // main wrapper for the test body
   solver {
+    smtSetLogic("QF_LIA")
     body
   }
 
