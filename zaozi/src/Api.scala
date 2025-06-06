@@ -782,6 +782,8 @@ trait SIntApi[R <: Referable[SInt]]
 
 trait BundleApi[T <: Bundle, R <: Referable[T]]
 
+trait RecordApi[T <: Record, R <: Referable[T]]
+
 trait VecApi[E <: Data, V <: Vec[E], R <: Referable[V]] extends ExtractElement[V, E, R, Referable[UInt] | Int]
 
 trait ClockApi[R <: Referable[Clock]]
@@ -893,6 +895,20 @@ trait TypeImpl:
     )(
       using sourcecode.Name.Machine
     ):            BundleField[T]
+  extension (ref: Record)
+    def elements: Seq[BundleField[?]]
+    def toMlirTypeImpl(
+      using Arena,
+      Context
+    ):            Type
+    def FlippedImpl[T <: Data](
+      name: String,
+      tpe:  T
+    ):            BundleField[T]
+    def AlignedImpl[T <: Data](
+      name: String,
+      tpe:  T
+    ):            BundleField[T]
   extension (ref: RProbe[?])
     def toMlirTypeImpl(
       using Arena,
@@ -966,3 +982,18 @@ trait TypeImpl:
     )(
       using TypeImpl
     ): Option[Ref[E]]
+
+  extension (ref: Record)
+    def getUntypedRefViaFieldValNameImpl(
+      refer:        Value,
+      fieldValName: String
+    )(
+      using Arena,
+      Block,
+      Context,
+      sourcecode.File,
+      sourcecode.Line,
+      sourcecode.Name.Machine
+    )(
+      using TypeImpl
+    ): Ref[Data]
