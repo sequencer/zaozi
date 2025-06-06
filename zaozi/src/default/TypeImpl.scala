@@ -195,6 +195,48 @@ given TypeImpl with
         val _tpe:    T       = tpe
       ref._elements += bf
       bf
+
+  extension (ref: Record)
+    def elements: Seq[BundleField[?]] =
+      require(!ref.instantiating)
+      ref._elements.toSeq
+    def toMlirTypeImpl(
+      using Arena,
+      Context
+    ): Type =
+      ref.instantiating = false
+      val mlirType = ref._elements
+        .map(f =>
+          summon[FirrtlBundleFieldApi]
+            .createFirrtlBundleField(f._name, f._isFlip, f._tpe.toMlirType)
+        )
+        .toSeq // to immutable Seq
+        .getBundle
+      mlirType
+    def FlippedImpl[T <: Data](
+      name: String,
+      tpe:  T
+    ): BundleField[T] =
+      require(ref.instantiating)
+      val bf = new BundleField[T]:
+        val _name:   String  = name
+        val _isFlip: Boolean = true
+        val _tpe:    T       = tpe
+      ref._elements += bf
+      bf
+
+    def AlignedImpl[T <: Data](
+      name: String,
+      tpe:  T
+    ): BundleField[T] =
+      require(ref.instantiating)
+      val bf = new BundleField[T]:
+        val _name:   String  = name
+        val _isFlip: Boolean = false
+        val _tpe:    T       = tpe
+      ref._elements += bf
+      bf
+
   extension (ref: RProbe[?])
     def toMlirTypeImpl(
       using Arena,
@@ -305,4 +347,35 @@ given TypeImpl with
           new Ref[E]:
             val _tpe:       E         = field._tpe.asInstanceOf[E]
             val _operation: Operation = subfieldOp.operation
+
+  extension (ref: Record)
+    def getUntypedRefViaFieldValNameImpl(
+      refer:        Value,
+      fieldValName: String
+    )(
+      using Arena,
+      Block,
+      Context,
+      sourcecode.File,
+      sourcecode.Line,
+      sourcecode.Name.Machine
+    )(
+      using TypeImpl
+    ): Ref[Data] =
+      require(!ref.instantiating)
+      ref._elements
+        .find(_._name == fieldValName)
+        .map: field =>
+          val subfieldOp = summon[SubfieldApi]
+            .op(
+              input = refer,
+              fieldIndex = ref.toMlirType.getBundleFieldIndex(field._name),
+              location = locate
+            )
+          subfieldOp.operation.appendToBlock()
+          new Ref[Data]:
+            val _tpe:       Data      = field._tpe.asInstanceOf[Data]
+            val _operation: Operation = subfieldOp.operation
+        .getOrElse:
+          throw new Exception(s"$fieldValName not found in ${ref._elements.map(_._name)}")
 end given
