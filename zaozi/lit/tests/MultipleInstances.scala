@@ -72,6 +72,16 @@ class GCDInput(parameter: GCDParameter) extends Bundle:
 class GCDOutput(parameter: GCDParameter) extends Bundle:
   val z: BundleField[UInt] = Aligned(UInt(parameter.width.W))
 
+// GCD:      module GCD_35bf2066(
+// GCD-NEXT:   input         clock,
+// GCD-NEXT:                 reset,
+// GCD-NEXT:   output        input_ready,
+// GCD-NEXT:   input         input_valid,
+// GCD-NEXT:   input  [31:0] input_bits_x,
+// GCD-NEXT:                 input_bits_y,
+// GCD-NEXT:   output        output_valid,
+// GCD-NEXT:   output [31:0] output_bits_z
+// GCD-NEXT: );
 class GCDIO(parameter: GCDParameter) extends HWInterface(parameter):
   val clock:  BundleField[Clock]                 = Flipped(Clock())
   val reset:  BundleField[Reset]                 = Flipped(if (parameter.useAsyncReset) AsyncReset() else Reset())
@@ -106,16 +116,6 @@ object Subtractor extends Generator[SubtractorParameter, SubtractorLayers, Subtr
     val io = summon[Interface[SubtractorIO]]
     io.z := (io.a - io.b).asBits.tail(parameter.width).asUInt
 
-// GCD:      module GCD_35bf2066(
-// GCD-NEXT:   output        output_valid,
-// GCD-NEXT:   output [31:0] output_bits_z,
-// GCD-NEXT:   input         input_valid,
-// GCD-NEXT:   output        input_ready,
-// GCD-NEXT:   input  [31:0] input_bits_x,
-// GCD-NEXT:                 input_bits_y,
-// GCD-NEXT:   input         reset,
-// GCD-NEXT:                 clock
-// GCD-NEXT: );
 @generator
 object GCD extends Generator[GCDParameter, GCDLayers, GCDIO, GCDProbe]:
   def architecture(parameter: GCDParameter) =
