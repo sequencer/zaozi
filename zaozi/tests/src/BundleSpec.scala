@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2025 Jiuyang Liu <liu@jiuyang.me>
-package me.jiuyang.zaozi.tests
+package me.jiuyang.zaozitest
 
 import me.jiuyang.zaozi.*
 import me.jiuyang.zaozi.default.{*, given}
@@ -117,7 +117,7 @@ object BundleSpec extends TestSuite:
           val io = summon[Interface[BundleSpecIO]]
           compileError("""io.fourzerofour""").check(
             "",
-            "Field 'fourzerofour' does not exist in type me.jiuyang.zaozi.tests.BundleSpecIO."
+            "Field 'fourzerofour' does not exist in type me.jiuyang.zaozitest.BundleSpecIO."
           )
       SymbolNotFound.compileErrorTest(BundleSpecParameter(32))
 

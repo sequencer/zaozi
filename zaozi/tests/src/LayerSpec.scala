@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2025 <liu@jiuyang.me>
-package me.jiuyang.zaozi.tests
+package me.jiuyang.zaozitest
 
 import me.jiuyang.zaozi.default.{*, given}
 import me.jiuyang.zaozi.*
