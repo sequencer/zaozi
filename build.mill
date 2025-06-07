@@ -23,6 +23,7 @@ object v {
   val upickle    = ivy"com.lihaoyi::upickle:4.0.2"
   val utest      = ivy"com.lihaoyi::utest:0.8.4"
   val sourcecode = ivy"com.lihaoyi::sourcecode:0.4.2"
+  val fastparse  = ivy"com.lihaoyi::fastparse:3.1.1"
   val pprint     = ivy"com.lihaoyi::pprint:0.9.0"
   val jmh        = "1.35"
 }
