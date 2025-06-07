@@ -425,9 +425,9 @@ object BitsSpec extends TestSuite:
           io.bool.dontCare()
           io.bits.dontCare()
           io.widenBits.dontCare()
-          io.bits := io.a.bit(4)
+          io.bool := io.a.bit(4)
       ExtractElement.verilogTest(BitsSpecParameter(8))(
-        "assign bits = {7'h0, a[4]};"
+        "assign bool = a[4];"
       )
 
     test("ExtractElement apply"):
@@ -442,9 +442,9 @@ object BitsSpec extends TestSuite:
           io.bool.dontCare()
           io.bits.dontCare()
           io.widenBits.dontCare()
-          io.bits := io.a(4)
+          io.bool := io.a(4)
       ExtractElementApply.verilogTest(BitsSpecParameter(8))(
-        "assign bits = {7'h0, a[4]};"
+        "assign bool = a[4];"
       )
 
     test("Named ExtractElement apply"):
@@ -459,9 +459,9 @@ object BitsSpec extends TestSuite:
           io.bool.dontCare()
           io.bits.dontCare()
           io.widenBits.dontCare()
-          io.bits := io.a(idx = 4)
+          io.bool := io.a(idx = 4)
       NamedExtractElementApply.verilogTest(BitsSpecParameter(8))(
-        "assign bits = {7'h0, a[4]};"
+        "assign bool = a[4];"
       )
 
     test("Apply with wrong data type"):
