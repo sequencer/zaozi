@@ -79,7 +79,30 @@ given [R <: Referable[Bits]]: BitsApi[R] with
         val _tpe:       UInt      = new UInt:
           private[zaozi] val _width = nodeOp.operation.getResult(0).getType.getBitWidth(true).toInt
         val _operation: Operation = nodeOp.operation
-
+    def asBool(
+      using Arena,
+      Context,
+      Block,
+      sourcecode.File,
+      sourcecode.Line,
+      sourcecode.Name.Machine,
+      InstanceContext
+    ): Node[Bool] =
+      val nodeOp = summon[NodeApi].op(
+        name = valName,
+        location = locate,
+        nameKind = FirrtlNameKind.Interesting,
+        input = ref.refer
+      )
+      val width = nodeOp.operation.getResult(0).getType.getBitWidth(true).toInt
+      require(
+        width == 1,
+        s"Cannot convert ${summon[sourcecode.Name.Machine]}: Bits(${width}) to Bool"
+      )
+      nodeOp.operation.appendToBlock()
+      new Node[Bool]:
+        val _tpe:       Bool      = new Object with Bool
+        val _operation: Operation = nodeOp.operation
     def unary_~(
       using Arena,
       Context,

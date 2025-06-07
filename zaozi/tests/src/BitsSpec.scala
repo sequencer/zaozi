@@ -66,6 +66,21 @@ object BitsSpec extends TestSuite:
         "assign uint = a;"
       )
 
+    test("AsBool"):
+      @generator
+      object AsBool extends Generator[BitsSpecParameter, BitsSpecLayers, BitsSpecIO, BitsSpecProbe] with HasVerilogTest:
+        def architecture(parameter: BitsSpecParameter) =
+          val io = summon[Interface[BitsSpecIO]]
+          io.sint.dontCare()
+          io.uint.dontCare()
+          io.bool.dontCare()
+          io.bits.dontCare()
+          io.widenBits.dontCare()
+          io.bool := io.a.asBool
+      AsBool.verilogTest(BitsSpecParameter(1))(
+        "assign bool = a;"
+      )
+
     test("~"):
       @generator
       object Not extends Generator[BitsSpecParameter, BitsSpecLayers, BitsSpecIO, BitsSpecProbe] with HasVerilogTest:

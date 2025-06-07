@@ -723,6 +723,7 @@ trait RefElement[D <: Data, E <: Data, R <: Referable[D], IDX]:
 trait BitsApi[R <: Referable[Bits]]
     extends AsSInt[Bits, R]
     with AsUInt[Bits, R]
+    with AsBool[Bits, R]
     with Not[Bits, Bits, R]
     with AndR[Bits, Bool, R]
     with OrR[Bits, Bool, R]
