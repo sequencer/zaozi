@@ -23,24 +23,28 @@ def parse_arg_lut(argLut_path: str):
     return arg_lut
 
 def parse_smtlib(file_path: str):
-    with open(file_path, 'r') as f:
-        content = f.read()
-
     # Parse the SMT-LIB expression using Z3
     solver = Solver()
-    solver.from_string(content)
+    solver.from_file(file_path)
+
+    solver.set(timeout=1000)
+
+    solver.set("random_seed", 10)
 
     # Check satisfiability and get the model
     if solver.check() == sat:
         model = solver.model()
-        # print(model.decls())
         # Extract the values of all declared constants
-        assignments = {str(d): model[d] for d in model.decls()}
-    else:
+        return {str(d): model[d] for d in model.decls()}
+    elif solver.check() == unsat:
         # If unsatisfiable, print the log and return
+        print("The SMT-LIB file is unsat.")
+        print(solver.unsat_core())
+        return None
+    else:
+        print("The SMT-LIB file is unknown because of", solver.reason_unknown())
         return None
     
-    return assignments
 
 def parse_template(template_path: str):
     with open(template_path, 'r') as f:
@@ -59,12 +63,11 @@ def parse(inst_path: str, argLut_path: str, file_path: str, template_path: str):
 
     # Parse SMT-LIB file to get variable assignments
     assignments = parse_smtlib(file_path)
-    assert assignments is not None, "SMT-LIB file is not satisfiable"
 
     # Parse template file
     template = parse_template(template_path)
 
-    return(inst_map, arg_lut, assignments, template)
+    return inst_map, arg_lut, assignments, template
 
 # Parse the resolved string to get instruction index and argument indices
 # The resolved string is in the format: "idx, inst_idx, arg1, arg2, ..."
@@ -85,6 +88,9 @@ def parse_resolved(s: str):
 
 def solve_and_replace(inst_path: str, argLut_path: str, file_path: str, template_path: str):
     inst_map, arg_lut_map, assignments, template = parse(inst_path, argLut_path, file_path, template_path)
+
+    if assignments is None:
+        return
 
     # Substitute assignments into template, get the third line and split by comma
     substituted = template.safe_substitute(assignments).split("\n")[2:]
