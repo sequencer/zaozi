@@ -505,7 +505,7 @@ given [R <: Referable[Bits]]: BitsApi[R] with
       sourcecode.Line,
       sourcecode.Name.Machine,
       InstanceContext
-    ): Node[Bits] = bits(idx, idx)
+    ): Node[Bool] = bits(idx, idx).asBool
 
     // sugars
     def apply(
@@ -531,5 +531,5 @@ given [R <: Referable[Bits]]: BitsApi[R] with
       sourcecode.Line,
       sourcecode.Name.Machine,
       InstanceContext
-    ): Node[Bits] = bit(idx)
+    ): Node[Bool] = bit(idx)
 end given

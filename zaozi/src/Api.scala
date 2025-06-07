@@ -739,7 +739,7 @@ trait BitsApi[R <: Referable[Bits]]
     with Head[Bits, Int, Bits, R]
     with Tail[Bits, Int, Bits, R]
     with Pad[Bits, Int, Bits, R]
-    with ExtractElement[Bits, Bits, R, Int]
+    with ExtractElement[Bits, Bool, R, Int]
     with ExtractRange[Bits, Bits, R, Int]
 
 trait BoolApi[R <: Referable[Bool]]
