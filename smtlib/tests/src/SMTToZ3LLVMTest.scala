@@ -38,6 +38,7 @@ def smtToZ3llvmTest(checkLines: String*)(body: (Arena, Context, Block) ?=> Unit)
   summon[Func].appendToModule()
 
   given PassManager = summon[PassManagerApi].passManagerCreate
+  summon[ConversionRegisterApi].lowerSMTToZ3LLVM
   summon[PassManager].addOwnedPass(summon[ConversionCreateApi].lowerSMTToZ3LLVM)
 
   solver {
@@ -48,6 +49,7 @@ def smtToZ3llvmTest(checkLines: String*)(body: (Arena, Context, Block) ?=> Unit)
   summon[Func].operation.dump()
   val out = new StringBuilder
   summon[Module].exportSMTLIB(out ++= _)
+  summon[PassManager].runOnOp(summon[Module].getOperation)
   summon[Context].destroy()
   summon[Arena].close()
 
