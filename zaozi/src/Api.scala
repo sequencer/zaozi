@@ -47,18 +47,18 @@ extension (layers: Seq[LayerTree])
   def nameHierarchy: Seq[Seq[String]] =
     layers.flatMap(_._dfs).filter(_._children.isEmpty).map(_._hierarchy.map(_._name))
 
-class Parameter
-class LayerInterface[P <: Parameter](parameter: P) extends Seq[LayerTree]:
+abstract class Parameter
+abstract class LayerInterface[P <: Parameter](parameter: P) extends Seq[LayerTree]:
   def layers: Seq[Layer] = Seq.empty
 
   final override def apply(idx: Int) = layers.toLayerTrees(idx)
   final override def iterator = layers.toLayerTrees.iterator
   final override def length   = layers.toLayerTrees.length
 
-trait HWInterface[P <: Parameter](parameter: P) extends Aggregate:
+trait HWInterface[P <: Parameter](parameter: P)       extends Aggregate:
   this: Bundle | Record =>
-class HWBundle[P <: Parameter](parameter: P)    extends HWInterface(parameter) with Bundle
-class HWRecord[P <: Parameter](parameter: P)    extends HWInterface(parameter) with Record
+abstract class HWBundle[P <: Parameter](parameter: P) extends HWInterface(parameter) with Bundle
+abstract class HWRecord[P <: Parameter](parameter: P) extends HWInterface(parameter) with Record
 
 trait DVInterface[P <: Parameter, L <: LayerInterface[P]](parameter: P) extends Aggregate:
   this: ProbeBundle | ProbeRecord =>
@@ -66,10 +66,10 @@ trait DVInterface[P <: Parameter, L <: LayerInterface[P]](parameter: P) extends 
   transparent inline def summonLayers: LayerInterface[?] = ${ summonLayersImpl }
   transparent inline def layers:       L                 = _layersOpt.getOrElse:
     summonLayers.asInstanceOf[L].tap(l => _layersOpt = Some(l))
-class DVBundle[P <: Parameter, L <: LayerInterface[P]](parameter: P)
+abstract class DVBundle[P <: Parameter, L <: LayerInterface[P]](parameter: P)
     extends DVInterface[P, L](parameter)
     with ProbeBundle
-class DVRecord[P <: Parameter, L <: LayerInterface[P]](parameter: P)
+abstract class DVRecord[P <: Parameter, L <: LayerInterface[P]](parameter: P)
     extends DVInterface[P, L](parameter)
     with ProbeRecord
 
