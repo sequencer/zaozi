@@ -29,17 +29,16 @@ given upickle.default.ReadWriter[RecordSpecParameter] = upickle.default.macroRW
 
 class RecordSpecLayers(parameter: RecordSpecParameter) extends LayerInterface(parameter)
 
-class DynamicFieldsNumIO(parameter: RecordSpecParameter) extends HWInterface(parameter):
+class DynamicFieldsNumIO(parameter: RecordSpecParameter) extends HWBundle(parameter):
   val a = Aligned(new UnfixedFieldsNumRecord(parameter.fieldNum, parameter.width))
 
-class NestedRecordIO(parameter: RecordSpecParameter) extends HWInterface(parameter):
+class NestedRecordIO(parameter: RecordSpecParameter) extends HWBundle(parameter):
   val b = Aligned(new NestedRecord(parameter.width))
 
-class SimpleRecordIO(parameter: RecordSpecParameter) extends HWInterface(parameter):
+class SimpleRecordIO(parameter: RecordSpecParameter) extends HWBundle(parameter):
   val c = Aligned(new SimpleRecord(parameter.width))
 
-class RecordSpecProbe(parameter: RecordSpecParameter)
-    extends DVInterface[RecordSpecParameter, RecordSpecLayers](parameter)
+class RecordSpecProbe(parameter: RecordSpecParameter) extends DVBundle[RecordSpecParameter, RecordSpecLayers](parameter)
 
 object RecordSpec extends TestSuite:
   val tests = Tests:

@@ -17,13 +17,13 @@ given upickle.default.ReadWriter[VecSpecParameter] = upickle.default.macroRW
 
 class VecSpecLayers(parameter: VecSpecParameter) extends LayerInterface(parameter)
 
-class VecSpecIO(parameter: VecSpecParameter) extends HWInterface(parameter):
+class VecSpecIO(parameter: VecSpecParameter) extends HWBundle(parameter):
   val a   = Flipped(Vec(parameter.vecCount, Bits(parameter.width.W)))
   val idx = Flipped(UInt(BigInt(parameter.vecCount).bitLength.W))
   val b   = Aligned(Vec(parameter.vecCount, Bits(parameter.width.W)))
   val out = Aligned(Bits(parameter.width.W))
 
-class VecSpecProbe(parameter: VecSpecParameter) extends DVInterface[VecSpecParameter, VecSpecLayers](parameter)
+class VecSpecProbe(parameter: VecSpecParameter) extends DVBundle[VecSpecParameter, VecSpecLayers](parameter)
 
 object VecSpec extends TestSuite:
   val tests = Tests:

@@ -15,12 +15,12 @@ class PassthroughParameterA(val width: Int) extends Parameter
 
 class PassthroughLayersA(parameter: PassthroughParameterA) extends LayerInterface(parameter)
 
-class PassthroughIOA(parameter: PassthroughParameterA) extends HWInterface(parameter):
+class PassthroughIOA(parameter: PassthroughParameterA) extends HWBundle(parameter):
   val i = Flipped(UInt(parameter.width.W))
   val o = Aligned(UInt(parameter.width.W))
 
 class PassthroughProbeA(parameter: PassthroughParameterA)
-    extends DVInterface[PassthroughParameterA, PassthroughLayersA](parameter)
+    extends DVBundle[PassthroughParameterA, PassthroughLayersA](parameter)
 
 @generator
 object PassthroughA extends Generator[PassthroughParameterA, PassthroughLayersA, PassthroughIOA, PassthroughProbeA]:
@@ -31,12 +31,12 @@ case class PassthroughParameterB(width: Int)() extends Parameter
 
 class PassthroughLayersB(parameter: PassthroughParameterB) extends LayerInterface(parameter)
 
-class PassthroughIOB(parameter: PassthroughParameterB) extends HWInterface(parameter):
+class PassthroughIOB(parameter: PassthroughParameterB) extends HWBundle(parameter):
   val i = Flipped(UInt(parameter.width.W))
   val o = Aligned(UInt(parameter.width.W))
 
 class PassthroughProbeB(parameter: PassthroughParameterB)
-    extends DVInterface[PassthroughParameterB, PassthroughLayersB](parameter)
+    extends DVBundle[PassthroughParameterB, PassthroughLayersB](parameter)
 
 @generator
 object PassthroughB extends Generator[PassthroughParameterB, PassthroughLayersB, PassthroughIOB, PassthroughProbeB]:

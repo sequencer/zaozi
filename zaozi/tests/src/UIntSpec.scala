@@ -17,7 +17,7 @@ given upickle.default.ReadWriter[UIntSpecParameter] = upickle.default.macroRW
 
 class UIntSpecLayers(parameter: UIntSpecParameter) extends LayerInterface(parameter)
 
-class UIntSpecIO(parameter: UIntSpecParameter) extends HWInterface(parameter):
+class UIntSpecIO(parameter: UIntSpecParameter) extends HWBundle(parameter):
   val a          = Flipped(UInt(parameter.width.W))
   val b          = Flipped(UInt(parameter.width.W))
   val c          = Flipped(UInt(parameter.width.W))
@@ -28,7 +28,7 @@ class UIntSpecIO(parameter: UIntSpecParameter) extends HWInterface(parameter):
   val clock      = Flipped(Clock())
   val asyncReset = Flipped(AsyncReset())
 
-class UIntSpecProbe(parameter: UIntSpecParameter) extends DVInterface[UIntSpecParameter, UIntSpecLayers](parameter)
+class UIntSpecProbe(parameter: UIntSpecParameter) extends DVBundle[UIntSpecParameter, UIntSpecLayers](parameter)
 
 object UIntSpec extends TestSuite:
   val tests = Tests:

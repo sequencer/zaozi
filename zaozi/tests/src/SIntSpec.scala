@@ -17,7 +17,7 @@ given upickle.default.ReadWriter[SIntSpecParameter] = upickle.default.macroRW
 
 class SIntSpecLayers(parameter: SIntSpecParameter) extends LayerInterface(parameter)
 
-class SIntSpecIO(parameter: SIntSpecParameter) extends HWInterface(parameter):
+class SIntSpecIO(parameter: SIntSpecParameter) extends HWBundle(parameter):
   val a          = Flipped(SInt(parameter.width.W))
   val b          = Flipped(SInt(parameter.width.W))
   val c          = Flipped(UInt(parameter.width.W))
@@ -28,7 +28,7 @@ class SIntSpecIO(parameter: SIntSpecParameter) extends HWInterface(parameter):
   val clock      = Flipped(Clock())
   val asyncReset = Flipped(AsyncReset())
 
-class SIntSpecProbe(parameter: SIntSpecParameter) extends DVInterface[SIntSpecParameter, SIntSpecLayers](parameter)
+class SIntSpecProbe(parameter: SIntSpecParameter) extends DVBundle[SIntSpecParameter, SIntSpecLayers](parameter)
 
 object SIntSpec extends TestSuite:
   val tests = Tests:

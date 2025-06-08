@@ -40,13 +40,13 @@ class LayerSpecLayers(parameter: LayerSpecParameter) extends LayerInterface(para
     Layer("A1")
   )
 
-class LayerSpecIO(parameter: LayerSpecParameter) extends HWInterface(parameter):
+class LayerSpecIO(parameter: LayerSpecParameter) extends HWBundle(parameter):
   val a0     = Flipped(UInt(parameter.width.W))
   val a0b0   = Flipped(UInt(parameter.width.W))
   val a0b0c0 = Flipped(UInt(parameter.width.W))
   val a0b1   = Flipped(UInt(parameter.width.W))
 
-class LayerSpecProbe(parameter: LayerSpecParameter) extends DVInterface[LayerSpecParameter, LayerSpecLayers](parameter):
+class LayerSpecProbe(parameter: LayerSpecParameter) extends DVBundle[LayerSpecParameter, LayerSpecLayers](parameter):
   val a0     = ProbeRead(UInt(parameter.width.W), layers("A0"))
   val a0b0   = ProbeRead(UInt(parameter.width.W), layers("A0")("A0B0"))
   val a0b0c0 = ProbeRead(UInt(parameter.width.W), layers("A0")("A0B0")("A0B0C0"))

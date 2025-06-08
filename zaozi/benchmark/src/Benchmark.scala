@@ -85,13 +85,13 @@ class GCDInput(parameter: GCDParameter) extends Bundle:
 class GCDOutput(parameter: GCDParameter) extends Bundle:
   val z: BundleField[UInt] = Aligned(UInt(parameter.width.W))
 
-class GCDIO(parameter: GCDParameter) extends HWInterface(parameter):
+class GCDIO(parameter: GCDParameter) extends HWBundle(parameter):
   val clock:  BundleField[Clock]                 = Flipped(Clock())
   val reset:  BundleField[Reset]                 = Flipped(if (parameter.useAsyncReset) AsyncReset() else Reset())
   val input:  BundleField[DecoupledIO[GCDInput]] = Flipped(Decoupled(new GCDInput(parameter)))
   val output: BundleField[ValidIO[GCDOutput]]    = Aligned(Valid(GCDOutput(parameter)))
 
-class GCDProbe(parameter: GCDParameter) extends DVInterface[GCDParameter, GCDLayers](parameter)
+class GCDProbe(parameter: GCDParameter) extends DVBundle[GCDParameter, GCDLayers](parameter)
 
 @generator
 object GCD extends Generator[GCDParameter, GCDLayers, GCDIO, GCDProbe]:
