@@ -6,13 +6,13 @@ import me.jiuyang.zaozi.*
 import me.jiuyang.zaozi.default.{*, given}
 import me.jiuyang.zaozi.magic.UntypedDynamicSubfield
 import me.jiuyang.zaozi.reftpe.{Ref, Referable}
-import me.jiuyang.zaozi.valuetpe.{Data, Record}
+import me.jiuyang.zaozi.valuetpe.{Data, ProbeRecord, Record}
 
 import org.llvm.mlir.scalalib.capi.ir.{Block, Context}
 
 import java.lang.foreign.Arena
 
-given [T <: Record, R <: Referable[T]]: RecordApi[T, R] with
+given [T <: Record | ProbeRecord, R <: Referable[T]]: RecordApi[T, R] with
   extension (ref: R)
     def field[T <: Data](
       fieldName: String

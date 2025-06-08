@@ -61,15 +61,17 @@ class HWBundle[P <: Parameter](parameter: P)    extends HWInterface(parameter) w
 class HWRecord[P <: Parameter](parameter: P)    extends HWInterface(parameter) with Record
 
 trait DVInterface[P <: Parameter, L <: LayerInterface[P]](parameter: P) extends Aggregate:
-  this: ProbeBundle =>
+  this: ProbeBundle | ProbeRecord =>
   private var _layersOpt:              Option[L]         = None
   transparent inline def summonLayers: LayerInterface[?] = ${ summonLayersImpl }
   transparent inline def layers:       L                 = _layersOpt.getOrElse:
     summonLayers.asInstanceOf[L].tap(l => _layersOpt = Some(l))
-
 class DVBundle[P <: Parameter, L <: LayerInterface[P]](parameter: P)
     extends DVInterface[P, L](parameter)
     with ProbeBundle
+class DVRecord[P <: Parameter, L <: LayerInterface[P]](parameter: P)
+    extends DVInterface[P, L](parameter)
+    with ProbeRecord
 
 class InstanceContext:
   class AnonSignalCounter(private var _count: Int):
@@ -792,7 +794,7 @@ trait SIntApi[R <: Referable[SInt]]
 
 trait BundleApi[T <: Bundle, R <: Referable[T]]
 
-trait RecordApi[T <: Record, R <: Referable[T]]
+trait RecordApi[T <: Record | ProbeRecord, R <: Referable[T]]
 
 trait VecApi[E <: Data, V <: Vec[E], R <: Referable[V]] extends ExtractElement[V, E, R, Referable[UInt] | Int]
 
@@ -905,6 +907,22 @@ trait TypeImpl:
     )(
       using sourcecode.Name.Machine
     ):            BundleField[T]
+  extension (ref: ProbeRecord)
+    def elements: Seq[BundleField[?]]
+    def toMlirTypeImpl(
+      using Arena,
+      Context
+    ):            Type
+    def ReadProbeImpl[T <: Data & CanProbe](
+      name:  String,
+      tpe:   T,
+      layer: LayerTree
+    ):            BundleField[RProbe[T]]
+    def ReadWriteProbeImpl[T <: Data & CanProbe](
+      name:  String,
+      tpe:   T,
+      layer: LayerTree
+    ):            BundleField[RWProbe[T]]
   extension (ref: Record)
     def elements: Seq[BundleField[?]]
     def toMlirTypeImpl(
@@ -992,6 +1010,21 @@ trait TypeImpl:
     )(
       using TypeImpl
     ): Option[Ref[E]]
+
+  extension (ref: ProbeRecord)
+    def getUntypedRefViaFieldValNameImpl(
+      refer:        Value,
+      fieldValName: String
+    )(
+      using Arena,
+      Block,
+      Context,
+      sourcecode.File,
+      sourcecode.Line,
+      sourcecode.Name.Machine
+    )(
+      using TypeImpl
+    ): Ref[Data]
 
   extension (ref: Record)
     def getUntypedRefViaFieldValNameImpl(
