@@ -20,7 +20,8 @@ case class TruncateParameter(inputWidth: Int, outputWidth: Int = 16) extends Par
   require(outputWidth <= inputWidth)
 given upickle.default.ReadWriter[TruncateParameter] = upickle.default.macroRW
 
-class TruncateLayers(parameter: TruncateParameter) extends LayerInterface(parameter)
+class TruncateLayers(parameter: TruncateParameter) extends LayerInterface(parameter):
+  def layers = Seq.empty
 
 class TruncateIO(parameter: TruncateParameter) extends HWBundle(parameter):
   val i = Flipped(UInt(parameter.inputWidth.W))

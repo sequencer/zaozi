@@ -15,7 +15,8 @@ import java.lang.foreign.Arena
 case class UIntSpecParameter(width: Int) extends Parameter
 given upickle.default.ReadWriter[UIntSpecParameter] = upickle.default.macroRW
 
-class UIntSpecLayers(parameter: UIntSpecParameter) extends LayerInterface(parameter)
+class UIntSpecLayers(parameter: UIntSpecParameter) extends LayerInterface(parameter):
+  def layers = Seq.empty
 
 class UIntSpecIO(parameter: UIntSpecParameter) extends HWBundle(parameter):
   val a          = Flipped(UInt(parameter.width.W))

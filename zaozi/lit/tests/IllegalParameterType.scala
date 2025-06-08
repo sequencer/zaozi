@@ -13,7 +13,8 @@ import java.lang.foreign.Arena
 // ERROR: PassthroughParameterA should be a case class
 class PassthroughParameterA(val width: Int) extends Parameter
 
-class PassthroughLayersA(parameter: PassthroughParameterA) extends LayerInterface(parameter)
+class PassthroughLayersA(parameter: PassthroughParameterA) extends LayerInterface(parameter):
+  def layers = Seq.empty
 
 class PassthroughIOA(parameter: PassthroughParameterA) extends HWBundle(parameter):
   val i = Flipped(UInt(parameter.width.W))

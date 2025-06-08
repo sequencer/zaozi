@@ -22,7 +22,8 @@ class SyncDomain extends Bundle:
 case class ReferableSpecParameter(width: Int) extends Parameter
 given upickle.default.ReadWriter[ReferableSpecParameter] = upickle.default.macroRW
 
-class ReferableSpecLayers(parameter: ReferableSpecParameter) extends LayerInterface(parameter)
+class ReferableSpecLayers(parameter: ReferableSpecParameter) extends LayerInterface(parameter):
+  def layers = Seq.empty
 
 class PassthroughIO(parameter: ReferableSpecParameter) extends HWBundle(parameter):
   val i = Flipped(UInt(parameter.width.W))

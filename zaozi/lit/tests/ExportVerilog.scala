@@ -17,7 +17,8 @@ import java.lang.foreign.Arena
 case class PassthroughParameter(width: Int) extends Parameter
 given upickle.default.ReadWriter[PassthroughParameter] = upickle.default.macroRW
 
-class PassthroughLayers(parameter: PassthroughParameter) extends LayerInterface(parameter)
+class PassthroughLayers(parameter: PassthroughParameter) extends LayerInterface(parameter):
+  def layers = Seq.empty
 
 class PassthroughIO(parameter: PassthroughParameter) extends HWBundle(parameter):
   val i = Flipped(UInt(parameter.width.W))
