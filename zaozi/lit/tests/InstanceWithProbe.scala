@@ -57,9 +57,8 @@ class InnerProbe(parameter: InnerParameter) extends DVBundle[InnerParameter, Inn
 @generator
 object Inner extends Generator[InnerParameter, InnerLayers, InnerIO, InnerProbe]:
   def architecture(parameter: InnerParameter) =
-    val io               = summon[Interface[InnerIO]]
-    val probe            = summon[Interface[InnerProbe]]
-    given Seq[LayerTree] = this.layers(parameter)
+    val io    = summon[Interface[InnerIO]]
+    val probe = summon[Interface[InnerProbe]]
     layer("A0"):
       probe.a0 <== io.a0
       layer("A0B0"):
