@@ -9,11 +9,7 @@ import org.llvm.mlir.scalalib.capi.ir.{Block, Context, Type, Value}
 
 import java.lang.foreign.Arena
 
-trait Bundle extends Data with DynamicSubfield:
-  private[zaozi] var instantiating = true
-
-  private[zaozi] val _elements = collection.mutable.Buffer.empty[BundleField[?]]
-
+trait Bundle extends Aggregate with DynamicSubfield:
   def Flipped[T <: Data](
     tpe: T
   )(

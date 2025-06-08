@@ -55,12 +55,21 @@ class LayerInterface[P <: Parameter](parameter: P) extends Seq[LayerTree]:
   final override def iterator = layers.toLayerTrees.iterator
   final override def length   = layers.toLayerTrees.length
 
-class HWInterface[P <: Parameter](parameter: P)                         extends Bundle
-class DVInterface[P <: Parameter, L <: LayerInterface[P]](parameter: P) extends ProbeBundle:
+trait HWInterface[P <: Parameter](parameter: P) extends Aggregate:
+  this: Bundle | Record =>
+class HWBundle[P <: Parameter](parameter: P)    extends HWInterface(parameter) with Bundle
+class HWRecord[P <: Parameter](parameter: P)    extends HWInterface(parameter) with Record
+
+trait DVInterface[P <: Parameter, L <: LayerInterface[P]](parameter: P) extends Aggregate:
+  this: ProbeBundle =>
   private var _layersOpt:              Option[L]         = None
   transparent inline def summonLayers: LayerInterface[?] = ${ summonLayersImpl }
   transparent inline def layers:       L                 = _layersOpt.getOrElse:
     summonLayers.asInstanceOf[L].tap(l => _layersOpt = Some(l))
+
+class DVBundle[P <: Parameter, L <: LayerInterface[P]](parameter: P)
+    extends DVInterface[P, L](parameter)
+    with ProbeBundle
 
 class InstanceContext:
   class AnonSignalCounter(private var _count: Int):
