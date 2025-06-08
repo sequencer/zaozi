@@ -196,6 +196,53 @@ given TypeImpl with
       ref._elements += bf
       bf
 
+  extension (ref: ProbeRecord)
+    def elements: Seq[BundleField[?]] =
+      require(!ref.instantiating)
+      ref._elements.toSeq
+    def toMlirTypeImpl(
+      using Arena,
+      Context
+    ): Type =
+      ref.instantiating = false
+      val mlirType = elements
+        .map(f =>
+          summon[FirrtlBundleFieldApi]
+            .createFirrtlBundleField(f._name, f._isFlip, f._tpe.toMlirType)
+        )
+        .getBundle
+      mlirType
+    def ReadProbeImpl[T <: Data & CanProbe](
+      name:  String,
+      tpe:   T,
+      layer: LayerTree
+    ): BundleField[RProbe[T]] =
+      require(ref.instantiating)
+      val bf = new BundleField[RProbe[T]]:
+        val _name:   String    = name
+        val _isFlip: Boolean   = false
+        val _tpe:    RProbe[T] = new RProbe[T]:
+          val _baseType: T         = tpe
+          val _color:    LayerTree = layer
+
+      ref._elements += bf
+      bf
+    def ReadWriteProbeImpl[T <: Data & CanProbe](
+      name:  String,
+      tpe:   T,
+      layer: LayerTree
+    ): BundleField[RWProbe[T]] =
+      require(ref.instantiating)
+      val bf = new BundleField[RWProbe[T]]:
+        val _name:   String     = name
+        val _isFlip: Boolean    = false
+        val _tpe:    RWProbe[T] = new RWProbe[T]:
+          val _baseType: T         = tpe
+          val _color:    LayerTree = layer
+
+      ref._elements += bf
+      bf
+
   extension (ref: Record)
     def elements: Seq[BundleField[?]] =
       require(!ref.instantiating)
@@ -348,6 +395,36 @@ given TypeImpl with
             val _tpe:       E         = field._tpe.asInstanceOf[E]
             val _operation: Operation = subfieldOp.operation
 
+  extension (ref: ProbeRecord)
+    def getUntypedRefViaFieldValNameImpl(
+      refer:        Value,
+      fieldValName: String
+    )(
+      using Arena,
+      Block,
+      Context,
+      sourcecode.File,
+      sourcecode.Line,
+      sourcecode.Name.Machine
+    )(
+      using TypeImpl
+    ): Ref[Data] =
+      require(!ref.instantiating)
+      ref._elements
+        .find(_._name == fieldValName)
+        .map: field =>
+          val openSubfieldOp = summon[OpenSubfieldApi]
+            .op(
+              input = refer,
+              fieldIndex = ref.toMlirType.getBundleFieldIndex(field._name),
+              location = locate
+            )
+          openSubfieldOp.operation.appendToBlock()
+          new Ref[Data]:
+            val _tpe:       Data      = field._tpe.asInstanceOf[Data]
+            val _operation: Operation = openSubfieldOp.operation
+        .getOrElse:
+          throw new Exception(s"$fieldValName not found in ${ref._elements.map(_._name)}")
   extension (ref: Record)
     def getUntypedRefViaFieldValNameImpl(
       refer:        Value,
