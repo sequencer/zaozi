@@ -42,13 +42,13 @@ given upickle.default.ReadWriter[InnerParameter] = upickle.default.macroRW
 class InnerLayers(parameter: InnerParameter) extends LayerInterface(parameter):
   override def layers = fooLayers
 
-class InnerIO(parameter: InnerParameter) extends HWInterface(parameter):
+class InnerIO(parameter: InnerParameter) extends HWBundle(parameter):
   val a0     = Flipped(UInt(parameter.width.W))
   val a0b0   = Flipped(UInt(parameter.width.W))
   val a0b0c0 = Flipped(UInt(parameter.width.W))
   val a0b1   = Flipped(UInt(parameter.width.W))
 
-class InnerProbe(parameter: InnerParameter) extends DVInterface[InnerParameter, InnerLayers](parameter):
+class InnerProbe(parameter: InnerParameter) extends DVBundle[InnerParameter, InnerLayers](parameter):
   val a0     = ProbeRead(UInt(parameter.width.W), layers("A0"))
   val a0b0   = ProbeRead(UInt(parameter.width.W), layers("A0")("A0B0"))
   val a0b0c0 = ProbeRead(UInt(parameter.width.W), layers("A0")("A0B0")("A0B0C0"))
@@ -75,13 +75,13 @@ given upickle.default.ReadWriter[OuterParameter] = upickle.default.macroRW
 class OuterLayers(parameter: OuterParameter) extends LayerInterface(parameter):
   override def layers = fooLayers
 
-class OuterIO(parameter: OuterParameter) extends HWInterface(parameter):
+class OuterIO(parameter: OuterParameter) extends HWBundle(parameter):
   val a0     = Flipped(UInt(parameter.width.W))
   val a0b0   = Flipped(UInt(parameter.width.W))
   val a0b0c0 = Flipped(UInt(parameter.width.W))
   val a0b1   = Flipped(UInt(parameter.width.W))
 
-class OuterProbe(parameter: OuterParameter) extends DVInterface[OuterParameter, OuterLayers](parameter)
+class OuterProbe(parameter: OuterParameter) extends DVBundle[OuterParameter, OuterLayers](parameter)
 
 @generator
 object Outer extends Generator[OuterParameter, OuterLayers, OuterIO, OuterProbe]:

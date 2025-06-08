@@ -19,12 +19,12 @@ given upickle.default.ReadWriter[PassthroughParameter] = upickle.default.macroRW
 
 class PassthroughLayers(parameter: PassthroughParameter) extends LayerInterface(parameter)
 
-class PassthroughIO(parameter: PassthroughParameter) extends HWInterface(parameter):
+class PassthroughIO(parameter: PassthroughParameter) extends HWBundle(parameter):
   val i = Flipped(UInt(parameter.width.W))
   val o = Aligned(UInt(parameter.width.W))
 
 class PassthroughProbe(parameter: PassthroughParameter)
-    extends DVInterface[PassthroughParameter, PassthroughLayers](parameter)
+    extends DVBundle[PassthroughParameter, PassthroughLayers](parameter)
 
 @generator
 object PassthroughModule extends Generator[PassthroughParameter, PassthroughLayers, PassthroughIO, PassthroughProbe]:

@@ -24,17 +24,17 @@ given upickle.default.ReadWriter[ReferableSpecParameter] = upickle.default.macro
 
 class ReferableSpecLayers(parameter: ReferableSpecParameter) extends LayerInterface(parameter)
 
-class PassthroughIO(parameter: ReferableSpecParameter) extends HWInterface(parameter):
+class PassthroughIO(parameter: ReferableSpecParameter) extends HWBundle(parameter):
   val i = Flipped(UInt(parameter.width.W))
   val o = Aligned(UInt(parameter.width.W))
 
-class ReferableSpecIO(parameter: ReferableSpecParameter) extends HWInterface(parameter):
+class ReferableSpecIO(parameter: ReferableSpecParameter) extends HWBundle(parameter):
   val asyncDomain = Flipped(new AsyncDomain)
   val syncDomain  = Flipped(new SyncDomain)
   val passthrough = Aligned(new PassthroughIO(parameter))
 
 class ReferableSpecProbe(parameter: ReferableSpecParameter)
-    extends DVInterface[ReferableSpecParameter, ReferableSpecLayers](parameter)
+    extends DVBundle[ReferableSpecParameter, ReferableSpecLayers](parameter)
 
 object ReferableSpec extends TestSuite:
   val tests = Tests:

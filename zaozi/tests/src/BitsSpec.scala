@@ -19,7 +19,7 @@ class BitsSpecLayers(parameter: BitsSpecParameter) extends LayerInterface(parame
 
 class BitsSpecIO(
   parameter: BitsSpecParameter)
-    extends HWInterface[BitsSpecParameter](parameter):
+    extends HWBundle(parameter):
   val a          = Flipped(Bits(parameter.width.W))
   val b          = Flipped(Bits(parameter.width.W))
   val c          = Flipped(UInt(parameter.width.W))
@@ -32,7 +32,7 @@ class BitsSpecIO(
   val clock      = Flipped(Clock())
   val asyncReset = Flipped(AsyncReset())
 
-class BitsSpecProbe(parameter: BitsSpecParameter) extends DVInterface[BitsSpecParameter, BitsSpecLayers](parameter)
+class BitsSpecProbe(parameter: BitsSpecParameter) extends DVBundle[BitsSpecParameter, BitsSpecLayers](parameter)
 
 object BitsSpec extends TestSuite:
   val tests = Tests:

@@ -29,7 +29,7 @@ given upickle.default.ReadWriter[BundleSpecParameter] = upickle.default.macroRW
 
 class BundleSpecLayers(parameter: BundleSpecParameter) extends LayerInterface(parameter)
 
-class BundleSpecIO(parameter: BundleSpecParameter) extends HWInterface(parameter):
+class BundleSpecIO(parameter: BundleSpecParameter) extends HWBundle(parameter):
   val a = Aligned(UInt(parameter.width.W))
   val b = Flipped(UInt(parameter.width.W))
   val c = Aligned(new Bundle {
@@ -41,8 +41,7 @@ class BundleSpecIO(parameter: BundleSpecParameter) extends HWInterface(parameter
   val j = Aligned(new TypeParamIO(new SimpleBundleA, new SimpleBundleB))
   val k = Option.when(parameter.width >= 16)(Aligned(UInt(parameter.width.W)))
 
-class BundleSpecProbe(parameter: BundleSpecParameter)
-    extends DVInterface[BundleSpecParameter, BundleSpecLayers](parameter)
+class BundleSpecProbe(parameter: BundleSpecParameter) extends DVBundle[BundleSpecParameter, BundleSpecLayers](parameter)
 
 object BundleSpec extends TestSuite:
   val tests = Tests:

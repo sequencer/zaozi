@@ -82,13 +82,13 @@ class GCDOutput(parameter: GCDParameter) extends Bundle:
 // GCD-NEXT:   output        output_valid,
 // GCD-NEXT:   output [31:0] output_bits_z
 // GCD-NEXT: );
-class GCDIO(parameter: GCDParameter) extends HWInterface(parameter):
+class GCDIO(parameter: GCDParameter) extends HWBundle(parameter):
   val clock:  BundleField[Clock]                 = Flipped(Clock())
   val reset:  BundleField[Reset]                 = Flipped(if (parameter.useAsyncReset) AsyncReset() else Reset())
   val input:  BundleField[DecoupledIO[GCDInput]] = Flipped(Decoupled(new GCDInput(parameter)))
   val output: BundleField[ValidIO[GCDOutput]]    = Aligned(Valid(GCDOutput(parameter)))
 
-class GCDProbe(parameter: GCDParameter) extends DVInterface[GCDParameter, GCDLayers](parameter)
+class GCDProbe(parameter: GCDParameter) extends DVBundle[GCDParameter, GCDLayers](parameter)
 
 case class SubtractorParameter(width: Int) extends Parameter
 given upickle.default.ReadWriter[SubtractorParameter] = upickle.default.macroRW
@@ -97,13 +97,12 @@ class SubtractorLayers(parameter: SubtractorParameter) extends LayerInterface(pa
 
 class SubtractorIO(
   parameter: SubtractorParameter)
-    extends HWInterface(parameter):
+    extends HWBundle(parameter):
   val a = Flipped(UInt(parameter.width.W))
   val b = Flipped(UInt(parameter.width.W))
   val z = Aligned(UInt(parameter.width.W))
 
-class SubtractorProbe(parameter: SubtractorParameter)
-    extends DVInterface[SubtractorParameter, SubtractorLayers](parameter)
+class SubtractorProbe(parameter: SubtractorParameter) extends DVBundle[SubtractorParameter, SubtractorLayers](parameter)
 
 // SUB:      module Subtractor_f34dfd42(
 // SUB-NEXT:   input [31:0] a,

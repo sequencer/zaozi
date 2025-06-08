@@ -22,11 +22,11 @@ given upickle.default.ReadWriter[TruncateParameter] = upickle.default.macroRW
 
 class TruncateLayers(parameter: TruncateParameter) extends LayerInterface(parameter)
 
-class TruncateIO(parameter: TruncateParameter) extends HWInterface(parameter):
+class TruncateIO(parameter: TruncateParameter) extends HWBundle(parameter):
   val i = Flipped(UInt(parameter.inputWidth.W))
   val o = Aligned(UInt(parameter.outputWidth.W))
 
-class TruncateProbe(parameter: TruncateParameter) extends DVInterface[TruncateParameter, TruncateLayers](parameter)
+class TruncateProbe(parameter: TruncateParameter) extends DVBundle[TruncateParameter, TruncateLayers](parameter)
 
 @generator
 object Truncate extends Generator[TruncateParameter, TruncateLayers, TruncateIO, TruncateProbe]:
