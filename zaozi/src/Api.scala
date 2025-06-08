@@ -104,6 +104,7 @@ trait Generator[PARAM <: Parameter, L <: LayerInterface[PARAM], I <: HWInterface
     Block,
     Interface[I],
     Interface[P],
+    L,
     InstanceContext
   ) ?=> Unit
 

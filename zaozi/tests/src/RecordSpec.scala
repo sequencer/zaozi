@@ -95,9 +95,8 @@ object RecordSpec extends TestSuite:
           extends Generator[RecordSpecParameter, RecordSpecLayers, RecordAsIO, RecordAsProbe]
           with HasVerilogTest:
         def architecture(parameter: RecordSpecParameter) =
-          val io               = summon[Interface[RecordAsIO]]
-          val probe            = summon[Interface[RecordAsProbe]]
-          given Seq[LayerTree] = this.layers(parameter)
+          val io    = summon[Interface[RecordAsIO]]
+          val probe = summon[Interface[RecordAsProbe]]
           Seq.tabulate(parameter.fieldNum): i =>
             io.field(s"output_$i") := io.field(s"input_$i")
             layer("verification"):

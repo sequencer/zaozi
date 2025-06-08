@@ -60,9 +60,8 @@ object LayerSpec extends TestSuite:
           extends Generator[LayerSpecParameter, LayerSpecLayers, LayerSpecIO, LayerSpecProbe]
           with HasVerilogTest:
         def architecture(parameter: LayerSpecParameter) =
-          val io               = summon[Interface[LayerSpecIO]]
-          val probe            = summon[Interface[LayerSpecProbe]]
-          given Seq[LayerTree] = this.layers(parameter)
+          val io    = summon[Interface[LayerSpecIO]]
+          val probe = summon[Interface[LayerSpecProbe]]
           layer("A0"):
             probe.a0 <== io.a0
             layer("A0B0"):

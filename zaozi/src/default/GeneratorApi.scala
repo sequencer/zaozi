@@ -147,6 +147,7 @@ given GeneratorApi with
           val _tpe:       P         = probe
           val _operation: Operation = probeWire.operation
       given InstanceContext = new InstanceContext
+      given L               = generator.layers(parameter)
       generator.architecture(parameter)
       module
 
