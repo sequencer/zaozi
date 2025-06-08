@@ -10,11 +10,7 @@ import org.llvm.mlir.scalalib.capi.ir.{Block, Context, Type, Value}
 
 import java.lang.foreign.Arena
 
-trait Record extends Data with UntypedDynamicSubfield:
-  private[zaozi] var instantiating = true
-
-  private[zaozi] val _elements = collection.mutable.Buffer.empty[BundleField[?]]
-
+trait Record extends Aggregate with UntypedDynamicSubfield:
   def Flipped[T <: Data](
     name: String,
     tpe:  T

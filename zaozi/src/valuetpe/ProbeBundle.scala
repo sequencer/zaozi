@@ -9,13 +9,8 @@ import org.llvm.mlir.scalalib.capi.ir.{Block, Context, Type, Value}
 
 import java.lang.foreign.Arena
 
-// The ProbeBundle is only defined at the interface of a module,
-// The users should
-trait ProbeBundle extends Data with DynamicSubfield:
-  private[zaozi] var instantiating = true
-
-  private[zaozi] val _elements = collection.mutable.Buffer.empty[BundleField[?]]
-
+// The ProbeBundle is only defined at the interface of a module
+trait ProbeBundle extends Aggregate with DynamicSubfield:
   def ProbeRead[T <: Data & CanProbe](
     tpe:   T,
     layer: LayerTree
