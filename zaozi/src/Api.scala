@@ -49,7 +49,7 @@ extension (layers: Seq[LayerTree])
 
 abstract class Parameter
 abstract class LayerInterface[P <: Parameter](parameter: P) extends Seq[LayerTree]:
-  def layers: Seq[Layer] = Seq.empty
+  def layers: Seq[Layer]
 
   final override def apply(idx: Int) = layers.toLayerTrees(idx)
   final override def iterator = layers.toLayerTrees.iterator

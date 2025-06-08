@@ -76,7 +76,8 @@ class ValidIO[T <: Data](_bits: T) extends Bundle:
 case class GCDParameter(width: Int, useAsyncReset: Boolean) extends Parameter
 given upickle.default.ReadWriter[GCDParameter] = upickle.default.macroRW
 
-class GCDLayers(parameter: GCDParameter) extends LayerInterface(parameter)
+class GCDLayers(parameter: GCDParameter) extends LayerInterface(parameter):
+  def layers = Seq.empty
 
 class GCDInput(parameter: GCDParameter) extends Bundle:
   val x: BundleField[UInt] = Aligned(UInt(parameter.width.W))

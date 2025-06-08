@@ -63,7 +63,8 @@ class ValidIO[T <: Data](_bits: T) extends Bundle:
 case class GCDParameter(width: Int, useAsyncReset: Boolean) extends Parameter
 given upickle.default.ReadWriter[GCDParameter] = upickle.default.macroRW
 
-class GCDLayers(parameter: GCDParameter) extends LayerInterface(parameter)
+class GCDLayers(parameter: GCDParameter) extends LayerInterface(parameter):
+  def layers = Seq.empty
 
 class GCDInput(parameter: GCDParameter) extends Bundle:
   val x: BundleField[UInt] = Aligned(UInt(parameter.width.W))
@@ -93,7 +94,8 @@ class GCDProbe(parameter: GCDParameter) extends DVBundle[GCDParameter, GCDLayers
 case class SubtractorParameter(width: Int) extends Parameter
 given upickle.default.ReadWriter[SubtractorParameter] = upickle.default.macroRW
 
-class SubtractorLayers(parameter: SubtractorParameter) extends LayerInterface(parameter)
+class SubtractorLayers(parameter: SubtractorParameter) extends LayerInterface(parameter):
+  def layers = Seq.empty
 
 class SubtractorIO(
   parameter: SubtractorParameter)

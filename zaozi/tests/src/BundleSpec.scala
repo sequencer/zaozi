@@ -27,7 +27,8 @@ class SimpleBundleB extends Bundle:
 case class BundleSpecParameter(width: Int) extends Parameter
 given upickle.default.ReadWriter[BundleSpecParameter] = upickle.default.macroRW
 
-class BundleSpecLayers(parameter: BundleSpecParameter) extends LayerInterface(parameter)
+class BundleSpecLayers(parameter: BundleSpecParameter) extends LayerInterface(parameter):
+  def layers = Seq.empty
 
 class BundleSpecIO(parameter: BundleSpecParameter) extends HWBundle(parameter):
   val a = Aligned(UInt(parameter.width.W))

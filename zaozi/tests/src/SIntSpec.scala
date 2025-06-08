@@ -15,7 +15,8 @@ import java.lang.foreign.Arena
 case class SIntSpecParameter(width: Int) extends Parameter
 given upickle.default.ReadWriter[SIntSpecParameter] = upickle.default.macroRW
 
-class SIntSpecLayers(parameter: SIntSpecParameter) extends LayerInterface(parameter)
+class SIntSpecLayers(parameter: SIntSpecParameter) extends LayerInterface(parameter):
+  def layers = Seq.empty
 
 class SIntSpecIO(parameter: SIntSpecParameter) extends HWBundle(parameter):
   val a          = Flipped(SInt(parameter.width.W))

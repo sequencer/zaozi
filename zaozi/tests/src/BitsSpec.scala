@@ -15,7 +15,8 @@ import me.jiuyang.zaozi.magic.macros.generator
 case class BitsSpecParameter(width: Int) extends Parameter
 given upickle.default.ReadWriter[BitsSpecParameter] = upickle.default.macroRW
 
-class BitsSpecLayers(parameter: BitsSpecParameter) extends LayerInterface(parameter)
+class BitsSpecLayers(parameter: BitsSpecParameter) extends LayerInterface(parameter):
+  def layers = Seq.empty
 
 class BitsSpecIO(
   parameter: BitsSpecParameter)

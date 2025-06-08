@@ -40,7 +40,7 @@ case class InnerParameter(width: Int) extends Parameter
 given upickle.default.ReadWriter[InnerParameter] = upickle.default.macroRW
 
 class InnerLayers(parameter: InnerParameter) extends LayerInterface(parameter):
-  override def layers = fooLayers
+  def layers = fooLayers
 
 class InnerIO(parameter: InnerParameter) extends HWBundle(parameter):
   val a0     = Flipped(UInt(parameter.width.W))
@@ -73,7 +73,7 @@ case class OuterParameter(width: Int) extends Parameter
 given upickle.default.ReadWriter[OuterParameter] = upickle.default.macroRW
 
 class OuterLayers(parameter: OuterParameter) extends LayerInterface(parameter):
-  override def layers = fooLayers
+  def layers = fooLayers
 
 class OuterIO(parameter: OuterParameter) extends HWBundle(parameter):
   val a0     = Flipped(UInt(parameter.width.W))

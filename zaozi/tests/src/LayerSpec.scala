@@ -18,7 +18,7 @@ case class LayerSpecParameter(width: Int) extends Parameter
 given upickle.default.ReadWriter[LayerSpecParameter] = upickle.default.macroRW
 
 class LayerSpecLayers(parameter: LayerSpecParameter) extends LayerInterface(parameter):
-  override def layers = Seq(
+  def layers = Seq(
     Layer(
       "A0",
       Seq(

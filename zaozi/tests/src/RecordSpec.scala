@@ -28,7 +28,7 @@ case class RecordSpecParameter(fieldNum: Int, width: Int) extends Parameter
 given upickle.default.ReadWriter[RecordSpecParameter] = upickle.default.macroRW
 
 class RecordSpecLayers(parameter: RecordSpecParameter) extends LayerInterface(parameter):
-  override def layers = Seq(Layer("verification"))
+  def layers = Seq(Layer("verification"))
 
 class DynamicFieldsNumIO(parameter: RecordSpecParameter) extends HWBundle(parameter):
   val a = Aligned(new UnfixedFieldsNumRecord(parameter.fieldNum, parameter.width))

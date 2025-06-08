@@ -15,7 +15,8 @@ import me.jiuyang.zaozi.magic.macros.generator
 case class VecSpecParameter(width: Int, vecCount: Int) extends Parameter
 given upickle.default.ReadWriter[VecSpecParameter] = upickle.default.macroRW
 
-class VecSpecLayers(parameter: VecSpecParameter) extends LayerInterface(parameter)
+class VecSpecLayers(parameter: VecSpecParameter) extends LayerInterface(parameter):
+  def layers = Seq.empty
 
 class VecSpecIO(parameter: VecSpecParameter) extends HWBundle(parameter):
   val a   = Flipped(Vec(parameter.vecCount, Bits(parameter.width.W)))
