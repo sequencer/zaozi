@@ -27,7 +27,8 @@ class NestedRecord(width: Int) extends Record:
 case class RecordSpecParameter(fieldNum: Int, width: Int) extends Parameter
 given upickle.default.ReadWriter[RecordSpecParameter] = upickle.default.macroRW
 
-class RecordSpecLayers(parameter: RecordSpecParameter) extends LayerInterface(parameter)
+class RecordSpecLayers(parameter: RecordSpecParameter) extends LayerInterface(parameter):
+  override def layers = Seq(Layer("verification"))
 
 class DynamicFieldsNumIO(parameter: RecordSpecParameter) extends HWBundle(parameter):
   val a = Aligned(new UnfixedFieldsNumRecord(parameter.fieldNum, parameter.width))
@@ -39,6 +40,14 @@ class SimpleRecordIO(parameter: RecordSpecParameter) extends HWBundle(parameter)
   val c = Aligned(new SimpleRecord(parameter.width))
 
 class RecordSpecProbe(parameter: RecordSpecParameter) extends DVBundle[RecordSpecParameter, RecordSpecLayers](parameter)
+
+class RecordAsIO(parameter: RecordSpecParameter) extends HWRecord(parameter):
+  val inputs  = Seq.tabulate(parameter.fieldNum)(i => Flipped(s"input_$i", UInt(parameter.width.W)))
+  val outputs = Seq.tabulate(parameter.fieldNum)(i => Aligned(s"output_$i", UInt(parameter.width.W)))
+
+class RecordAsProbe(parameter: RecordSpecParameter) extends DVRecord[RecordSpecParameter, RecordSpecLayers](parameter):
+  val probes =
+    Seq.tabulate(parameter.fieldNum)(i => ProbeRead(s"probe_$i", UInt(parameter.width.W), layers("verification")))
 
 object RecordSpec extends TestSuite:
   val tests = Tests:
@@ -79,3 +88,24 @@ object RecordSpec extends TestSuite:
             io.c.field("o") := io.c.field("i")
           .getMessage() ==> "o not found in ArrayBuffer(a, b)"
       AccessValName.compileErrorTest(RecordSpecParameter(2, 32))
+
+    test("Record as Interface"):
+      @generator
+      object RecordAsInterface
+          extends Generator[RecordSpecParameter, RecordSpecLayers, RecordAsIO, RecordAsProbe]
+          with HasVerilogTest:
+        def architecture(parameter: RecordSpecParameter) =
+          val io               = summon[Interface[RecordAsIO]]
+          val probe            = summon[Interface[RecordAsProbe]]
+          given Seq[LayerTree] = this.layers(parameter)
+          Seq.tabulate(parameter.fieldNum): i =>
+            io.field(s"output_$i") := io.field(s"input_$i")
+            layer("verification"):
+              probe.field(s"probe_$i") <== io.field(s"input_$i")
+      // FIXME: wait https://github.com/llvm/circt/pull/8093
+      RecordAsInterface.verilogTest(RecordSpecParameter(2, 32))(
+        "assign output_0 = input_0;",
+        "assign output_1 = input_1;",
+        "wire [31:0] input_0_probe = input_0;",
+        "wire [31:0] input_1_probe = input_1;"
+      )
