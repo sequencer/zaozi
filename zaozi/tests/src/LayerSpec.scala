@@ -74,6 +74,7 @@ object LayerSpec extends TestSuite:
 
       val parameter  = LayerSpecParameter(32)
       val moduleName = SimpleLayer.moduleName(parameter)
+      // FIXME: wait https://github.com/llvm/circt/pull/8093
       SimpleLayer.verilogTest(parameter)(
         s"bind ${moduleName} ${moduleName}_A0_A0B1 a0_a0B1",
         s"bind ${moduleName} ${moduleName}_A0_A0B0_A0B0C0 a0_a0B0_a0B0C0",
