@@ -7,9 +7,9 @@ import mill.scalalib._
 import mill.scalalib.TestModule.Utest
 import mill.scalalib.scalafmt._
 
-import build.v
+import build.{v, ZaoziPublishModule}
 
-object `package` extends RootModule with ScalaModule with ScalafmtModule {
+object `package` extends RootModule with ScalaModule with ScalafmtModule with ZaoziPublishModule {
   def scalaVersion = Task(v.scala)
   def ivyDeps      = Task(Seq(v.mainargs, v.oslib, v.upickle))
 
