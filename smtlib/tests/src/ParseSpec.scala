@@ -9,28 +9,45 @@ import utest.*
 object ParseSpec extends TestSuite:
   val tests = Tests:
     test("simple parser"):
-      assert(
-        parseSExpr(
-          """(set-logic QF_UF)
-            |(declare-fun x () Int)
-            |(assert (> x 5))
-            |(check-sat)
-            |""".stripMargin
-        ).isSuccess
-      )
+      parseSExpr(
+        """(set-logic QF_UF)
+          |(declare-fun x () Int)
+          |(assert (> x 5))
+          |(check-sat)
+          |""".stripMargin
+      ).isSuccess ==> true
     test("convert to SMT IR"):
-      import me.jiuyang.smtlib.SMTCommand.*
-      assert(
-        parseSMT(
-          """(set-logic QF_UF)
-            |(declare-fun x () Int)
-            |(assert (> x 5))
-            |(check-sat)
-            |""".stripMargin
-        ) == List(
-          SetLogic("QF_UF"),
-          DeclareFun("x", List(), "Int"),
-          Assert(IntCmp(">", Variable("x"), IntConstant(5))),
-          Check
-        )
+      parseSMT(
+        """(set-logic QF_UF)
+          |(declare-fun x () Int)
+          |(assert (> x 5))
+          |(check-sat)
+          |""".stripMargin
+      ) ==> List(
+        SetLogic("QF_UF"),
+        DeclareFun("x", List(), "Int"),
+        Assert(IntCmp(">", Variable("x"), IntConstant(5))),
+        Check
       )
+    test("parse SMT Output"):
+      parseSMT(
+        """(
+          |   (define-fun x () Bool true)
+          |   (define-fun y () Bool false)
+          |)""".stripMargin.stripPrefix("(").stripSuffix(")")
+      ) ==> List(
+        DefineFun("x", List(), "Bool", BoolConstant(true)),
+        DefineFun("y", List(), "Bool", BoolConstant(false))
+      )
+    test("parse Z3 Result"):
+      parseZ3Output(
+        """sat
+          |(
+          |  (define-fun x () Bool
+          |    true)
+          |  (define-fun y () Bool
+          |    false)
+          |  (define-fun z () Int
+          |    1)
+          |)""".stripMargin
+      ) ==> Seq(("sat", true), ("x", true), ("y", false), ("z", 1))

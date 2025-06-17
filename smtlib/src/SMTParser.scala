@@ -71,6 +71,23 @@ def convert(sexpr: SExpr): SMTCommand =
 def parseSMT(input: String): Seq[SMTCommand] =
   parseSExpr(input).get.value.map(convert)
 
+def parseZ3Output(input: String): Seq[(String, Boolean | Int)] =
+  val sat = input.split("\n").head match
+    case "sat"     => Seq(("sat", true))
+    case "unknown" => return Seq(("unknown", false))
+    case "unsat"   => return Seq(("unsat", false))
+    case _         => throw new Exception(s"Unexpected result: ${input.split("\n").head.trim}")
+
+  val modelRaw     = input.split("\n").drop(1).mkString("\n")
+  val modelTrimmed = modelRaw.trim.stripPrefix("(").stripSuffix(")")
+
+  val model = parseSMT(modelTrimmed).map {
+    case SMTCommand.DefineFun(name, _, _, SMTCommand.BoolConstant(value)) => (name, value)
+    case SMTCommand.DefineFun(name, _, _, SMTCommand.IntConstant(value))  => (name, value.toInt)
+    case other                                                            => throw new Exception(s"Unexpected command in result: $other")
+  }
+  sat ++ model
+
 enum SExpr:
   case Symbol(value: String)
   case StringLit(value: String)
