@@ -13,6 +13,7 @@ def parseSExpr(input: String): Parsed[Seq[SExpr]] =
     )
   )
 
+// format: off
 def convert(sexpr: SExpr): SMTCommand =
   import SExpr.*
   sexpr match
@@ -29,6 +30,9 @@ def convert(sexpr: SExpr): SMTCommand =
     case List(Symbol("declare-fun") :: Symbol(name) :: List(argTypes) :: Symbol(retType) :: Nil) =>
       val args = argTypes.collect { case Symbol(t) => t }
       SMTCommand.DeclareFun(name, args, retType)
+    case List(Symbol("define-fun") :: Symbol(name) :: List(argTypes) :: Symbol(retType) :: retValue :: Nil) =>
+      val args = argTypes.collect { case Symbol(t) => t }
+      SMTCommand.DefineFun(name, args, retType, convert(retValue))
     case List(Symbol("and") :: args)                                                             =>
       SMTCommand.And(args.map(convert))
     case List(Symbol("or") :: args)                                                              =>
@@ -62,6 +66,7 @@ def convert(sexpr: SExpr): SMTCommand =
     case List(Symbol("extract") :: Symbol(high) :: Symbol(low) :: arg :: Nil)                    =>
       SMTCommand.Extract(high.toInt, low.toInt, convert(arg))
     case other                                                                                   => throw new Exception(s"Unknown or unimplemented expression: $other")
+// format: on
 
 def parseSMT(input: String): Seq[SMTCommand] =
   parseSExpr(input).get.value.map(convert)
@@ -165,6 +170,7 @@ enum SMTCommand:
   case Check
   case Concat(args: Seq[SMTCommand])
   case DeclareFun(name: String, argTypes: Seq[String], retType: String)
+  case DefineFun(name: String, argTypes: Seq[String], retType: String, retValue: SMTCommand)
   case Distinct(args: Seq[SMTCommand])
   case Eq(lhs: SMTCommand, rhs: SMTCommand)
   case Extract(high: Int, low: Int, arg: SMTCommand)
