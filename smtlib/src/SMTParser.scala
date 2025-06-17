@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2025 Jianhao Ye <Clo91eaf@qq.com>
-package me.jiuyang.smtlib
+package me.jiuyang.smtlib.parser
 
 import fastparse.*
 import NoWhitespace.*

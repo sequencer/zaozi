@@ -2,7 +2,8 @@
 // SPDX-FileCopyrightText: 2025 Jianhao Ye <Clo91eaf@qq.com>
 package me.jiuyang.smtlib.tests
 
-import me.jiuyang.smtlib.{parseSExpr, parseSMT}
+import me.jiuyang.smtlib.parser.{parseSExpr, parseSMT, parseZ3Output}
+import me.jiuyang.smtlib.parser.SMTCommand.*
 import utest.*
 
 object ParseSpec extends TestSuite:
