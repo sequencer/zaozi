@@ -138,6 +138,7 @@ hwModuleTypeGetNumInputs        # header: $CIRCT_INSTALL_PATH/include/circt-c/Di
 hwModuleTypeGetNumOutputs       # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/HW.h
 hwModuleTypeGetOutputName       # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/HW.h
 hwModuleTypeGetOutputType       # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/HW.h
+hwModuleTypeGetPort             # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/HW.h
 hwOutputFileGetFileName         # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/HW.h
 hwOutputFileGetFromFileName     # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/HW.h
 hwParamDeclAttrGet              # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/HW.h
@@ -279,6 +280,7 @@ omFrozenPathTypeGetTypeID         # header: $CIRCT_INSTALL_PATH/include/circt-c/
 omIntegerAttrGet                  # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/OM.h
 omIntegerAttrGetInt               # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/OM.h
 omIntegerAttrToString             # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/OM.h
+omListAttrGet                     # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/OM.h
 omListAttrGetElement              # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/OM.h
 omListAttrGetNumElements          # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/OM.h
 omListTypeGetElementType          # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/OM.h
@@ -288,6 +290,8 @@ omMapAttrGetElementValue          # header: $CIRCT_INSTALL_PATH/include/circt-c/
 omMapAttrGetNumElements           # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/OM.h
 omMapTypeGetKeyType               # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/OM.h
 omReferenceAttrGetInnerRef        # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/OM.h
+omStringTypeGet                   # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/OM.h
+omStringTypeGetTypeID             # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/OM.h
 omTypeIsAAnyType                  # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/OM.h
 omTypeIsAClassType                # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/OM.h
 omTypeIsAFrozenBasePathType       # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/OM.h
@@ -480,6 +484,7 @@ circtFirtoolPopulatePreprocessTransforms                                # header
 circtRtgToolOptionsAddUnsupportedInstruction      # header: $CIRCT_INSTALL_PATH/include/circt-c/RtgTool.h
 circtRtgToolOptionsCreateDefault                  # header: $CIRCT_INSTALL_PATH/include/circt-c/RtgTool.h
 circtRtgToolOptionsDestroy                        # header: $CIRCT_INSTALL_PATH/include/circt-c/RtgTool.h
+circtRtgToolOptionsSetMemoriesAsImmediates        # header: $CIRCT_INSTALL_PATH/include/circt-c/RtgTool.h
 circtRtgToolOptionsSetOutputFormat                # header: $CIRCT_INSTALL_PATH/include/circt-c/RtgTool.h
 circtRtgToolOptionsSetOutputPath                  # header: $CIRCT_INSTALL_PATH/include/circt-c/RtgTool.h
 circtRtgToolOptionsSetSeed                        # header: $CIRCT_INSTALL_PATH/include/circt-c/RtgTool.h
