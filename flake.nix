@@ -28,7 +28,7 @@
         legacyPackages = pkgs;
         devShells.default = pkgs.mkShell {
           inputsFrom = [ pkgs.zaozi.zaozi-assembly ];
-          nativeBuildInputs = with pkgs; [ nixd ];
+          nativeBuildInputs = with pkgs; [ nixd z3 ];
           env = with pkgs;
             {
               CIRCT_INSTALL_PATH = circt-install;
