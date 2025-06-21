@@ -812,11 +812,10 @@ given ExistsApi with
             namedAttributeApi.namedAttributeGet(
               "weight".identifierGet,
               weight.toLong.integerAttrGet(32.integerTypeGet)
-            )
-          ) ++ noPatternAttr ++ Seq(
+            ),
             // ::mlir::ArrayAttr
-            namedAttributeApi.namedAttributeGet("boundVarNames".identifierGet, Seq.empty.arrayAttrGet)
-          )
+            namedAttributeApi.namedAttributeGet("boundVarNames".identifierGet, boundVarNames.map(_.stringAttrGet).arrayAttrGet)
+          ) ++ noPatternAttr
         ,
         inferredResultsTypes = Some(1)
       )
@@ -896,11 +895,10 @@ given ForallApi with
             namedAttributeApi.namedAttributeGet(
               "weight".identifierGet,
               weight.toLong.integerAttrGet(32.integerTypeGet)
-            )
-          ) ++ noPatternAttr ++ Seq(
+            ),
             // ::mlir::ArrayAttr
-            namedAttributeApi.namedAttributeGet("boundVarNames".identifierGet, Seq.empty.arrayAttrGet)
-          )
+            namedAttributeApi.namedAttributeGet("boundVarNames".identifierGet, boundVarNames.map(_.stringAttrGet).arrayAttrGet)
+          ) ++ noPatternAttr
         ,
         inferredResultsTypes = Some(1)
       )
