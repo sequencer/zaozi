@@ -12,7 +12,7 @@ import build.{circtlib, v}
 
 object `package` extends RootModule with ScalaModule with ScalafmtModule { m =>
   def scalaVersion = Task(v.scala)
-  def ivyDeps      = Task(Seq(v.mainargs, v.oslib, v.upickle, v.sourcecode))
+  def ivyDeps      = Task(Seq(v.mainargs, v.oslib, v.upickle, v.sourcecode, v.fastparse))
   def moduleDeps   = Seq(circtlib)
 
   override def scalacOptions: Target[Seq[String]] = Task(super.scalacOptions() ++ Some("-Xprint-suspension"))
