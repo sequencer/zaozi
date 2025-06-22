@@ -13,6 +13,7 @@
 , scala-cli
 , add-determinism
 , mill-ivy-env-shell-hook
+, z3
 }:
 
 let
@@ -48,6 +49,7 @@ let
       scala-cli
       add-determinism
       makeWrapper
+      z3
     ];
 
     shellHook = ''

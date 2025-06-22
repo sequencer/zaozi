@@ -4,6 +4,7 @@ package me.jiuyang.smtlib.tests
 
 import me.jiuyang.smtlib.{*, given}
 import me.jiuyang.smtlib.default.{*, given}
+import me.jiuyang.smtlib.parser.{parseZ3Output, Z3Result}
 
 import org.llvm.mlir.scalalib.capi.dialect.func.{Func, FuncApi, given}
 import org.llvm.mlir.scalalib.capi.dialect.smt.DialectApi as SmtDialect
@@ -12,8 +13,6 @@ import org.llvm.mlir.scalalib.capi.dialect.func.DialectApi as FuncDialect
 import org.llvm.mlir.scalalib.capi.dialect.func.given_DialectApi
 import org.llvm.mlir.scalalib.capi.target.exportsmtlib.given_ExportSmtlibApi
 import org.llvm.mlir.scalalib.capi.ir.{Block, Context, ContextApi, LocationApi, Module, ModuleApi, Value, given}
-
-import java.io.{File, FileWriter}
 
 import java.lang.foreign.Arena
 
@@ -32,19 +31,50 @@ def smtTest(checkLines: String*)(body: (Arena, Context, Block) ?=> Unit): Unit =
   body
 
   // dump mlir
-  summon[Func].operation.dump()
   val out = new StringBuilder
   summon[Module].exportSMTLIB(out ++= _)
   summon[Context].destroy()
   summon[Arena].close()
 
-  // output smtlib2 to file
-  println(out.toString)
-  val writer = new FileWriter(new File("./output.smt2"), true)
-  writer.write(out.toString.replace("(reset)", "(get-model)"))
-  writer.close()
+  // check the output
+  if (checkLines.isEmpty)
+    assert(out.toString == "Nothing To Check")
+  else checkLines.foreach(l => assert(out.toString.contains(l)))
+
+def smtZ3Test(checkLines: String*)(body: (Arena, Context, Block) ?=> Unit): Z3Result =
+  given Arena   = Arena.ofConfined()
+  given Context = summon[ContextApi].contextCreate
+  summon[SmtDialect].loadDialect()
+  summon[FuncDialect].loadDialect()
+
+  // Then based on the module to construct the Func.func .
+  given Module = summon[ModuleApi].moduleCreateEmpty(summon[LocationApi].locationUnknownGet)
+  given Func   = summon[FuncApi].op("func")
+  given Block  = summon[Func].block
+  summon[Func].appendToModule()
+
+  solver {
+    body
+    smtCheck
+  }
+
+  val out = new StringBuilder
+  summon[Module].exportSMTLIB(out ++= _)
+  summon[Context].destroy()
+  summon[Arena].close()
 
   // check the output
   if (checkLines.isEmpty)
     assert(out.toString == "Nothing To Check")
   else checkLines.foreach(l => assert(out.toString.contains(l)))
+
+  val smt = out.toString.replace("(reset)", "(get-model)")
+
+  val z3Output = os
+    .proc("z3", "-in", "-t:1000")
+    .call(
+      stdin = smt,
+      check = false // ignore the error message when `unknown` or `unsat`
+    )
+
+  parseZ3Output(z3Output.out.text())
