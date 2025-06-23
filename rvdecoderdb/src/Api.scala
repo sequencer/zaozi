@@ -4,7 +4,7 @@
 package org.chipsalliance.rvdecoderdb
 
 /** Parse instructions from riscv/riscv-opcodes */
-def instructions(riscvOpcodes: os.Path, customOpCodes: Iterable[os.Path] = None): Iterable[Instruction] =
+def instructions(riscvOpcodes: os.Path, customOpcodes: Iterable[os.Path] = None): Iterable[Instruction] =
   def isInstructionSetFile(p: os.Path) =
     os.isFile(p) && {
       val base = p.baseName
@@ -19,7 +19,7 @@ def instructions(riscvOpcodes: os.Path, customOpCodes: Iterable[os.Path] = None)
     .filter(isInstructionSetFile)
     .map(f => (f.baseName, os.read(f), !f.segments.contains("unratified"), false))
 
-  val custom = customOpCodes
+  val custom = customOpcodes
     .flatMap(p =>
       if isInstructionSetFile(p) then Seq((p.baseName, os.read(p), false, true))
       else
@@ -30,10 +30,10 @@ def instructions(riscvOpcodes: os.Path, customOpCodes: Iterable[os.Path] = None)
 
   parser.parse(
     official ++ custom,
-    argLut(riscvOpcodes, customOpCodes).view.mapValues(a => (a.lsb, a.msb)).toMap
+    argLut(riscvOpcodes, customOpcodes).view.mapValues(a => (a.lsb, a.msb)).toMap
   )
 
-def argLut(riscvOpcodes: os.Path, customOpCodes: Iterable[os.Path]): Map[String, Arg] =
+def argLut(riscvOpcodes: os.Path, customOpcodes: Iterable[os.Path]): Map[String, Arg] =
   def to_args(line: String) = line.replace(", ", ",").replace("\"", "") match {
     case s"$name,$pos0,$pos1" => name -> Arg(name, pos0.toInt, pos1.toInt)
     case lstr                 => throw new Exception(s"invalid arg lut line: ${lstr}")
@@ -43,7 +43,7 @@ def argLut(riscvOpcodes: os.Path, customOpCodes: Iterable[os.Path]): Map[String,
     .lines(riscvOpcodes / "arg_lut.csv")
     .map(to_args)
 
-  val custom = customOpCodes
+  val custom = customOpcodes
     .flatMap(p =>
       os.read
         .lines(p / "arg_lut.csv")
