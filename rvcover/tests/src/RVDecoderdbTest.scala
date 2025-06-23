@@ -43,7 +43,7 @@ def getArgLut(): Seq[(String, org.chipsalliance.rvdecoderdb.Arg)] =
     )
   )
   org.chipsalliance.rvdecoderdb
-    .argLut(riscvOpcodesPath)
+    .argLut(riscvOpcodesPath, None)
     .toSeq
     .sortBy(i => (i._1, i._2.name))
 
