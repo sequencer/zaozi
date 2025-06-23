@@ -164,44 +164,6 @@ object OmSmoke extends TestSuite:
           bool2Attr.integerAttrGetValueInt ==> -1
           bool3Attr.integerAttrGetValueInt ==> 0
 
-      test("Map"):
-        test("Map Constant"):
-          val mapClass = evaluator.instantiate("MapConstant")
-          val mapI64   = mapClass.objectGetField("map_i64")
-
-          mapI64.isMap ==> false
-          mapI64.getPrimitive.isMapAttr ==> true
-
-          val mapI64Attr = mapI64.getPrimitive
-
-          mapI64Attr.mapAttrGetNumElements ==> 2
-          mapI64Attr.mapAttrGetElementKey(0).str ==> "a"
-          mapI64Attr.mapAttrGetElementValue(1).integerAttrGetValueInt ==> 32
-
-          mapI64Attr.getType.isMapType ==> true
-
-        test("OM Map"):
-          val mapCreateClass =
-            evaluator.instantiate("MapCreate")
-          val mapField       = mapCreateClass.objectGetField("map_field")
-
-          mapField.isMap ==> true
-
-          val keys = mapField.mapGetKeys
-          keys.arrayAttrGetNumElements ==> 2
-          mapField.mapGetElement(keys.arrayAttrGetElement(0)).isObject ==> true
-          mapField.mapGetType.isMapType ==> true
-          mapField.mapGetType.mapTypeGetKeyType.isStringType ==> true
-
-      test("Tuple"):
-        val tupleClass = evaluator.instantiate("Tuple", true.boolAttrGet.toEvaluatorValue)
-        val tuple      = tupleClass.objectGetField("tuple")
-        val value      = tupleClass.objectGetField("val")
-
-        tuple.isTuple ==> true
-        tuple.tupleGetElement(0).getPrimitive.boolAttrGetValue ==> true
-        tuple.tupleGetElement(1).getPrimitive.stringAttrGetValue ==> value.getPrimitive.stringAttrGetValue
-
       test("FrozenPath"):
         val pathClass = evaluator.instantiate("FrozenPath", summon[EvaluatorApi].basePathGetEmpty)
         test("FrozenPath"):

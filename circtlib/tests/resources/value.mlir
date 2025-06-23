@@ -96,28 +96,6 @@ om.class @BoolConstant(%b0 : i1) -> (bool: i1, bool2: i1, bool3: i1) {
   om.class.fields %b0, %1, %2 : i1, i1, i1
 }
  
-om.class @MapConstant() -> (map_i64: !om.map<!om.string, i64>) {
-  %0 = om.constant #om.map<i64, {a = 42, b = 32}> : !om.map<!om.string, i64>
-  om.class.fields %0 : !om.map<!om.string, i64>
-}
-
-om.class @MapCreate() -> (map_field: !om.map<!om.string, !om.class.type<@Empty>>) {
-  %s0 = om.constant "foo" : !om.string
-  %s1 = om.constant "bar" : !om.string
-  %0 = om.object @Empty() : () -> !om.class.type<@Empty>
-  %1 = om.tuple_create %s0, %0 : !om.string, !om.class.type<@Empty>
-  %2 = om.tuple_create %s1, %0 : !om.string, !om.class.type<@Empty>
-  %map = om.map_create %1, %2 : !om.string, !om.class.type<@Empty>
-  om.class.fields %map : !om.map<!om.string, !om.class.type<@Empty>>
-}
-
-om.class @Tuple(%int: i1) -> (tuple: tuple<i1, !om.string>, val: !om.string) {
-  %str = om.constant "foo" : !om.string
-  %tuple = om.tuple_create %int, %str  : i1, !om.string
-  %val = om.tuple_get %tuple[1]  : tuple<i1, !om.string>
-  om.class.fields %tuple, %val : tuple<i1, !om.string>, !om.string
-}
-
 om.class @FrozenPath(%basepath: !om.frozenbasepath) -> (path: !om.frozenpath, path_empty: !om.frozenpath, basepath: !om.frozenbasepath){
   %0 = om.frozenbasepath_create %basepath "Foo/bar"
   %1 = om.frozenpath_create reference %basepath "Foo/bar:Bar>w.a"

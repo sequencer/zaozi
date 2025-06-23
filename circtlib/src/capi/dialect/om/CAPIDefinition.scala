@@ -36,14 +36,11 @@ end DialectApi
   * omFrozenPathTypeGetTypeID
   * omListTypeGetElementType
   * omListTypeGetTypeID
-  * omMapTypeGetKeyType
   * omTypeIsAAnyType
   * omTypeIsAClassType
   * omTypeIsAFrozenBasePathType
   * omTypeIsAFrozenPathType
   * omTypeIsAListType
-  * omTypeIsAMapType
-  * omTypeIsAStringType
   * }}}
   */
 trait TypeApi:
@@ -71,16 +68,11 @@ trait TypeApi:
     using arena: Arena
   ): TypeID
   extension (tpe: Type)
-    inline def mapTypeGetKeyType(
-      using arena: Arena
-    ): Type
-  extension (tpe: Type)
     inline def isAnyType:            Boolean
     inline def isClassType:          Boolean
     inline def isFrozenBasePathType: Boolean
     inline def isFrozenPathType:     Boolean
     inline def isListType:           Boolean
-    inline def isMapType:            Boolean
     inline def isStringType:         Boolean
 end TypeApi
 
@@ -105,13 +97,6 @@ end TypeApi
   * omEvaluatorValueIsAList
   * omEvaluatorListGetNumElements
   * omEvaluatorListGetElement
-  * omEvaluatorValueIsATuple
-  * omEvaluatorTupleGetNumElements
-  * omEvaluatorTupleGetElement
-  * omEvaluatorMapGetElement
-  * omEvaluatorMapGetKeys
-  * omEvaluatorValueIsAMap
-  * omEvaluatorMapGetType
   * omEvaluatorValueIsABasePath
   * omEvaluatorBasePathGetEmpty
   * omEvaluatorValueIsAPath
@@ -145,17 +130,6 @@ trait EvaluatorApi:
       using arena: Arena
     ):                             OMEvaluatorValue
     inline def listGetNumElements: Int
-    inline def mapGetElement(
-      map:         Attribute
-    )(
-      using arena: Arena
-    ):                             OMEvaluatorValue
-    inline def mapGetKeys(
-      using arena: Arena
-    ):                             Attribute
-    inline def mapGetType(
-      using arena: Arena
-    ):                             Type
   inline def evaluatorNew(
     module:      Module
   )(
@@ -180,13 +154,7 @@ trait EvaluatorApi:
   extension (evaluatorValue: OMEvaluatorValue)
     inline def pathGetAsString(
       using arena: Arena
-    ):                              Attribute
-    inline def tupleGetElement(
-      pos:         Int
-    )(
-      using arena: Arena
-    ):                              OMEvaluatorValue
-    inline def tupleGetNumElements: Int
+    ): Attribute
   inline def fromPrimitive(
     primitive:   Attribute
   )(
@@ -212,29 +180,22 @@ trait EvaluatorApi:
     ):                      OMEvaluatorValue
     inline def isBasePath:  Boolean
     inline def isList:      Boolean
-    inline def isMap:       Boolean
     inline def isObject:    Boolean
     inline def isPath:      Boolean
     inline def isPrimitive: Boolean
     inline def isReference: Boolean
-    inline def isTuple:     Boolean
-    inline def isNull:      Boolean
 end EvaluatorApi
 
 /** OM Attribute API
   * {{{
   * omAttrIsAIntegerAttr
   * omAttrIsAListAttr
-  * omAttrIsAMapAttr
   * omAttrIsAReferenceAttr
   * omIntegerAttrGet
   * omIntegerAttrGetInt
   * omIntegerAttrToString
   * omListAttrGetElement
   * omListAttrGetNumElements
-  * omMapAttrGetElementKey
-  * omMapAttrGetElementValue
-  * omMapAttrGetNumElements
   * omReferenceAttrGetInnerRef
   * }}}
   */
@@ -242,7 +203,6 @@ trait AttributeApi:
   extension (attr: Attribute)
     inline def isIntegerAttr:          Boolean
     inline def isListAttr:             Boolean
-    inline def isMapAttr:              Boolean
     inline def isReferenceAttr:        Boolean
     inline def integerAttrGet(
       using arena: Arena
@@ -259,17 +219,6 @@ trait AttributeApi:
       using arena: Arena
     ):                                 Attribute
     inline def listAttrGetNumElements: Int
-    inline def mapAttrGetElementKey(
-      pos:         Int
-    )(
-      using arena: Arena
-    ):                                 Identifier
-    inline def mapAttrGetElementValue(
-      pos:         Int
-    )(
-      using arena: Arena
-    ):                                 Attribute
-    inline def mapAttrGetNumElements:  Int
     inline def referenceAttrGetInnerRef(
       using arena: Arena
     ):                                 Attribute

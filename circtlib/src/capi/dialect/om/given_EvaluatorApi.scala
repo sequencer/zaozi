@@ -8,9 +8,6 @@ import org.llvm.circt.CAPI.{
   omEvaluatorInstantiate,
   omEvaluatorListGetElement,
   omEvaluatorListGetNumElements,
-  omEvaluatorMapGetElement,
-  omEvaluatorMapGetKeys,
-  omEvaluatorMapGetType,
   omEvaluatorNew,
   omEvaluatorObjectGetField,
   omEvaluatorObjectGetFieldNames,
@@ -19,8 +16,6 @@ import org.llvm.circt.CAPI.{
   omEvaluatorObjectIsEq,
   omEvaluatorObjectIsNull,
   omEvaluatorPathGetAsString,
-  omEvaluatorTupleGetElement,
-  omEvaluatorTupleGetNumElements,
   omEvaluatorValueFromPrimitive,
   omEvaluatorValueGetContext,
   omEvaluatorValueGetLoc,
@@ -28,12 +23,10 @@ import org.llvm.circt.CAPI.{
   omEvaluatorValueGetReferenceValue,
   omEvaluatorValueIsABasePath,
   omEvaluatorValueIsAList,
-  omEvaluatorValueIsAMap,
   omEvaluatorValueIsAObject,
   omEvaluatorValueIsAPath,
   omEvaluatorValueIsAPrimitive,
   omEvaluatorValueIsAReference,
-  omEvaluatorValueIsATuple,
   omEvaluatorValueIsNull
 }
 import org.llvm.mlir.scalalib.capi.support.{*, given}
@@ -75,17 +68,6 @@ given EvaluatorApi with
       using arena: Arena
     ): OMEvaluatorValue = OMEvaluatorValue(omEvaluatorListGetElement(arena, evaluatorValue.segment, pos))
     inline def listGetNumElements: Int = omEvaluatorListGetNumElements(evaluatorValue.segment).toInt
-    inline def mapGetElement(
-      map:         Attribute
-    )(
-      using arena: Arena
-    ): OMEvaluatorValue = OMEvaluatorValue(omEvaluatorMapGetElement(arena, evaluatorValue.segment, map.segment))
-    inline def mapGetKeys(
-      using arena: Arena
-    ): Attribute = new Attribute(omEvaluatorMapGetKeys(arena, evaluatorValue.segment))
-    inline def mapGetType(
-      using arena: Arena
-    ): Type = new Type(omEvaluatorMapGetType(arena, evaluatorValue.segment))
   inline def evaluatorNew(
     module:      Module
   )(
@@ -119,12 +101,6 @@ given EvaluatorApi with
     inline def pathGetAsString(
       using arena: Arena
     ): Attribute = new Attribute(omEvaluatorPathGetAsString(arena, evaluatorValue.segment))
-    inline def tupleGetElement(
-      pos:         Int
-    )(
-      using arena: Arena
-    ): OMEvaluatorValue = OMEvaluatorValue(omEvaluatorTupleGetElement(arena, evaluatorValue.segment, pos))
-    inline def tupleGetNumElements: Int = omEvaluatorTupleGetNumElements(evaluatorValue.segment).toInt
   inline def fromPrimitive(
     primitive:   Attribute
   )(
@@ -150,11 +126,9 @@ given EvaluatorApi with
     ): OMEvaluatorValue = OMEvaluatorValue(omEvaluatorValueGetReferenceValue(arena, evaluatorValue.segment))
     inline def isBasePath:  Boolean = omEvaluatorValueIsABasePath(evaluatorValue.segment)
     inline def isList:      Boolean = omEvaluatorValueIsAList(evaluatorValue.segment)
-    inline def isMap:       Boolean = omEvaluatorValueIsAMap(evaluatorValue.segment)
     inline def isObject:    Boolean = omEvaluatorValueIsAObject(evaluatorValue.segment)
     inline def isPath:      Boolean = omEvaluatorValueIsAPath(evaluatorValue.segment)
     inline def isPrimitive: Boolean = omEvaluatorValueIsAPrimitive(evaluatorValue.segment)
     inline def isReference: Boolean = omEvaluatorValueIsAReference(evaluatorValue.segment)
-    inline def isTuple:     Boolean = omEvaluatorValueIsATuple(evaluatorValue.segment)
     inline def isNull:      Boolean = omEvaluatorValueIsNull(evaluatorValue.segment)
 end given
