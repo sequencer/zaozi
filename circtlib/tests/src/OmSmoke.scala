@@ -110,18 +110,12 @@ object OmSmoke extends TestSuite:
           val listI64   = listClass.objectGetField("list_i64")
           val listI32   = listClass.objectGetField("list_i32")
 
-          listI64.isList ==> false
-          listI32.isList ==> false
-
-          val listI64Attr = listI64.getPrimitive
-          val listI32Attr = listI32.getPrimitive
-
-          listI64Attr.isListAttr ==> true
-          listI32Attr.isListAttr ==> true
-          listI64Attr.listAttrGetElement(0).integerAttrGetValueInt ==> 42
-          listI32Attr.listAttrGetNumElements ==> 0
-
-          listI64Attr.getType.isListType ==> true
+          // NOTE: this hehavior changes from https://github.com/llvm/circt/pull/8556
+          // before firtool 1.122.0, list constants are mlir attrs rather than list evaluator values
+          listI64.isList ==> true
+          listI32.isList ==> true
+          listI64.getPrimitive.isListAttr ==> false
+          listI32.getPrimitive.isListAttr ==> false
 
         test("OM List"):
           val listCreateClass = evaluator.instantiate("ListCreate")

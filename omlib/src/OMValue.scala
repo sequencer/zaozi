@@ -99,6 +99,7 @@ extension (evaluatorValue: OMEvaluatorValue)
         case bool if bool.isBool             => OMBool(bool.boolAttrGetValue)
         case int if int.isInteger            => OMInt(int.integerAttrGetValueInt)
         case omInt if omInt.isIntegerAttr    => OMInt(omInt.integerAttrGetInt.integerAttrGetValueInt)
+        // since firtool 1.22.0 there should be no longer list attrs but we still support it for backward compatibility
         case listAttr if listAttr.isListAttr =>
           OMList(
             Array.tabulate(listAttr.listAttrGetNumElements)(i =>
