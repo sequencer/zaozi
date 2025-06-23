@@ -11,13 +11,11 @@ import org.llvm.circt.CAPI.{
   omFrozenPathTypeGetTypeID,
   omListTypeGetElementType,
   omListTypeGetTypeID,
-  omMapTypeGetKeyType,
   omTypeIsAAnyType,
   omTypeIsAClassType,
   omTypeIsAFrozenBasePathType,
   omTypeIsAFrozenPathType,
   omTypeIsAListType,
-  omTypeIsAMapType,
   omTypeIsAStringType
 }
 
@@ -51,15 +49,10 @@ given TypeApi with
     using arena: Arena
   ): TypeID = TypeID(omListTypeGetTypeID(arena))
   extension (tpe: Type)
-    inline def mapTypeGetKeyType(
-      using arena: Arena
-    ): Type = Type(omMapTypeGetKeyType(arena, tpe.segment))
-  extension (tpe: Type)
     inline def isAnyType:            Boolean = omTypeIsAAnyType(tpe.segment)
     inline def isClassType:          Boolean = omTypeIsAClassType(tpe.segment)
     inline def isFrozenBasePathType: Boolean = omTypeIsAFrozenBasePathType(tpe.segment)
     inline def isFrozenPathType:     Boolean = omTypeIsAFrozenPathType(tpe.segment)
     inline def isListType:           Boolean = omTypeIsAListType(tpe.segment)
-    inline def isMapType:            Boolean = omTypeIsAMapType(tpe.segment)
     inline def isStringType:         Boolean = omTypeIsAStringType(tpe.segment)
 end given
