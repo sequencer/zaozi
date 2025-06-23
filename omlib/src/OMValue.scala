@@ -44,27 +44,15 @@ sealed trait OMValue:
     case _             => None
   def path    = pathOpt.get
 
-  def tupleOpt = this match
-    case OMTuple(value) => Some(value)
-    case _              => None
-  def tuple    = tupleOpt.get
-
   def listOpt = this match
     case OMList(value) => Some(value)
     case _             => None
   def list    = listOpt.get
 
-  def mapOpt = this match
-    case OMMap(value) => Some(value)
-    case _            => None
-  def map    = mapOpt.get
-
   def flatten: Seq[OMValue] = Seq(this) ++ (this match
-    case OMObj(value)   => value.flatMap((_, child) => child.flatten).toSeq
-    case OMMap(value)   => value.flatMap((_, child) => child.flatten).toSeq
-    case OMList(value)  => value.flatMap(_.flatten).toSeq
-    case OMTuple(value) => value._1.flatten ++ value._2.flatten
-    case _              => Seq()
+    case OMObj(value)  => value.flatMap((_, child) => child.flatten).toSeq
+    case OMList(value) => value.flatMap(_.flatten).toSeq
+    case _             => Seq()
   )
 
   // Due to https://github.com/com-lihaoyi/upickle/issues/394, we convert OMValue to ujson.Value for serialization
@@ -74,8 +62,6 @@ sealed trait OMValue:
     case OMInt(value)    => ujson.Num(value)
     case OMBool(value)   => ujson.Bool(value)
     case OMList(value)   => ujson.Arr.from(value.map(_.toUjson))
-    case OMMap(value)    => ujson.Obj.from(value.mapValues(_.toUjson))
-    case OMTuple(value)  => ujson.Obj(("_1", value._1.toUjson), ("_2", value._2.toUjson))
     case OMRef(value)    => ujson.Obj(("module", value._1), ("name", value._2))
     case OMPath(value)   => ujson.Str(value)
 
@@ -88,8 +74,6 @@ case class OMString(value: String)                      extends OMValue
 case class OMInt(value: Long)                           extends OMValue
 case class OMBool(value: Boolean)                       extends OMValue
 case class OMList(value: Array[OMValue])                extends OMValue
-case class OMMap(value: LinkedHashMap[String, OMValue]) extends OMValue
-case class OMTuple(value: Tuple2[OMValue, OMValue])     extends OMValue
 case class OMRef(value: Tuple2[String, String])         extends OMValue
 case class OMPath(value: String)                        extends OMValue
 
@@ -121,14 +105,6 @@ extension (evaluatorValue: OMEvaluatorValue)
               listAttr.listAttrGetElement(i).toEvaluatorValue.toScala
             )
           )
-        case mapAttr if mapAttr.isMapAttr    =>
-          OMMap(
-            LinkedHashMap.from(
-              Seq.tabulate(mapAttr.mapAttrGetNumElements)(i =>
-                (mapAttr.mapAttrGetElementKey(i).str, mapAttr.mapAttrGetElementValue(i).toEvaluatorValue.toScala)
-              )
-            )
-          )
         case ref if ref.isReferenceAttr      =>
           val innerRef = ref.referenceAttrGetInnerRef
           OMRef((innerRef.innerRefAttrGetModule.stringAttrGetValue, innerRef.innerRefAttrGetName.stringAttrGetValue))
@@ -138,18 +114,6 @@ extension (evaluatorValue: OMEvaluatorValue)
       OMList(
         Array.tabulate(list.listGetNumElements)(i => list.listGetElement(i).toScala)
       )
-    case map if map.isMap                   =>
-      val keys = map.mapGetKeys
-      OMMap(
-        LinkedHashMap.from(
-          Seq.tabulate(keys.arrayAttrGetNumElements)(i =>
-            val key = keys.arrayAttrGetElement(i)
-            (key.stringAttrGetValue, map.mapGetElement(key).toScala)
-          )
-        )
-      )
-    case tuple if tuple.isTuple             =>
-      OMTuple((tuple.tupleGetElement(0).toScala, tuple.tupleGetElement(1).toScala))
     case path if path.isPath                => OMPath(path.pathGetAsString.stringAttrGetValue)
     case basepath if basepath.isBasePath    => throw new Exception(s"not support BasePath")
     case _                                  => throw new Exception(s"Unsupport ObjectModel Evaluator Type")
