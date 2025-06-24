@@ -9,6 +9,7 @@ import org.llvm.mlir.scalalib.capi.ir.{Block, Context, Location, LocationApi, Op
 
 import java.lang.foreign.Arena
 
+// todo: remove recipe api, use new Recipe directly
 def recipe(
   name:  String,
   sets:  Recipe ?=> Ref[Bool]*
