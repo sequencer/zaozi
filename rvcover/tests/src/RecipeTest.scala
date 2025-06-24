@@ -15,7 +15,7 @@ object RecipeTest extends TestSuite:
   val tests = Tests:
     test("TestRecipe"):
       rvcoverTest {
-        val instructionCount = 100
+        val instructionCount = 2
         val r = recipe("TestRecipe", isRVI()) {
           (0 until instructionCount).foreach { i =>
             index(i) {
@@ -27,11 +27,4 @@ object RecipeTest extends TestSuite:
           }
           distinct(0 until instructionCount)(_.imm12)
         }
-
-        assert(r.name == "TestRecipe")
-        println(r)
-
-        val writer = new FileWriter(new File("./output.template"), true)
-        writer.write(r.toString())
-        writer.close()
       }

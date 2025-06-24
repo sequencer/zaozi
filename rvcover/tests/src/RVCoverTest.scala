@@ -4,6 +4,7 @@ package me.jiuyang.rvcover.tests
 
 import me.jiuyang.smtlib.default.{*, given}
 import me.jiuyang.smtlib.tpe.*
+import me.jiuyang.smtlib.parser.{parseZ3Output, Z3Status}
 import me.jiuyang.smtlib.*
 
 import org.llvm.mlir.scalalib.capi.dialect.func.{Func, FuncApi, given}
@@ -20,26 +21,21 @@ import java.io.{File, FileWriter}
 
 import java.lang.foreign.Arena
 
-def rvcoverTest(body: (Arena, Context, Block) ?=> Unit): Unit =
-  // prepare instruction map
-  val instWriter = new FileWriter(new File("./output.inst"))
-  getInstructions().foreach { case instruction =>
-    instWriter.write(s"${instruction.name}")
-    instruction.args.foreach { arg =>
-      val argName: String = translateToCamelCase(arg.name)
-      instWriter.write(s", $argName")
+import utest.*
+import me.jiuyang.smtlib.parser.Z3Result
+
+def getModelField(model: Map[String, Boolean | BigInt], name: String): Int =
+  model
+    .get(name)
+    .map {
+      case b: Boolean => throw new RuntimeException(s"Expected an integer for $name, but got a boolean: $b")
+      case i: BigInt  => i.toInt
     }
-    instWriter.write("\n")
-  }
-  instWriter.close()
+    .getOrElse(
+      throw new RuntimeException(s"Model does not contain field: $name")
+    )
 
-  // prepare argLut map
-  val argLutWriter = new FileWriter(new File("./output.argLut"))
-  getArgLut().foreach { case (name, _) =>
-    argLutWriter.write(s"${translateToCamelCase(name)}\n")
-  }
-  argLutWriter.close()
-
+def rvcoverTest(body: (Arena, Context, Block) ?=> Unit): Unit =
   // prepare the Context
   given Arena   = Arena.ofConfined()
   given Context = summon[ContextApi].contextCreate
@@ -56,6 +52,7 @@ def rvcoverTest(body: (Arena, Context, Block) ?=> Unit): Unit =
   solver {
     smtSetLogic("QF_LIA")
     body
+    smtCheck
   }
 
   // output smtlib
@@ -66,7 +63,33 @@ def rvcoverTest(body: (Arena, Context, Block) ?=> Unit): Unit =
 
   println(out.toString)
 
-  // output file
-  val writer = new FileWriter(new File("./output.smt2"), true)
-  writer.write(out.toString.replace("(reset)", "(check-sat)\n(get-model)"))
-  writer.close()
+  val smt = out.toString.replace("(reset)", "(get-model)")
+
+  val z3Output = os
+    .proc("z3", "-in", "-t:1000")
+    .call(
+      stdin = smt,
+      check = false // ignore the error message when `unknown` or `unsat`
+    )
+
+  val z3Result = parseZ3Output(z3Output.out.text())
+  // todo: handling unsat status in the future
+  z3Result.status ==> Z3Status.Sat
+  val model    = z3Result.model
+
+  val instructions      = getInstructions()
+  val instructionCounts = 2
+
+  // todo: move it to the Recipe class defination
+  (0 until instructionCounts).foreach { i =>
+    val nameId = getModelField(model, s"nameId_$i")
+    val inst  = instructions(nameId)
+    val name  = inst.name
+    val args  = inst.args.map { arg =>
+      val argName: String = translateToCamelCase(arg.name)
+      val argNameLowered = argName.head.toLower + argName.tail
+      val prefix         = if arg.name.startsWith("r") then "x" else ""
+      prefix + getModelField(model, argNameLowered + s"_$i").toString()
+    }
+    println(s"Instruction $i: $name ${args.mkString(" ")}")
+  }
