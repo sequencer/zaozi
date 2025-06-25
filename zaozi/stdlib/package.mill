@@ -1,0 +1,50 @@
+// SPDX-License-Identifier: Apache-2.0
+// SPDX-FileCopyrightText: 2025 Jiuyang Liu <liu@jiuyang.me>
+package build.zaozi.stdlib
+
+import mill._
+import mill.scalalib.TestModule.Utest
+import mill.scalalib._
+import mill.scalalib.scalafmt._
+import os.Path
+
+import build.{v, circtlib, zaozi, decoder, LitModule}
+
+object `package` extends RootModule with ScalaModule with ScalafmtModule { m =>
+  def scalaVersion = Task(v.scala)
+  def moduleDeps   = Seq(zaozi, decoder)
+
+  override def scalacOptions: T[Seq[String]] = T(super.scalacOptions() ++ Seq("-experimental"))
+
+  override def forkArgs: T[Seq[String]] = Task(
+    super.forkArgs() ++ circtlib.forkArgs()
+  )
+  
+  object lit extends ScalaModule with ScalafmtModule {
+    def scalaVersion = Task(v.scala)
+    def moduleDeps   = Seq(m)
+    override def forkArgs: T[Seq[String]] = Task(
+      super.forkArgs() ++ circtlib.forkArgs()
+    )
+    object tests extends LitModule {
+      def scalaVersion:    T[String]       = Task(m.scalaVersion())
+      def runClasspath:    T[Seq[os.Path]] = Task(lit.runClasspath().map(_.path))
+      def javaLibraryPath: T[Seq[os.Path]] = Task(
+        (circtlib.libraryPaths()).map(_.path)
+      )
+      def javaHome:        T[os.Path]      = Task(os.Path(sys.props("java.home")))
+      def litDir:          T[os.Path]      = Task(millSourcePath)
+      def litConfigIn:     T[PathRef]      = Task.Source(millSourcePath / "lit.site.cfg.py.in")
+    }
+  }
+
+  object tests extends ScalaTests with ScalafmtModule with Utest {
+    override def scalacOptions: Target[Seq[String]] = Task(super.scalacOptions().filterNot(_ == "-Xcheck-macros"))
+
+    def ivyDeps = Agg(v.utest)
+
+    override def forkArgs: T[Seq[String]] = Task(
+      super.forkArgs() ++ circtlib.forkArgs()
+    )
+  }
+}
