@@ -27,5 +27,7 @@ in
 
   riscv-opcodes = final.callPackage ./pkgs/riscv-opcodes.nix { };
 
+  espresso = final.callPackage ./pkgs/espresso.nix { };
+
   zaozi = final.callPackage ./zaozi { };
 }

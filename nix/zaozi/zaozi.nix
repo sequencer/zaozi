@@ -14,6 +14,7 @@
 , add-determinism
 , mill-ivy-env-shell-hook
 , z3
+, espresso
 }:
 
 let
@@ -50,6 +51,7 @@ let
       add-determinism
       makeWrapper
       z3
+      espresso
     ];
 
     shellHook = ''
