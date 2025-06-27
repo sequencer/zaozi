@@ -329,6 +329,48 @@ trait AsUInt[D <: Data, R <: Referable[D]]:
       InstanceContext
     ): Node[UInt]
 
+trait AsBundle[D <: Data, R <: Referable[D]]:
+  extension (ref: R)
+    def asBundle[T <: Bundle](
+      tpe: T
+    )(
+      using Arena,
+      Context,
+      Block,
+      sourcecode.File,
+      sourcecode.Line,
+      sourcecode.Name.Machine,
+      InstanceContext
+    ): Node[T]
+
+trait AsRecord[D <: Data, R <: Referable[D]]:
+  extension (ref: R)
+    def asRecord[T <: Record](
+      tpe: T
+    )(
+      using Arena,
+      Context,
+      Block,
+      sourcecode.File,
+      sourcecode.Line,
+      sourcecode.Name.Machine,
+      InstanceContext
+    ): Node[T]
+
+trait AsVec[D <: Data, R <: Referable[D]]:
+  extension (ref: R)
+    def asVec[E <: Data](
+      tpe: E
+    )(
+      using Arena,
+      Context,
+      Block,
+      sourcecode.File,
+      sourcecode.Line,
+      sourcecode.Name.Machine,
+      InstanceContext
+    ): Node[Vec[E]]
+
 trait ProbeDefine[D <: Data & CanProbe, P <: RWProbe[D] | RProbe[D], SRC <: Referable[D], SINK <: Referable[P]]:
   extension (ref: SINK)
     def <==(
@@ -736,6 +778,9 @@ trait BitsApi[R <: Referable[Bits]]
     extends AsSInt[Bits, R]
     with AsUInt[Bits, R]
     with AsBool[Bits, R]
+    with AsBundle[Bits, R]
+    with AsRecord[Bits, R]
+    with AsVec[Bits, R]
     with Not[Bits, Bits, R]
     with AndR[Bits, Bool, R]
     with OrR[Bits, Bool, R]
@@ -793,11 +838,13 @@ trait SIntApi[R <: Referable[SInt]]
     with Shl[SInt, Int | Referable[UInt], SInt, R]
     with Shr[SInt, Int | Referable[UInt], SInt, R]
 
-trait BundleApi[T <: Bundle, R <: Referable[T]]
+trait BundleApi[T <: Bundle | ProbeBundle, R <: Referable[T]] extends AsBits[T, R]
 
-trait RecordApi[T <: Record | ProbeRecord, R <: Referable[T]]
+trait RecordApi[T <: Record | ProbeRecord, R <: Referable[T]] extends AsBits[T, R]
 
-trait VecApi[E <: Data, V <: Vec[E], R <: Referable[V]] extends ExtractElement[V, E, R, Referable[UInt] | Int]
+trait VecApi[E <: Data, V <: Vec[E], R <: Referable[V]]
+    extends AsBits[V, R]
+    with ExtractElement[V, E, R, Referable[UInt] | Int]
 
 trait ClockApi[R <: Referable[Clock]]
 

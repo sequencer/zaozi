@@ -5,7 +5,7 @@ package me.jiuyang.zaozitest
 import me.jiuyang.zaozi.*
 import me.jiuyang.zaozi.default.{*, given}
 import me.jiuyang.zaozi.reftpe.*
-
+import me.jiuyang.zaozi.valuetpe.*
 import org.llvm.mlir.scalalib.capi.ir.{given_ContextApi, Context, ContextApi}
 
 import java.lang.foreign.Arena
@@ -34,6 +34,10 @@ class BitsSpecIO(
   val asyncReset = Flipped(AsyncReset())
 
 class BitsSpecProbe(parameter: BitsSpecParameter) extends DVBundle[BitsSpecParameter, BitsSpecLayers](parameter)
+
+class SimpleBundleC extends Bundle:
+  val x = Aligned(Bits(4.W))
+  val y = Aligned(Bits(4.W))
 
 object BitsSpec extends TestSuite:
   val tests = Tests:
@@ -463,6 +467,75 @@ object BitsSpec extends TestSuite:
           io.bool := io.a(idx = 4)
       NamedExtractElementApply.verilogTest(BitsSpecParameter(8))(
         "assign bool = a[4];"
+      )
+    test("AsBundle"):
+      @generator
+      object AsBundle
+          extends Generator[BitsSpecParameter, BitsSpecLayers, BitsSpecIO, BitsSpecProbe]
+          with HasVerilogTest:
+        def architecture(parameter: BitsSpecParameter) =
+          val io         = summon[Interface[BitsSpecIO]]
+          io.sint.dontCare()
+          io.uint.dontCare()
+          io.bool.dontCare()
+          io.bits.dontCare()
+          io.widenBits.dontCare()
+          val bundleNode = io.a.asBundle(new SimpleBundleC)
+          io.bits := (bundleNode.y ## bundleNode.x)
+      AsBundle.verilogTest(BitsSpecParameter(8))("assign bits = {a[3:0], a[7:4]};")
+
+    test("AsRecord"):
+      @generator
+      object AsRecord
+          extends Generator[BitsSpecParameter, BitsSpecLayers, BitsSpecIO, BitsSpecProbe]
+          with HasVerilogTest:
+        def architecture(parameter: BitsSpecParameter) =
+          val io = summon[Interface[BitsSpecIO]]
+          io.sint.dontCare()
+          io.uint.dontCare()
+          io.bool.dontCare()
+          io.bits.dontCare()
+          io.widenBits.dontCare()
+
+          // Define a simple record to cast to
+          class SimpleRecord extends Record:
+            val field1 = Aligned("first", Bits(4.W))
+            val field2 = Aligned("second", Bits(4.W))
+
+          // Cast an 8-bit value to the record
+          val simpleRecordType = new SimpleRecord()
+          val recordNode       = io.a.asRecord(simpleRecordType)
+
+          // Use the record fields
+          io.bits := recordNode.field[Bits]("first") ## recordNode.field[Bits]("second")
+      AsRecord.verilogTest(BitsSpecParameter(8))(
+        "assign bits = a;"
+      )
+
+    test("AsVec"):
+      @generator
+      object AsVec extends Generator[BitsSpecParameter, BitsSpecLayers, BitsSpecIO, BitsSpecProbe] with HasVerilogTest:
+        def architecture(parameter: BitsSpecParameter) =
+          val io = summon[Interface[BitsSpecIO]]
+          io.sint.dontCare()
+          io.uint.dontCare()
+          io.bool.dontCare()
+          io.bits.dontCare()
+          io.widenBits.dontCare()
+
+          class SimpleRecord extends Record:
+            val field1 = Aligned("first", Bits(2.W))
+            val field2 = Aligned("second", Bits(2.W))
+
+          val simpleRecordType = new SimpleRecord()
+          val recordNode       = io.a.asVec(simpleRecordType)
+
+          // Use the record fields
+          io.bits :=
+            recordNode(0).field[Bits]("second") ## recordNode(0).field[Bits]("first") ##
+              recordNode(1).field[Bits]("first") ## recordNode(1).field[Bits]("second")
+      AsVec.verilogTest(BitsSpecParameter(8))(
+        "assign bits = {a[1:0], a[3:2], a[7:4]};"
       )
 
     test("Apply with wrong data type"):

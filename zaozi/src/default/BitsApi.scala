@@ -6,8 +6,11 @@ import me.jiuyang.zaozi.BitsApi
 import me.jiuyang.zaozi.InstanceContext
 import me.jiuyang.zaozi.reftpe.*
 import me.jiuyang.zaozi.valuetpe.*
-
 import org.llvm.circt.scalalib.capi.dialect.firrtl.{given_FirrtlBundleFieldApi, given_TypeApi, FirrtlNameKind}
+import org.llvm.circt.scalalib.dialect.firrtl.operation.BitCast
+import org.llvm.circt.scalalib.dialect.firrtl.operation.{given_BitCastApi, BitCastApi}
+import org.llvm.circt.scalalib.dialect.firrtl.operation.ConnectApi
+import org.llvm.circt.scalalib.dialect.firrtl.operation.WireApi
 import org.llvm.circt.scalalib.dialect.firrtl.operation.{
   AndPrimApi,
   AndRPrimApi,
@@ -94,7 +97,7 @@ given [R <: Referable[Bits]]: BitsApi[R] with
         nameKind = FirrtlNameKind.Interesting,
         input = ref.refer
       )
-      val width = nodeOp.operation.getResult(0).getType.getBitWidth(true).toInt
+      val width  = nodeOp.operation.getResult(0).getType.getBitWidth(true).toInt
       require(
         width == 1,
         s"Cannot convert ${summon[sourcecode.Name.Machine]}: Bits(${width}) to Bool"
@@ -103,6 +106,74 @@ given [R <: Referable[Bits]]: BitsApi[R] with
       new Node[Bool]:
         val _tpe:       Bool      = new Object with Bool
         val _operation: Operation = nodeOp.operation
+    def asBundle[T <: Bundle](
+      tpe: T
+    )(
+      using Arena,
+      Context,
+      Block,
+      sourcecode.File,
+      sourcecode.Line,
+      sourcecode.Name.Machine,
+      InstanceContext
+    ): Node[T] =
+      val bitcastOp = summon[BitCastApi].op(
+        input = ref.refer,
+        tpe = tpe.toMlirType,
+        location = locate
+      )
+      bitcastOp.operation.appendToBlock()
+      new Node[T]:
+        val _tpe:       T         = tpe
+        val _operation: Operation = bitcastOp.operation
+    def asRecord[T <: Record](
+      tpe: T
+    )(
+      using Arena,
+      Context,
+      Block,
+      sourcecode.File,
+      sourcecode.Line,
+      sourcecode.Name.Machine,
+      InstanceContext
+    ): Node[T] =
+      val bitcastOp = summon[BitCastApi].op(
+        input = ref.refer,
+        tpe = tpe.toMlirType,
+        location = locate
+      )
+      bitcastOp.operation.appendToBlock()
+      new Node[T]:
+        val _tpe:       T         = tpe
+        val _operation: Operation = bitcastOp.operation
+    def asVec[E <: Data](
+      tpe: E
+    )(
+      using Arena,
+      Context,
+      Block,
+      sourcecode.File,
+      sourcecode.Line,
+      sourcecode.Name.Machine,
+      InstanceContext
+    ): Node[Vec[E]] =
+      val srcWidth = ref.refer.getType.getBitWidth(true).toInt
+      val dstWidth = tpe.toMlirType.getBitWidth(true).toInt
+      require(
+        srcWidth % dstWidth == 0,
+        s"type cast to Vec[$tpe] failed: width $srcWidth cannot divide $dstWidth"
+      )
+      val count     = srcWidth / dstWidth
+      val vecTpe    = Vec[E](count, tpe)
+      val bitcastOp = summon[BitCastApi].op(
+        input = ref.refer,
+        tpe = vecTpe.toMlirType,
+        location = locate
+      )
+      bitcastOp.operation.appendToBlock()
+      new Node[Vec[E]]:
+        val _tpe:       Vec[E]    = Vec[E](count, tpe)
+        val _operation: Operation = bitcastOp.operation
     def unary_~(
       using Arena,
       Context,

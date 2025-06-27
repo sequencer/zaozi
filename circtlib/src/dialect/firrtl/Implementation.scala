@@ -898,6 +898,31 @@ given BitsPrimApi with
 
 end given
 
+given BitCastApi with
+  def op(
+    input:       Value,
+    tpe:         Type,
+    location:    Location
+  )(
+    using arena: Arena,
+    context:     Context
+  ): BitCast =
+    BitCast(
+      summon[OperationApi].operationCreate(
+        name = "firrtl.bitcast",
+        location = location,
+        operands = Seq(input),
+        resultsTypes = Some(Seq(tpe))
+      )
+    )
+  extension (ref: BitCast)
+    def operation: Operation = ref._operation
+    def result(
+      using Arena
+    ): Value = operation.getResult(0)
+
+end given
+
 given CatPrimApi with
   def op(
     lhs:         Value,

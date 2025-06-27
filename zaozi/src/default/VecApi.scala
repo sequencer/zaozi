@@ -15,6 +15,26 @@ import java.lang.foreign.Arena
 
 given [E <: Data, V <: Vec[E], R <: Referable[V]]: VecApi[E, V, R] with
   extension (ref: R)
+    def asBits(
+      using Arena,
+      Context,
+      Block,
+      sourcecode.File,
+      sourcecode.Line,
+      sourcecode.Name.Machine,
+      InstanceContext
+    ): Node[Bits] =
+      val nodeOp = summon[NodeApi].op(
+        name = valName,
+        location = locate,
+        nameKind = FirrtlNameKind.Interesting,
+        input = ref.refer
+      )
+      nodeOp.operation.appendToBlock()
+      new Node[Bits]:
+        val _tpe:       Bits      = new Bits:
+          private[zaozi] val _width = nodeOp.operation.getResult(0).getType.getBitWidth(true).toInt
+        val _operation: Operation = nodeOp.operation
     def bit(
       idx: Referable[UInt] | Int
     )(
