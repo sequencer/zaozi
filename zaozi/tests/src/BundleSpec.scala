@@ -95,6 +95,20 @@ object BundleSpec extends TestSuite:
       )
       OptionalField.firrtlTest(BundleSpecParameter(8))(out => !out.contains("connect io.k, io.b"))
 
+    test("asBits should work"):
+      @generator
+      object AsBitsShouldWork
+          extends Generator[BundleSpecParameter, BundleSpecLayers, BundleSpecIO, BundleSpecProbe]
+          with HasVerilogTest:
+        def architecture(parameter: BundleSpecParameter) =
+          val io = summon[Interface[BundleSpecIO]]
+          io.a := io.f.asBits(15, 0).asUInt
+          io.c.dontCare()
+          io.k.foreach(_.dontCare())
+      AsBitsShouldWork.verilogTest(BundleSpecParameter(16))(
+        "assign a = f_g[15:0];"
+      )
+
     test("Subaccess on non-Bundle type"):
       @generator
       object SubaccessOnNonBundleType

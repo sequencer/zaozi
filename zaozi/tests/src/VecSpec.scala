@@ -38,7 +38,19 @@ object VecSpec extends TestSuite:
       Assign.firrtlTest(VecSpecParameter(8, 4))(
         "connect io.b, io.a"
       )
-
+    test("AsBits"):
+      @generator
+      object Assign extends Generator[VecSpecParameter, VecSpecLayers, VecSpecIO, VecSpecProbe] with HasVerilogTest:
+        def architecture(parameter: VecSpecParameter) =
+          val io = summon[Interface[VecSpecIO]]
+          io.b := io.a.asBits.asVec(Bits(parameter.width.W))
+          io.out.dontCare()
+      Assign.verilogTest(VecSpecParameter(8, 4))(
+        "assign b_0 = a_0",
+        "assign b_1 = a_1",
+        "assign b_2 = a_2",
+        "assign b_3 = a_3"
+      )
     test("Dynamic index"):
       @generator
       object DynamicIndex

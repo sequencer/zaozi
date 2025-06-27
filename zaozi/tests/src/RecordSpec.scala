@@ -21,6 +21,10 @@ class SimpleRecord(width: Int) extends Record:
   val i = Flipped("a", UInt(width.W))
   val o = Aligned("b", UInt(width.W))
 
+class AlignedRecord(width: Int) extends Record:
+  val i = Aligned("a", UInt(width.W))
+  val o = Aligned("b", UInt(width.W))
+
 class NestedRecord(width: Int) extends Record:
   val inner = Aligned("inner", new SimpleRecord(width))
 
@@ -76,7 +80,24 @@ object RecordSpec extends TestSuite:
       NestedRecordTest.verilogTest(RecordSpecParameter(2, 32))(
         "assign b_inner_b = b_inner_a;"
       )
+    test("asBits should work"):
+      @generator
+      object AsBitsShouldWork
+          extends Generator[RecordSpecParameter, RecordSpecLayers, RecordAsIO, RecordSpecProbe]
+          with HasVerilogTest:
+        def architecture(parameter: RecordSpecParameter) =
+          val io = summon[Interface[RecordAsIO]]
 
+          io.field("output_0") := (io.field[UInt]("input_0").asBits ## io.field[UInt]("input_1").asBits)
+            .asRecord(new AlignedRecord(8))
+            .field[UInt]("b")
+          io.field("output_1") := (io.field[UInt]("input_0").asBits ## io.field[UInt]("input_1").asBits)
+            .asRecord(new AlignedRecord(8))
+            .field[UInt]("a")
+      AsBitsShouldWork.verilogTest(RecordSpecParameter(2, 8))(
+        "assign output_0 = input_1;",
+        "assign output_1 = input_0;"
+      )
     test("Fields cannot access by val name"):
       @generator
       object AccessValName
