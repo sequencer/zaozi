@@ -6,9 +6,6 @@ import me.jiuyang.smtlib.default.{*, given}
 import me.jiuyang.smtlib.tpe.*
 import me.jiuyang.rvcover.*
 
-import os.Path
-import java.io.{File, FileWriter}
-
 import utest.*
 
 object RecipeTest extends TestSuite:
