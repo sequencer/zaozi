@@ -181,3 +181,35 @@ trait PanamaModule extends JavaModule {
 
   def jextractBinary: Target[Path]
 }
+
+// Lit-based Test
+trait LitModule extends Module {
+  def scalaVersion:    T[String]
+  def runClasspath:    T[Seq[os.Path]]
+  def javaLibraryPath: T[Seq[os.Path]]
+  def javaHome:        T[os.Path]
+  def litDir:          T[os.Path]
+  def litConfigIn:     T[PathRef]
+  def litConfig:       T[PathRef] = T {
+    os.write(
+      Task.dest / "lit.site.cfg.py",
+      os.read(litConfigIn().path)
+        .replaceAll("@SCALA_VERSION@", scalaVersion())
+        .replaceAll("@RUN_CLASSPATH@", runClasspath().mkString(","))
+        .replaceAll("@JAVA_HOME@", javaHome().toString)
+        .replaceAll("@JAVA_LIBRARY_PATH@", javaLibraryPath().mkString(","))
+        .replaceAll("@LIT_DIR@", litDir().toString)
+    )
+    PathRef(Task.dest)
+  }
+  def litBinary          = Task(
+    os.Path(
+      Task.env.getOrElse("LIT_INSTALL_PATH", "LIT_INSTALL_PATH not found, you are not in the nix env?")
+    ) / "bin" / "lit"
+  )
+  def run(args: String*) = Task.Command(
+    // Due to a data race in https://github.com/VirtusLab/scala-cli/blob/8ab834ab3832ab680e72dcf85c685bf01516a97c/modules/build/src/main/scala/scala/build/LocalRepo.scala#L78, we disable parallelism to work around it for now
+    os.proc(litBinary().toString(), litConfig().path, "-a", "-j 1")
+      .call(Task.dest, stdout = os.ProcessOutput.Readlines(line => Task.ctx().log.info("[lit] " + line)))
+  )
+}
