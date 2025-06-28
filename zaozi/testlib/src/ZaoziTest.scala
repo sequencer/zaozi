@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2025 Jiuyang Liu <liu@jiuyang.me>
-package me.jiuyang.zaozitest
+package me.jiuyang.zaozi.testlib
 
 import me.jiuyang.zaozi.*
 import me.jiuyang.zaozi.default.{*, given}
@@ -144,6 +144,7 @@ trait HasVerilogTest:
     parameter:  this.TPARAM
   )(checkLines: String*
   ): Unit = verilogTest(parameter)(out => checkLines.forall(l => out.contains(l)))
+
 trait HasCompileErrorTest:
   this: Generator[?, ?, ?, ?] =>
   private val self = this.asInstanceOf[Generator[this.TPARAM, this.TLAYER, this.TINTF, this.TPROBE]]

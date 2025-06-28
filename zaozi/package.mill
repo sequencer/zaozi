@@ -11,6 +11,7 @@ import contrib.jmh.JmhModule
 import os.Path
 
 import build.{circtlib, v, ZaoziPublishModule, LitModule}
+import build.zaozi.testlib
 
 object `package` extends RootModule with ScalaModule with ScalafmtModule with ZaoziPublishModule { m =>
   def scalaVersion = Task(v.scala)
@@ -67,6 +68,7 @@ object `package` extends RootModule with ScalaModule with ScalafmtModule with Za
     override def scalacOptions: Target[Seq[String]] = Task(super.scalacOptions().filterNot(_ == "-Xcheck-macros"))
 
     def ivyDeps = Agg(v.utest)
+    def moduleDeps = Seq(testlib)
 
     override def forkArgs: T[Seq[String]] = Task(
       super.forkArgs() ++ circtlib.forkArgs()

@@ -6,6 +6,7 @@ import me.jiuyang.zaozi.*
 import me.jiuyang.zaozi.default.{*, given}
 import me.jiuyang.zaozi.reftpe.Interface
 import me.jiuyang.zaozi.valuetpe.*
+import me.jiuyang.zaozi.testlib.*
 import org.llvm.mlir.scalalib.capi.ir.{given_ContextApi, Context, ContextApi}
 import utest.*
 
