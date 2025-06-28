@@ -8,21 +8,16 @@ import me.jiuyang.smtlib.parser.{parseZ3Output, Z3Status}
 import me.jiuyang.smtlib.*
 
 import org.llvm.mlir.scalalib.capi.dialect.func.{Func, FuncApi, given}
-import org.llvm.mlir.scalalib.capi.dialect.smt.DialectApi as SmtDialect
-import org.llvm.mlir.scalalib.capi.dialect.smt.given_DialectApi
 import org.llvm.mlir.scalalib.capi.dialect.func.DialectApi as FuncDialect
 import org.llvm.mlir.scalalib.capi.dialect.func.given_DialectApi
+import org.llvm.mlir.scalalib.capi.dialect.smt.DialectApi as SmtDialect
+import org.llvm.mlir.scalalib.capi.dialect.smt.given_DialectApi
 import org.llvm.mlir.scalalib.capi.target.exportsmtlib.given_ExportSmtlibApi
 import org.llvm.mlir.scalalib.capi.ir.{Block, Context, ContextApi, LocationApi, Module, ModuleApi, Value, given}
-
-import org.chipsalliance.rvdecoderdb.{Encoding, Instruction, InstructionSet}
-import os.Path
-import java.io.{File, FileWriter}
 
 import java.lang.foreign.Arena
 
 import utest.*
-import me.jiuyang.smtlib.parser.Z3Result
 
 def getModelField(model: Map[String, Boolean | BigInt], name: String): Int =
   model
@@ -61,8 +56,6 @@ def rvcoverTest(body: (Arena, Context, Block) ?=> Unit): Unit =
   summon[Context].destroy()
   summon[Arena].close()
 
-  println(out.toString)
-
   val smt = out.toString.replace("(reset)", "(get-model)")
 
   val z3Output = os
@@ -81,15 +74,17 @@ def rvcoverTest(body: (Arena, Context, Block) ?=> Unit): Unit =
   val instructionCounts = 2
 
   // todo: move it to the Recipe class defination
+  // fix: output bits directly 
   (0 until instructionCounts).foreach { i =>
     val nameId = getModelField(model, s"nameId_$i")
-    val inst  = instructions(nameId)
-    val name  = inst.name
-    val args  = inst.args.map { arg =>
+    val inst   = instructions(nameId)
+    val name   = inst.name
+    val args   = inst.args.map { arg =>
       val argName: String = translateToCamelCase(arg.name)
       val argNameLowered = argName.head.toLower + argName.tail
       val prefix         = if arg.name.startsWith("r") then "x" else ""
       prefix + getModelField(model, argNameLowered + s"_$i").toString()
     }
     println(s"Instruction $i: $name ${args.mkString(" ")}")
+    println(s"Instruction $i: " + inst.toString)
   }
