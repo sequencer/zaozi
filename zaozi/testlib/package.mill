@@ -1,0 +1,23 @@
+// SPDX-License-Identifier: Apache-2.0
+// SPDX-FileCopyrightText: 2025 Jiuyang Liu <liu@jiuyang.me>
+package build.zaozi.testlib
+
+import mill._
+import mill.scalalib.TestModule.Utest
+import mill.scalalib._
+import mill.scalalib.scalafmt._
+import os.Path
+
+import build.{v, circtlib, zaozi}
+
+object `package` extends RootModule with ScalaModule with ScalafmtModule { m =>
+  def scalaVersion = Task(v.scala)
+  def moduleDeps   = Seq(zaozi)
+  def ivyDeps      = Agg(v.utest)
+
+  override def scalacOptions: T[Seq[String]] = T(super.scalacOptions() ++ Seq("-experimental"))
+
+  override def forkArgs: T[Seq[String]] = Task(
+    super.forkArgs() ++ circtlib.forkArgs()
+  )
+}
