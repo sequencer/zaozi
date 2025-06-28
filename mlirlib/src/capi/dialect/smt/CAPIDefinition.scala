@@ -77,7 +77,7 @@ trait AttributeApi:
     )(
       using arena: Arena,
       context:     Context
-    ): Attribute
+    ):                                                    Attribute
   extension (attr:  Attribute) inline def isSMTAttribute: Boolean
   extension (str:   String)
     inline def checkBVCmpPredicateAttribute(

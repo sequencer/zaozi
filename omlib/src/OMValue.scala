@@ -52,8 +52,7 @@ sealed trait OMValue:
   def flatten: Seq[OMValue] = Seq(this) ++ (this match
     case OMObj(value)  => value.flatMap((_, child) => child.flatten).toSeq
     case OMList(value) => value.flatMap(_.flatten).toSeq
-    case _             => Seq()
-  )
+    case _             => Seq())
 
   // Due to https://github.com/com-lihaoyi/upickle/issues/394, we convert OMValue to ujson.Value for serialization
   def toUjson: ujson.Value = this match

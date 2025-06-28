@@ -131,13 +131,13 @@ trait InstanceGraphApi:
   extension (operation:           Operation)
     inline def instanceGraphGet(
       using arena: Arena
-    ): HWInstanceGraph
+    ):     HWInstanceGraph
   extension (hwInstanceGraphNode: HWInstanceGraphNode)
     inline def equal(that: HWInstanceGraphNode): Boolean
     inline def getModule(
       using arena: Arena
-    ): Module
+    ):                                           Module
     inline def getModuleOp(
       using arena: Arena
-    ): Operation
+    ):                                           Operation
 end InstanceGraphApi

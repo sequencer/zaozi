@@ -42,9 +42,9 @@ case class Layer(name: String, children: Seq[Layer] = Seq.empty):
       def _name:     String         = name
       def _children: Seq[LayerTree] = children.map(_.toLayerTree)
     ._rebuild
-extension (layers: Seq[Layer]) def toLayerTrees: Seq[LayerTree] = layers.map(_.toLayerTree)
+extension (layers: Seq[Layer]) def toLayerTrees: Seq[LayerTree]   = layers.map(_.toLayerTree)
 extension (layers: Seq[LayerTree])
-  def nameHierarchy: Seq[Seq[String]] =
+  def nameHierarchy:                             Seq[Seq[String]] =
     layers.flatMap(_._dfs).filter(_._children.isEmpty).map(_._hierarchy.map(_._name))
 
 abstract class Parameter
@@ -52,8 +52,8 @@ abstract class LayerInterface[P <: Parameter](parameter: P) extends Seq[LayerTre
   def layers: Seq[Layer]
 
   final override def apply(idx: Int) = layers.toLayerTrees(idx)
-  final override def iterator = layers.toLayerTrees.iterator
-  final override def length   = layers.toLayerTrees.length
+  final override def iterator        = layers.toLayerTrees.iterator
+  final override def length          = layers.toLayerTrees.length
 
 trait HWInterface[P <: Parameter](parameter: P)       extends Aggregate:
   this: Bundle | Record =>
@@ -219,7 +219,7 @@ trait ConstructorApi:
     sourcecode.Line,
     sourcecode.Name.Machine,
     InstanceContext
-  ): Wire[T]
+  ):   Wire[T]
   def Reg[T <: Data](
     refType: T
   )(
@@ -231,7 +231,7 @@ trait ConstructorApi:
     sourcecode.Line,
     sourcecode.Name.Machine,
     InstanceContext
-  ): Reg[T]
+  ):   Reg[T]
   def RegInit[T <: Data](
     input: Const[T]
   )(
@@ -244,7 +244,7 @@ trait ConstructorApi:
     sourcecode.Line,
     sourcecode.Name.Machine,
     InstanceContext
-  ): Reg[T]
+  ):   Reg[T]
   extension (bigInt: BigInt)
     def U(
       width: Width

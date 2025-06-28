@@ -41,7 +41,7 @@ trait StringRefApi extends HasSegment[StringRef] with HasSizeOf[StringRef]:
   extension (string:    String)
     inline def toStringRef(
       using arena: Arena
-    ): StringRef
+    ):    StringRef
   extension (stringRef: StringRef)
     inline def toBytes:       Array[Byte]
     inline def toScalaString: String
@@ -67,7 +67,7 @@ trait LlvmThreadPoolApi extends HasSegment[LlvmThreadPool] with HasSizeOf[LlvmTh
   inline def llvmThreadPoolCreate(
   )(
     using arena: Arena
-  ): LlvmThreadPool
+  ):                                                               LlvmThreadPool
   extension (llvmThreadPool: LlvmThreadPool) inline def destroy(): Unit
 end LlvmThreadPoolApi
 

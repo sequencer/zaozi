@@ -157,8 +157,8 @@ given [R <: Referable[Bits]]: BitsApi[R] with
       sourcecode.Name.Machine,
       InstanceContext
     ): Node[Vec[E]] =
-      val srcWidth = ref.refer.getType.getBitWidth(true).toInt
-      val dstWidth = tpe.toMlirType.getBitWidth(true).toInt
+      val srcWidth  = ref.refer.getType.getBitWidth(true).toInt
+      val dstWidth  = tpe.toMlirType.getBitWidth(true).toInt
       require(
         srcWidth % dstWidth == 0,
         s"type cast to Vec[$tpe] failed: width $srcWidth cannot divide $dstWidth"
