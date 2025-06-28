@@ -814,7 +814,10 @@ given ExistsApi with
               weight.toLong.integerAttrGet(32.integerTypeGet)
             ),
             // ::mlir::ArrayAttr
-            namedAttributeApi.namedAttributeGet("boundVarNames".identifierGet, boundVarNames.map(_.stringAttrGet).arrayAttrGet)
+            namedAttributeApi.namedAttributeGet(
+              "boundVarNames".identifierGet,
+              boundVarNames.map(_.stringAttrGet).arrayAttrGet
+            )
           ) ++ noPatternAttr
         ,
         inferredResultsTypes = Some(1)
@@ -897,7 +900,10 @@ given ForallApi with
               weight.toLong.integerAttrGet(32.integerTypeGet)
             ),
             // ::mlir::ArrayAttr
-            namedAttributeApi.namedAttributeGet("boundVarNames".identifierGet, boundVarNames.map(_.stringAttrGet).arrayAttrGet)
+            namedAttributeApi.namedAttributeGet(
+              "boundVarNames".identifierGet,
+              boundVarNames.map(_.stringAttrGet).arrayAttrGet
+            )
           ) ++ noPatternAttr
         ,
         inferredResultsTypes = Some(1)

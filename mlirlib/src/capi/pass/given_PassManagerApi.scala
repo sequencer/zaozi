@@ -47,7 +47,7 @@ given PassManagerApi with
     ): OpPassManager = OpPassManager(
       mlirPassManagerGetNestedUnder(arena, passManager.segment, operationName.toStringRef.segment)
     )
-    inline def destroy(): Unit          = mlirPassManagerDestroy(passManager.segment)
+    inline def destroy():                       Unit          = mlirPassManagerDestroy(passManager.segment)
     inline def enableIRPrinting(
       printBeforeAll:          Boolean,
       printAfterAll:           Boolean,
@@ -68,10 +68,10 @@ given PassManagerApi with
       flags.segment,
       treePrintingPath.toStringRef.segment
     )
-    inline def enableVerifier(enable: Boolean): Unit = mlirPassManagerEnableVerifier(passManager.segment, enable)
+    inline def enableVerifier(enable: Boolean): Unit          = mlirPassManagerEnableVerifier(passManager.segment, enable)
     inline def addOwnedPass(
       pass: Pass
     ): Unit = mlirPassManagerAddOwnedPass(passManager.segment, pass.segment)
-    inline def segment:   MemorySegment = passManager._segment
-    inline def sizeOf:    Int           = MlirPassManager.sizeof().toInt
+    inline def segment:                         MemorySegment = passManager._segment
+    inline def sizeOf:                          Int           = MlirPassManager.sizeof().toInt
 end given

@@ -247,9 +247,9 @@ given OperationApi with
       using arena: Arena
     ): Unit = mlirOperationWriteBytecode(operation.segment, callBack.bytesToStringCallback.segment, MemorySegment.NULL)
 
-    inline def dump(): Unit = mlirOperationDump(operation.segment)
-    inline def moveAfter(other:  Operation): Unit = mlirOperationMoveAfter(operation.segment, other.segment)
-    inline def moveBefore(other: Operation): Unit = mlirOperationMoveBefore(operation.segment, other.segment)
+    inline def dump():                       Unit          = mlirOperationDump(operation.segment)
+    inline def moveAfter(other:  Operation): Unit          = mlirOperationMoveAfter(operation.segment, other.segment)
+    inline def moveBefore(other: Operation): Unit          = mlirOperationMoveBefore(operation.segment, other.segment)
     inline def walk(
       callback:    Operation => WalkResultEnum,
       walk:        WalkEnum
@@ -277,8 +277,8 @@ given OperationApi with
     )(
       using block: Block
     ): Unit = block.insertOwnedOperationBefore(ref, operation)
-    inline def segment: MemorySegment = operation._segment
-    inline def sizeOf: Int = MlirOperation.sizeof().toInt
+    inline def segment:                      MemorySegment = operation._segment
+    inline def sizeOf:                       Int           = MlirOperation.sizeof().toInt
 end given
 
 given WalkResultEnumApi with

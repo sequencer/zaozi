@@ -104,7 +104,7 @@ final case class Z3Result(status: Z3Status, model: Seq[(String, Boolean | BigInt
 // This function parses the output from Z3 and returns a Z3Result.
 def parseZ3Output(input: String): Z3Result =
   val statusLine = input.split("\n").head.trim
-  val status = statusLine match
+  val status     = statusLine match
     case "sat"     => Z3Status.Sat
     case "unsat"   => Z3Status.Unsat
     case "unknown" => Z3Status.Unknown

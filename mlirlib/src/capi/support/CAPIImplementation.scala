@@ -16,8 +16,7 @@ given [T <: Int | Long | Float | Double]: ScalaTpeToMlirArray[T] with
           case int:    Int    => MemoryLayout.sequenceLayout(xs.size, CAPI.C_INT)
           case long:   Long   => MemoryLayout.sequenceLayout(xs.size, CAPI.C_LONG)
           case float:  Float  => MemoryLayout.sequenceLayout(xs.size, CAPI.C_FLOAT)
-          case double: Double => MemoryLayout.sequenceLayout(xs.size, CAPI.C_DOUBLE)
-        )
+          case double: Double => MemoryLayout.sequenceLayout(xs.size, CAPI.C_DOUBLE))
         xs.zipWithIndex.foreach:
           case (int: Int, i: Int)       => buffer.setAtIndex(CAPI.C_INT, i, int)
           case (long: Long, i: Int)     => buffer.setAtIndex(CAPI.C_LONG, i, long)

@@ -114,7 +114,7 @@ class generator extends MacroAnnotation:
                                 }
                               )
                             }
-                          case None => '{ None }
+                          case None                => '{ None }
 
                         '{
                           mainargs.ArgSig
@@ -140,8 +140,7 @@ class generator extends MacroAnnotation:
                       .select(paramConstructor)
                       .appliedToArgs(params.map: param =>
                         methodOwner.asTerm.tpe.memberType(paramConstructor).memberType(param).asType match
-                          case '[t] => '{ $args(${ Expr(params.indexOf(param)) }).asInstanceOf[t] }.asTerm
-                      )
+                          case '[t] => '{ $args(${ Expr(params.indexOf(param)) }).asInstanceOf[t] }.asTerm)
                       .asExprOf[tParam]
 
                   '{ (b: tParamCompModule, params: Seq[Any]) => ${ callOf('b, 'params) } }
@@ -162,8 +161,7 @@ class generator extends MacroAnnotation:
                     () =>
                       ${
                         Ident(tpiParam.tpe match
-                          case TypeRef(a, b) => TermRef(a, b)
-                        ).asExpr
+                          case TypeRef(a, b) => TermRef(a, b)).asExpr
                       }
                   )).constructOrExit(${ args })
                 }

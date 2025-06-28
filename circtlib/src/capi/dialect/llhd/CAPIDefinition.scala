@@ -42,7 +42,7 @@ trait AttributeApi:
   )(
     using arena: Arena,
     context:     Context
-  ): Attribute
+  ):                                                 Attribute
   extension (attribute: Attribute)
     def TimeAttrGetDelta():   BigInt
     def TimeAttrGetEpsilon(): BigInt

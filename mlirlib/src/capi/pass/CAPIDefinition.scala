@@ -43,18 +43,18 @@ trait PassManagerApi extends HasSegment[PassManager] with HasSizeOf[PassManager]
   extension (passManager: PassManager)
     inline def getAsOpPassManager(
       using arena: Arena
-    ):                    OpPassManager
+    ):                                          OpPassManager
     inline def runOnOp(
       operation:   Operation
     )(
       using arena: Arena
-    ):                    LogicalResult
+    ):                                          LogicalResult
     inline def getNestedUnder(
       operationName: String
     )(
       using arena:   Arena
-    ):                    OpPassManager
-    inline def destroy(): Unit
+    ):                                          OpPassManager
+    inline def destroy():                       Unit
     inline def enableIRPrinting(
       printBeforeAll:          Boolean,
       printAfterAll:           Boolean,
@@ -65,11 +65,11 @@ trait PassManagerApi extends HasSegment[PassManager] with HasSizeOf[PassManager]
       treePrintingPath:        String
     )(
       using arena:             Arena
-    ):                    Unit
+    ):                                          Unit
     inline def enableVerifier(enable: Boolean): Unit
     inline def addOwnedPass(
       pass: Pass
-    ): Unit
+    ):                                          Unit
 
 end PassManagerApi
 

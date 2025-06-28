@@ -69,23 +69,23 @@ given BlockApi with
     inline def argumentGetOwner(
       using arena: Arena
     ): Block = Block(mlirBlockArgumentGetOwner(arena, block.segment))
-    inline def destroy():                                                              Unit = mlirBlockDestroy(block.segment)
-    inline def detach():                                                               Unit = mlirBlockDetach(block.segment)
-    inline def appendOwnedOperation(operation: Operation):                             Unit =
+    inline def destroy():                                                              Unit          = mlirBlockDestroy(block.segment)
+    inline def detach():                                                               Unit          = mlirBlockDetach(block.segment)
+    inline def appendOwnedOperation(operation: Operation):                             Unit          =
       mlirBlockAppendOwnedOperation(block.segment, operation.segment)
-    inline def insertOwnedOperation(pos: Long, operation: Operation):                  Unit =
+    inline def insertOwnedOperation(pos: Long, operation: Operation):                  Unit          =
       mlirBlockInsertOwnedOperation(block.segment, pos, operation.segment)
-    inline def insertOwnedOperationAfter(reference: Operation, operation: Operation):  Unit =
+    inline def insertOwnedOperationAfter(reference: Operation, operation: Operation):  Unit          =
       mlirBlockInsertOwnedOperationAfter(block.segment, reference.segment, operation.segment)
-    inline def insertOwnedOperationBefore(reference: Operation, operation: Operation): Unit =
+    inline def insertOwnedOperationBefore(reference: Operation, operation: Operation): Unit          =
       mlirBlockInsertOwnedOperationBefore(block.segment, reference.segment, operation.segment)
-    inline def eraseArgument(index: Int): Unit = mlirBlockEraseArgument(block.segment, index)
+    inline def eraseArgument(index: Int):                                              Unit          = mlirBlockEraseArgument(block.segment, index)
     inline def print(
       callBack:    String => Unit
     )(
       using arena: Arena
     ): Unit = mlirBlockPrint(block.segment, callBack.stringToStringCallback.segment, MemorySegment.NULL)
-    inline def segment: MemorySegment = block._segment
-    inline def sizeOf: Int = MlirBlock.sizeof().toInt
+    inline def segment:                                                                MemorySegment = block._segment
+    inline def sizeOf:                                                                 Int           = MlirBlock.sizeof().toInt
 
 end given

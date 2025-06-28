@@ -44,7 +44,7 @@ trait WireApi     extends HasOperation[Wire]:
   )(
     using arena: Arena,
     context:     Context
-  ): Wire
+  ):   Wire
   extension (ref: Wire)
     def result(
       using Arena

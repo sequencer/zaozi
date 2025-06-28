@@ -27,13 +27,13 @@ trait ContextApi extends HasSegment[Context] with HasSizeOf[Context]:
       name:        String
     )(
       using arena: Arena
-    ):                    Dialect
-    inline def destroy(): Unit
+    ):                                                            Dialect
+    inline def destroy():                                         Unit
     inline def allowUnregisteredDialects(allow: Boolean):         Unit
     inline def appendDialectRegistry(registry:  DialectRegistry): Unit
     inline def enableMultithreading(enable:     Boolean):         Unit
-    inline def loadAllAvailableDialects(): Unit
-    inline def setThreadPool(threadPool: LlvmThreadPool): Unit
+    inline def loadAllAvailableDialects():                        Unit
+    inline def setThreadPool(threadPool:        LlvmThreadPool):  Unit
 end ContextApi
 
 class Dialect(val _segment: MemorySegment)
@@ -44,16 +44,16 @@ trait DialectHandleApi extends HasSegment[DialectHandle] with HasSizeOf[DialectH
   extension (dialectHandle: DialectHandle)
     inline def getNamespace(
       using arena: Arena
-    ): String
+    ):                                                          String
     inline def loadDialect(
       using arena: Arena,
       context:     Context
-    ): Unit
+    ):                                                          Unit
     inline def insertDialect(dialectRegistry: DialectRegistry): Unit
     inline def insertDialect(
     )(
       using context: Context
-    ): Unit
+    ):                                                          Unit
 end DialectHandleApi
 
 class DialectRegistry(val _segment: MemorySegment)
@@ -61,7 +61,7 @@ trait DialectRegistryApi extends HasSegment[DialectRegistry] with HasSizeOf[Dial
   inline def registryCreate(
   )(
     using arena: Arena
-  ): DialectRegistry
+  ):                                                                 DialectRegistry
   extension (dialectRegistry: DialectRegistry) inline def destroy(): Unit
 end DialectRegistryApi
 
@@ -197,14 +197,14 @@ trait OpPrintingFlagsApi extends HasSegment[OpPrintingFlags] with HasSizeOf[OpPr
   ): OpPrintingFlags
 
   extension (opPrintingFlags: OpPrintingFlags)
-    inline def flagsDestroy(): Unit
-    inline def flagsElideLargeElementsAttrs(largeElementLimit:   Long): Unit
-    inline def flagsElideLargeResourceString(largeResourceLimit: Long): Unit
+    inline def flagsDestroy():                                                                  Unit
+    inline def flagsElideLargeElementsAttrs(largeElementLimit:   Long):                         Unit
+    inline def flagsElideLargeResourceString(largeResourceLimit: Long):                         Unit
     inline def flagsEnableDebugInfo(enable:                      Boolean, prettyForm: Boolean): Unit
-    inline def flagsPrintGenericOpForm(): Unit
-    inline def flagsUseLocalScope():      Unit
-    inline def flagsAssumeVerified():     Unit
-    inline def flagsSkipRegions():        Unit
+    inline def flagsPrintGenericOpForm():                                                       Unit
+    inline def flagsUseLocalScope():                                                            Unit
+    inline def flagsAssumeVerified():                                                           Unit
+    inline def flagsSkipRegions():                                                              Unit
 end OpPrintingFlagsApi
 
 class BytecodeWriterConfig(val _segment: MemorySegment)
@@ -244,137 +244,137 @@ trait OperationApi extends HasSegment[Operation] with HasSizeOf[Operation]:
   extension (operation: Operation)
     inline def getContext(
       using arena: Arena
-    ):                             Context
+    ):                                                   Context
     inline def getLocation(
       using arena: Arena
-    ):                             Location
+    ):                                                   Location
     inline def getTypeID(
       using arena: Arena
-    ):                             TypeID
+    ):                                                   TypeID
     inline def getName(
       using arena: Arena
-    ):                             Identifier
+    ):                                                   Identifier
     inline def getBlock(
       using arena: Arena
-    ):                             Block
+    ):                                                   Block
     inline def getParentOperation(
       using arena: Arena
-    ):                             Operation
+    ):                                                   Operation
     inline def getRegion(
       pos:         Long
     )(
       using arena: Arena
-    ):                             Region
+    ):                                                   Region
     inline def getNextInBlock(
       using arena: Arena
-    ):                             Operation
+    ):                                                   Operation
     inline def getOperand(
       pos:         Long
     )(
       using arena: Arena
-    ):                             Value
+    ):                                                   Value
     inline def getResult(
       pos:         Long
     )(
       using arena: Arena
-    ):                             Value
-    inline def getNumResults:      Long
+    ):                                                   Value
+    inline def getNumResults:                            Long
     inline def getSuccessor(
       pos:         Long
     )(
       using arena: Arena
-    ):                             Block
+    ):                                                   Block
     inline def getInherentAttributeByName(
       name:        String
     )(
       using arena: Arena
-    ):                             Attribute
+    ):                                                   Attribute
     inline def getDiscardableAttribute(
       pos:         Long
     )(
       using arena: Arena
-    ):                             NamedAttribute
+    ):                                                   NamedAttribute
     inline def getDiscardableAttributeByName(
       name:        String
     )(
       using arena: Arena
-    ):                             Attribute
+    ):                                                   Attribute
     inline def getAttribute(
       pos:         Long
     )(
       using arena: Arena
-    ):                             NamedAttribute
+    ):                                                   NamedAttribute
     inline def getAttributeByName(
       name:        String
     )(
       using arena: Arena
-    ):                             Attribute
+    ):                                                   Attribute
     inline def writeBytecodeWithConfig(
       config:      BytecodeWriterConfig,
       callback:    Array[Byte] => Unit
     )(
       using arena: Arena
-    ):                             LogicalResult
+    ):                                                   LogicalResult
     inline def getFirstRegion(
       using arena: Arena
-    ):                             Region
-    inline def destroy():          Unit
-    inline def removeFromParent(): Unit
+    ):                                                   Region
+    inline def destroy():                                Unit
+    inline def removeFromParent():                       Unit
     inline def setOperand(pos:   Long, newValue: Value): Unit
     inline def setOperands(
       operands: Seq[Value]
     )(
       using Arena
-    ): Unit
+    ):                                                   Unit
     inline def setSuccessor(pos: Long, block:    Block): Unit
     inline def setInherentAttributeByName(
       name: String,
       attr: Attribute
     )(
       using Arena
-    ): Unit
+    ):                                                   Unit
     inline def setDiscardableAttributeByName(
       name: String,
       attr: Attribute
     )(
       using Arena
-    ): Unit
+    ):                                                   Unit
     inline def setAttributeByName(
       name: String,
       attr: Attribute
     )(
       using Arena
-    ): Unit
+    ):                                                   Unit
     inline def print(
       callback: String => Unit
     )(
       using Arena
-    ): Unit
+    ):                                                   Unit
     inline def printWithFlags(
       callback: String => Unit
     )(
       using Arena
-    ): Unit
+    ):                                                   Unit
     inline def printWithState(
       asmState: AsmState,
       callback: String => Unit
     )(
       using Arena
-    ): Unit
+    ):                                                   Unit
     inline def writeBytecode(
       callBack:    Array[Byte] => Unit
     )(
       using arena: Arena
-    ): Unit
-    inline def dump(): Unit
-    inline def moveAfter(other:  Operation): Unit
-    inline def moveBefore(other: Operation): Unit
+    ):                                                   Unit
+    inline def dump():                                   Unit
+    inline def moveAfter(other:  Operation):             Unit
+    inline def moveBefore(other: Operation):             Unit
     inline def walk(
       callback:    Operation => WalkResultEnum,
       walk:        WalkEnum
     )(
       using arena: Arena
-    ): Unit
+    ):                                                   Unit
 
     inline def appendToBlock(
     )(
@@ -421,17 +421,17 @@ trait RegionApi extends HasSegment[Region] with HasSizeOf[Region]:
   extension (op: Region)
     inline def getFirstBlock(
       using arena: Arena
-    ): Block
+    ):                                                                 Block
     inline def getNextInOperation(
       using arena: Arena
-    ): Region
+    ):                                                                 Region
     inline def destroy(
     )(
       using arena: Arena
-    ): Unit
+    ):                                                                 Unit
     inline def appendOwnedBlock(
       block: Block
-    ): Unit
+    ):                                                                 Unit
     inline def insertOwnedBlock(pos:             Long, block:  Block): Unit
     inline def insertOwnedBlockAfter(reference:  Block, block: Block): Unit
     inline def insertOwnedBlockBefore(reference: Block, block: Block): Unit
@@ -448,49 +448,49 @@ trait BlockApi extends HasSegment[Block] with HasSizeOf[Block]:
   extension (block: Block)
     inline def getParentOperation(
       using arena: Arena
-    ):                    Operation
+    ):                                                                                 Operation
     inline def getNextInRegion(
       using arena: Arena
-    ):                    Block
+    ):                                                                                 Block
     inline def getFirstOperation(
       using arena: Arena
-    ):                    Operation
+    ):                                                                                 Operation
     inline def getTerminator(
       using arena: Arena
-    ):                    Operation
+    ):                                                                                 Operation
     inline def addArgument(
       tpe:         Type,
       loc:         Location
     )(
       using arena: Arena
-    ):                    Operation
+    ):                                                                                 Operation
     inline def insertArgument(
       pos:         Int,
       tpe:         Type,
       loc:         Location
     )(
       using arena: Arena
-    ):                    Operation
+    ):                                                                                 Operation
     inline def getArgument(
       pos:         Long
     )(
       using arena: Arena
-    ):                    Value
+    ):                                                                                 Value
     inline def argumentGetOwner(
       using arena: Arena
-    ):                    Block
-    inline def destroy(): Unit
-    inline def detach():  Unit
-    inline def appendOwnedOperation(operation:       Operation): Unit
+    ):                                                                                 Block
+    inline def destroy():                                                              Unit
+    inline def detach():                                                               Unit
+    inline def appendOwnedOperation(operation:       Operation):                       Unit
     inline def insertOwnedOperation(pos:             Long, operation:      Operation): Unit
     inline def insertOwnedOperationAfter(reference:  Operation, operation: Operation): Unit
     inline def insertOwnedOperationBefore(reference: Operation, operation: Operation): Unit
-    inline def eraseArgument(index:                  Int): Unit
+    inline def eraseArgument(index:                  Int):                             Unit
     inline def print(
       callBack:    String => Unit
     )(
       using arena: Arena
-    ): Unit
+    ):                                                                                 Unit
 end BlockApi
 
 class Value(val _segment: MemorySegment)
@@ -498,23 +498,23 @@ trait ValueApi extends HasSegment[Value] with HasSizeOf[Value]:
   extension (value: Value)
     inline def getType(
       using arena: Arena
-    ): Type
+    ):                                         Type
     inline def getFirstUse(
       using arena: Arena
-    ): Type
-    inline def setType(tpe: Type): Unit
-    inline def dump(): Unit
+    ):                                         Type
+    inline def setType(tpe:            Type):  Unit
+    inline def dump():                         Unit
     inline def print(
       callback:    String => Unit
     )(
       using arena: Arena
-    ):                 Unit
+    ):                                         Unit
     inline def printAsOperand(
       state:       AsmState,
       callback:    String => Unit
     )(
       using arena: Arena
-    ):                 Unit
+    ):                                         Unit
     inline def replaceAllUsesOfWith(w: Value): Unit
 end ValueApi
 
@@ -552,26 +552,26 @@ class Attribute(val _segment: MemorySegment)
 trait AttributeApi extends HasSegment[Attribute] with HasSizeOf[Attribute]:
   inline def allocateAttribute(
     using arena: Arena
-  ): Attribute
+  ):                                                      Attribute
   inline def getNull(
     using arena: Arena,
     context:     Context
-  ): Attribute
+  ):                                                      Attribute
   extension (attribute: Attribute)
     inline def getType(
       using arena: Arena
-    ): Type
+    ):                                                    Type
   // Location
   extension (attribute: Attribute) inline def isLocation: Boolean
   // Array
   inline def arrayAttrGetTypeID(
     using arena: Arena
-  ): TypeID
+  ):                                                      TypeID
   extension (array:     Seq[Attribute])
     inline def arrayAttrGet(
       using arena: Arena,
       context:     Context
-    ): Attribute
+    ):                                                    Attribute
   extension (attribute: Attribute)
     inline def isArray:                 Boolean
     inline def arrayAttrGetNumElements: Int
@@ -583,12 +583,12 @@ trait AttributeApi extends HasSegment[Attribute] with HasSizeOf[Attribute]:
   // Dictionary
   inline def dictionaryAttrGetTypeID(
     using arena: Arena
-  ): TypeID
+  ):                                                      TypeID
   extension (map:       Map[String, Attribute])
     inline def directoryAttrGet(
       using arena: Arena,
       context:     Context
-    ): Attribute
+    ):                                                    Attribute
   extension (attribute: Attribute)
     inline def isDictionary:                 Boolean
     inline def dictionaryAttrGetNumElements: Int
@@ -600,7 +600,7 @@ trait AttributeApi extends HasSegment[Attribute] with HasSizeOf[Attribute]:
   // Floating point
   inline def floatAttrGetTypeID(
     using arena: Arena
-  ): TypeID
+  ):                                                      TypeID
   extension (double:    Double)
     inline def floatAttrDoubleGet(
       tpe:         Type
@@ -620,14 +620,14 @@ trait AttributeApi extends HasSegment[Attribute] with HasSizeOf[Attribute]:
   // Integer
   inline def integerAttrGetTypeID(
     using arena: Arena
-  ): TypeID
+  ):                                                      TypeID
   extension (int:       Long)
     inline def integerAttrGet(
       tpe:         Type
     )(
       using arena: Arena,
       context:     Context
-    ): Attribute
+    ):                                                    Attribute
   extension (attribute: Attribute)
     inline def isInteger:               Boolean
     inline def integerAttrGetValueInt:  Long
@@ -638,7 +638,7 @@ trait AttributeApi extends HasSegment[Attribute] with HasSizeOf[Attribute]:
     inline def boolAttrGet(
       using arena: Arena,
       context:     Context
-    ): Attribute
+    ):                                                    Attribute
   extension (attribute: Attribute)
     inline def isBool:           Boolean
     inline def boolAttrGetValue: Boolean
@@ -674,7 +674,7 @@ trait AttributeApi extends HasSegment[Attribute] with HasSizeOf[Attribute]:
     )(
       using arena: Arena,
       context:     Context
-    ): Attribute
+    ):    Attribute
   extension (attribute: Attribute)
     inline def isSymbolRef:                         Boolean
     inline def symbolRefAttrGetRootReference(
@@ -697,7 +697,7 @@ trait AttributeApi extends HasSegment[Attribute] with HasSizeOf[Attribute]:
     inline def flatSymbolRefAttrGet(
       using arena: Arena,
       context:     Context
-    ): Attribute
+    ):    Attribute
   extension (attribute: Attribute)
     inline def isFlatSymbolRef: Boolean
     inline def flatSymbolRefAttrGetValue(
@@ -713,7 +713,7 @@ trait AttributeApi extends HasSegment[Attribute] with HasSizeOf[Attribute]:
     inline def typeAttrGet(
       using arena: Arena,
       context:     Context
-    ): Attribute
+    ):       Attribute
   extension (attribute: Attribute)
     inline def isType: Boolean
     inline def typeAttrGetValue(
@@ -740,7 +740,7 @@ trait AttributeApi extends HasSegment[Attribute] with HasSizeOf[Attribute]:
     inline def denseBoolArrayGet(
       using arena: Arena,
       context:     Context
-    ): Attribute
+    ):     Attribute
   extension (ints:      Seq[Int])
     inline def denseI8ArrayGet(
       using arena: Arena,
@@ -758,26 +758,26 @@ trait AttributeApi extends HasSegment[Attribute] with HasSizeOf[Attribute]:
     inline def denseI64ArrayGet(
       using arena: Arena,
       context:     Context
-    ): Attribute
+    ):     Attribute
   extension (floats:    Seq[Float])
     inline def denseF32ArrayGet(
       using arena: Arena,
       context:     Context
-    ): Attribute
+    ):     Attribute
   extension (doubles:   Seq[Double])
     inline def denseF64ArrayGet(
       using arena: Arena,
       context:     Context
-    ): Attribute
+    ):     Attribute
   extension (attribute: Attribute)
-    inline def isDenseBoolArray:         Boolean
-    inline def isDenseI8Array:           Boolean
-    inline def isDenseI16Array:          Boolean
-    inline def isDenseI32Array:          Boolean
-    inline def isDenseI64Array:          Boolean
-    inline def isDenseF32Array:          Boolean
-    inline def isDenseF64Array:          Boolean
-    inline def denseArrayGetNumElements: Long
+    inline def isDenseBoolArray:                    Boolean
+    inline def isDenseI8Array:                      Boolean
+    inline def isDenseI16Array:                     Boolean
+    inline def isDenseI32Array:                     Boolean
+    inline def isDenseI64Array:                     Boolean
+    inline def isDenseF32Array:                     Boolean
+    inline def isDenseF64Array:                     Boolean
+    inline def denseArrayGetNumElements:            Long
     inline def denseBoolArrayGetElement(pos: Long): Boolean
     inline def denseI8ArrayGetElement(pos:   Long): Int
     inline def denseI16ArrayGetElement(pos:  Long): Int
