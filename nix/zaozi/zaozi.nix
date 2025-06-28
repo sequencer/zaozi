@@ -28,6 +28,7 @@ let
           ./../../build.mill
           ./../../circtlib
           ./../../mlirlib
+          ./../../decoder
           ./../../zaozi
         ];
       };
