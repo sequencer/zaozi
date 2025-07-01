@@ -18,6 +18,10 @@ In this code, we use the macro annotation `@generator` to automatically fulfill 
 
 The overarching principle is that a generator is essentially a series of *pure functions*. They consume a parameter and produce the final module; therefore, users *SHOULD NOT* use any input outside the provided parameter.
 
+## Parameter
+
+In Zaozi, a parameter type is a class (typically a case class) that extends `Parameter` and can be serialized and deserialized using given `upickle.Writer` and `upickle.Reader` instances. Each Generator has a `parseParameter` method that can parse command-line arguments into the parameter type. This method requires a given `mainargs.TokensReader` instance. Additionally, the method can be overridden by the user to support cases where the parameter is difficult to construct from the command line.
+
 ## Interface
 
 In Zaozi, three types represent the interface of a FIRRTL module: `HWInterface`, `DVInterface`, and `LayerInterface`. All of these consume a parameter of the same type as the Generator's parameter type to produce their structure. Notably, users *SHOULD NOT* pass the same interface type to different generators unless the generators have exactly identical interfaces (e.g., two generator implementations of the same module, a.k.a. `InstanceChoice`) although interface types are designed as type parameters of `Generator`. The same rule holds for parameter types.
@@ -113,3 +117,19 @@ val sub1 = Subtractor.instantiate(SubtractorParameter(parameter.width))
 sub1.io.a := x
 sub1.io.b := y
 ```
+
+## Elaboration
+
+Zaozi supports invoking any generator directly from the command line without additional code. By default, the `main` method has two subcommands: `config` and `design`.
+
+- The `config` subcommand parses command-line arguments into a parameter and serializes it to a JSON file.
+- The `design` subcommand accepts a JSON file to elaborate MLIR Bytecode.
+
+Users can specify the output directory by setting the environment variable `ZAOZI_OUTDIR`, as shown below:
+
+```shell
+./gcd.jar config config.json --width 32 --use-async-reset false
+ZAOZI_OUTDIR=result ./gcd.jar design config.json
+```
+
+Additionally, users can provide a `GeneratorApi` with `mainImpl` to support custom elaboration flows, or simply override the `main` method in a specific generator.
