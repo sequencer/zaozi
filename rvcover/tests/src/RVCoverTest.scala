@@ -16,6 +16,7 @@ import org.llvm.mlir.scalalib.capi.target.exportsmtlib.given_ExportSmtlibApi
 import org.llvm.mlir.scalalib.capi.ir.{Block, Context, ContextApi, LocationApi, Module, ModuleApi, Value, given}
 
 import java.lang.foreign.Arena
+import java.io.FileOutputStream
 
 import utest.*
 
@@ -73,18 +74,37 @@ def rvcoverTest(body: (Arena, Context, Block) ?=> Unit): Unit =
   val instructions      = getInstructions()
   val instructionCounts = 2
 
-  // todo: move it to the Recipe class defination
-  // fix: output bits directly 
-  (0 until instructionCounts).foreach { i =>
-    val nameId = getModelField(model, s"nameId_$i")
-    val inst   = instructions(nameId)
-    val name   = inst.name
-    val args   = inst.args.map { arg =>
-      val argName: String = translateToCamelCase(arg.name)
-      val argNameLowered = argName.head.toLower + argName.tail
-      val prefix         = if arg.name.startsWith("r") then "x" else ""
-      prefix + getModelField(model, argNameLowered + s"_$i").toString()
+  val fos = new FileOutputStream("output.bin")
+  try {
+    (0 until instructionCounts).foreach { i =>
+      val nameId = getModelField(model, s"nameId_$i")
+      val inst   = instructions(nameId)
+
+      val (args, bits) = inst.args.foldLeft((Vector.empty[String], inst.encoding.value)) {
+        case ((argsAcc, bitsAcc), arg) =>
+          val argName        = translateToCamelCase(arg.name)
+          val argNameLowered = argName.head.toLower + argName.tail
+          val prefix         = if arg.name.startsWith("r") then "x" else ""
+          val argValue       = getModelField(model, argNameLowered + s"_$i")
+          (
+            argsAcc :+ (prefix + argValue.toString),
+            bitsAcc | (BigInt(argValue) << arg.msb)
+          )
+      }
+
+      println(s"Instruction $i: ${inst.name} ${args.mkString(" ")}")
+      println(s"${bits.toString(2).reverse.padTo(32, '0').reverse}")
+      val value: Long = bits.toLong & 0xffffffffL
+      // little-endian byte order by default
+      val bytes = scala.Array(
+        (value & 0xff).toByte,
+        ((value >> 8) & 0xff).toByte,
+        ((value >> 16) & 0xff).toByte,
+        ((value >> 24) & 0xff).toByte
+      )
+      // output bits to file
+      fos.write(bytes)
     }
-    println(s"Instruction $i: $name ${args.mkString(" ")}")
-    println(s"Instruction $i: " + inst.toString)
+  } finally {
+    fos.close()
   }
