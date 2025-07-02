@@ -85,7 +85,7 @@ object GenerateConstraints extends TestSuite:
       }
 
       val sets = instruction.instructionSets
-        .map(_.name)                                         // e.g., "rv_i", "rv_zicsr", etc.
+        .map(_.name) // e.g., "rv_i", "rv_zicsr", etc.
         .map("is" + _.replace("_", "").toUpperCase() + "()") // e.g., "isRVI()", "isRVZICSR()", etc.
 
       val s =

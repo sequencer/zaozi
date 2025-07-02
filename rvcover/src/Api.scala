@@ -20,9 +20,13 @@ def recipe(
 )(block: Recipe ?=> Unit
 ): Recipe = {
   given Recipe = new Recipe(name)
-  
+
   // assert sets are valid
-  val includedSets: List[Ref[Bool]] = sets.toList.map(f => f(using summon[Recipe]))
+  val includedSets: List[Ref[Bool]] = sets.toList.map(f =>
+    f(
+      using summon[Recipe]
+    )
+  )
   includedSets.foreach { set =>
     smtAssert(set)
   }
@@ -56,9 +60,13 @@ def index(
 
 def distinct[D <: Data, R <: Referable[D]](
   indices: Iterable[Int]
+)(field:   Index => R
 )(
-  field: Index => R
-)(using Recipe, Arena, Context, Block): Unit =
-  val recipe = summon[Recipe]
+  using Recipe,
+  Arena,
+  Context,
+  Block
+): Unit =
+  val recipe    = summon[Recipe]
   val indexObjs = indices.map(recipe.getIndex)
   smtAssert(smtDistinct(indexObjs.map(field).toSeq*))

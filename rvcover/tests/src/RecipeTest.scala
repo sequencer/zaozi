@@ -13,10 +13,10 @@ object RecipeTest extends TestSuite:
     test("TestRecipe"):
       rvcoverTest {
         val instructionCount = 2
-        val r = recipe("TestRecipe", isRVI()) {
+        val r                = recipe("TestRecipe", isRVI()) {
           (0 until instructionCount).foreach { i =>
             index(i) {
-              isAddi() & 
+              isAddi() &
                 rs1Range(1, 32) &
                 rdRange(1, 32) &
                 imm12Range(0, 100)
