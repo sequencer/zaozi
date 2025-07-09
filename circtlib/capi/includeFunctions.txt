@@ -300,6 +300,7 @@ omTypeIsAListType                 # header: $CIRCT_INSTALL_PATH/include/circt-c/
 omTypeIsAMapType                  # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/OM.h
 omTypeIsAStringType               # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/OM.h
 mlirGetDialectHandle__rtg__       # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/RTG.h
+registerRTGPasses                 # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/RTG.h
 rtgAnyContextAttrGet              # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/RTG.h
 rtgArrayTypeGet                   # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/RTG.h
 rtgArrayTypeGetElementType        # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/RTG.h
