@@ -31,8 +31,8 @@ object Encoding:
 
 /** Like chisel3.BitPat, this is a 32-bits field stores the Instruction encoding. */
 case class Encoding(value: BigInt, mask: BigInt):
-  def toCustomBitPat(pat: String) =
-    Seq.tabulate(32)(i => if !mask.testBit(i) then pat else if value.testBit(i) then "1" else "0").reverse.mkString
+  def toCustomBitPat(pat: String, width: Int = 32) =
+    Seq.tabulate(width)(i => if !mask.testBit(i) then pat else if value.testBit(i) then "1" else "0").reverse.mkString
 
   override def toString = toCustomBitPat("?")
 
