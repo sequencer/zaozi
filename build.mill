@@ -1,43 +1,34 @@
+//| mvnDeps:
+//| - com.lihaoyi::mill-contrib-jmh:$MILL_VERSION
+
 // SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2025 Jiuyang Liu <liu@jiuyang.me>
 package build
-
-import $ivy.`de.tototec::de.tobiasroeser.mill.vcs.version::0.4.1`
 
 import mill._
 import mill.scalalib.TestModule.Utest
 import mill.scalalib._
 import mill.scalalib.publish._
 import mill.scalalib.scalafmt._
-import de.tobiasroeser.mill.vcs.version.VcsVersion
-import $ivy.`com.lihaoyi::mill-contrib-jmh:`
 import contrib.jmh.JmhModule
 import os.Path
 
-import $packages._
-
 object v {
   val scala      = "3.6.2"
-  val mainargs   = ivy"com.lihaoyi::mainargs:0.7.6"
-  val oslib      = ivy"com.lihaoyi::os-lib:0.11.3"
-  val upickle    = ivy"com.lihaoyi::upickle:4.0.2"
-  val utest      = ivy"com.lihaoyi::utest:0.8.4"
-  val sourcecode = ivy"com.lihaoyi::sourcecode:0.4.2"
-  val fastparse  = ivy"com.lihaoyi::fastparse:3.1.1"
-  val pprint     = ivy"com.lihaoyi::pprint:0.9.0"
+  val mainargs   = mvn"com.lihaoyi::mainargs:0.7.6"
+  val oslib      = mvn"com.lihaoyi::os-lib:0.11.3"
+  val upickle    = mvn"com.lihaoyi::upickle:4.0.2"
+  val utest      = mvn"com.lihaoyi::utest:0.8.4"
+  val sourcecode = mvn"com.lihaoyi::sourcecode:0.4.2"
+  val fastparse  = mvn"com.lihaoyi::fastparse:3.1.1"
+  val pprint     = mvn"com.lihaoyi::pprint:0.9.0"
   val jmh        = "1.35"
 }
 
 trait ZaoziPublishModule extends PublishModule {
-  def publishVersion: mill.T[String] = VcsVersion
-    .vcsState()
-    .format(
-      countSep = "+",
-      revHashDigits = 8,
-      untaggedSuffix = "-SNAPSHOT"
-    )
+  def publishVersion: mill.T[String] = "0.0.1-SNAPSHOT"
 
-  def pomSettings = T(
+  def pomSettings = Task(
     PomSettings(
       description = artifactName(),
       organization = "me.jiuyang",
@@ -71,8 +62,8 @@ trait PanamaModule extends JavaModule {
     ).call()
 
     includeFiles().foreach { file =>
-      os.remove(file)
-      os.write(file, "")
+      os.remove(file.path)
+      os.write(file.path, "")
     }
 
     os.read
@@ -81,16 +72,16 @@ trait PanamaModule extends JavaModule {
       .filter(str => !str.contains("jextract"))
       .foreach { str =>
         val writeStr = str.replaceFirst("--include.+? ", "") + "\n"
-        if (str.startsWith("--include-constant")) os.write.append(includeConstantsFile(), writeStr)
-        if (str.startsWith("--include-function")) os.write.append(includeFunctionsFile(), writeStr)
-        if (str.startsWith("--include-struct")) os.write.append(includeStructsFile(), writeStr)
-        if (str.startsWith("--include-typedef")) os.write.append(includeTypedefsFile(), writeStr)
-        if (str.startsWith("--include-union")) os.write.append(includeUnionsFile(), writeStr)
-        if (str.startsWith("--include-var")) os.write.append(includeVarsFile(), writeStr)
+        if (str.startsWith("--include-constant")) os.write.append(includeConstantsFile().path, writeStr)
+        if (str.startsWith("--include-function")) os.write.append(includeFunctionsFile().path, writeStr)
+        if (str.startsWith("--include-struct")) os.write.append(includeStructsFile().path, writeStr)
+        if (str.startsWith("--include-typedef")) os.write.append(includeTypedefsFile().path, writeStr)
+        if (str.startsWith("--include-union")) os.write.append(includeUnionsFile().path, writeStr)
+        if (str.startsWith("--include-var")) os.write.append(includeVarsFile().path, writeStr)
       }
   }
 
-  override def generatedSources: Target[Seq[PathRef]] = T {
+  override def generatedSources: T[Seq[PathRef]] = Task {
     super.generatedSources() ++ {
       // @formatter:off
       os.proc(
@@ -114,7 +105,7 @@ trait PanamaModule extends JavaModule {
     }
   }
 
-  override def javacOptions: Target[Seq[String]] = Task(
+  override def javacOptions: T[Seq[String]] = Task(
     super.javacOptions() ++ Seq("--enable-preview", "--release", "21")
   )
 
@@ -134,52 +125,64 @@ trait PanamaModule extends JavaModule {
     )
   )
 
-  def includeConstantsFile: Target[Path]
-  def includeConstants:     Target[IndexedSeq[String]] = Task.Input(
-    os.read.lines(includeConstantsFile()).filter(s => s.nonEmpty && !s.startsWith("#")).map(_.replaceFirst(" .*", ""))
+  def includeConstantsFile: T[PathRef]
+  def includeConstants:     T[IndexedSeq[String]] = Task(
+    os.read
+      .lines(includeConstantsFile().path)
+      .filter(s => s.nonEmpty && !s.startsWith("#"))
+      .map(_.replaceFirst(" .*", ""))
   )
 
-  def includeFunctionsFile: Target[Path]
-  def includeFunctions:     Target[IndexedSeq[String]] = Task.Input(
-    os.read.lines(includeFunctionsFile()).filter(s => s.nonEmpty && !s.startsWith("#")).map(_.replaceFirst(" .*", ""))
+  def includeFunctionsFile: T[PathRef]
+  def includeFunctions:     T[IndexedSeq[String]] = Task(
+    os.read
+      .lines(includeFunctionsFile().path)
+      .filter(s => s.nonEmpty && !s.startsWith("#"))
+      .map(_.replaceFirst(" .*", ""))
   )
 
-  def includeStructsFile: Target[Path]
-  def includeStructs:     Target[IndexedSeq[String]] = Task.Input(
-    os.read.lines(includeStructsFile()).filter(s => s.nonEmpty && !s.startsWith("#")).map(_.replaceFirst(" .*", ""))
+  def includeStructsFile: T[PathRef]
+  def includeStructs:     T[IndexedSeq[String]] = Task(
+    os.read
+      .lines(includeStructsFile().path)
+      .filter(s => s.nonEmpty && !s.startsWith("#"))
+      .map(_.replaceFirst(" .*", ""))
   )
 
-  def includeTypedefsFile: Target[Path]
-  def includeTypedefs:     Target[IndexedSeq[String]] = Task.Input(
-    os.read.lines(includeTypedefsFile()).filter(s => s.nonEmpty && !s.startsWith("#")).map(_.replaceFirst(" .*", ""))
+  def includeTypedefsFile: T[PathRef]
+  def includeTypedefs:     T[IndexedSeq[String]] = Task(
+    os.read
+      .lines(includeTypedefsFile().path)
+      .filter(s => s.nonEmpty && !s.startsWith("#"))
+      .map(_.replaceFirst(" .*", ""))
   )
 
-  def includeUnionsFile: Target[Path]
-  def includeUnions:     Target[IndexedSeq[String]] = Task.Input(
-    os.read.lines(includeUnionsFile()).filter(s => s.nonEmpty && !s.startsWith("#")).map(_.replaceFirst(" .*", ""))
+  def includeUnionsFile: T[PathRef]
+  def includeUnions:     T[IndexedSeq[String]] = Task(
+    os.read.lines(includeUnionsFile().path).filter(s => s.nonEmpty && !s.startsWith("#")).map(_.replaceFirst(" .*", ""))
   )
 
-  def includeVarsFile: Target[Path]
-  def includeVars:     Target[IndexedSeq[String]] = Task.Input(
-    os.read.lines(includeVarsFile()).filter(s => s.nonEmpty && !s.startsWith("#")).map(_.replaceFirst(" .*", ""))
+  def includeVarsFile: T[PathRef]
+  def includeVars:     T[IndexedSeq[String]] = Task(
+    os.read.lines(includeVarsFile().path).filter(s => s.nonEmpty && !s.startsWith("#")).map(_.replaceFirst(" .*", ""))
   )
 
-  def linkLibrariesFile: Target[Path]
-  def linkLibraries:     Target[IndexedSeq[String]] = Task.Input(
-    os.read.lines(linkLibrariesFile()).filter(s => s.nonEmpty && !s.startsWith("#")).map(_.replaceFirst(" .*", ""))
+  def linkLibrariesFile: T[PathRef]
+  def linkLibraries:     T[IndexedSeq[String]] = Task(
+    os.read.lines(linkLibrariesFile().path).filter(s => s.nonEmpty && !s.startsWith("#")).map(_.replaceFirst(" .*", ""))
   )
 
-  def target: Target[String]
+  def target: T[String]
 
-  def headerClassName: Target[String]
+  def headerClassName: T[String]
 
-  def header: Target[PathRef]
+  def header: T[PathRef]
 
-  def includePaths: Target[Seq[PathRef]]
+  def includePaths: T[Seq[PathRef]]
 
-  def libraryPaths: Target[Seq[PathRef]]
+  def libraryPaths: T[Seq[PathRef]]
 
-  def jextractBinary: Target[Path]
+  def jextractBinary: T[Path]
 }
 
 // Lit-based Test
@@ -190,7 +193,7 @@ trait LitModule extends Module {
   def javaHome:        T[os.Path]
   def litDir:          T[os.Path]
   def litConfigIn:     T[PathRef]
-  def litConfig:       T[PathRef] = T {
+  def litConfig:       T[PathRef] = Task {
     os.write(
       Task.dest / "lit.site.cfg.py",
       os.read(litConfigIn().path)
