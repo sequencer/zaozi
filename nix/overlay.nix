@@ -10,12 +10,13 @@ in
 {
   mill = let jre = final.jdk21; in
     (prev.mill.override { inherit jre; }).overrideAttrs rec {
-      # Fixed the buggy sorting issue in target resolve
-      version = "0.12.8-1-46e216";
+      version = "1.0.0";
       src = final.fetchurl {
-        url = "https://repo1.maven.org/maven2/com/lihaoyi/mill-dist/${version}/mill-dist-${version}-assembly.jar";
-        hash = "sha256-XNtl9NBQPlkYu/odrR/Z7hk3F01B6Rk4+r/8tMWzMm8=";
+        url = "https://repo1.maven.org/maven2/com/lihaoyi/mill-dist/${version}/mill-dist-${version}.exe";
+        hash = "sha256-pgkwME2xs4ezfWS1HGFS2uPIqqvECTOAILWmCqci2Aw=";
       };
+      propagatedBuildInputs = with prev; [ which ];
+      doInstallCheck = false;
       passthru = { inherit jre; };
     };
 
