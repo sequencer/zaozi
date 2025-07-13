@@ -8,14 +8,14 @@ import mill.scalalib._
 import mill.scalalib.scalafmt._
 import os.Path
 
-import build.{v, circtlib, zaozi}
+import build.{circtlib, v, zaozi}
 
-object `package` extends RootModule with ScalaModule with ScalafmtModule { m =>
+object `package` extends ScalaModule with ScalafmtModule { m =>
   def scalaVersion = Task(v.scala)
   def moduleDeps   = Seq(zaozi)
-  def ivyDeps      = Agg(v.utest)
+  def mvnDeps      = Seq(v.utest)
 
-  override def scalacOptions: T[Seq[String]] = T(super.scalacOptions() ++ Seq("-experimental"))
+  override def scalacOptions: T[Seq[String]] = Task(super.scalacOptions() ++ Seq("-experimental"))
 
   override def forkArgs: T[Seq[String]] = Task(
     super.forkArgs() ++ circtlib.forkArgs()

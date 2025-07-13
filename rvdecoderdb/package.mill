@@ -9,11 +9,11 @@ import mill.scalalib.scalafmt._
 
 import build.{v, ZaoziPublishModule}
 
-object `package` extends RootModule with ScalaModule with ScalafmtModule with ZaoziPublishModule {
+object `package` extends ScalaModule with ScalafmtModule with ZaoziPublishModule {
   def scalaVersion = Task(v.scala)
-  def ivyDeps      = Task(Seq(v.mainargs, v.oslib, v.upickle))
+  def mvnDeps      = Seq(v.mainargs, v.oslib, v.upickle)
 
   object tests extends ScalaTests with ScalafmtModule with Utest {
-    def ivyDeps = Agg(v.utest)
+    def mvnDeps = Seq(v.utest)
   }
 }

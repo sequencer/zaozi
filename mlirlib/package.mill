@@ -9,42 +9,42 @@ import mill.scalalib.scalafmt._
 
 import build.{v, PanamaModule, ZaoziPublishModule}
 
-object `package` extends RootModule with ScalaModule with ScalafmtModule with PanamaModule with ZaoziPublishModule {
+object `package` extends ScalaModule with ScalafmtModule with PanamaModule with ZaoziPublishModule {
   def scalaVersion = Task(v.scala)
 
-  override def dumpIncludes() = Task.Command {
-    super.dumpIncludes()()
+  def dumpIncludes() = Task.Command {
+    super.dumpIncludes()
     includeFiles().foreach { file =>
       val lines =
         os.read
-          .lines(file)
+          .lines(file.path)
           .filter(str => str.contains(mlirInstallPath().toString))
           // to eliminte error cause by a jextract bug
           .filter(str => !str.contains("mlirTypeIDAllocatorAllocateTypeID"))
           .map(_.replaceAll(mlirInstallPath().toString, "\\$MLIR_INSTALL_PATH").trim)
-      os.write.over(file, (license ++ lines).mkString("\n"))
+      os.write.over(file.path, (license ++ lines).mkString("\n"))
     }
   }
 
-  def includeConstantsFile = millSourcePath / "capi" / "includeConstants.txt"
+  def includeConstantsFile = Task.Source(moduleDir / "capi" / "includeConstants.txt")
 
-  def includeFunctionsFile = millSourcePath / "capi" / "includeFunctions.txt"
+  def includeFunctionsFile = Task.Source(moduleDir / "capi" / "includeFunctions.txt")
 
-  def includeStructsFile = millSourcePath / "capi" / "includeStructs.txt"
+  def includeStructsFile = Task.Source(moduleDir / "capi" / "includeStructs.txt")
 
-  def includeTypedefsFile = millSourcePath / "capi" / "includeTypedefs.txt"
+  def includeTypedefsFile = Task.Source(moduleDir / "capi" / "includeTypedefs.txt")
 
-  def includeUnionsFile = millSourcePath / "capi" / "includeUnions.txt"
+  def includeUnionsFile = Task.Source(moduleDir / "capi" / "includeUnions.txt")
 
-  def includeVarsFile = millSourcePath / "capi" / "includeVars.txt"
+  def includeVarsFile = Task.Source(moduleDir / "capi" / "includeVars.txt")
 
-  def linkLibrariesFile = millSourcePath / "capi" / "linkLibraries.txt"
+  def linkLibrariesFile = Task.Source(moduleDir / "capi" / "linkLibraries.txt")
 
   def target = Task("org.llvm.mlir")
 
   def headerClassName = Task("CAPI")
 
-  def header = Task(PathRef(millSourcePath / "capi" / "jextract-headers.h"))
+  def header = Task.Source(moduleDir / "capi" / "jextract-headers.h")
 
   def mlirInstallPath = Task.Input(
     os.Path(Task.env.getOrElse("MLIR_INSTALL_PATH", "MLIR_INSTALL_PATH not found, you are not in the nix env?"))
@@ -61,7 +61,7 @@ object `package` extends RootModule with ScalaModule with ScalafmtModule with Pa
   def libraryPaths = Task(Seq(PathRef(mlirInstallPath() / "lib")))
 
   object tests extends ScalaTests with ScalafmtModule with Utest {
-    def ivyDeps = Agg(v.utest)
+    def mvnDeps = Seq(v.utest)
 
     override def forkArgs: T[Seq[String]] = Task(
       super.forkArgs() ++ Seq("--enable-native-access=ALL-UNNAMED", "--enable-preview")

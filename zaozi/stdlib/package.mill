@@ -8,14 +8,14 @@ import mill.scalalib._
 import mill.scalalib.scalafmt._
 import os.Path
 
-import build.{v, circtlib, zaozi, decoder, LitModule}
+import build.{circtlib, decoder, v, zaozi, LitModule}
 import build.zaozi.testlib
 
-object `package` extends RootModule with ScalaModule with ScalafmtModule { m =>
+object `package` extends ScalaModule with ScalafmtModule { m =>
   def scalaVersion = Task(v.scala)
   def moduleDeps   = Seq(zaozi, decoder)
 
-  override def scalacOptions: T[Seq[String]] = T(super.scalacOptions() ++ Seq("-experimental"))
+  override def scalacOptions: T[Seq[String]] = Task(super.scalacOptions() ++ Seq("-experimental"))
 
   override def forkArgs: T[Seq[String]] = Task(
     super.forkArgs() ++ circtlib.forkArgs()
@@ -34,15 +34,15 @@ object `package` extends RootModule with ScalaModule with ScalafmtModule { m =>
         (circtlib.libraryPaths()).map(_.path)
       )
       def javaHome:        T[os.Path]      = Task(os.Path(sys.props("java.home")))
-      def litDir:          T[os.Path]      = Task(millSourcePath)
-      def litConfigIn:     T[PathRef]      = Task.Source(millSourcePath / "lit.site.cfg.py.in")
+      def litDir:          T[os.Path]      = Task(moduleDir)
+      def litConfigIn:     T[PathRef]      = Task.Source(moduleDir / "lit.site.cfg.py.in")
     }
   }
 
   object tests extends ScalaTests with ScalafmtModule with Utest {
-    override def scalacOptions: Target[Seq[String]] = Task(super.scalacOptions().filterNot(_ == "-Xcheck-macros"))
+    override def scalacOptions: T[Seq[String]] = Task(super.scalacOptions().filterNot(_ == "-Xcheck-macros"))
 
-    def ivyDeps = Agg(v.utest)
+    def mvnDeps = Seq(v.utest)
 
     override def moduleDeps: Seq[JavaModule] = Seq(m, testlib)
 

@@ -6,20 +6,21 @@ import mill._
 import mill.scalalib.TestModule.Utest
 import mill.scalalib._
 import mill.scalalib.scalafmt._
-import $ivy.`com.lihaoyi::mill-contrib-jmh:`
 import contrib.jmh.JmhModule
 import os.Path
 
-import build.{circtlib, v, ZaoziPublishModule, LitModule}
+import build.{circtlib, v, LitModule, ZaoziPublishModule}
 import build.zaozi.testlib
 
-object `package` extends RootModule with ScalaModule with ScalafmtModule with ZaoziPublishModule { m =>
+object `package` extends ScalaModule with ScalafmtModule with ZaoziPublishModule { m =>
   def scalaVersion = Task(v.scala)
-  def ivyDeps      = Task(Seq(v.mainargs, v.oslib, v.upickle, v.sourcecode))
+  def mvnDeps      = Seq(v.mainargs, v.oslib, v.upickle, v.sourcecode)
   def moduleDeps   = Seq(circtlib)
 
   // Due to a bug of macro in utest, we have to disable -Xcheck-macros to make dotty happy
-  override def scalacOptions: Target[Seq[String]] = Task(super.scalacOptions() ++ Seq("-Xprint-suspension", "-experimental", "-Xcheck-macros"))
+  override def scalacOptions: T[Seq[String]] = Task(
+    super.scalacOptions() ++ Seq("-Xprint-suspension", "-experimental", "-Xcheck-macros")
+  )
 
   object lit extends ScalaModule with ScalafmtModule {
     def scalaVersion = Task(v.scala)
@@ -34,8 +35,8 @@ object `package` extends RootModule with ScalaModule with ScalafmtModule with Za
         (circtlib.libraryPaths()).map(_.path)
       )
       def javaHome:        T[os.Path]      = Task(os.Path(sys.props("java.home")))
-      def litDir:          T[os.Path]      = Task(millSourcePath)
-      def litConfigIn:     T[PathRef]      = Task.Source(millSourcePath / "lit.site.cfg.py.in")
+      def litDir:          T[os.Path]      = Task(moduleDir)
+      def litConfigIn:     T[PathRef]      = Task.Source(moduleDir / "lit.site.cfg.py.in")
     }
   }
 
@@ -44,19 +45,20 @@ object `package` extends RootModule with ScalaModule with ScalafmtModule with Za
     def scalaVersion   = Task(v.scala)
     def moduleDeps     = Seq(tests)
     def jmhCoreVersion = Task(v.jmh)
-    override def scalacOptions: Target[Seq[String]] = Task(super.scalacOptions() :+ "-experimental")
-    override def forkArgs: T[Seq[String]] = Task(
+    override def scalacOptions: T[Seq[String]] = Task(super.scalacOptions() :+ "-experimental")
+    override def forkArgs:      T[Seq[String]] = Task(
       super.forkArgs() ++ circtlib.forkArgs()
     )
     def runJmh(args: String*) = Task.Command {
       val (_, resources) = generateBenchmarkSources()
       mill.util.Jvm.callProcess(
-        "org.openjdk.jmh.Main",
+        mainClass = "org.openjdk.jmh.Main",
         classPath = (runClasspath() ++ generatorDeps()).map(_.path) ++
-          Seq(compileGeneratedSources().path, resources),
+          Seq(compileGeneratedSources().path, resources.path),
         mainArgs = args,
         cwd = Task.ctx().dest,
         jvmArgs = forkArgs(),
+        javaHome = javaHome().map(_.path),
         stdin = os.Inherit,
         stdout = os.Inherit
       )
@@ -65,9 +67,9 @@ object `package` extends RootModule with ScalaModule with ScalafmtModule with Za
   }
 
   object tests extends ScalaTests with ScalafmtModule with Utest {
-    override def scalacOptions: Target[Seq[String]] = Task(super.scalacOptions().filterNot(_ == "-Xcheck-macros"))
+    override def scalacOptions: T[Seq[String]] = Task(super.scalacOptions().filterNot(_ == "-Xcheck-macros"))
 
-    def ivyDeps = Agg(v.utest)
+    def mvnDeps    = Seq(v.utest)
     def moduleDeps = Seq(testlib)
 
     override def forkArgs: T[Seq[String]] = Task(
@@ -75,4 +77,3 @@ object `package` extends RootModule with ScalaModule with ScalafmtModule with Za
     )
   }
 }
-
