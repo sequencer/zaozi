@@ -3,7 +3,6 @@
 
 { lib
 , stdenv
-, generateIvyCache
 , makeWrapper
 , mill
 , circt-install
@@ -12,9 +11,13 @@
 , lit
 , scala-cli
 , add-determinism
-, mill-ivy-env-shell-hook
 , z3
 , espresso
+, mill-ivy-fetcher
+, ivy-gather
+, writeShellApplication
+, mill-ivy-env-shell-hook
+
 }:
 
 let
@@ -33,13 +36,18 @@ let
         ];
       };
 
-    passthru.millDeps = generateIvyCache {
-      inherit name;
-      src = self.src;
-      hash = "sha256-C4IUEPWLyl+KCSBZeYU26aEBnHAcRRHa2BEihoXdtc8=";
+    passthru.bump = writeShellApplication {
+      name = "bump-zaozi-mill-lock";
+      runtimeInputs = [
+        mill
+        mill-ivy-fetcher
+      ];
+      text = ''
+        mif run -p "${src}" -o ./nix/zaozi/zaozi-lock.nix "$@"
+      '';
     };
 
-    buildInputs = passthru.millDeps.cache.ivyDepsList;
+    buildInputs = [ (ivy-gather ./zaozi-lock.nix) ];
 
     nativeBuildInputs = [
       mill
@@ -70,8 +78,9 @@ let
 
     outputs = [ "out" ];
 
+    # FIXME: wait https://github.com/com-lihaoyi/mill/pull/5521
     buildPhase = ''
-      mill -i '__.assembly'
+      mill -i --offline '__.assembly'
     '';
 
     installPhase = ''
