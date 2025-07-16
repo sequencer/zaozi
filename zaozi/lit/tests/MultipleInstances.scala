@@ -4,8 +4,7 @@
 // DEFINE: %{test} = scala-cli --server=false --java-home=%JAVAHOME --extra-jars=%RUNCLASSPATH --scala-version=%SCALAVERSION -O="-experimental" --java-opt="--enable-native-access=ALL-UNNAMED" --java-opt="--enable-preview" --java-opt="-Djava.library.path=%JAVALIBRARYPATH" --main-class GCD %s --
 // RUN: %{test} config %t.json --width 32 --use-async-reset false
 // RUN: %{test} design %t.json
-// RUN: firtool GCD*.mlirbc | FileCheck %s -check-prefix=GCD
-// RUN: firtool Subtractor*.mlirbc | FileCheck %s -check-prefix=SUB
+// RUN: firld *.mlirbc --base-circuit GCD_35bf2066 --no-mangle | firtool --format=mlir | FileCheck %s --check-prefixes=GCD,SUB
 // RUN: rm %t.json *.mlirbc -f
 
 import me.jiuyang.zaozi.*
@@ -73,16 +72,16 @@ class GCDInput(parameter: GCDParameter) extends Bundle:
 class GCDOutput(parameter: GCDParameter) extends Bundle:
   val z: BundleField[UInt] = Aligned(UInt(parameter.width.W))
 
-// GCD:      module GCD_35bf2066(
-// GCD-NEXT:   input         clock,
-// GCD-NEXT:                 reset,
-// GCD-NEXT:   output        input_ready,
-// GCD-NEXT:   input         input_valid,
-// GCD-NEXT:   input  [31:0] input_bits_x,
-// GCD-NEXT:                 input_bits_y,
-// GCD-NEXT:   output        output_valid,
-// GCD-NEXT:   output [31:0] output_bits_z
-// GCD-NEXT: );
+// GCD-DAG:      module GCD_35bf2066(
+// GCD-DAG-NEXT:   input         clock,
+// GCD-DAG-NEXT:                 reset,
+// GCD-DAG-NEXT:   output        input_ready,
+// GCD-DAG-NEXT:   input         input_valid,
+// GCD-DAG-NEXT:   input  [31:0] input_bits_x,
+// GCD-DAG-NEXT:                 input_bits_y,
+// GCD-DAG-NEXT:   output        output_valid,
+// GCD-DAG-NEXT:   output [31:0] output_bits_z
+// GCD-DAG-NEXT: );
 class GCDIO(parameter: GCDParameter) extends HWBundle(parameter):
   val clock:  BundleField[Clock]                 = Flipped(Clock())
   val reset:  BundleField[Reset]                 = Flipped(if (parameter.useAsyncReset) AsyncReset() else Reset())
@@ -106,11 +105,11 @@ class SubtractorIO(
 
 class SubtractorProbe(parameter: SubtractorParameter) extends DVBundle[SubtractorParameter, SubtractorLayers](parameter)
 
-// SUB:      module Subtractor_f34dfd42(
-// SUB-NEXT:   input [31:0] a,
-// SUB-NEXT:   b,
-// SUB-NEXT:   output [31:0] z
-// SUB-NEXT: );
+// SUB-DAG:      module Subtractor_f34dfd42(
+// SUB-DAG-NEXT:   input [31:0] a,
+// SUB-DAG-NEXT:   b,
+// SUB-DAG-NEXT:   output [31:0] z
+// SUB-DAG-NEXT: );
 @generator
 object Subtractor extends Generator[SubtractorParameter, SubtractorLayers, SubtractorIO, SubtractorProbe]:
   def architecture(parameter: SubtractorParameter) =
@@ -133,20 +132,20 @@ object GCD extends Generator[GCDParameter, GCDLayers, GCDIO, GCDProbe]:
     io.output.bits.z := x
     io.output.valid  := !busy & startupFlag
 
-    // GCD:      Subtractor_f34dfd42 sub1 (
-    // GCD-NEXT:   .a (x),
-    // GCD-NEXT:   .b (y),
-    // GCD-NEXT:   .z (_sub1_z)
-    // GCD-NEXT: );
+    // GCD-DAG:      Subtractor_f34dfd42 sub1 (
+    // GCD-DAG-NEXT:   .a (x),
+    // GCD-DAG-NEXT:   .b (y),
+    // GCD-DAG-NEXT:   .z (_sub1_z)
+    // GCD-DAG-NEXT: );
     val sub1 = Subtractor.instantiate(SubtractorParameter(parameter.width))
     sub1.io.a := x
     sub1.io.b := y
 
-    // GCD:      Subtractor_f34dfd42 sub2 (
-    // GCD-NEXT:   .a (y),
-    // GCD-NEXT:   .b (x),
-    // GCD-NEXT:   .z (_sub2_z)
-    // GCD-NEXT: );
+    // GCD-DAG:      Subtractor_f34dfd42 sub2 (
+    // GCD-DAG-NEXT:   .a (y),
+    // GCD-DAG-NEXT:   .b (x),
+    // GCD-DAG-NEXT:   .z (_sub2_z)
+    // GCD-DAG-NEXT: );
     val sub2 = Subtractor.instantiate(SubtractorParameter(parameter.width))
     sub2.io.a := y
     sub2.io.b := x
