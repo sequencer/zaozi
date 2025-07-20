@@ -349,6 +349,91 @@ object Smoke extends TestSuite:
               test("SInt"):
                 summon[LEQPrimApi].op(sint1.result, sint2.result, unknownLocation).operation.appendToBlock()
 
+            test("LTLAndIntrinsic"):
+              summon[LTLAndIntrinsicApi]
+                .op(bool1.result, bool1.result, 1.getUInt, unknownLocation)
+                .operation
+                .appendToBlock()
+
+            test("LTLClockIntrinsic"):
+              given org.llvm.mlir.scalalib.capi.ir.Block = module.block
+              val clock                                  = summon[WireApi].op(
+                name = "clock",
+                location = unknownLocation,
+                nameKind = FirrtlNameKind.Droppable,
+                tpe = summon[FirrtlTypeApi].getClock
+              )
+              summon[LTLClockIntrinsicApi]
+                .op(bool1.result, clock.result, 1.getUInt, unknownLocation)
+                .operation
+                .appendToBlock()
+
+            test("LTLConcatIntrinsic"):
+              summon[LTLConcatIntrinsicApi]
+                .op(bool1.result, bool1.result, 1.getUInt, unknownLocation)
+                .operation
+                .appendToBlock()
+
+            test("LTLDelayIntrinsic"):
+              summon[LTLDelayIntrinsicApi]
+                .op(bool1.result, 1, 1, 1.getUInt, unknownLocation)
+                .operation
+                .appendToBlock()
+
+            test("LTLEventuallyIntrinsic"):
+              summon[LTLEventuallyIntrinsicApi]
+                .op(bool1.result, 1.getUInt, unknownLocation)
+                .operation
+                .appendToBlock()
+
+            test("LTLGoToRepeatIntrinsic"):
+              summon[LTLGoToRepeatIntrinsicApi]
+                .op(bool1.result, 1, 1, 1.getUInt, unknownLocation)
+                .operation
+                .appendToBlock()
+
+            test("LTLImplicationIntrinsic"):
+              summon[LTLImplicationIntrinsicApi]
+                .op(bool1.result, bool1.result, 1.getUInt, unknownLocation)
+                .operation
+                .appendToBlock()
+
+            test("LTLIntersectIntrinsic"):
+              summon[LTLIntersectIntrinsicApi]
+                .op(bool1.result, bool1.result, 1.getUInt, unknownLocation)
+                .operation
+                .appendToBlock()
+
+            test("LTLNonConsecutiveRepeatIntrinsic"):
+              summon[LTLNonConsecutiveRepeatIntrinsicApi]
+                .op(bool1.result, 1, 1, 1.getUInt, unknownLocation)
+                .operation
+                .appendToBlock()
+
+            test("LTLNotIntrinsic"):
+              summon[LTLNotIntrinsicApi]
+                .op(bool1.result, 1.getUInt, unknownLocation)
+                .operation
+                .appendToBlock()
+
+            test("LTLOrIntrinsic"):
+              summon[LTLOrIntrinsicApi]
+                .op(bool1.result, bool1.result, 1.getUInt, unknownLocation)
+                .operation
+                .appendToBlock()
+
+            test("LTLRepeatIntrinsic"):
+              summon[LTLRepeatIntrinsicApi]
+                .op(bool1.result, 1, 1, 1.getUInt, unknownLocation)
+                .operation
+                .appendToBlock()
+
+            test("LTLUntilIntrinsic"):
+              summon[LTLUntilIntrinsicApi]
+                .op(bool1.result, bool1.result, 1.getUInt, unknownLocation)
+                .operation
+                .appendToBlock()
+
             test("LTPrim"):
               test("UInt"):
                 summon[LTPrimApi].op(uint1.result, uint2.result, unknownLocation).operation.appendToBlock()
@@ -454,6 +539,36 @@ object Smoke extends TestSuite:
 
               test("SInt"):
                 summon[TailPrimApi].op(sint1.result, 0, unknownLocation).operation.appendToBlock()
+
+            test("VerifAssertIntrinsic"):
+              summon[VerifAssertIntrinsicApi]
+                .op(bool1.result, bool1.result, "assert1", unknownLocation)
+                .operation
+                .appendToBlock()
+
+            test("VerifAssumeIntrinsic"):
+              summon[VerifAssumeIntrinsicApi]
+                .op(bool1.result, bool1.result, "assume1", unknownLocation)
+                .operation
+                .appendToBlock()
+
+            test("VerifCoverIntrinsic"):
+              summon[VerifCoverIntrinsicApi]
+                .op(bool1.result, bool1.result, "cover1", unknownLocation)
+                .operation
+                .appendToBlock()
+
+            test("VerifEnsureIntrinsic"):
+              summon[VerifEnsureIntrinsicApi]
+                .op(bool1.result, bool1.result, "ensure1", unknownLocation)
+                .operation
+                .appendToBlock()
+
+            test("VerifRequireIntrinsic"):
+              summon[VerifRequireIntrinsicApi]
+                .op(bool1.result, bool1.result, "require1", unknownLocation)
+                .operation
+                .appendToBlock()
 
             test("XorPrimApi"):
               test("UInt"):
