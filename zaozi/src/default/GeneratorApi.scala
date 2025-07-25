@@ -2,6 +2,8 @@
 // SPDX-FileCopyrightText: 2025 Jiuyang Liu <liu@jiuyang.me>
 package me.jiuyang.zaozi.default
 
+import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.Try
 
 import me.jiuyang.zaozi.*
@@ -149,6 +151,8 @@ given GeneratorApi with
       given InstanceContext = new InstanceContext
       given L               = generator.layers(parameter)
       generator.architecture(parameter)
+      import ExecutionContext.Implicits.global
+      Await.ready(Future.sequence(summon[InstanceContext].ElaboratingModules), Duration.Inf)
       module
 
     def instance(
@@ -232,26 +236,28 @@ given GeneratorApi with
     )(
       using Arena,
       Context
-    ): Unit =
-      val mlirbcFile =
-        os.Path(
-          sys.env.getOrElse("ZAOZI_OUTDIR", ""),
-          os.pwd
-        ) / s"${generator.moduleName(parameter)}.mlirbc"
+    ): Future[Unit] =
+      import ExecutionContext.Implicits.global
+      Future:
+        val mlirbcFile =
+          os.Path(
+            sys.env.getOrElse("ZAOZI_OUTDIR", ""),
+            os.pwd
+          ) / s"${generator.moduleName(parameter)}.mlirbc"
 
-      generator.elaborationCache.get(parameter) match
-        case Some(mlirbc) =>
-          os.write.over(mlirbcFile, mlirbc)
-        case None         =>
-          given MlirModule = summon[MlirModuleApi].moduleCreateEmpty(summon[LocationApi].locationUnknownGet)
-          given Circuit    = summon[CircuitApi].op(generator.moduleName(parameter))
-          summon[Circuit].appendToModule()
-          generator.module(parameter).appendToCircuit()
-          validateCircuit()
+        generator.elaborationCache.get(parameter) match
+          case Some(mlirbc) =>
+            os.write.over(mlirbcFile, mlirbc)
+          case None         =>
+            given MlirModule = summon[MlirModuleApi].moduleCreateEmpty(summon[LocationApi].locationUnknownGet)
+            given Circuit    = summon[CircuitApi].op(generator.moduleName(parameter))
+            summon[Circuit].appendToModule()
+            generator.module(parameter).appendToCircuit()
+            validateCircuit()
 
-          val out = os.write.outputStream(mlirbcFile, openOptions = Seq(WRITE, CREATE, TRUNCATE_EXISTING))
-          summon[MlirModule].getOperation.writeBytecode(bc => out.write(bc))
-          generator.elaborationCache.put(parameter, os.read.bytes(mlirbcFile))
+            val out = os.write.outputStream(mlirbcFile, openOptions = Seq(WRITE, CREATE, TRUNCATE_EXISTING))
+            summon[MlirModule].getOperation.writeBytecode(bc => out.write(bc))
+            generator.elaborationCache.put(parameter, os.read.bytes(mlirbcFile))
 
     def instantiate(
       parameter: PARAM
@@ -264,7 +270,7 @@ given GeneratorApi with
       sourcecode.Name.Machine,
       InstanceContext
     ): Instance[I, P] =
-      generator.dumpMlirbc(parameter)
+      summon[InstanceContext].ElaboratingModules += generator.dumpMlirbc(parameter)
       generator.instance(parameter)
 
     private def configImpl(
@@ -283,7 +289,7 @@ given GeneratorApi with
       given Context = summon[ContextApi].contextCreate
       summon[FirrtlDialectApi].loadDialect
 
-      generator.dumpMlirbc(upickle.default.read(os.read(configFile)))
+      Await.ready(generator.dumpMlirbc(upickle.default.read(os.read(configFile))), Duration.Inf)
 
       summon[Context].destroy()
       summon[Arena].close()

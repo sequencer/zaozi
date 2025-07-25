@@ -16,7 +16,7 @@ object `package` extends ScalaModule with ScalafmtModule with PanamaModule with 
   def mvnDeps      = Seq(v.pprint)
 
   override def dumpIncludes() = Task.Command {
-    super.dumpIncludes()
+    super.dumpIncludes()()
     includeFiles().foreach { file =>
       val lines =
         os.read

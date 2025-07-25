@@ -13,7 +13,7 @@ object `package` extends ScalaModule with ScalafmtModule with PanamaModule with 
   def scalaVersion = Task(v.scala)
 
   def dumpIncludes() = Task.Command {
-    super.dumpIncludes()
+    super.dumpIncludes()()
     includeFiles().foreach { file =>
       val lines =
         os.read

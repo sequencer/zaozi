@@ -12,6 +12,7 @@ import org.llvm.circt.scalalib.dialect.firrtl.operation.{Module as CirctModule, 
 import org.llvm.mlir.scalalib.capi.ir.{Block, Context, Operation, Type, Value}
 
 import java.lang.foreign.Arena
+import scala.concurrent.Future
 
 /** Rebuild the [[Layer]] with each [[Layer]] contains the entire tree. */
 trait LayerTree:
@@ -81,7 +82,8 @@ class InstanceContext:
       _count += 1
       o
 
-  val anonSignalCounter = new AnonSignalCounter(0)
+  val anonSignalCounter  = new AnonSignalCounter(0)
+  val ElaboratingModules = collection.mutable.Buffer.empty[Future[Unit]]
 
 trait Generator[PARAM <: Parameter, L <: LayerInterface[PARAM], I <: HWInterface[PARAM], P <: DVInterface[PARAM, L]]:
   /* For traits with self-type annotation that don't want type parameters
@@ -159,7 +161,7 @@ trait GeneratorApi:
     )(
       using Arena,
       Context
-    ): Unit
+    ): Future[Unit]
 
     def mainImpl(
       args: Array[String]
