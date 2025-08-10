@@ -12,8 +12,8 @@ import build.{v, PanamaModule, ZaoziPublishModule}
 object `package` extends ScalaModule with ScalafmtModule with PanamaModule with ZaoziPublishModule {
   def scalaVersion = Task(v.scala)
 
-  def dumpIncludes() = Task.Command {
-    super.dumpIncludes()
+  override def dumpIncludes() = Task.Command {
+    super.dumpIncludes()()
     includeFiles().foreach { file =>
       val lines =
         os.read
