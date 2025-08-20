@@ -504,6 +504,7 @@ mlirCreateCIRCTConversionCalyxToHW                    # header: $CIRCT_INSTALL_P
 mlirCreateCIRCTConversionConvertAIGToComb             # header: $CIRCT_INSTALL_PATH/include/circt/Conversion/Conversion.capi.h.inc
 mlirCreateCIRCTConversionConvertCombToAIG             # header: $CIRCT_INSTALL_PATH/include/circt/Conversion/Conversion.capi.h.inc
 mlirCreateCIRCTConversionConvertCombToArith           # header: $CIRCT_INSTALL_PATH/include/circt/Conversion/Conversion.capi.h.inc
+mlirCreateCIRCTConversionConvertCombToDatapath        # header: $CIRCT_INSTALL_PATH/include/circt/Conversion/Conversion.capi.h.inc
 mlirCreateCIRCTConversionConvertCombToSMT             # header: $CIRCT_INSTALL_PATH/include/circt/Conversion/Conversion.capi.h.inc
 mlirCreateCIRCTConversionConvertFSMToSV               # header: $CIRCT_INSTALL_PATH/include/circt/Conversion/Conversion.capi.h.inc
 mlirCreateCIRCTConversionConvertHWToBTOR2             # header: $CIRCT_INSTALL_PATH/include/circt/Conversion/Conversion.capi.h.inc
@@ -548,6 +549,7 @@ mlirRegisterCIRCTConversionCalyxToHW                  # header: $CIRCT_INSTALL_P
 mlirRegisterCIRCTConversionConvertAIGToComb           # header: $CIRCT_INSTALL_PATH/include/circt/Conversion/Conversion.capi.h.inc
 mlirRegisterCIRCTConversionConvertCombToAIG           # header: $CIRCT_INSTALL_PATH/include/circt/Conversion/Conversion.capi.h.inc
 mlirRegisterCIRCTConversionConvertCombToArith         # header: $CIRCT_INSTALL_PATH/include/circt/Conversion/Conversion.capi.h.inc
+mlirRegisterCIRCTConversionConvertCombToDatapath      # header: $CIRCT_INSTALL_PATH/include/circt/Conversion/Conversion.capi.h.inc
 mlirRegisterCIRCTConversionConvertCombToSMT           # header: $CIRCT_INSTALL_PATH/include/circt/Conversion/Conversion.capi.h.inc
 mlirRegisterCIRCTConversionConvertFSMToSV             # header: $CIRCT_INSTALL_PATH/include/circt/Conversion/Conversion.capi.h.inc
 mlirRegisterCIRCTConversionConvertHWToBTOR2           # header: $CIRCT_INSTALL_PATH/include/circt/Conversion/Conversion.capi.h.inc
