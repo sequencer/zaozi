@@ -62,6 +62,7 @@ import org.llvm.mlir.scalalib.capi.pass.{given_PassManagerApi, PassManager}
 
 import java.lang.foreign.Arena
 import java.nio.file.StandardOpenOption.*
+import java.io.ByteArrayOutputStream
 
 export given_GeneratorApi.*
 export me.jiuyang.zaozi.magic.macros.generator
@@ -233,25 +234,21 @@ given GeneratorApi with
       using Arena,
       Context
     ): Unit =
-      val mlirbcFile =
-        os.Path(
-          sys.env.getOrElse("ZAOZI_OUTDIR", ""),
-          os.pwd
-        ) / s"${generator.moduleName(parameter)}.mlirbc"
+      if !generator.elaboratedModules.contains(parameter) then
+        given MlirModule = summon[MlirModuleApi].moduleCreateEmpty(summon[LocationApi].locationUnknownGet)
+        given Circuit    = summon[CircuitApi].op(generator.moduleName(parameter))
+        summon[Circuit].appendToModule()
+        generator.module(parameter).appendToCircuit()
+        validateCircuit()
 
-      generator.elaborationCache.get(parameter) match
-        case Some(mlirbc) =>
-          os.write.over(mlirbcFile, mlirbc)
-        case None         =>
-          given MlirModule = summon[MlirModuleApi].moduleCreateEmpty(summon[LocationApi].locationUnknownGet)
-          given Circuit    = summon[CircuitApi].op(generator.moduleName(parameter))
-          summon[Circuit].appendToModule()
-          generator.module(parameter).appendToCircuit()
-          validateCircuit()
-
-          val out = os.write.outputStream(mlirbcFile, openOptions = Seq(WRITE, CREATE, TRUNCATE_EXISTING))
-          summon[MlirModule].getOperation.writeBytecode(bc => out.write(bc))
-          generator.elaborationCache.put(parameter, os.read.bytes(mlirbcFile))
+        val mlirbcFile =
+          os.Path(
+            sys.env.getOrElse("ZAOZI_OUTDIR", ""),
+            os.pwd
+          ) / s"${generator.moduleName(parameter)}.mlirbc"
+        val out        = os.write.outputStream(mlirbcFile, openOptions = Seq(WRITE, CREATE, TRUNCATE_EXISTING))
+        summon[MlirModule].getOperation.writeBytecode(bc => out.write(bc))
+        generator.elaboratedModules.add(parameter)
 
     def instantiate(
       parameter: PARAM
