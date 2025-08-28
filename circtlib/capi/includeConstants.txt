@@ -54,6 +54,3 @@ CIRCT_FIRTOOL_VERIFICATION_FLAVOR_IF_ELSE_FATAL                         # header
 CIRCT_FIRTOOL_VERIFICATION_FLAVOR_IMMEDIATE                             # header: $CIRCT_INSTALL_PATH/include/circt-c/Firtool/Firtool.h
 CIRCT_FIRTOOL_VERIFICATION_FLAVOR_NONE                                  # header: $CIRCT_INSTALL_PATH/include/circt-c/Firtool/Firtool.h
 CIRCT_FIRTOOL_VERIFICATION_FLAVOR_SVA                                   # header: $CIRCT_INSTALL_PATH/include/circt-c/Firtool/Firtool.h
-CIRCT_RTGTOOL_OUTPUT_FORMAT_ASM                   # header: $CIRCT_INSTALL_PATH/include/circt-c/RtgTool.h
-CIRCT_RTGTOOL_OUTPUT_FORMAT_ELABORATED_MLIR       # header: $CIRCT_INSTALL_PATH/include/circt-c/RtgTool.h
-CIRCT_RTGTOOL_OUTPUT_FORMAT_MLIR                  # header: $CIRCT_INSTALL_PATH/include/circt-c/RtgTool.h

@@ -326,6 +326,9 @@ mlirShapedTypeHasStaticShape           # header: $MLIR_INSTALL_PATH/include/mlir
 mlirShapedTypeIsDynamicDim             # header: $MLIR_INSTALL_PATH/include/mlir-c/BuiltinTypes.h
 mlirShapedTypeIsDynamicSize            # header: $MLIR_INSTALL_PATH/include/mlir-c/BuiltinTypes.h
 mlirShapedTypeIsDynamicStrideOrOffset  # header: $MLIR_INSTALL_PATH/include/mlir-c/BuiltinTypes.h
+mlirShapedTypeIsStaticDim              # header: $MLIR_INSTALL_PATH/include/mlir-c/BuiltinTypes.h
+mlirShapedTypeIsStaticSize             # header: $MLIR_INSTALL_PATH/include/mlir-c/BuiltinTypes.h
+mlirShapedTypeIsStaticStrideOrOffset   # header: $MLIR_INSTALL_PATH/include/mlir-c/BuiltinTypes.h
 mlirTF32TypeGet                        # header: $MLIR_INSTALL_PATH/include/mlir-c/BuiltinTypes.h
 mlirTupleTypeGet                       # header: $MLIR_INSTALL_PATH/include/mlir-c/BuiltinTypes.h
 mlirTupleTypeGetNumTypes               # header: $MLIR_INSTALL_PATH/include/mlir-c/BuiltinTypes.h
@@ -638,8 +641,12 @@ mlirBlockGetArgument                          # header: $MLIR_INSTALL_PATH/inclu
 mlirBlockGetFirstOperation                    # header: $MLIR_INSTALL_PATH/include/mlir-c/IR.h
 mlirBlockGetNextInRegion                      # header: $MLIR_INSTALL_PATH/include/mlir-c/IR.h
 mlirBlockGetNumArguments                      # header: $MLIR_INSTALL_PATH/include/mlir-c/IR.h
+mlirBlockGetNumPredecessors                   # header: $MLIR_INSTALL_PATH/include/mlir-c/IR.h
+mlirBlockGetNumSuccessors                     # header: $MLIR_INSTALL_PATH/include/mlir-c/IR.h
 mlirBlockGetParentOperation                   # header: $MLIR_INSTALL_PATH/include/mlir-c/IR.h
 mlirBlockGetParentRegion                      # header: $MLIR_INSTALL_PATH/include/mlir-c/IR.h
+mlirBlockGetPredecessor                       # header: $MLIR_INSTALL_PATH/include/mlir-c/IR.h
+mlirBlockGetSuccessor                         # header: $MLIR_INSTALL_PATH/include/mlir-c/IR.h
 mlirBlockGetTerminator                        # header: $MLIR_INSTALL_PATH/include/mlir-c/IR.h
 mlirBlockInsertArgument                       # header: $MLIR_INSTALL_PATH/include/mlir-c/IR.h
 mlirBlockInsertOwnedOperation                 # header: $MLIR_INSTALL_PATH/include/mlir-c/IR.h
@@ -766,6 +773,7 @@ mlirOperationGetResult                        # header: $MLIR_INSTALL_PATH/inclu
 mlirOperationGetSuccessor                     # header: $MLIR_INSTALL_PATH/include/mlir-c/IR.h
 mlirOperationGetTypeID                        # header: $MLIR_INSTALL_PATH/include/mlir-c/IR.h
 mlirOperationHasInherentAttributeByName       # header: $MLIR_INSTALL_PATH/include/mlir-c/IR.h
+mlirOperationIsBeforeInBlock                  # header: $MLIR_INSTALL_PATH/include/mlir-c/IR.h
 mlirOperationMoveAfter                        # header: $MLIR_INSTALL_PATH/include/mlir-c/IR.h
 mlirOperationMoveBefore                       # header: $MLIR_INSTALL_PATH/include/mlir-c/IR.h
 mlirOperationPrint                            # header: $MLIR_INSTALL_PATH/include/mlir-c/IR.h
@@ -863,6 +871,7 @@ mlirPassManagerCreate             # header: $MLIR_INSTALL_PATH/include/mlir-c/Pa
 mlirPassManagerCreateOnOperation  # header: $MLIR_INSTALL_PATH/include/mlir-c/Pass.h
 mlirPassManagerDestroy            # header: $MLIR_INSTALL_PATH/include/mlir-c/Pass.h
 mlirPassManagerEnableIRPrinting   # header: $MLIR_INSTALL_PATH/include/mlir-c/Pass.h
+mlirPassManagerEnableTiming       # header: $MLIR_INSTALL_PATH/include/mlir-c/Pass.h
 mlirPassManagerEnableVerifier     # header: $MLIR_INSTALL_PATH/include/mlir-c/Pass.h
 mlirPassManagerGetAsOpPassManager # header: $MLIR_INSTALL_PATH/include/mlir-c/Pass.h
 mlirPassManagerGetNestedUnder     # header: $MLIR_INSTALL_PATH/include/mlir-c/Pass.h
@@ -938,6 +947,7 @@ mlirCreateConversionConvertAsyncToLLVMPass               # header: $MLIR_INSTALL
 mlirCreateConversionConvertBufferizationToMemRefPass     # header: $MLIR_INSTALL_PATH/include/mlir/Conversion/Passes.capi.h.inc
 mlirCreateConversionConvertComplexToLLVMPass             # header: $MLIR_INSTALL_PATH/include/mlir/Conversion/Passes.capi.h.inc
 mlirCreateConversionConvertComplexToLibm                 # header: $MLIR_INSTALL_PATH/include/mlir/Conversion/Passes.capi.h.inc
+mlirCreateConversionConvertComplexToROCDLLibraryCalls    # header: $MLIR_INSTALL_PATH/include/mlir/Conversion/Passes.capi.h.inc
 mlirCreateConversionConvertComplexToSPIRVPass            # header: $MLIR_INSTALL_PATH/include/mlir/Conversion/Passes.capi.h.inc
 mlirCreateConversionConvertComplexToStandardPass         # header: $MLIR_INSTALL_PATH/include/mlir/Conversion/Passes.capi.h.inc
 mlirCreateConversionConvertControlFlowToLLVMPass         # header: $MLIR_INSTALL_PATH/include/mlir/Conversion/Passes.capi.h.inc
@@ -960,7 +970,6 @@ mlirCreateConversionConvertMathToROCDL                   # header: $MLIR_INSTALL
 mlirCreateConversionConvertMathToSPIRVPass               # header: $MLIR_INSTALL_PATH/include/mlir/Conversion/Passes.capi.h.inc
 mlirCreateConversionConvertMemRefToEmitC                 # header: $MLIR_INSTALL_PATH/include/mlir/Conversion/Passes.capi.h.inc
 mlirCreateConversionConvertMemRefToSPIRVPass             # header: $MLIR_INSTALL_PATH/include/mlir/Conversion/Passes.capi.h.inc
-mlirCreateConversionConvertMeshToMPIPass                 # header: $MLIR_INSTALL_PATH/include/mlir/Conversion/Passes.capi.h.inc
 mlirCreateConversionConvertNVGPUToNVVMPass               # header: $MLIR_INSTALL_PATH/include/mlir/Conversion/Passes.capi.h.inc
 mlirCreateConversionConvertNVVMToLLVMPass                # header: $MLIR_INSTALL_PATH/include/mlir/Conversion/Passes.capi.h.inc
 mlirCreateConversionConvertOpenACCToSCFPass              # header: $MLIR_INSTALL_PATH/include/mlir/Conversion/Passes.capi.h.inc
@@ -971,6 +980,7 @@ mlirCreateConversionConvertSCFToOpenMPPass               # header: $MLIR_INSTALL
 mlirCreateConversionConvertSPIRVToLLVMPass               # header: $MLIR_INSTALL_PATH/include/mlir/Conversion/Passes.capi.h.inc
 mlirCreateConversionConvertShapeConstraintsPass          # header: $MLIR_INSTALL_PATH/include/mlir/Conversion/Passes.capi.h.inc
 mlirCreateConversionConvertShapeToStandardPass           # header: $MLIR_INSTALL_PATH/include/mlir/Conversion/Passes.capi.h.inc
+mlirCreateConversionConvertShardToMPIPass                # header: $MLIR_INSTALL_PATH/include/mlir/Conversion/Passes.capi.h.inc
 mlirCreateConversionConvertTensorToLinalgPass            # header: $MLIR_INSTALL_PATH/include/mlir/Conversion/Passes.capi.h.inc
 mlirCreateConversionConvertTensorToSPIRVPass             # header: $MLIR_INSTALL_PATH/include/mlir/Conversion/Passes.capi.h.inc
 mlirCreateConversionConvertToEmitC                       # header: $MLIR_INSTALL_PATH/include/mlir/Conversion/Passes.capi.h.inc
@@ -981,6 +991,7 @@ mlirCreateConversionConvertVectorToLLVMPass              # header: $MLIR_INSTALL
 mlirCreateConversionConvertVectorToSCF                   # header: $MLIR_INSTALL_PATH/include/mlir/Conversion/Passes.capi.h.inc
 mlirCreateConversionConvertVectorToSPIRVPass             # header: $MLIR_INSTALL_PATH/include/mlir/Conversion/Passes.capi.h.inc
 mlirCreateConversionConvertVectorToXeGPU                 # header: $MLIR_INSTALL_PATH/include/mlir/Conversion/Passes.capi.h.inc
+mlirCreateConversionConvertXeVMToLLVMPass                # header: $MLIR_INSTALL_PATH/include/mlir/Conversion/Passes.capi.h.inc
 mlirCreateConversionFinalizeMemRefToLLVMConversionPass   # header: $MLIR_INSTALL_PATH/include/mlir/Conversion/Passes.capi.h.inc
 mlirCreateConversionGpuToLLVMConversionPass              # header: $MLIR_INSTALL_PATH/include/mlir/Conversion/Passes.capi.h.inc
 mlirCreateConversionLiftControlFlowToSCFPass             # header: $MLIR_INSTALL_PATH/include/mlir/Conversion/Passes.capi.h.inc
@@ -1014,6 +1025,7 @@ mlirRegisterConversionConvertAsyncToLLVMPass             # header: $MLIR_INSTALL
 mlirRegisterConversionConvertBufferizationToMemRefPass   # header: $MLIR_INSTALL_PATH/include/mlir/Conversion/Passes.capi.h.inc
 mlirRegisterConversionConvertComplexToLLVMPass           # header: $MLIR_INSTALL_PATH/include/mlir/Conversion/Passes.capi.h.inc
 mlirRegisterConversionConvertComplexToLibm               # header: $MLIR_INSTALL_PATH/include/mlir/Conversion/Passes.capi.h.inc
+mlirRegisterConversionConvertComplexToROCDLLibraryCalls  # header: $MLIR_INSTALL_PATH/include/mlir/Conversion/Passes.capi.h.inc
 mlirRegisterConversionConvertComplexToSPIRVPass          # header: $MLIR_INSTALL_PATH/include/mlir/Conversion/Passes.capi.h.inc
 mlirRegisterConversionConvertComplexToStandardPass       # header: $MLIR_INSTALL_PATH/include/mlir/Conversion/Passes.capi.h.inc
 mlirRegisterConversionConvertControlFlowToLLVMPass       # header: $MLIR_INSTALL_PATH/include/mlir/Conversion/Passes.capi.h.inc
@@ -1036,7 +1048,6 @@ mlirRegisterConversionConvertMathToROCDL                 # header: $MLIR_INSTALL
 mlirRegisterConversionConvertMathToSPIRVPass             # header: $MLIR_INSTALL_PATH/include/mlir/Conversion/Passes.capi.h.inc
 mlirRegisterConversionConvertMemRefToEmitC               # header: $MLIR_INSTALL_PATH/include/mlir/Conversion/Passes.capi.h.inc
 mlirRegisterConversionConvertMemRefToSPIRVPass           # header: $MLIR_INSTALL_PATH/include/mlir/Conversion/Passes.capi.h.inc
-mlirRegisterConversionConvertMeshToMPIPass               # header: $MLIR_INSTALL_PATH/include/mlir/Conversion/Passes.capi.h.inc
 mlirRegisterConversionConvertNVGPUToNVVMPass             # header: $MLIR_INSTALL_PATH/include/mlir/Conversion/Passes.capi.h.inc
 mlirRegisterConversionConvertNVVMToLLVMPass              # header: $MLIR_INSTALL_PATH/include/mlir/Conversion/Passes.capi.h.inc
 mlirRegisterConversionConvertOpenACCToSCFPass            # header: $MLIR_INSTALL_PATH/include/mlir/Conversion/Passes.capi.h.inc
@@ -1047,6 +1058,7 @@ mlirRegisterConversionConvertSCFToOpenMPPass             # header: $MLIR_INSTALL
 mlirRegisterConversionConvertSPIRVToLLVMPass             # header: $MLIR_INSTALL_PATH/include/mlir/Conversion/Passes.capi.h.inc
 mlirRegisterConversionConvertShapeConstraintsPass        # header: $MLIR_INSTALL_PATH/include/mlir/Conversion/Passes.capi.h.inc
 mlirRegisterConversionConvertShapeToStandardPass         # header: $MLIR_INSTALL_PATH/include/mlir/Conversion/Passes.capi.h.inc
+mlirRegisterConversionConvertShardToMPIPass              # header: $MLIR_INSTALL_PATH/include/mlir/Conversion/Passes.capi.h.inc
 mlirRegisterConversionConvertTensorToLinalgPass          # header: $MLIR_INSTALL_PATH/include/mlir/Conversion/Passes.capi.h.inc
 mlirRegisterConversionConvertTensorToSPIRVPass           # header: $MLIR_INSTALL_PATH/include/mlir/Conversion/Passes.capi.h.inc
 mlirRegisterConversionConvertToEmitC                     # header: $MLIR_INSTALL_PATH/include/mlir/Conversion/Passes.capi.h.inc
@@ -1057,6 +1069,7 @@ mlirRegisterConversionConvertVectorToLLVMPass            # header: $MLIR_INSTALL
 mlirRegisterConversionConvertVectorToSCF                 # header: $MLIR_INSTALL_PATH/include/mlir/Conversion/Passes.capi.h.inc
 mlirRegisterConversionConvertVectorToSPIRVPass           # header: $MLIR_INSTALL_PATH/include/mlir/Conversion/Passes.capi.h.inc
 mlirRegisterConversionConvertVectorToXeGPU               # header: $MLIR_INSTALL_PATH/include/mlir/Conversion/Passes.capi.h.inc
+mlirRegisterConversionConvertXeVMToLLVMPass              # header: $MLIR_INSTALL_PATH/include/mlir/Conversion/Passes.capi.h.inc
 mlirRegisterConversionFinalizeMemRefToLLVMConversionPass # header: $MLIR_INSTALL_PATH/include/mlir/Conversion/Passes.capi.h.inc
 mlirRegisterConversionGpuToLLVMConversionPass            # header: $MLIR_INSTALL_PATH/include/mlir/Conversion/Passes.capi.h.inc
 mlirRegisterConversionLiftControlFlowToSCFPass           # header: $MLIR_INSTALL_PATH/include/mlir/Conversion/Passes.capi.h.inc
@@ -1100,6 +1113,7 @@ mlirCreateGPUGpuModuleToBinaryPass                # header: $MLIR_INSTALL_PATH/i
 mlirCreateGPUGpuNVVMAttachTarget                  # header: $MLIR_INSTALL_PATH/include/mlir/Dialect/GPU/Transforms/Passes.capi.h.inc
 mlirCreateGPUGpuROCDLAttachTarget                 # header: $MLIR_INSTALL_PATH/include/mlir/Dialect/GPU/Transforms/Passes.capi.h.inc
 mlirCreateGPUGpuSPIRVAttachTarget                 # header: $MLIR_INSTALL_PATH/include/mlir/Dialect/GPU/Transforms/Passes.capi.h.inc
+mlirCreateGPUGpuXeVMAttachTarget                  # header: $MLIR_INSTALL_PATH/include/mlir/Dialect/GPU/Transforms/Passes.capi.h.inc
 mlirRegisterGPUGpuAsyncRegionPass                 # header: $MLIR_INSTALL_PATH/include/mlir/Dialect/GPU/Transforms/Passes.capi.h.inc
 mlirRegisterGPUGpuDecomposeMemrefsPass            # header: $MLIR_INSTALL_PATH/include/mlir/Dialect/GPU/Transforms/Passes.capi.h.inc
 mlirRegisterGPUGpuEliminateBarriers               # header: $MLIR_INSTALL_PATH/include/mlir/Dialect/GPU/Transforms/Passes.capi.h.inc
@@ -1110,6 +1124,7 @@ mlirRegisterGPUGpuModuleToBinaryPass              # header: $MLIR_INSTALL_PATH/i
 mlirRegisterGPUGpuNVVMAttachTarget                # header: $MLIR_INSTALL_PATH/include/mlir/Dialect/GPU/Transforms/Passes.capi.h.inc
 mlirRegisterGPUGpuROCDLAttachTarget               # header: $MLIR_INSTALL_PATH/include/mlir/Dialect/GPU/Transforms/Passes.capi.h.inc
 mlirRegisterGPUGpuSPIRVAttachTarget               # header: $MLIR_INSTALL_PATH/include/mlir/Dialect/GPU/Transforms/Passes.capi.h.inc
+mlirRegisterGPUGpuXeVMAttachTarget                # header: $MLIR_INSTALL_PATH/include/mlir/Dialect/GPU/Transforms/Passes.capi.h.inc
 mlirRegisterGPUPasses                             # header: $MLIR_INSTALL_PATH/include/mlir/Dialect/GPU/Transforms/Passes.capi.h.inc
 mlirCreateLinalgConvertElementwiseToLinalgPass     # header: $MLIR_INSTALL_PATH/include/mlir/Dialect/Linalg/Passes.capi.h.inc
 mlirCreateLinalgConvertLinalgToAffineLoopsPass     # header: $MLIR_INSTALL_PATH/include/mlir/Dialect/Linalg/Passes.capi.h.inc
