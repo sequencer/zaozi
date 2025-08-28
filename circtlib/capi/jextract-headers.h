@@ -29,6 +29,5 @@
 #include <circt-c/Dialect/RTG.h>
 #include <circt-c/Dialect/HWArith.h>
 #include <circt-c/ExportFIRRTL.h>
-#include <circt-c/RtgTool.h>
 
 #endif // JEXTRACT_HEADERS_H
