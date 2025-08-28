@@ -137,6 +137,11 @@ def validateCircuit(
                       ),
                       // ::mlir::ArrayAttr
                       namedAttributeApi.namedAttributeGet(
+                        "knownLayers".identifierGet,
+                        op.getInherentAttributeByName("layers")
+                      ),
+                      // ::mlir::ArrayAttr
+                      namedAttributeApi.namedAttributeGet(
                         "layers".identifierGet,
                         op.getInherentAttributeByName("layers")
                       )

@@ -149,6 +149,10 @@ given ExtModuleApi with
             )
             // ::mlir::ArrayAttr
             // namedAttributeApi.namedAttributeGet(
+            //   "knownLayers".identifierGet, ???
+            // ),
+            // ::mlir::ArrayAttr
+            // namedAttributeApi.namedAttributeGet(
             //   "layers".identifierGet, ???
             // ),
             // ::mlir::ArrayAttr
