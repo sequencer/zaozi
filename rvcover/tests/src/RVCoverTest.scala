@@ -86,9 +86,19 @@ def rvcoverTest(body: (Arena, Context, Block) ?=> Unit): Unit =
           val argNameLowered = argName.head.toLower + argName.tail
           val prefix         = if arg.name.startsWith("r") then "x" else ""
           val argValue       = getModelField(model, argNameLowered + s"_$i")
+
+          // deal with negative immediate values
+          val processedValue: Long = if (argValue < 0) {
+            val fieldWidth = arg.lsb - arg.msb + 1
+            val mask = (1L << fieldWidth) - 1
+            argValue.toLong & mask
+          } else {
+            argValue.toLong
+          }
+
           (
             argsAcc :+ (prefix + argValue.toString),
-            bitsAcc | (BigInt(argValue) << arg.msb)
+            bitsAcc | (BigInt(processedValue) << arg.msb)
           )
       }
 
