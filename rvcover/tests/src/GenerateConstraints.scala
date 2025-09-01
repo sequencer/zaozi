@@ -39,8 +39,19 @@ object GenerateConstraints extends TestSuite:
       // camelCase the argument name
       val argName: String = translateToCamelCase(name)
       val argNameLowered = argName.head.toLower + argName.tail
+
+      val width = arg.msb - arg.lsb + 1
+      // if the argument name contains "imm" (case insensitive), use signed range
+      val range = if (argName.toLowerCase.contains("imm")) {
+        val min = -(1 << (width - 1))
+        val max = (1 << (width - 1))
+        s"($min, $max)"
+      } else {
+        s"(0, ${1 << width})"
+      }
+
       writer.write(
-        s"def has$argName()(using Arena, Context, Block, Index): Ref[Bool] = ${argNameLowered}Range(0, ${1 << (arg.msb - arg.lsb + 1)})\n"
+        s"def has$argName()(using Arena, Context, Block, Index): Ref[Bool] = ${argNameLowered}Range$range\n"
       )
     }
 
