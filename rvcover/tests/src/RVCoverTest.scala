@@ -57,10 +57,19 @@ def rvcoverTest(body: (Arena, Context, Block) ?=> Unit): Unit =
   summon[Context].destroy()
   summon[Arena].close()
 
+  // output to file
+  val smtfos = new FileOutputStream("output.smt2")
+  try {
+    smtfos.write(out.toString.getBytes)
+  } finally {
+    smtfos.close()
+  }
+
+  // call z3
   val smt = out.toString.replace("(reset)", "(get-model)")
 
   val z3Output = os
-    .proc("z3", "-in", "-t:1000")
+    .proc("z3", "-in", "-t:5000")
     .call(
       stdin = smt,
       check = false // ignore the error message when `unknown` or `unsat`
@@ -72,9 +81,10 @@ def rvcoverTest(body: (Arena, Context, Block) ?=> Unit): Unit =
   val model    = z3Result.model
 
   val instructions      = getInstructions()
-  val instructionCounts = 2
+  // todo: refactor the hack
+  val instructionCounts = (out.toString.split("nameId_").length - 1) / 2
 
-  val fos = new FileOutputStream("output.bin")
+  val fos = new FileOutputStream("output.bin", true)
   try {
     (0 until instructionCounts).foreach { i =>
       val nameId = getModelField(model, s"nameId_$i")
