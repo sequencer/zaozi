@@ -40,7 +40,7 @@ object GenerateConstraints extends TestSuite:
       val argName: String = translateToCamelCase(name)
       val argNameLowered = argName.head.toLower + argName.tail
 
-      val width = arg.msb - arg.lsb + 1
+      val width = arg.lsb - arg.msb + 1
       // if the argument name contains "imm" (case insensitive), use signed range
       val range = if (argName.toLowerCase.contains("imm")) {
         val min = -(1 << (width - 1))
