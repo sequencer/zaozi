@@ -885,7 +885,16 @@ trait TypeImpl:
     def operationImpl:        Operation
     def ioImpl[T <: Data]:    Wire[T]
     def probeImpl[T <: Data]: Wire[T]
-
+  extension (ref: Sequence)
+    def operationImpl: Operation
+    def referImpl(
+      using Arena
+    ):                 Value
+  extension (ref: Property)
+    def operationImpl: Operation
+    def referImpl(
+      using Arena
+    ):                 Value
   extension (ref: Reset)
     def toMlirTypeImpl(
       using Arena,

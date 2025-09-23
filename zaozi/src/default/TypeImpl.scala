@@ -50,6 +50,16 @@ given TypeImpl with
     def operationImpl:        Operation = ref._operation
     def ioImpl[T <: Data]:    Wire[T]   = ref._ioWire.asInstanceOf[Wire[T]]
     def probeImpl[T <: Data]: Wire[T]   = ref._probeWire.asInstanceOf[Wire[T]]
+  extension (ref: Sequence)
+    def operationImpl: Operation = ref.op.operation
+    def referImpl(
+      using Arena
+    ): Value = ref.operation.getResult(0)
+  extension (ref: Property)
+    def operationImpl: Operation = ref.op.operation
+    def referImpl(
+      using Arena
+    ): Value = ref.operation.getResult(0)
 
   extension (ref: Reset)
     def toMlirTypeImpl(
