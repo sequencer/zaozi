@@ -11,7 +11,6 @@ import org.llvm.circt.CAPI.{
   circtFirtoolOptionsSetAllowAddingPortsOnPublic,
   circtFirtoolOptionsSetBlackBoxRootPath,
   circtFirtoolOptionsSetBuildMode,
-  circtFirtoolOptionsSetChiselInterfaceOutDirectory,
   circtFirtoolOptionsSetCkgEnableName,
   circtFirtoolOptionsSetCkgInputName,
   circtFirtoolOptionsSetCkgModuleName,
@@ -31,7 +30,6 @@ import org.llvm.circt.CAPI.{
   circtFirtoolOptionsSetEtcDisableInstanceExtraction,
   circtFirtoolOptionsSetEtcDisableModuleInlining,
   circtFirtoolOptionsSetEtcDisableRegisterExtraction,
-  circtFirtoolOptionsSetExportChiselInterface,
   circtFirtoolOptionsSetExportModuleHierarchy,
   circtFirtoolOptionsSetExtractTestCode,
   circtFirtoolOptionsSetIgnoreReadEnableMem,
@@ -95,11 +93,6 @@ given FirtoolApi with
     )(
       using arena: Arena
     ): Unit = circtFirtoolOptionsSetBuildMode(firtoolOptions.segment, value.toNative)
-    inline def setChiselInterfaceOutDirectory(
-      value:       String
-    )(
-      using arena: Arena
-    ): Unit = circtFirtoolOptionsSetChiselInterfaceOutDirectory(firtoolOptions.segment, value.toStringRef.segment)
     inline def setCkgEnableName(
       value:       String
     )(
@@ -195,11 +188,6 @@ given FirtoolApi with
     )(
       using arena: Arena
     ): Unit = circtFirtoolOptionsSetEtcDisableRegisterExtraction(firtoolOptions.segment, value)
-    inline def setExportChiselInterface(
-      value:       Boolean
-    )(
-      using arena: Arena
-    ): Unit = circtFirtoolOptionsSetExportChiselInterface(firtoolOptions.segment, value)
     inline def setExportModuleHierarchy(
       value:       Boolean
     )(

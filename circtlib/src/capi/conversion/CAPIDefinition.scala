@@ -64,12 +64,6 @@ trait ConversionCreateApi:
   def dcToHW(
     using arena: Arena
   ): Pass
-  def exportChiselInterface(
-    using arena: Arena
-  ): Pass
-  def exportSplitChiselInterface(
-    using arena: Arena
-  ): Pass
   def exportSplitVerilog(
     using arena: Arena
   ): Pass
@@ -142,49 +136,47 @@ trait ConversionCreateApi:
 end ConversionCreateApi
 
 trait ConversionRegisterApi:
-  def affineToLoopSchedule:       Unit
-  def cfToHandshake:              Unit
-  def calyxNative:                Unit
-  def calyxRemoveGroupsFromFSM:   Unit
-  def calyxToFSM:                 Unit
-  def calyxToHW:                  Unit
-  def convertAIGToComb:           Unit
-  def convertCombToAIG:           Unit
-  def convertCombToArith:         Unit
-  def convertCombToSMT:           Unit
-  def convertFSMToSV:             Unit
-  def convertHWToBTOR2:           Unit
-  def convertHWToLLVM:            Unit
-  def convertHWToSMT:             Unit
-  def convertHWToSystemC:         Unit
-  def convertMooreToCore:         Unit
-  def convertToArcs:              Unit
-  def convertVerifToSMT:          Unit
-  def dcToHW:                     Unit
-  def exportChiselInterface:      Unit
-  def exportSplitChiselInterface: Unit
-  def exportSplitVerilog:         Unit
-  def exportVerilog:              Unit
-  def hwArithToHW:                Unit
-  def hwLowerInstanceChoices:     Unit
-  def handshakeRemoveBlock:       Unit
-  def handshakeToDC:              Unit
-  def handshakeToHW:              Unit
-  def legalizeAnonEnums:          Unit
-  def loopScheduleToCalyx:        Unit
-  def lowerArcToLLVM:             Unit
-  def lowerFIRRTLToHW:            Unit
-  def lowerFirMem:                Unit
-  def lowerHWToSV:                Unit
-  def lowerLTLToCore:             Unit
-  def lowerSMTToZ3LLVM:           Unit
-  def lowerSeqToSV:               Unit
-  def lowerSimToSV:               Unit
-  def lowerVerifToSV:             Unit
-  def materializeCalyxToFSM:      Unit
-  def passes:                     Unit
-  def pipelineToHW:               Unit
-  def prepareForEmission:         Unit
-  def scfToCalyx:                 Unit
-  def testApplyLoweringOption:    Unit
+  def affineToLoopSchedule:     Unit
+  def cfToHandshake:            Unit
+  def calyxNative:              Unit
+  def calyxRemoveGroupsFromFSM: Unit
+  def calyxToFSM:               Unit
+  def calyxToHW:                Unit
+  def convertAIGToComb:         Unit
+  def convertCombToAIG:         Unit
+  def convertCombToArith:       Unit
+  def convertCombToSMT:         Unit
+  def convertFSMToSV:           Unit
+  def convertHWToBTOR2:         Unit
+  def convertHWToLLVM:          Unit
+  def convertHWToSMT:           Unit
+  def convertHWToSystemC:       Unit
+  def convertMooreToCore:       Unit
+  def convertToArcs:            Unit
+  def convertVerifToSMT:        Unit
+  def dcToHW:                   Unit
+  def exportSplitVerilog:       Unit
+  def exportVerilog:            Unit
+  def hwArithToHW:              Unit
+  def hwLowerInstanceChoices:   Unit
+  def handshakeRemoveBlock:     Unit
+  def handshakeToDC:            Unit
+  def handshakeToHW:            Unit
+  def legalizeAnonEnums:        Unit
+  def loopScheduleToCalyx:      Unit
+  def lowerArcToLLVM:           Unit
+  def lowerFIRRTLToHW:          Unit
+  def lowerFirMem:              Unit
+  def lowerHWToSV:              Unit
+  def lowerLTLToCore:           Unit
+  def lowerSMTToZ3LLVM:         Unit
+  def lowerSeqToSV:             Unit
+  def lowerSimToSV:             Unit
+  def lowerVerifToSV:           Unit
+  def materializeCalyxToFSM:    Unit
+  def passes:                   Unit
+  def pipelineToHW:             Unit
+  def prepareForEmission:       Unit
+  def scfToCalyx:               Unit
+  def testApplyLoweringOption:  Unit
 end ConversionRegisterApi

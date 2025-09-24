@@ -22,8 +22,6 @@ import org.llvm.circt.CAPI.{
   mlirCreateCIRCTConversionConvertToArcs,
   mlirCreateCIRCTConversionConvertVerifToSMT,
   mlirCreateCIRCTConversionDCToHW,
-  mlirCreateCIRCTConversionExportChiselInterface,
-  mlirCreateCIRCTConversionExportSplitChiselInterface,
   mlirCreateCIRCTConversionExportSplitVerilog,
   mlirCreateCIRCTConversionExportVerilog,
   mlirCreateCIRCTConversionHWArithToHW,
@@ -110,12 +108,6 @@ given ConversionCreateApi with
   def dcToHW(
     using arena: Arena
   ): Pass = Pass(mlirCreateCIRCTConversionDCToHW(arena))
-  def exportChiselInterface(
-    using arena: Arena
-  ): Pass = Pass(mlirCreateCIRCTConversionExportChiselInterface(arena))
-  def exportSplitChiselInterface(
-    using arena: Arena
-  ): Pass = Pass(mlirCreateCIRCTConversionExportSplitChiselInterface(arena))
   def exportSplitVerilog(
     using arena: Arena
   ): Pass = Pass(mlirCreateCIRCTConversionExportSplitVerilog(arena))
