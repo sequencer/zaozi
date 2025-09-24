@@ -100,11 +100,6 @@ trait FirtoolApi:
     )(
       using arena: Arena
     ): Unit
-    inline def setChiselInterfaceOutDirectory(
-      value:       String
-    )(
-      using arena: Arena
-    ): Unit
     inline def setCkgEnableName(
       value:       String
     )(
@@ -196,11 +191,6 @@ trait FirtoolApi:
       using arena: Arena
     ): Unit
     inline def setEtcDisableRegisterExtraction(
-      value:       Boolean
-    )(
-      using arena: Arena
-    ): Unit
-    inline def setExportChiselInterface(
       value:       Boolean
     )(
       using arena: Arena
