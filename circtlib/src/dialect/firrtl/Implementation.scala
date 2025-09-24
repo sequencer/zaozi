@@ -340,6 +340,8 @@ given InstanceApi with
               interface.map(_.getName.stringAttrGet).arrayAttrGet
             ),
             // ::mlir::ArrayAttr
+            namedAttributeApi.namedAttributeGet("domainInfo".identifierGet, Seq.empty.arrayAttrGet),
+            // ::mlir::ArrayAttr
             namedAttributeApi.namedAttributeGet("annotations".identifierGet, Seq.empty.arrayAttrGet),
             // ::mlir::ArrayAttr
             namedAttributeApi.namedAttributeGet(
