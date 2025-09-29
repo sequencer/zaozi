@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2025 Jianhao Ye <Clo91eaf@qq.com>
-package me.jiuyang.rvcover.tests
+package me.jiuyang.rvprobe.tests
 
 import me.jiuyang.smtlib.default.{*, given}
 import me.jiuyang.smtlib.tpe.*
@@ -31,7 +31,7 @@ def getModelField(model: Map[String, Boolean | BigInt], name: String): Int =
       throw new RuntimeException(s"Model does not contain field: $name")
     )
 
-def rvcoverTest(body: (Arena, Context, Block) ?=> Unit): Unit =
+def rvprobeTest(body: (Arena, Context, Block) ?=> Unit): Unit =
   // prepare the Context
   given Arena   = Arena.ofConfined()
   given Context = summon[ContextApi].contextCreate

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2025 Jianhao Ye <Clo91eaf@qq.com>
-package build.rvcover
+package build.rvprobe
 
 import mill._
 import mill.scalalib.TestModule.Utest
@@ -25,7 +25,7 @@ object `package` extends RootModule with ScalaModule with ScalafmtModule { m =>
   )
 
   def fileHeader: Target[Seq[String]] = Seq(
-    "package me.jiuyang.rvcover",
+    "package me.jiuyang.rvprobe",
     "",
     "import me.jiuyang.smtlib.default.{*, given}",
     "import me.jiuyang.smtlib.tpe.*",
@@ -81,7 +81,7 @@ object `package` extends RootModule with ScalaModule with ScalafmtModule { m =>
 
   // generateConstraints by passing absolute path as arg
   // json format should match the "instruction schema"
-  // e.g. mill -i rvcover.generateConstraints --jsonPath /path/to/xx.json
+  // e.g. mill -i rvprobe.generateConstraints --jsonPath /path/to/xx.json
   def generateConstraints(jsonPath: String) = T.command {
     // license
     os.write.over(generatedConstraintsPath(), license().mkString("\n"))

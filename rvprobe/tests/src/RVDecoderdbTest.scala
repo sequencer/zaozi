@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2025 Jianhao Ye <Clo91eaf@qq.com>
-package me.jiuyang.rvcover.tests
+package me.jiuyang.rvprobe.tests
 
 import me.jiuyang.smtlib.default.{*, given}
 import me.jiuyang.smtlib.tpe.*
-import me.jiuyang.rvcover.*
+import me.jiuyang.rvprobe.*
 
 import org.chipsalliance.rvdecoderdb.*
 import os.Path

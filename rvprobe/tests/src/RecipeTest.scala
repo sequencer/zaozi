@@ -1,17 +1,17 @@
 // SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2025 Jianhao Ye <Clo91eaf@qq.com>
-package me.jiuyang.rvcover.tests
+package me.jiuyang.rvprobe.tests
 
 import me.jiuyang.smtlib.default.{*, given}
 import me.jiuyang.smtlib.tpe.*
-import me.jiuyang.rvcover.*
+import me.jiuyang.rvprobe.*
 
 import utest.*
 
 object RecipeTest extends TestSuite:
   val tests = Tests:
     test("TestRecipe"):
-      rvcoverTest {
+      rvprobeTest {
         val instructionCount = 50
         // rv64gc
         recipe("AddwTests", isRVI(), isRVM(), isRVA(), isRVF(), isRVD(), isRV64I(), isRV64M(), isRV64A(), isRV64F(), isRV64D(), isRV64C()) {

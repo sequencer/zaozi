@@ -1,17 +1,17 @@
 // SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2025 Jianhao Ye <Clo91eaf@qq.com>
-package me.jiuyang.rvcover.tests
+package me.jiuyang.rvprobe.tests
 
 import me.jiuyang.smtlib.default.{*, given}
 import me.jiuyang.smtlib.tpe.*
-import me.jiuyang.rvcover.*
+import me.jiuyang.rvprobe.*
 
 import utest.*
 
 object RV32I extends TestSuite:
   val tests = Tests:
     test("Slli"):
-      rvcoverTest {
+      rvprobeTest {
         val instructionCount = 50
         recipe("SlliTests", isRVI(), isRVM(), isRVA(), isRVF(), isRVD(), isRV64I(), isRV64M(), isRV64A(), isRV64F(), isRV64D(), isRV64C()) {
           (0 until instructionCount).foreach { i =>
@@ -32,7 +32,7 @@ object RV32I extends TestSuite:
         }
       }
     test("Srai"):
-      rvcoverTest {
+      rvprobeTest {
         val instructionCount = 50
         recipe("SraiTests", isRVI(), isRVM(), isRVA(), isRVF(), isRVD(), isRV64I(), isRV64M(), isRV64A(), isRV64F(), isRV64D(), isRV64C()) {
           (0 until instructionCount).foreach { i =>
@@ -53,7 +53,7 @@ object RV32I extends TestSuite:
         }
       }
     test("Srli"):
-      rvcoverTest {
+      rvprobeTest {
         val instructionCount = 50
         recipe("SrliTests", isRVI(), isRVM(), isRVA(), isRVF(), isRVD(), isRV64I(), isRV64M(), isRV64A(), isRV64F(), isRV64D(), isRV64C()) {
           (0 until instructionCount).foreach { i =>
@@ -74,7 +74,7 @@ object RV32I extends TestSuite:
         }
       }
     test("Slli"):
-      rvcoverTest {
+      rvprobeTest {
         val instructionCount = 50
         recipe("SlliTests", isRVI(), isRVM(), isRVA(), isRVF(), isRVD(), isRV64I(), isRV64M(), isRV64A(), isRV64F(), isRV64D(), isRV64C()) {
           (0 until instructionCount).foreach { i =>
@@ -95,7 +95,7 @@ object RV32I extends TestSuite:
         }
       }
     test("Srai"):
-      rvcoverTest {
+      rvprobeTest {
         val instructionCount = 50
         recipe("SraiTests", isRVI(), isRVM(), isRVA(), isRVF(), isRVD(), isRV64I(), isRV64M(), isRV64A(), isRV64F(), isRV64D(), isRV64C()) {
           (0 until instructionCount).foreach { i =>
@@ -116,7 +116,7 @@ object RV32I extends TestSuite:
         }
       }
     test("Srli"):
-      rvcoverTest {
+      rvprobeTest {
         val instructionCount = 50
         recipe("SrliTests", isRVI(), isRVM(), isRVA(), isRVF(), isRVD(), isRV64I(), isRV64M(), isRV64A(), isRV64F(), isRV64D(), isRV64C()) {
           (0 until instructionCount).foreach { i =>
@@ -137,7 +137,7 @@ object RV32I extends TestSuite:
         }
       }
     test("Add"):
-      rvcoverTest {
+      rvprobeTest {
         val instructionCount = 50
         recipe("AddTests", isRVI(), isRVM(), isRVA(), isRVF(), isRVD(), isRV64I(), isRV64M(), isRV64A(), isRV64F(), isRV64D(), isRV64C()) {
           (0 until instructionCount).foreach { i =>
@@ -159,7 +159,7 @@ object RV32I extends TestSuite:
         }
       }
     test("Addi"):
-      rvcoverTest {
+      rvprobeTest {
         val instructionCount = 50
         recipe("AddiTests", isRVI(), isRVM(), isRVA(), isRVF(), isRVD(), isRV64I(), isRV64M(), isRV64A(), isRV64F(), isRV64D(), isRV64C()) {
           (0 until instructionCount).foreach { i =>
@@ -181,7 +181,7 @@ object RV32I extends TestSuite:
         }
       }
     test("And"):
-      rvcoverTest {
+      rvprobeTest {
         val instructionCount = 50
         recipe("AndTests", isRVI(), isRVM(), isRVA(), isRVF(), isRVD(), isRV64I(), isRV64M(), isRV64A(), isRV64F(), isRV64D(), isRV64C()) {
           (0 until instructionCount).foreach { i =>
@@ -203,7 +203,7 @@ object RV32I extends TestSuite:
         }
       }
     test("Andi"):
-      rvcoverTest {
+      rvprobeTest {
         val instructionCount = 50
         recipe("AndiTests", isRVI(), isRVM(), isRVA(), isRVF(), isRVD(), isRV64I(), isRV64M(), isRV64A(), isRV64F(), isRV64D(), isRV64C()) {
           (0 until instructionCount).foreach { i =>
@@ -225,7 +225,7 @@ object RV32I extends TestSuite:
         }
       }
     test("Auipc"):
-      rvcoverTest {
+      rvprobeTest {
         val instructionCount = 50
         recipe("AuipcTests", isRVI(), isRVM(), isRVA(), isRVF(), isRVD(), isRV64I(), isRV64M(), isRV64A(), isRV64F(), isRV64D(), isRV64C()) {
           (0 until instructionCount).foreach { i =>
@@ -246,7 +246,7 @@ object RV32I extends TestSuite:
         }
       }
       test("Beq"):
-        rvcoverTest {
+        rvprobeTest {
           val instructionCount = 40
           recipe("BeqTests", isRVI(), isRVM(), isRVA(), isRVF(), isRVD(), isRV64I(), isRV64M(), isRV64A(), isRV64F(), isRV64D(), isRV64C()) {
             (0 until 5).foreach { i =>
@@ -268,7 +268,7 @@ object RV32I extends TestSuite:
           }
         }
       test("Bge"):
-        rvcoverTest {
+        rvprobeTest {
           val instructionCount = 40
           recipe("BgeTests", isRVI(), isRVM(), isRVA(), isRVF(), isRVD(), isRV64I(), isRV64M(), isRV64A(), isRV64F(), isRV64D(), isRV64C()) {
             (0 until 5).foreach { i =>
@@ -290,7 +290,7 @@ object RV32I extends TestSuite:
           }
         }
       test("Bgeu"):
-        rvcoverTest {
+        rvprobeTest {
           val instructionCount = 40
           recipe("BgeuTests", isRVI(), isRVM(), isRVA(), isRVF(), isRVD(), isRV64I(), isRV64M(), isRV64A(), isRV64F(), isRV64D(), isRV64C()) {
             (0 until 5).foreach { i =>
@@ -312,7 +312,7 @@ object RV32I extends TestSuite:
           }
         }
       test("Blt"):
-        rvcoverTest {
+        rvprobeTest {
           val instructionCount = 40
           recipe("BltTests", isRVI(), isRVM(), isRVA(), isRVF(), isRVD(), isRV64I(), isRV64M(), isRV64A(), isRV64F(), isRV64D(), isRV64C()) {
             (0 until 5).foreach { i =>
@@ -334,7 +334,7 @@ object RV32I extends TestSuite:
           }
         }
       test("Bltu"):
-        rvcoverTest {
+        rvprobeTest {
           val instructionCount = 40
           recipe("BltuTests", isRVI(), isRVM(), isRVA(), isRVF(), isRVD(), isRV64I(), isRV64M(), isRV64A(), isRV64F(), isRV64D(), isRV64C()) {
             (0 until 5).foreach { i =>
@@ -356,7 +356,7 @@ object RV32I extends TestSuite:
           }
         }
       test("Bne"):
-        rvcoverTest {
+        rvprobeTest {
           val instructionCount = 40
           recipe("BneTests", isRVI(), isRVM(), isRVA(), isRVF(), isRVD(), isRV64I(), isRV64M(), isRV64A(), isRV64F(), isRV64D(), isRV64C()) {
             (0 until 5).foreach { i =>
@@ -378,7 +378,7 @@ object RV32I extends TestSuite:
           }
         }
     test("Lui"):
-      rvcoverTest {
+      rvprobeTest {
         val instructionCount = 50
         recipe("LuiTests", isRVI(), isRVM(), isRVA(), isRVF(), isRVD(), isRV64I(), isRV64M(), isRV64A(), isRV64F(), isRV64D(), isRV64C()) {
           (0 until instructionCount).foreach { i =>
@@ -399,7 +399,7 @@ object RV32I extends TestSuite:
         }
       }
     test("Or"):
-      rvcoverTest {
+      rvprobeTest {
         val instructionCount = 50
         recipe("OrTests", isRVI(), isRVM(), isRVA(), isRVF(), isRVD(), isRV64I(), isRV64M(), isRV64A(), isRV64F(), isRV64D(), isRV64C()) {
           (0 until instructionCount).foreach { i =>
@@ -421,7 +421,7 @@ object RV32I extends TestSuite:
         }
       }
     test("Ori"):
-      rvcoverTest {
+      rvprobeTest {
         val instructionCount = 50
         recipe("OriTests", isRVI(), isRVM(), isRVA(), isRVF(), isRVD(), isRV64I(), isRV64M(), isRV64A(), isRV64F(), isRV64D(), isRV64C()) {
           (0 until instructionCount).foreach { i =>
@@ -443,7 +443,7 @@ object RV32I extends TestSuite:
         }
       }
     test("Sll"):
-      rvcoverTest {
+      rvprobeTest {
         val instructionCount = 50
         recipe("SllTests", isRVI(), isRVM(), isRVA(), isRVF(), isRVD(), isRV64I(), isRV64M(), isRV64A(), isRV64F(), isRV64D(), isRV64C()) {
           (0 until instructionCount).foreach { i =>
@@ -465,7 +465,7 @@ object RV32I extends TestSuite:
         }
       }
     test("Slt"):
-      rvcoverTest {
+      rvprobeTest {
         val instructionCount = 50
         recipe("SltTests", isRVI(), isRVM(), isRVA(), isRVF(), isRVD(), isRV64I(), isRV64M(), isRV64A(), isRV64F(), isRV64D(), isRV64C()) {
           (0 until instructionCount).foreach { i =>
@@ -487,7 +487,7 @@ object RV32I extends TestSuite:
         }
       }
     test("Slti"):
-      rvcoverTest {
+      rvprobeTest {
         val instructionCount = 50
         recipe("SltiTests", isRVI(), isRVM(), isRVA(), isRVF(), isRVD(), isRV64I(), isRV64M(), isRV64A(), isRV64F(), isRV64D(), isRV64C()) {
           (0 until instructionCount).foreach { i =>
@@ -509,7 +509,7 @@ object RV32I extends TestSuite:
         }
       }
     test("Sltiu"):
-      rvcoverTest {
+      rvprobeTest {
         val instructionCount = 50
         recipe("SltiuTests", isRVI(), isRVM(), isRVA(), isRVF(), isRVD(), isRV64I(), isRV64M(), isRV64A(), isRV64F(), isRV64D(), isRV64C()) {
           (0 until instructionCount).foreach { i =>
@@ -531,7 +531,7 @@ object RV32I extends TestSuite:
         }
       }
     test("Sltu"):
-      rvcoverTest {
+      rvprobeTest {
         val instructionCount = 50
         recipe("SltuTests", isRVI(), isRVM(), isRVA(), isRVF(), isRVD(), isRV64I(), isRV64M(), isRV64A(), isRV64F(), isRV64D(), isRV64C()) {
           (0 until instructionCount).foreach { i =>
@@ -553,7 +553,7 @@ object RV32I extends TestSuite:
         }
       }
     test("Sra"):
-      rvcoverTest {
+      rvprobeTest {
         val instructionCount = 50
         recipe("SraTests", isRVI(), isRVM(), isRVA(), isRVF(), isRVD(), isRV64I(), isRV64M(), isRV64A(), isRV64F(), isRV64D(), isRV64C()) {
           (0 until instructionCount).foreach { i =>
@@ -575,7 +575,7 @@ object RV32I extends TestSuite:
         }
       }
     test("Srl"):
-      rvcoverTest {
+      rvprobeTest {
         val instructionCount = 50
         recipe("SrlTests", isRVI(), isRVM(), isRVA(), isRVF(), isRVD(), isRV64I(), isRV64M(), isRV64A(), isRV64F(), isRV64D(), isRV64C()) {
           (0 until instructionCount).foreach { i =>
@@ -597,7 +597,7 @@ object RV32I extends TestSuite:
         }
       }
     test("Sub"):
-      rvcoverTest {
+      rvprobeTest {
         val instructionCount = 50
         recipe("SubTests", isRVI(), isRVM(), isRVA(), isRVF(), isRVD(), isRV64I(), isRV64M(), isRV64A(), isRV64F(), isRV64D(), isRV64C()) {
           (0 until instructionCount).foreach { i =>
@@ -619,7 +619,7 @@ object RV32I extends TestSuite:
         }
       }
     test("Xor"):
-      rvcoverTest {
+      rvprobeTest {
         val instructionCount = 50
         recipe("XorTests", isRVI(), isRVM(), isRVA(), isRVF(), isRVD(), isRV64I(), isRV64M(), isRV64A(), isRV64F(), isRV64D(), isRV64C()) {
           (0 until instructionCount).foreach { i =>
@@ -641,7 +641,7 @@ object RV32I extends TestSuite:
         }
       }
     test("Xori"):
-      rvcoverTest {
+      rvprobeTest {
         val instructionCount = 50
         recipe("XoriTests", isRVI(), isRVM(), isRVA(), isRVF(), isRVD(), isRV64I(), isRV64M(), isRV64A(), isRV64F(), isRV64D(), isRV64C()) {
           (0 until instructionCount).foreach { i =>
