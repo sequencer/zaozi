@@ -41,7 +41,8 @@ def recipe(
   summon[Recipe]
 }
 
-def index(
+// create an instruction with given index
+def instruction(
   idx:   Int
 )(
   using Arena,
@@ -58,15 +59,12 @@ def index(
   smtAssert(block)
 }
 
-def distinct[D <: Data, R <: Referable[D]](
-  indices: Iterable[Int]
-)(field:   Index => R
+// get an instruction with given index
+def instruction(
+  idx:   Int
 )(
-  using Recipe,
-  Arena,
+  using Arena,
   Context,
-  Block
-): Unit =
-  val recipe    = summon[Recipe]
-  val indexObjs = indices.map(recipe.getIndex)
-  smtAssert(smtDistinct(indexObjs.map(field).toSeq*))
+  Block,
+  Recipe
+): Index = summon[Recipe].getIndex(idx)

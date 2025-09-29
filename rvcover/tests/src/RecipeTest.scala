@@ -12,16 +12,19 @@ object RecipeTest extends TestSuite:
   val tests = Tests:
     test("TestRecipe"):
       rvcoverTest {
-        val instructionCount = 2
-        val r                = recipe("TestRecipe", isRVI()) {
+        val instructionCount = 50
+        // rv64gc
+        recipe("AddwTests", isRVI(), isRVM(), isRVA(), isRVF(), isRVD(), isRV64I(), isRV64M(), isRV64A(), isRV64F(), isRV64D(), isRV64C()) {
           (0 until instructionCount).foreach { i =>
-            index(i) {
-              isAddi() &
-                rs1Range(1, 32) &
-                rdRange(1, 32) &
-                imm12Range(0, 100)
+            instruction(i) {
+              isAddw() & rdRange(1, 32) & rs1Range(1, 32) & rs2Range(1, 32)
             }
           }
-          distinct(0 until instructionCount)(_.imm12)
+
+          sequence(0, instructionCount).coverBins(_.rd, (1 until 32).map(i => i.S))
+          sequence(0, instructionCount).coverBins(_.rs1, (1 until 32).map(i => i.S))
+          sequence(0, instructionCount).coverBins(_.rs2, (1 until 32).map(i => i.S))
+
+          coverSigns(instructionCount, isAddw(), true, true, true)
         }
       }
