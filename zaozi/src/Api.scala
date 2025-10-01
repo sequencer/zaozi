@@ -192,9 +192,7 @@ trait ConstructorApi:
     Context,
     Block,
     sourcecode.File,
-    sourcecode.Line,
-    sourcecode.Name.Machine,
-    InstanceContext
+    sourcecode.Line
   ): When
 
   extension (when: When)
@@ -202,11 +200,7 @@ trait ConstructorApi:
       body: (Arena, Context, Block) ?=> Unit
     )(
       using Arena,
-      Context,
-      sourcecode.File,
-      sourcecode.Line,
-      sourcecode.Name.Machine,
-      InstanceContext
+      Context
     ): Unit
 
   def Wire[T <: Data](
@@ -251,7 +245,9 @@ trait ConstructorApi:
     )(
       using Arena,
       Context,
-      Block
+      Block,
+      sourcecode.File,
+      sourcecode.Line
     ):     Const[UInt]
     def U(
       using Arena,
@@ -268,7 +264,9 @@ trait ConstructorApi:
     )(
       using Arena,
       Context,
-      Block
+      Block,
+      sourcecode.File,
+      sourcecode.Line
     ):     Const[SInt]
     def S(
       using Arena,
@@ -280,7 +278,9 @@ trait ConstructorApi:
     def B(
       using Arena,
       Context,
-      Block
+      Block,
+      sourcecode.File,
+      sourcecode.Line
     ): Const[Bool]
 end ConstructorApi
 
