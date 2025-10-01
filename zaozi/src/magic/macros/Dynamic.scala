@@ -14,7 +14,7 @@ private def summonContextualParameters(
     report.errorAndAbort("No implicit value found for Arena.")
   }
   val typeImpl        = Expr.summon[me.jiuyang.zaozi.TypeImpl].getOrElse {
-    report.errorAndAbort("No implicit value found for Arena.")
+    report.errorAndAbort("No implicit value found for TypeImpl.")
   }
   val context         = Expr.summon[org.llvm.mlir.scalalib.capi.ir.Context].getOrElse {
     report.errorAndAbort("No implicit value found for Context.")
