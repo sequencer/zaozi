@@ -5,13 +5,11 @@ package me.jiuyang.zaozi.default
 import me.jiuyang.zaozi.*
 import me.jiuyang.zaozi.default.{*, given}
 import me.jiuyang.zaozi.magic.UntypedDynamicSubfield
-import me.jiuyang.zaozi.reftpe.Node
-import me.jiuyang.zaozi.reftpe.{Ref, Referable}
-import me.jiuyang.zaozi.valuetpe.Bits
-import me.jiuyang.zaozi.valuetpe.{Data, ProbeRecord, Record}
+import me.jiuyang.zaozi.reftpe.{Node, Ref, Referable}
+import me.jiuyang.zaozi.valuetpe.{Bits, Data, ProbeRecord, Record}
+
 import org.llvm.circt.scalalib.capi.dialect.firrtl.{*, given}
-import org.llvm.circt.scalalib.dialect.firrtl.operation.{given_BitCastApi, BitCast, BitCastApi}
-import org.llvm.circt.scalalib.dialect.firrtl.operation.{given_NodeApi, NodeApi}
+import org.llvm.circt.scalalib.dialect.firrtl.operation.{given_BitCastApi, given_NodeApi, BitCast, BitCastApi, NodeApi}
 import org.llvm.mlir.scalalib.capi.ir.{*, given}
 
 import java.lang.foreign.Arena
@@ -37,6 +35,11 @@ given [T <: Record | ProbeRecord, R <: Referable[T]]: RecordApi[T, R] with
         val _tpe:       Bits      = new Bits:
           private[zaozi] val _width = bitcastOp.operation.getResult(0).getType.getBitWidth(true).toInt
         val _operation: Operation = bitcastOp.operation
+
+    def width(
+      using Arena,
+      Context
+    ) = ref.refer.getType.getBitWidth(true).toInt
 
     def field[T <: Data](
       fieldName: String

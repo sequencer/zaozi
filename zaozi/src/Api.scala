@@ -774,6 +774,13 @@ trait RefElement[D <: Data, E <: Data, R <: Referable[D], IDX]:
       sourcecode.Name.Machine,
       InstanceContext
     ): Ref[E]
+trait GetWidth[D <: Data, R <: Referable[D]]:
+  extension (ref: R)
+    def width(
+      using Arena,
+      Context
+    ): Int
+
 trait BitsApi[R <: Referable[Bits]]
     extends AsSInt[Bits, R]
     with AsUInt[Bits, R]
@@ -798,6 +805,7 @@ trait BitsApi[R <: Referable[Bits]]
     with Pad[Bits, Int, Bits, R]
     with ExtractElement[Bits, Bool, R, Int]
     with ExtractRange[Bits, Bits, R, Int]
+    with GetWidth[Bits, R]
 
 trait BoolApi[R <: Referable[Bool]]
     extends AsBits[Bool, R]
@@ -808,6 +816,7 @@ trait BoolApi[R <: Referable[Bool]]
     with Or[Bool, Bool, R]
     with Xor[Bool, Bool, R]
     with Mux[Bool, R]
+    with GetWidth[Bool, R]
 trait UIntApi[R <: Referable[UInt]]
     extends AsBits[UInt, R]
     with Add[UInt, UInt, R]
@@ -823,6 +832,7 @@ trait UIntApi[R <: Referable[UInt]]
     with Neq[UInt, Bool, R]
     with Shl[UInt, Int | Referable[UInt], UInt, R]
     with Shr[UInt, Int | Referable[UInt], UInt, R]
+    with GetWidth[UInt, R]
 trait SIntApi[R <: Referable[SInt]]
     extends AsBits[SInt, R]
     with Add[SInt, SInt, R]
@@ -837,14 +847,16 @@ trait SIntApi[R <: Referable[SInt]]
     with Neq[SInt, Bool, R]
     with Shl[SInt, Int | Referable[UInt], SInt, R]
     with Shr[SInt, Int | Referable[UInt], SInt, R]
+    with GetWidth[SInt, R]
 
-trait BundleApi[T <: Bundle | ProbeBundle, R <: Referable[T]] extends AsBits[T, R]
+trait BundleApi[T <: Bundle | ProbeBundle, R <: Referable[T]] extends AsBits[T, R] with GetWidth[T, R]
 
-trait RecordApi[T <: Record | ProbeRecord, R <: Referable[T]] extends AsBits[T, R]
+trait RecordApi[T <: Record | ProbeRecord, R <: Referable[T]] extends AsBits[T, R] with GetWidth[T, R]
 
 trait VecApi[E <: Data, V <: Vec[E], R <: Referable[V]]
     extends AsBits[V, R]
     with ExtractElement[V, E, R, Referable[UInt] | Int]
+    with GetWidth[V, R]
 
 trait ClockApi[R <: Referable[Clock]]
 
