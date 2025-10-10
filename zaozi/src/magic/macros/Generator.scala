@@ -18,21 +18,26 @@ class generator extends MacroAnnotation:
       case ClassDef(name, constr, parents, selfOpt, body)
           // a bit of dirty but quotes does not expose the SingletonTypeTree
           if selfOpt.exists(_.tpt.toString().startsWith("SingletonTypeTree")) =>
-        val objSym                       = definition.symbol
-        val (tpiParam, tpiL, tpiI, tpiP) = parents
+        val objSym                                = definition.symbol
+        val (tpiParam, tpiL, tpiI, tpiP, tpiVOpt) = parents
           .map(parent =>
             parent match
               case Applied(
-                    generatorName,
+                    TypeIdent("Generator"),
                     List(param: TypeIdent, l: TypeIdent, i: TypeIdent, p: TypeIdent)
                   ) =>
-                Some(param, l, i, p)
+                Some(param, l, i, p, None)
+              case Applied(
+                    TypeIdent("VerilogWrapper"),
+                    List(param: TypeIdent, l: TypeIdent, i: TypeIdent, p: TypeIdent, v: TypeIdent)
+                  ) =>
+                Some(param, l, i, p, Some(v))
               case _ => None
           )
           .flatten
           .headOption
           .getOrElse {
-            report.errorAndAbort("@generator object should extends trait Generator")
+            report.errorAndAbort("@generator object should extends trait Generator or VerilogWrapper")
           }
 
         def makeInterfaceDef(symbolName: String, resultType: TypeTree) = DefDef(
@@ -226,7 +231,13 @@ class generator extends MacroAnnotation:
         val parseParameterDefOpt = parseParameterDef.pipe(defOpt)
         val mainDefOpt           = mainDef.pipe(defOpt)
 
-        val newBody = List(layersDefOpt, interfaceDefOpt, probeDefOpt, parseParameterDefOpt, mainDefOpt).flatten ++ body
+        val newBody = List(
+          layersDefOpt,
+          interfaceDefOpt,
+          probeDefOpt,
+          parseParameterDefOpt,
+          mainDefOpt
+        ).flatten ++ body
         List(ClassDef.copy(definition)(name, constr, parents, selfOpt, newBody))
       case _ =>
         report.error("@generator should only annotate an object")
