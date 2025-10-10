@@ -11,6 +11,8 @@ trait Vec[E <: Data] extends Data:
   private[zaozi] val _elementType: E
   private[zaozi] val _count:       Int
 
+  def getElementType = _elementType
+
   def toMlirType(
     using Arena,
     Context,

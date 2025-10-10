@@ -10,6 +10,8 @@ import org.llvm.mlir.scalalib.capi.ir.{Context, Type}
 import java.lang.foreign.Arena
 
 trait Data:
+  // TODO: this method is lazy hence we need to maintain several fields such as _width in Scala
+  //       consider changing it a constructor thus we can only keep a pointer to the MLIR operation
   def toMlirType(
     using Arena,
     Context,
