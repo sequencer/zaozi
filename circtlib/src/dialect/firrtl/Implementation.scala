@@ -74,10 +74,13 @@ given CircuitApi with
 end given
 given ExtModuleApi with
   inline def op(
-    name:             String,
+    symbolName:       String,
+    moduleName:       String,
     location:         Location,
     firrtlConvention: FirrtlConvention,
-    interface:        Seq[(FirrtlBundleField, Location)]
+    interface:        Seq[(FirrtlBundleField, Location)],
+    layers:           Seq[Seq[String]],
+    verilogParameter: Map[String, VerilogParameterType]
   )(
     using Arena,
     Context
@@ -86,23 +89,23 @@ given ExtModuleApi with
       summon[OperationApi].operationCreate(
         name = "firrtl.extmodule",
         location = location,
-        regionBlockTypeLocations = Seq(
-          Seq(
-            (interface.map(_._1.getType), interface.map(_._2))
-          )
-        ),
+        regionBlockTypeLocations = Seq(Seq.empty),
         namedAttributes =
           val namedAttributeApi = summon[NamedAttributeApi]
+          val layersAttr        =
+            layers
+              .map(path => path.reverse.last.symbolRefAttrGet(path.drop(1).map(_.flatSymbolRefAttrGet)))
+              .arrayAttrGet
           Seq(
             // ::mlir::StringAttr
             namedAttributeApi.namedAttributeGet(
               "sym_name".identifierGet,
-              name.stringAttrGet
+              symbolName.stringAttrGet
             ),
             // ::mlir::StringAttr
             namedAttributeApi.namedAttributeGet(
               "defname".identifierGet,
-              name.stringAttrGet
+              moduleName.stringAttrGet
             ),
             // ::circt::firrtl::ConventionAttr
             namedAttributeApi.namedAttributeGet(
@@ -146,15 +149,28 @@ given ExtModuleApi with
             namedAttributeApi.namedAttributeGet(
               "annotations".identifierGet,
               Seq.empty.arrayAttrGet
+            ),
+            // ::mlir::ArrayAttr
+            namedAttributeApi.namedAttributeGet(
+              "knownLayers".identifierGet,
+              layersAttr
+            ),
+            // ::mlir::ArrayAttr
+            namedAttributeApi.namedAttributeGet(
+              "layers".identifierGet,
+              layersAttr
+            ),
+            // ::mlir::ArrayAttr
+            namedAttributeApi.namedAttributeGet(
+              "parameters".identifierGet,
+              verilogParameter.map {
+                // TODO: Support more parameter types if needed
+                case (name, str: String)   => str.getParamDeclAttribute(name)
+                case (name, int: BigInt)   => int.getParamDeclAttribute(name)
+                case (name, dbl: Double)   => dbl.getParamDeclAttribute(name)
+                case (name, bool: Boolean) => bool.getParamDeclAttribute(name)
+              }.toSeq.arrayAttrGet
             )
-            // ::mlir::ArrayAttr
-            // namedAttributeApi.namedAttributeGet(
-            //   "knownLayers".identifierGet, ???
-            // ),
-            // ::mlir::ArrayAttr
-            // namedAttributeApi.namedAttributeGet(
-            //   "layers".identifierGet, ???
-            // ),
             // ::mlir::ArrayAttr
             // namedAttributeApi.namedAttributeGet(
             //   "internalPaths".identifierGet, ???
@@ -162,7 +178,14 @@ given ExtModuleApi with
           )
       )
     )
-  extension (ref: ExtModule) def operation: Operation = ref._operation
+  extension (ref: ExtModule)
+    inline def operation: Operation = ref._operation
+    inline def appendToCircuit(
+    )(
+      using arena: Arena,
+      circuit:     Circuit
+    ): Unit =
+      circuit.block.appendOwnedOperation(ref.operation)
 end given
 
 given ModuleApi with
