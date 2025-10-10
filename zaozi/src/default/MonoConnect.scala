@@ -12,6 +12,7 @@ import org.llvm.mlir.scalalib.capi.ir.{Block, Context, given}
 import java.lang.foreign.Arena
 
 // TODO: split LHS & RHS into two different trait? this might help for Vec static accessing assignment.
+// TODO: Const cannot be SINK
 given [D <: Data, SRC <: Referable[D], SINK <: Referable[D]]: MonoConnect[D, SRC, SINK] with
   extension (ref: SINK)
     def :=(
