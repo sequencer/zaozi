@@ -853,87 +853,87 @@ trait ResetApi[R <: Referable[Reset]]
 trait TypeImpl:
   extension (ref: Interface[?])
     private[zaozi] def operationImpl: Operation
-    def referImpl(
+    private[zaozi] def referImpl(
       using Arena
     ):                                Value
   extension (ref: Wire[?])
     private[zaozi] def operationImpl: Operation
-    def referImpl(
+    private[zaozi] def referImpl(
       using Arena
     ):                                Value
   extension (ref: Reg[?])
     private[zaozi] def operationImpl: Operation
-    def referImpl(
+    private[zaozi] def referImpl(
       using Arena
     ):                                Value
   extension (ref: Node[?])
-    def operationImpl: Operation
-    def referImpl(
+    private[zaozi] def operationImpl: Operation
+    private[zaozi] def referImpl(
       using Arena
-    ):                 Value
+    ):                                Value
   extension (ref: Ref[?])
-    def operationImpl: Operation
-    def referImpl(
+    private[zaozi] def operationImpl: Operation
+    private[zaozi] def referImpl(
       using Arena
-    ):                 Value
+    ):                                Value
   extension (ref: Const[?])
-    def operationImpl: Operation
-    def referImpl(
+    private[zaozi] def operationImpl: Operation
+    private[zaozi] def referImpl(
       using Arena
-    ):                 Value
+    ):                                Value
   extension (ref: Instance[?, ?])
-    def operationImpl:        Operation
-    def ioImpl[T <: Data]:    Wire[T]
-    def probeImpl[T <: Data]: Wire[T]
+    private[zaozi] def operationImpl:        Operation
+    private[zaozi] def ioImpl[T <: Data]:    Wire[T]
+    private[zaozi] def probeImpl[T <: Data]: Wire[T]
 
   extension (ref: Reset)
-    def toMlirTypeImpl(
+    private[zaozi] def toMlirTypeImpl(
       using Arena,
       Context
     ): Type
   extension (ref: Clock)
-    def toMlirTypeImpl(
+    private[zaozi] def toMlirTypeImpl(
       using Arena,
       Context
     ): Type
   extension (ref: UInt)
-    def toMlirTypeImpl(
+    private[zaozi] def toMlirTypeImpl(
       using Arena,
       Context
     ): Type
   extension (ref: SInt)
-    def toMlirTypeImpl(
+    private[zaozi] def toMlirTypeImpl(
       using Arena,
       Context
     ): Type
   extension (ref: Bits)
-    def toMlirTypeImpl(
+    private[zaozi] def toMlirTypeImpl(
       using Arena,
       Context
     ): Type
   extension (ref: Analog)
-    def toMlirTypeImpl(
+    private[zaozi] def toMlirTypeImpl(
       using Arena,
       Context
     ): Type
   extension (ref: Bool)
-    def toMlirTypeImpl(
+    private[zaozi] def toMlirTypeImpl(
       using Arena,
       Context
     ): Type
   extension (ref: ProbeBundle)
     def elements: Seq[BundleField[?]]
-    def toMlirTypeImpl(
+    private[zaozi] def toMlirTypeImpl(
       using Arena,
       Context
     ):            Type
-    def ReadProbeImpl[T <: Data & CanProbe](
+    private[zaozi] def ReadProbeImpl[T <: Data & CanProbe](
       tpe:   T,
       layer: LayerTree
     )(
       using sourcecode.Name.Machine
     ):            BundleField[RProbe[T]]
-    def ReadWriteProbeImpl[T <: Data & CanProbe](
+    private[zaozi] def ReadWriteProbeImpl[T <: Data & CanProbe](
       tpe:   T,
       layer: LayerTree
     )(
@@ -941,58 +941,58 @@ trait TypeImpl:
     ):            BundleField[RWProbe[T]]
   extension (ref: Bundle)
     def elements: Seq[BundleField[?]]
-    def toMlirTypeImpl(
+    private[zaozi] def toMlirTypeImpl(
       using Arena,
       Context
     ):            Type
-    def FlippedImpl[T <: Data](
+    private[zaozi] def FlippedImpl[T <: Data](
       tpe: T
     )(
       using sourcecode.Name.Machine
     ):            BundleField[T]
-    def AlignedImpl[T <: Data](
+    private[zaozi] def AlignedImpl[T <: Data](
       tpe: T
     )(
       using sourcecode.Name.Machine
     ):            BundleField[T]
   extension (ref: ProbeRecord)
     def elements: Seq[BundleField[?]]
-    def toMlirTypeImpl(
+    private[zaozi] def toMlirTypeImpl(
       using Arena,
       Context
     ):            Type
-    def ReadProbeImpl[T <: Data & CanProbe](
+    private[zaozi] def ReadProbeImpl[T <: Data & CanProbe](
       name:  String,
       tpe:   T,
       layer: LayerTree
     ):            BundleField[RProbe[T]]
-    def ReadWriteProbeImpl[T <: Data & CanProbe](
+    private[zaozi] def ReadWriteProbeImpl[T <: Data & CanProbe](
       name:  String,
       tpe:   T,
       layer: LayerTree
     ):            BundleField[RWProbe[T]]
   extension (ref: Record)
     def elements: Seq[BundleField[?]]
-    def toMlirTypeImpl(
+    private[zaozi] def toMlirTypeImpl(
       using Arena,
       Context
     ):            Type
-    def FlippedImpl[T <: Data](
+    private[zaozi] def FlippedImpl[T <: Data](
       name: String,
       tpe:  T
     ):            BundleField[T]
-    def AlignedImpl[T <: Data](
+    private[zaozi] def AlignedImpl[T <: Data](
       name: String,
       tpe:  T
     ):            BundleField[T]
   extension (ref: RProbe[?])
-    def toMlirTypeImpl(
+    private[zaozi] def toMlirTypeImpl(
       using Arena,
       Context,
       TypeImpl
     ): Type
   extension (ref: RWProbe[?])
-    def toMlirTypeImpl(
+    private[zaozi] def toMlirTypeImpl(
       using Arena,
       Context,
       TypeImpl
@@ -1000,12 +1000,12 @@ trait TypeImpl:
   extension (ref: Vec[?])
     def elementType: Data
     def count:       Int
-    def toMlirTypeImpl(
+    private[zaozi] def toMlirTypeImpl(
       using Arena,
       Context
     ):               Type
   extension (ref: ProbeBundle)
-    def getRefViaFieldValNameImpl[E <: Data](
+    private[zaozi] def getRefViaFieldValNameImpl[E <: Data](
       refer:        Value,
       fieldValName: String
     )(
@@ -1018,7 +1018,7 @@ trait TypeImpl:
     )(
       using TypeImpl
     ): Ref[E]
-    def getOptionRefViaFieldValNameImpl[E <: Data](
+    private[zaozi] def getOptionRefViaFieldValNameImpl[E <: Data](
       refer:        Value,
       fieldValName: String
     )(
@@ -1032,7 +1032,7 @@ trait TypeImpl:
       using TypeImpl
     ): Option[Ref[E]]
   extension (ref: Bundle)
-    def getRefViaFieldValNameImpl[E <: Data](
+    private[zaozi] def getRefViaFieldValNameImpl[E <: Data](
       refer:        Value,
       fieldValName: String
     )(
@@ -1045,7 +1045,7 @@ trait TypeImpl:
     )(
       using TypeImpl
     ): Ref[E]
-    def getOptionRefViaFieldValNameImpl[E <: Data](
+    private[zaozi] def getOptionRefViaFieldValNameImpl[E <: Data](
       refer:        Value,
       fieldValName: String
     )(
@@ -1060,7 +1060,7 @@ trait TypeImpl:
     ): Option[Ref[E]]
 
   extension (ref: ProbeRecord)
-    def getUntypedRefViaFieldValNameImpl(
+    private[zaozi] def getUntypedRefViaFieldValNameImpl(
       refer:        Value,
       fieldValName: String
     )(
@@ -1075,7 +1075,7 @@ trait TypeImpl:
     ): Ref[Data]
 
   extension (ref: Record)
-    def getUntypedRefViaFieldValNameImpl(
+    private[zaozi] def getUntypedRefViaFieldValNameImpl(
       refer:        Value,
       fieldValName: String
     )(
