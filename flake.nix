@@ -6,12 +6,13 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable-small";
     nixpkgs4circt.url = "github:NixOS/nixpkgs/nixos-unstable-small";
+    sn-bindgen.url = "github:indoorvivants/sn-bindgen";
     flake-utils.url = "github:numtide/flake-utils";
     mill-ivy-fetcher.url = "github:Avimitin/mill-ivy-fetcher";
   };
 
-  outputs = inputs@{ self, nixpkgs, nixpkgs4circt, flake-utils, mill-ivy-fetcher }:
-    let overlay = (import ./nix/overlay.nix) { extraNixpkgsSrc = nixpkgs4circt; };
+  outputs = inputs@{ self, nixpkgs, nixpkgs4circt, flake-utils, mill-ivy-fetcher, sn-bindgen }:
+    let overlay = (import ./nix/overlay.nix) { extraNixpkgsSrc = nixpkgs4circt; inherit sn-bindgen; };
     in {
       # System-independent attr
       inherit inputs;
@@ -19,7 +20,7 @@
     } // flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = import nixpkgs {
-          overlays = [ overlay mill-ivy-fetcher.overlays.default ];
+          overlays = [ overlay mill-ivy-fetcher.overlays.default sn-bindgen.overlays.default ];
           inherit system;
         };
       in
