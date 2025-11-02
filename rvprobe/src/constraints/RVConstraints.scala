@@ -1330,8 +1330,6 @@ case class Recipe(val name: String)(using Arena, Context, Block) {
   def addIndex(idx: Index): Index = indices.getOrElseUpdate(idx.idx, idx)
   def getIndex(idx: Int): Index = indices(idx)
 
-  def getInstructionCount(): Int = indices.size
-
   override def toString(): String = s"Recipe: $name\nIndices:\n${indices.values.map(_.toString).mkString("\n")}"
 }
 
