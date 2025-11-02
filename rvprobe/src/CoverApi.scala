@@ -5,7 +5,6 @@ package me.jiuyang.rvprobe
 import me.jiuyang.smtlib.default.{*, given}
 import me.jiuyang.smtlib.tpe.*
 
-import me.jiuyang.rvprobe.*
 import me.jiuyang.rvprobe.constraints.*
 
 import org.llvm.mlir.scalalib.capi.ir.{Block, Context, Location, LocationApi, Operation, Type, Value, given}
