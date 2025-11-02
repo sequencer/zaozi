@@ -1,11 +1,12 @@
 // SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2025 Jianhao Ye <Clo91eaf@qq.com>
-package me.jiuyang.rvprobe.constraints
+package me.jiuyang.rvprobe
 
 import me.jiuyang.smtlib.default.{*, given}
 import me.jiuyang.smtlib.tpe.*
 
-import me.jiuyang.rvprobe.instruction
+import me.jiuyang.rvprobe.*
+import me.jiuyang.rvprobe.constraints.*
 
 import org.llvm.mlir.scalalib.capi.ir.{Block, Context, Location, LocationApi, Operation, Type, Value, given}
 
@@ -130,7 +131,7 @@ def coverWAWHazards(
 
 def coverSigns(
   instructionCount: Int,
-  inst:      Index ?=> Ref[Bool],
+  inst:             Index ?=> Ref[Bool],
   hasRd:            Boolean = false,
   hasRs1:           Boolean = false,
   hasRs2:           Boolean = false
