@@ -1,42 +1,15 @@
 // SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2025 Jianhao Ye <Clo91eaf@qq.com>
-package me.jiuyang.rvcover
+package me.jiuyang.rvprobe.constraints
 
 import me.jiuyang.smtlib.default.{*, given}
 import me.jiuyang.smtlib.tpe.*
 
+import me.jiuyang.rvprobe.instruction
+
 import org.llvm.mlir.scalalib.capi.ir.{Block, Context, Location, LocationApi, Operation, Type, Value, given}
 
 import java.lang.foreign.Arena
-
-def sequence(start: Int, end: Int)(
-  using Arena,
-  Context,
-  Block,
-  Recipe
-): Seq[Index] =
-  val recipe    = summon[Recipe]
-  (start until end).map(recipe.getIndex)
-
-
-extension(indexObjs: Seq[Index])
-  def coverBins(targets: Index => Referable[SInt],
-    bins:    Seq[Const[SInt]]
-  )(
-    using Arena,
-    Context,
-    Block,
-    Recipe
-  ): Unit =
-    val targetValues = indexObjs.map(targets)
-
-    // For each element in bins, there exists at least one element in targets that is equal to it.
-    val constraints = bins.map { binElement =>
-      smtOr(targetValues.map(_ === binElement).toSeq*)
-    }
-
-    // Combine all constraints with AND and assert
-    smtAssert(smtAnd(constraints*))
 
 def coverBins(
   indices: Iterable[Int]
@@ -191,16 +164,3 @@ def coverSigns(
     smtAssert(instruction(instructionCount + 2).rs2 === 2.S)
     smtAssert(instruction(instructionCount + 3).rs2 === 1.S)
   }
-
-def distinct[D <: Data, R <: Referable[D]](
-  indices: Iterable[Int]
-)(field:   Index => R
-)(
-  using Recipe,
-  Arena,
-  Context,
-  Block
-): Unit =
-  val recipe    = summon[Recipe]
-  val indexObjs = indices.map(recipe.getIndex)
-  smtAssert(smtDistinct(indexObjs.map(field).toSeq*))

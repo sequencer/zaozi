@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2025 Jianhao Ye <Clo91eaf@qq.com>
-package me.jiuyang.rvcover
+package me.jiuyang.rvprobe
+
+import me.jiuyang.rvprobe.constraints.*
 
 import me.jiuyang.smtlib.default.{*, given}
 import me.jiuyang.smtlib.tpe.*
@@ -9,10 +11,9 @@ import org.llvm.mlir.scalalib.capi.ir.{Block, Context, Location, LocationApi, Op
 
 import java.lang.foreign.Arena
 
-// todo: remove recipe api, use new Recipe directly
 def recipe(
   name:  String,
-  sets:  Recipe ?=> Ref[Bool]*
+  sets:  Seq[Recipe ?=> Ref[Bool]]
 )(
   using Arena,
   Context,
@@ -27,14 +28,11 @@ def recipe(
       using summon[Recipe]
     )
   )
-  includedSets.foreach { set =>
-    smtAssert(set)
-  }
   // assert that sets are mutually exclusive
   val excludedSets = summon[Recipe].allSets.diff(includedSets)
-  excludedSets.foreach { set =>
-    smtAssert(!set)
-  }
+
+  smtAssert(smtAnd(includedSets*))
+  smtAssert(!smtOr(excludedSets*))
 
   block
 
@@ -61,10 +59,54 @@ def instruction(
 
 // get an instruction with given index
 def instruction(
-  idx:   Int
+  idx: Int
 )(
   using Arena,
   Context,
   Block,
   Recipe
 ): Index = summon[Recipe].getIndex(idx)
+
+def sequence(
+  start: Int,
+  end:   Int
+)(
+  using Arena,
+  Context,
+  Block,
+  Recipe
+): Seq[Index] =
+  val recipe = summon[Recipe]
+  (start until end).map(recipe.getIndex)
+
+def distinct[D <: Data, R <: Referable[D]](
+  indices: Iterable[Int]
+)(field:   Index => R
+)(
+  using Recipe,
+  Arena,
+  Context,
+  Block
+): Unit =
+  val recipe    = summon[Recipe]
+  val indexObjs = indices.map(recipe.getIndex)
+  smtAssert(smtDistinct(indexObjs.map(field).toSeq*))
+
+def isRV64G(
+): Seq[Recipe ?=> Ref[Bool]] =
+  Seq(
+    isRVI(),
+    isRVM(),
+    isRVA(),
+    isRVF(),
+    isRVD(),
+    isRV64I(),
+    isRV64M(),
+    isRV64A(),
+    isRV64F(),
+    isRV64D()
+  )
+
+def isRV64GC(
+): Seq[Recipe ?=> Ref[Bool]] =
+  isRV64G() :+ isRVC()

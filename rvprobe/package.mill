@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2025 Jianhao Ye <Clo91eaf@qq.com>
-package build.rvcover
+package build.rvprobe
 
 import mill._
 import mill.scalalib.TestModule.Utest
@@ -8,7 +8,7 @@ import mill.scalalib._
 import mill.scalalib.scalafmt._
 import os.Path
 
-import build.{rvdecoderdb, smtlib, circtlib, v}
+import build.{circtlib, rvdecoderdb, smtlib, v}
 
 object `package` extends RootModule with ScalaModule with ScalafmtModule { m =>
   def scalaVersion = Task(v.scala)
@@ -21,11 +21,11 @@ object `package` extends RootModule with ScalaModule with ScalafmtModule { m =>
 
   def license: Target[Seq[String]] = Seq(
     "// SPDX-License-Identifier: Apache-2.0",
-    "// SPDX-FileCopyrightText: 2025 Jianhao Ye <Clo91eaf@qq.com>",
+    "// SPDX-FileCopyrightText: 2025 Jianhao Ye <Clo91eaf@qq.com>"
   )
 
   def fileHeader: Target[Seq[String]] = Seq(
-    "package me.jiuyang.rvcover",
+    "package me.jiuyang.rvprobe",
     "",
     "import me.jiuyang.smtlib.default.{*, given}",
     "import me.jiuyang.smtlib.tpe.*",
@@ -46,31 +46,32 @@ object `package` extends RootModule with ScalaModule with ScalafmtModule { m =>
     val json       = ujson.read(jsonString)
 
     json.obj("instructions").arr.foldLeft(Map.empty[String, (List[String], List[String])]) { (globalAcc, instruction) =>
-      val name = instruction.obj("instructionName").str.replace(".", "_")
-      val camelName = name.replace(".", "_")
+      val name      = instruction.obj("instructionName").str.replace(".", "_")
+      val camelName = name
+        .replace(".", "_")
         .split("[^a-zA-Z0-9]")
         .filter(_.nonEmpty)
         .map(_.capitalize)
         .mkString
 
-      val localMap = instruction.obj("attributes").arr.foldLeft(Map.empty[String, (List[String], List[String])]) {
-        (acc, attr) =>
+      val localMap =
+        instruction.obj("attributes").arr.foldLeft(Map.empty[String, (List[String], List[String])]) { (acc, attr) =>
           val identifier = attr.obj("identifier").str
           attr.obj.get("value") match {
             case Some(v) =>
               v.str match {
-                case "Y" =>
+                case "Y"  =>
                   val (yesList, noList) = acc.getOrElse(identifier, (List(), List()))
                   acc.updated(identifier, (yesList :+ camelName, noList))
-                case "N" =>
+                case "N"  =>
                   val (yesList, noList) = acc.getOrElse(identifier, (List(), List()))
                   acc.updated(identifier, (yesList, noList :+ camelName))
                 case "DC" => acc
                 case _    => throw new RuntimeException(s"Unknown value for attribute $identifier: ${v.str}")
               }
-            case None => throw new RuntimeException(s"Attribute $identifier has no value")
+            case None    => throw new RuntimeException(s"Attribute $identifier has no value")
           }
-      }
+        }
 
       // Merge localMap into globalAcc
       localMap.foldLeft(globalAcc) { case (acc, (k, vTuple)) =>
@@ -81,28 +82,39 @@ object `package` extends RootModule with ScalaModule with ScalafmtModule { m =>
 
   // generateConstraints by passing absolute path as arg
   // json format should match the "instruction schema"
-  // e.g. mill -i rvcover.generateConstraints --jsonPath /path/to/xx.json
+  // e.g. mill -i rvprobe.generateConstraints --jsonPath /path/to/xx.json
   def generateConstraints(jsonPath: String) = T.command {
     // license
     os.write.over(generatedConstraintsPath(), license().mkString("\n"))
 
     // file header
-    os.write.append(generatedConstraintsPath(), fileHeader().mkString("\n", "\n" , "\n"))
+    os.write.append(generatedConstraintsPath(), fileHeader().mkString("\n", "\n", "\n"))
 
     // Parse the JSON file and generate constraints
     val instructionsAttributes = parseJson(os.Path(jsonPath))
     instructionsAttributes.foreach { case (instructionName, attributes) =>
       val positiveAttributes  = attributes._1.map(attr => s"is${attr}()").toList
       val negativeAttributes  = attributes._2.map(attr => s"is${attr}()").toList
-      val positiveConstraint  = if (positiveAttributes.length > 1) positiveAttributes.mkString("smtOr(", ", ", ")") else if (positiveAttributes.length == 1) positiveAttributes.last else ""
-      val negativeConstraint  = if (negativeAttributes.length > 1) negativeAttributes.mkString("!smtOr(", ", ", ")") else if (negativeAttributes.length == 1) negativeAttributes.last else ""
+      val positiveConstraint  =
+        if (positiveAttributes.length > 1) positiveAttributes.mkString("smtOr(", ", ", ")")
+        else if (positiveAttributes.length == 1) positiveAttributes.last
+        else ""
+      val negativeConstraint  =
+        if (negativeAttributes.length > 1) negativeAttributes.mkString("!smtOr(", ", ", ")")
+        else if (negativeAttributes.length == 1) negativeAttributes.last
+        else ""
       val conjunctionOperator = if (positiveConstraint.nonEmpty && negativeConstraint.nonEmpty) " & " else ""
 
-      os.write.append(generatedConstraintsPath(),
+      os.write.append(
+        generatedConstraintsPath(),
         s"def ${instructionName}()(using Arena, Context, Block, Index, Recipe): Ref[Bool] = ${positiveConstraint + conjunctionOperator + negativeConstraint}\n"
       )
     }
   }
+
+  override def forkArgs: T[Seq[String]] = Task(
+    super.forkArgs() ++ circtlib.forkArgs()
+  )
 
   object tests extends ScalaTests with ScalafmtModule with Utest {
     def ivyDeps = Agg(v.utest)
