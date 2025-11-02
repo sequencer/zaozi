@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2025 Jianhao Ye <Clo91eaf@qq.com>
-package me.jiuyang.rvprobe.apps
+package me.jiuyang.rvprobe.scripts
 
 import me.jiuyang.rvprobe.*
 import org.chipsalliance.rvdecoderdb.{Encoding, Instruction, InstructionSet}
@@ -11,7 +11,7 @@ import java.io.{File, FileWriter}
 // nix build .#t1.blastoise.t1emu.omreader
 // ./result/bin/omreader | jq '{instructions}' > /tmp/instruction.json
 
-// Run with: mill rvprobe.runMain me.jiuyang.rvprobe.apps.UpdateT1Constraints /tmp/instruction.json
+// Run with: mill rvprobe.runMain me.jiuyang.rvprobe.scripts.UpdateT1Constraints /tmp/instruction.json
 // make sure git repo is clear before running this script
 @main def UpdateT1Constraints(jsonPath: String): Unit =
   val writer = new FileWriter(new File("rvprobe/src/constraints/T1Constraints.scala"))

@@ -12,7 +12,7 @@ import utest.*
 import java.lang.foreign.Arena
 
 // set the instruction set
-object RVDecoderdbWrapperTest extends TestSuite:
+object RVDecoderdbApiTest extends TestSuite:
   val tests = Tests:
     test("import rvdecoderdb success"):
       val riscvOpcodesPath: Path                  = Path(

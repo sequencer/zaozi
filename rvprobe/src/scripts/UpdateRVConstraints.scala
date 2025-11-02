@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2025 Jianhao Ye <Clo91eaf@qq.com>
-package me.jiuyang.rvprobe.apps
+package me.jiuyang.rvprobe.scripts
 
 import me.jiuyang.rvprobe.*
 import org.chipsalliance.rvdecoderdb.{Encoding, Instruction, InstructionSet}
 import os.Path
 import java.io.{File, FileWriter}
 
-// Run with: mill rvprobe.runMain me.jiuyang.rvprobe.apps.UpdateRVConstraints
+// Run with: mill rvprobe.runMain me.jiuyang.rvprobe.scripts.UpdateRVConstraints
 // make sure git repo is clear before running this script
 @main def UpdateRVConstraints(outputPath: String = "rvprobe/src/constraints/RVConstraints.scala"): Unit =
   val writer = new FileWriter(new File(outputPath))
