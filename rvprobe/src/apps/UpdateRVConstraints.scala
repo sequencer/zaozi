@@ -9,8 +9,8 @@ import java.io.{File, FileWriter}
 
 // Run with: mill rvprobe.runMain me.jiuyang.rvprobe.apps.UpdateRVConstraints
 // make sure git repo is clear before running this script
-object UpdateRVConstraints extends App:
-  val writer = new FileWriter(new File("rvprobe/src/constraints/RVConstraints.scala"))
+@main def UpdateRVConstraints(outputPath: String = "rvprobe/src/constraints/RVConstraints.scala"): Unit =
+  val writer = new FileWriter(new File(outputPath))
   val riscvOpcodesPath: Path = Path(
     sys.env.getOrElse(
       "RISCV_OPCODES_INSTALL_PATH",
