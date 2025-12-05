@@ -33,6 +33,9 @@ let
           ./../../mlirlib
           ./../../decoder
           ./../../zaozi
+          ./../../smtlib
+          ./../../rvdecoderdb
+          ./../../omlib
         ];
       };
 
@@ -74,7 +77,7 @@ let
     env.MLIR_INSTALL_PATH = mlir-install;
     env.JEXTRACT_INSTALL_PATH = jextract-21;
     env.LIT_INSTALL_PATH = lit;
-    env.JAVA_TOOL_OPTIONS = "--enable-preview";
+    env.JAVA_TOOL_OPTIONS = "--enable-preview -Djextract.decls.per.header=65535";
 
     outputs = [ "out" ];
 

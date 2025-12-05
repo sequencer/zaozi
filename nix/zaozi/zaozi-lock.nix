@@ -41,6 +41,20 @@ in
     installPath = "https/repo1.maven.org/maven2/commons-io/commons-io/2.18.0";
   };
 
+  "com.eed3si9n.jarjar_jarjar-1.14.1" = fetchMaven {
+    name = "com.eed3si9n.jarjar_jarjar-1.14.1";
+    urls = [ "https://repo1.maven.org/maven2/com/eed3si9n/jarjar/jarjar/1.14.1/jarjar-1.14.1.jar" "https://repo1.maven.org/maven2/com/eed3si9n/jarjar/jarjar/1.14.1/jarjar-1.14.1.pom" ];
+    hash = "sha256-47RmaZw1Ef2vU7cnZUN638FGWS+mvuUXmk7CDo0qMpc=";
+    installPath = "https/repo1.maven.org/maven2/com/eed3si9n/jarjar/jarjar/1.14.1";
+  };
+
+  "com.eed3si9n.jarjarabrams_jarjar-abrams-core_2.13-1.14.1" = fetchMaven {
+    name = "com.eed3si9n.jarjarabrams_jarjar-abrams-core_2.13-1.14.1";
+    urls = [ "https://repo1.maven.org/maven2/com/eed3si9n/jarjarabrams/jarjar-abrams-core_2.13/1.14.1/jarjar-abrams-core_2.13-1.14.1.jar" "https://repo1.maven.org/maven2/com/eed3si9n/jarjarabrams/jarjar-abrams-core_2.13/1.14.1/jarjar-abrams-core_2.13-1.14.1.pom" ];
+    hash = "sha256-LVu6tbRRyUDhJPD/+PUHw8XcAjnPCb8pSR4UlWsbUo0=";
+    installPath = "https/repo1.maven.org/maven2/com/eed3si9n/jarjarabrams/jarjar-abrams-core_2.13/1.14.1";
+  };
+
   "com.eed3si9n_shaded-jawn-parser_2.13-1.3.2" = fetchMaven {
     name = "com.eed3si9n_shaded-jawn-parser_2.13-1.3.2";
     urls = [ "https://repo1.maven.org/maven2/com/eed3si9n/shaded-jawn-parser_2.13/1.3.2/shaded-jawn-parser_2.13-1.3.2.jar" "https://repo1.maven.org/maven2/com/eed3si9n/shaded-jawn-parser_2.13/1.3.2/shaded-jawn-parser_2.13-1.3.2.pom" ];
@@ -228,6 +242,13 @@ in
     urls = [ "https://repo1.maven.org/maven2/com/lihaoyi/mill-libs-javalib-classgraph-worker_3/1.0.0/mill-libs-javalib-classgraph-worker_3-1.0.0.jar" "https://repo1.maven.org/maven2/com/lihaoyi/mill-libs-javalib-classgraph-worker_3/1.0.0/mill-libs-javalib-classgraph-worker_3-1.0.0.pom" ];
     hash = "sha256-u3TJcZSymcVwCixHg42TzdBOaST0krs+s7Nx1Io9K2w=";
     installPath = "https/repo1.maven.org/maven2/com/lihaoyi/mill-libs-javalib-classgraph-worker_3/1.0.0";
+  };
+
+  "com.lihaoyi_mill-libs-javalib-jarjarabrams-worker_3-1.0.0" = fetchMaven {
+    name = "com.lihaoyi_mill-libs-javalib-jarjarabrams-worker_3-1.0.0";
+    urls = [ "https://repo1.maven.org/maven2/com/lihaoyi/mill-libs-javalib-jarjarabrams-worker_3/1.0.0/mill-libs-javalib-jarjarabrams-worker_3-1.0.0.jar" "https://repo1.maven.org/maven2/com/lihaoyi/mill-libs-javalib-jarjarabrams-worker_3/1.0.0/mill-libs-javalib-jarjarabrams-worker_3-1.0.0.pom" ];
+    hash = "sha256-19+mXC6XdNGzLCCbfUIpWgTeHOVUx0dC4yTGlar3Z+Q=";
+    installPath = "https/repo1.maven.org/maven2/com/lihaoyi/mill-libs-javalib-jarjarabrams-worker_3/1.0.0";
   };
 
   "com.lihaoyi_mill-libs-javalib-testrunner-entrypoint-1.0.0" = fetchMaven {
@@ -804,11 +825,25 @@ in
     installPath = "https/repo1.maven.org/maven2/org/antlr/antlr4-runtime/4.7.2";
   };
 
+  "org.apache.commons_commons-lang3-3.8.1" = fetchMaven {
+    name = "org.apache.commons_commons-lang3-3.8.1";
+    urls = [ "https://repo1.maven.org/maven2/org/apache/commons/commons-lang3/3.8.1/commons-lang3-3.8.1.jar" "https://repo1.maven.org/maven2/org/apache/commons/commons-lang3/3.8.1/commons-lang3-3.8.1.pom" ];
+    hash = "sha256-PX52bOjWqywIfIR5kYAvbLzPkBStV0JVgpiYo3OKSQg=";
+    installPath = "https/repo1.maven.org/maven2/org/apache/commons/commons-lang3/3.8.1";
+  };
+
   "org.apache_apache-13" = fetchMaven {
     name = "org.apache_apache-13";
     urls = [ "https://repo1.maven.org/maven2/org/apache/apache/13/apache-13.pom" ];
     hash = "sha256-sACBC2XyW8OQOMbX09EPCVL/lqUvROHaHHHiQ3XpTk4=";
     installPath = "https/repo1.maven.org/maven2/org/apache/apache/13";
+  };
+
+  "org.apache_apache-19" = fetchMaven {
+    name = "org.apache_apache-19";
+    urls = [ "https://repo1.maven.org/maven2/org/apache/apache/19/apache-19.pom" ];
+    hash = "sha256-zhBKa7d1483sjfmn+XnLUQgYZltXXBPJayIZ44PcKHo=";
+    installPath = "https/repo1.maven.org/maven2/org/apache/apache/19";
   };
 
   "org.apache_apache-30" = fetchMaven {
@@ -1924,6 +1959,13 @@ in
     installPath = "https/repo1.maven.org/maven2/org/apache/commons/commons-parent/28";
   };
 
+  "org.apache.commons_commons-parent-47" = fetchMaven {
+    name = "org.apache.commons_commons-parent-47";
+    urls = [ "https://repo1.maven.org/maven2/org/apache/commons/commons-parent/47/commons-parent-47.pom" ];
+    hash = "sha256-3nKXz/Cqz3ed8sPyeJUIYW5uQ/1nCy8N5gPATIkI9DQ=";
+    installPath = "https/repo1.maven.org/maven2/org/apache/commons/commons-parent/47";
+  };
+
   "org.apache.commons_commons-parent-64" = fetchMaven {
     name = "org.apache.commons_commons-parent-64";
     urls = [ "https://repo1.maven.org/maven2/org/apache/commons/commons-parent/64/commons-parent-64.pom" ];
@@ -2153,6 +2195,27 @@ in
     urls = [ "https://repo1.maven.org/maven2/org/openjdk/jmh/jmh-parent/1.35/jmh-parent-1.35.pom" ];
     hash = "sha256-IQnIt0jWZjNk1M7ea1vYvyZ4A+KYuxGR0od7Rvl+Su0=";
     installPath = "https/repo1.maven.org/maven2/org/openjdk/jmh/jmh-parent/1.35";
+  };
+
+  "org.ow2.asm_asm-9.6" = fetchMaven {
+    name = "org.ow2.asm_asm-9.6";
+    urls = [ "https://repo1.maven.org/maven2/org/ow2/asm/asm/9.6/asm-9.6.jar" "https://repo1.maven.org/maven2/org/ow2/asm/asm/9.6/asm-9.6.pom" ];
+    hash = "sha256-YUDEEPax1rAvqhvZossCp4md8slGC0l7uiCBWC+LoHM=";
+    installPath = "https/repo1.maven.org/maven2/org/ow2/asm/asm/9.6";
+  };
+
+  "org.ow2.asm_asm-commons-9.6" = fetchMaven {
+    name = "org.ow2.asm_asm-commons-9.6";
+    urls = [ "https://repo1.maven.org/maven2/org/ow2/asm/asm-commons/9.6/asm-commons-9.6.jar" "https://repo1.maven.org/maven2/org/ow2/asm/asm-commons/9.6/asm-commons-9.6.pom" ];
+    hash = "sha256-iKQ5oUlElzCk7WqOWFkD5KYiaTk9ZfKprevu3FJlfZg=";
+    installPath = "https/repo1.maven.org/maven2/org/ow2/asm/asm-commons/9.6";
+  };
+
+  "org.ow2.asm_asm-tree-9.6" = fetchMaven {
+    name = "org.ow2.asm_asm-tree-9.6";
+    urls = [ "https://repo1.maven.org/maven2/org/ow2/asm/asm-tree/9.6/asm-tree-9.6.jar" "https://repo1.maven.org/maven2/org/ow2/asm/asm-tree/9.6/asm-tree-9.6.pom" ];
+    hash = "sha256-1l/dKuNH2ecb7V5QAu2AkGIPvg0fLsbVSNnrOpZq9Wg=";
+    installPath = "https/repo1.maven.org/maven2/org/ow2/asm/asm-tree/9.6";
   };
 
   "org.ow2.asm_asm-9.8" = fetchMaven {
