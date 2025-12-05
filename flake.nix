@@ -26,6 +26,10 @@
       {
         formatter = pkgs.nixpkgs-fmt;
         legacyPackages = pkgs;
+        packages = {
+          default = pkgs.zaozi.zaozi-assembly;
+          zaozi-assembly = pkgs.zaozi.zaozi-assembly;
+        };
         devShells.default = pkgs.mkShell {
           inputsFrom = [ pkgs.zaozi.zaozi-assembly ];
           nativeBuildInputs = with pkgs; [ nixd ];
