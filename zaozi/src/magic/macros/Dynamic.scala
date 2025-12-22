@@ -83,18 +83,11 @@ def referableSelectDynamic[T <: me.jiuyang.zaozi.valuetpe.Data: Type](
   }
 
   val fieldType = fieldSymbol.tree match {
-    case ValDef(_, fieldTypeRepr, _) =>
-      // Find the Path-dependent type:
-      if (
-        fieldTypeRepr.tpe.typeArgs.headOption.map(_.typeSymbol.maybeOwner == referableType.typeSymbol).getOrElse(false)
-      )
-        val dataTypeRepr = fieldTypeRepr.tpe.typeArgs.head
-        // Maintain a map to recovery this.T to concrete type from parameters.
-        val localTypes   = referableType.classSymbol.get.declaredTypes
-        val typeArgs     = referableType.typeArgs
-        // substitute from local type to parameters
-        fieldTypeRepr.tpe.substituteTypes(from = localTypes, to = typeArgs)
-      else fieldTypeRepr.tpe
+    case ValDef(_, fieldTypeTree, _) =>
+      // Substitute type parameters in the field type with the concrete type arguments from referableType
+      val typeParams = referableType.typeSymbol.declaredTypes.filter(_.isTypeParam)
+      val typeArgs   = referableType.typeArgs
+      fieldTypeTree.tpe.substituteTypes(typeParams.take(typeArgs.length), typeArgs)
     case _                           => report.errorAndAbort(s"Unable to determine the type of field '$fieldNameStr'.")
   }
 
