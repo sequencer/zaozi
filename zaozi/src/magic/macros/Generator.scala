@@ -19,17 +19,17 @@ class generator extends MacroAnnotation:
           // a bit of dirty but quotes does not expose the SingletonTypeTree
           if selfOpt.exists(_.tpt.toString().startsWith("SingletonTypeTree")) =>
         val objSym                                = definition.symbol
-        val (tpiParam, tpiL, tpiI, tpiP, tpiVOpt) = parents
+        val (tptParam, tptL, tptI, tptP, tptVOpt) = parents
           .map(parent =>
             parent match
               case Applied(
                     TypeIdent("Generator"),
-                    List(param: TypeIdent, l: TypeIdent, i: TypeIdent, p: TypeIdent)
+                    List(param: TypeTree, l: TypeTree, i: TypeTree, p: TypeTree)
                   ) =>
                 Some(param, l, i, p, None)
               case Applied(
                     TypeIdent("VerilogWrapper"),
-                    List(param: TypeIdent, l: TypeIdent, i: TypeIdent, p: TypeIdent, v: TypeIdent)
+                    List(param: TypeTree, l: TypeTree, i: TypeTree, p: TypeTree, v: TypeTree)
                   ) =>
                 Some(param, l, i, p, Some(v))
               case _ => None
@@ -45,24 +45,24 @@ class generator extends MacroAnnotation:
             objSym,
             symbolName,
             // we have to construct MethodType manually since the type is different with the declaration's in Generator
-            MethodType(List("parameter"))(methodType => List(tpiParam.tpe), methodType => resultType.tpe)
+            MethodType(List("parameter"))(methodType => List(tptParam.tpe), methodType => resultType.tpe)
           ),
           (argss: List[List[Tree]]) =>
             Some(Select.unique(New(resultType), "<init>").appliedTo(argss.head.head.asExpr.asTerm))
         )
 
         def parseParameterDef =
-          val tpsParam     = tpiParam.symbol
+          val tpsParam     = tptParam.symbol
           val paramCompObj = tpsParam.companionClass
           if (
-            !(tpiParam.tpe <:< TypeRepr.of[java.io.Serializable]
+            !(tptParam.tpe <:< TypeRepr.of[java.io.Serializable]
               && paramCompObj.typeRef <:< TypeRepr.of[java.lang.Object])
           )
-            report.errorAndAbort(s"${tpiParam.show} should be a case class")
+            report.errorAndAbort(s"${tptParam.show} should be a case class")
 
           Seq(
             selfOpt.get.tpt,
-            tpiParam,
+            tptParam,
             tpsParam.companionModule.tree.asInstanceOf[ValDef].tpt /* type of module class */
           )
             .map(_.tpe.asType) match
@@ -81,7 +81,7 @@ class generator extends MacroAnnotation:
                     )
                     .getOrElse {
                       report.errorAndAbort(
-                        s"Cannot find apply method in companion object of ${tpiParam.tpe.show}",
+                        s"Cannot find apply method in companion object of ${tptParam.tpe.show}",
                         paramCompObj.pos.getOrElse(Position.ofMacroExpansion)
                       )
                     }
@@ -165,7 +165,7 @@ class generator extends MacroAnnotation:
                     $mainData.asInstanceOf[mainargs.MainData[tParam, Any]],
                     () =>
                       ${
-                        Ident(tpiParam.tpe match
+                        Ident(tptParam.tpe match
                           case TypeRef(a, b) => TermRef(a, b)).asExpr
                       }
                   )).constructOrExit(${ args })
@@ -197,12 +197,12 @@ class generator extends MacroAnnotation:
             Symbol.requiredClass("me.jiuyang.zaozi.Generator").declaredMethod("main").head.info
           ),
           (argss: List[List[Tree]]) =>
-            tpiParam.tpe.asType match
+            tptParam.tpe.asType match
               case '[tParam] =>
                 Some(
                   Select
                     .unique(Ref(Symbol.requiredModule("me.jiuyang.zaozi.default.given_GeneratorApi")), "mainImpl")
-                    .appliedToTypeTrees(List(tpiParam, tpiL, tpiI, tpiP))
+                    .appliedToTypeTrees(List(tptParam, tptL, tptI, tptP))
                     .appliedTo(This(objSym))
                     .appliedTo(argss.head.head.asExpr.asTerm)
                     .appliedTo(
@@ -210,7 +210,7 @@ class generator extends MacroAnnotation:
                         .summon[upickle.default.ReadWriter[tParam]]
                         .getOrElse:
                           report.errorAndAbort(
-                            s"No given instance of upickle.default.ReadWriter[${tpiParam.show}] was Found"
+                            s"No given instance of upickle.default.ReadWriter[${tptParam.show}] was Found"
                           )
                         .asTerm
                     )
@@ -224,9 +224,9 @@ class generator extends MacroAnnotation:
             report.errorAndAbort(s"Overriding ${definition.symbol.name} is forbidden")
           Some(definition)
 
-        val layersDefOpt    = makeInterfaceDef("layers", tpiL).pipe(defSome)
-        val interfaceDefOpt = makeInterfaceDef("interface", tpiI).pipe(defSome)
-        val probeDefOpt     = makeInterfaceDef("probe", tpiP).pipe(defSome)
+        val layersDefOpt    = makeInterfaceDef("layers", tptL).pipe(defSome)
+        val interfaceDefOpt = makeInterfaceDef("interface", tptI).pipe(defSome)
+        val probeDefOpt     = makeInterfaceDef("probe", tptP).pipe(defSome)
 
         val parseParameterDefOpt = parseParameterDef.pipe(defOpt)
         val mainDefOpt           = mainDef.pipe(defOpt)
