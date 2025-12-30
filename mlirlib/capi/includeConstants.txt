@@ -111,6 +111,8 @@ MlirWalkPreOrder                              # header: $MLIR_INSTALL_PATH/inclu
 MlirWalkResultAdvance                         # header: $MLIR_INSTALL_PATH/include/mlir-c/IR.h
 MlirWalkResultInterrupt                       # header: $MLIR_INSTALL_PATH/include/mlir-c/IR.h
 MlirWalkResultSkip                            # header: $MLIR_INSTALL_PATH/include/mlir-c/IR.h
+MLIR_PASS_DISPLAY_MODE_LIST       # header: $MLIR_INSTALL_PATH/include/mlir-c/Pass.h
+MLIR_PASS_DISPLAY_MODE_PIPELINE   # header: $MLIR_INSTALL_PATH/include/mlir-c/Pass.h
 MLIR_ENABLE_EXPENSIVE_PATTERN_API_CHECKS # header: $MLIR_INSTALL_PATH/include/mlir/Config/mlir-config.h
 MLIR_ENABLE_NVPTXCOMPILER                # header: $MLIR_INSTALL_PATH/include/mlir/Config/mlir-config.h
 MLIR_ENABLE_PDL_IN_PATTERNMATCH          # header: $MLIR_INSTALL_PATH/include/mlir/Config/mlir-config.h
