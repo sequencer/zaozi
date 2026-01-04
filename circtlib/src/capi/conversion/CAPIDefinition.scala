@@ -25,12 +25,6 @@ trait ConversionCreateApi:
   def calyxToHW(
     using arena: Arena
   ): Pass
-  def convertAIGToComb(
-    using arena: Arena
-  ): Pass
-  def convertCombToAIG(
-    using arena: Arena
-  ): Pass
   def convertCombToArith(
     using arena: Arena
   ): Pass
@@ -53,9 +47,6 @@ trait ConversionCreateApi:
     using arena: Arena
   ): Pass
   def convertMooreToCore(
-    using arena: Arena
-  ): Pass
-  def convertToArcs(
     using arena: Arena
   ): Pass
   def convertVerifToSMT(
@@ -142,8 +133,6 @@ trait ConversionRegisterApi:
   def calyxRemoveGroupsFromFSM: Unit
   def calyxToFSM:               Unit
   def calyxToHW:                Unit
-  def convertAIGToComb:         Unit
-  def convertCombToAIG:         Unit
   def convertCombToArith:       Unit
   def convertCombToSMT:         Unit
   def convertFSMToSV:           Unit
@@ -152,7 +141,6 @@ trait ConversionRegisterApi:
   def convertHWToSMT:           Unit
   def convertHWToSystemC:       Unit
   def convertMooreToCore:       Unit
-  def convertToArcs:            Unit
   def convertVerifToSMT:        Unit
   def dcToHW:                   Unit
   def exportSplitVerilog:       Unit

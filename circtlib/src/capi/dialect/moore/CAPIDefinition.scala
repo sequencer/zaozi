@@ -92,6 +92,8 @@ trait TypeApi:
     using arena: Arena
   ): Type
   inline def realTypeGet(
+    width:       Int
+  )(
     using arena: Arena,
     context:     Context
   ): Type

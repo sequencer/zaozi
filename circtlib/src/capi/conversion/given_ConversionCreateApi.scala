@@ -9,8 +9,6 @@ import org.llvm.circt.CAPI.{
   mlirCreateCIRCTConversionCalyxRemoveGroupsFromFSM,
   mlirCreateCIRCTConversionCalyxToFSM,
   mlirCreateCIRCTConversionCalyxToHW,
-  mlirCreateCIRCTConversionConvertAIGToComb,
-  mlirCreateCIRCTConversionConvertCombToAIG,
   mlirCreateCIRCTConversionConvertCombToArith,
   mlirCreateCIRCTConversionConvertCombToSMT,
   mlirCreateCIRCTConversionConvertFSMToSV,
@@ -19,7 +17,6 @@ import org.llvm.circt.CAPI.{
   mlirCreateCIRCTConversionConvertHWToSMT,
   mlirCreateCIRCTConversionConvertHWToSystemC,
   mlirCreateCIRCTConversionConvertMooreToCore,
-  mlirCreateCIRCTConversionConvertToArcs,
   mlirCreateCIRCTConversionConvertVerifToSMT,
   mlirCreateCIRCTConversionDCToHW,
   mlirCreateCIRCTConversionExportSplitVerilog,
@@ -69,12 +66,6 @@ given ConversionCreateApi with
   def calyxToHW(
     using arena: Arena
   ): Pass = Pass(mlirCreateCIRCTConversionCalyxToHW(arena))
-  def convertAIGToComb(
-    using arena: Arena
-  ): Pass = Pass(mlirCreateCIRCTConversionConvertAIGToComb(arena))
-  def convertCombToAIG(
-    using arena: Arena
-  ): Pass = Pass(mlirCreateCIRCTConversionConvertCombToAIG(arena))
   def convertCombToArith(
     using arena: Arena
   ): Pass = Pass(mlirCreateCIRCTConversionConvertCombToArith(arena))
@@ -99,9 +90,6 @@ given ConversionCreateApi with
   def convertMooreToCore(
     using arena: Arena
   ): Pass = Pass(mlirCreateCIRCTConversionConvertMooreToCore(arena))
-  def convertToArcs(
-    using arena: Arena
-  ): Pass = Pass(mlirCreateCIRCTConversionConvertToArcs(arena))
   def convertVerifToSMT(
     using arena: Arena
   ): Pass = Pass(mlirCreateCIRCTConversionConvertVerifToSMT(arena))
