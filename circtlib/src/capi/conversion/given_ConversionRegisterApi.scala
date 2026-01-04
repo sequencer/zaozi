@@ -9,8 +9,6 @@ import org.llvm.circt.CAPI.{
   mlirRegisterCIRCTConversionCalyxRemoveGroupsFromFSM,
   mlirRegisterCIRCTConversionCalyxToFSM,
   mlirRegisterCIRCTConversionCalyxToHW,
-  mlirRegisterCIRCTConversionConvertAIGToComb,
-  mlirRegisterCIRCTConversionConvertCombToAIG,
   mlirRegisterCIRCTConversionConvertCombToArith,
   mlirRegisterCIRCTConversionConvertCombToSMT,
   mlirRegisterCIRCTConversionConvertFSMToSV,
@@ -19,7 +17,6 @@ import org.llvm.circt.CAPI.{
   mlirRegisterCIRCTConversionConvertHWToSMT,
   mlirRegisterCIRCTConversionConvertHWToSystemC,
   mlirRegisterCIRCTConversionConvertMooreToCore,
-  mlirRegisterCIRCTConversionConvertToArcs,
   mlirRegisterCIRCTConversionConvertVerifToSMT,
   mlirRegisterCIRCTConversionDCToHW,
   mlirRegisterCIRCTConversionExportSplitVerilog,
@@ -55,8 +52,6 @@ given ConversionRegisterApi with
   def calyxRemoveGroupsFromFSM: Unit = mlirRegisterCIRCTConversionCalyxRemoveGroupsFromFSM()
   def calyxToFSM:               Unit = mlirRegisterCIRCTConversionCalyxToFSM()
   def calyxToHW:                Unit = mlirRegisterCIRCTConversionCalyxToHW()
-  def convertAIGToComb:         Unit = mlirRegisterCIRCTConversionConvertAIGToComb()
-  def convertCombToAIG:         Unit = mlirRegisterCIRCTConversionConvertCombToAIG()
   def convertCombToArith:       Unit = mlirRegisterCIRCTConversionConvertCombToArith()
   def convertCombToSMT:         Unit = mlirRegisterCIRCTConversionConvertCombToSMT()
   def convertFSMToSV:           Unit = mlirRegisterCIRCTConversionConvertFSMToSV()
@@ -65,7 +60,6 @@ given ConversionRegisterApi with
   def convertHWToSMT:           Unit = mlirRegisterCIRCTConversionConvertHWToSMT()
   def convertHWToSystemC:       Unit = mlirRegisterCIRCTConversionConvertHWToSystemC()
   def convertMooreToCore:       Unit = mlirRegisterCIRCTConversionConvertMooreToCore()
-  def convertToArcs:            Unit = mlirRegisterCIRCTConversionConvertToArcs()
   def convertVerifToSMT:        Unit = mlirRegisterCIRCTConversionConvertVerifToSMT()
   def dcToHW:                   Unit = mlirRegisterCIRCTConversionDCToHW()
   def exportSplitVerilog:       Unit = mlirRegisterCIRCTConversionExportSplitVerilog()

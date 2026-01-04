@@ -56,35 +56,9 @@ end AttributeApi
 /** LLHD Type API
   *
   * {{{
-  * llhdPointerTypeGet
-  * llhdPointerTypeGetElementType
-  * llhdSignalTypeGet
-  * llhdSignalTypeGetElementType
-  * llhdTypeIsAPointerType
-  * llhdTypeIsASignalType
   * llhdTypeIsATimeType
   * }}}
   */
 trait TypeApi:
-  inline def pointerTypeGet(
-    element:     Type
-  )(
-    using arena: Arena
-  ): Type
-  extension (tpe: Type)
-    inline def pointerTypeGetElementType(
-    )(
-      using arena: Arena
-    ):                        Type
-    inline def signalTypeGet(
-    )(
-      using arena: Arena
-    ):                        Type
-    inline def signalTypeGetElementType(
-    )(
-      using arena: Arena
-    ):                        Type
-    inline def isPointerType: Boolean
-    inline def isSignalType:  Boolean
-    inline def isTimeType:    Boolean
+  extension (tpe: Type) inline def isTimeType: Boolean
 end TypeApi

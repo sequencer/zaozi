@@ -77,9 +77,11 @@ given TypeApi with
     using arena: Arena
   ): Type = Type(mooreQueueTypeGet(arena, elementType.segment, bound))
   inline def realTypeGet(
+    width:       Int
+  )(
     using arena: Arena,
     context:     Context
-  ): Type = Type(mooreRealTypeGet(arena, context.segment))
+  ): Type = Type(mooreRealTypeGet(arena, context.segment, width))
   inline def stringTypeGet(
     using arena: Arena,
     context:     Context
