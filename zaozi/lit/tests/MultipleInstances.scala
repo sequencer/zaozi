@@ -73,7 +73,7 @@ class GCDInput(parameter: GCDParameter) extends Bundle:
 class GCDOutput(parameter: GCDParameter) extends Bundle:
   val z: BundleField[UInt] = Aligned(UInt(parameter.width.W))
 
-// GCD-DAG:      module GCD_35bf2066(
+// GCD-DAG:      module GCD_{{.*}}(
 // GCD-DAG-NEXT:   input         clock,
 // GCD-DAG-NEXT:                 reset,
 // GCD-DAG-NEXT:   output        input_ready,
@@ -106,7 +106,7 @@ class SubtractorIO(
 
 class SubtractorProbe(parameter: SubtractorParameter) extends DVBundle[SubtractorParameter, SubtractorLayers](parameter)
 
-// SUB-DAG:      module Subtractor_f34dfd42(
+// SUB-DAG:      module Subtractor_{{.*}}(
 // SUB-DAG-NEXT:   input [31:0] a,
 // SUB-DAG-NEXT:   b,
 // SUB-DAG-NEXT:   output [31:0] z
@@ -116,6 +116,70 @@ object Subtractor extends Generator[SubtractorParameter, SubtractorLayers, Subtr
   def architecture(parameter: SubtractorParameter) =
     val io = summon[Interface[SubtractorIO]]
     io.z := (io.a - io.b).asBits.tail(parameter.width).asUInt
+
+case class GenXParameter(width: Int) extends Parameter
+given upickle.default.ReadWriter[GenXParameter] = upickle.default.macroRW
+
+class GenXLayers(parameter: GenXParameter) extends LayerInterface(parameter):
+  def layers = Seq.empty
+
+class GenXIO(parameter: GenXParameter) extends HWBundle(parameter):
+  val x          = Flipped(UInt(parameter.width.W))
+  val y          = Flipped(UInt(parameter.width.W))
+  val inputFire  = Flipped(Bool())
+  val inputValue = Flipped(UInt(parameter.width.W))
+  val xGreaterY  = Flipped(Bool())
+  val nextX      = Aligned(UInt(parameter.width.W))
+
+class GenXProbe(parameter: GenXParameter) extends DVBundle[GenXParameter, GenXLayers](parameter)
+
+@generator
+object GenX extends Generator[GenXParameter, GenXLayers, GenXIO, GenXProbe]:
+  def architecture(parameter: GenXParameter) =
+    val io  = summon[Interface[GenXIO]]
+    val sub = Subtractor.instantiate(SubtractorParameter(parameter.width))
+    sub.io.a := io.x
+    sub.io.b := io.y
+
+    io.nextX := io.inputFire ? (
+      io.inputValue,
+      io.xGreaterY ? (
+        sub.io.z,
+        io.x
+      )
+    )
+
+case class GenYParameter(width: Int) extends Parameter
+given upickle.default.ReadWriter[GenYParameter] = upickle.default.macroRW
+
+class GenYLayers(parameter: GenYParameter) extends LayerInterface(parameter):
+  def layers = Seq.empty
+
+class GenYIO(parameter: GenYParameter) extends HWBundle(parameter):
+  val x          = Flipped(UInt(parameter.width.W))
+  val y          = Flipped(UInt(parameter.width.W))
+  val inputFire  = Flipped(Bool())
+  val inputValue = Flipped(UInt(parameter.width.W))
+  val xGreaterY  = Flipped(Bool())
+  val nextY      = Aligned(UInt(parameter.width.W))
+
+class GenYProbe(parameter: GenYParameter) extends DVBundle[GenYParameter, GenYLayers](parameter)
+
+@generator
+object GenY extends Generator[GenYParameter, GenYLayers, GenYIO, GenYProbe]:
+  def architecture(parameter: GenYParameter) =
+    val io  = summon[Interface[GenYIO]]
+    val sub = Subtractor.instantiate(SubtractorParameter(parameter.width))
+    sub.io.a := io.y
+    sub.io.b := io.x
+
+    io.nextY := io.inputFire ? (
+      io.inputValue,
+      io.xGreaterY ? (
+        io.y,
+        sub.io.z
+      )
+    )
 
 @generator
 object GCD extends Generator[GCDParameter, GCDLayers, GCDIO, GCDProbe]:
@@ -133,39 +197,38 @@ object GCD extends Generator[GCDParameter, GCDLayers, GCDIO, GCDProbe]:
     io.output.bits.z := x
     io.output.valid  := !busy & startupFlag
 
-    // GCD-DAG:      Subtractor_f34dfd42 sub1 (
-    // GCD-DAG-NEXT:   .a (x),
-    // GCD-DAG-NEXT:   .b (y),
-    // GCD-DAG-NEXT:   .z (_sub1_z)
+    // GCD-DAG:      GenX_{{.*}} genX (
+    // GCD-DAG-NEXT:   .x (x),
+    // GCD-DAG-NEXT:   .y (y),
+    // GCD-DAG-NEXT:   .inputFire (_input_fire),
+    // GCD-DAG-NEXT:   .inputValue (input_bits_x),
+    // GCD-DAG-NEXT:   .xGreaterY (_genX_xGreaterY),
+    // GCD-DAG-NEXT:   .nextX (_genX_nextX)
     // GCD-DAG-NEXT: );
-    val sub1 = Subtractor.instantiate(SubtractorParameter(parameter.width))
-    sub1.io.a := x
-    sub1.io.b := y
+    val genX = GenX.instantiate(GenXParameter(parameter.width))
+    genX.io.x          := x
+    genX.io.y          := y
+    genX.io.inputFire  := io.input.fire
+    genX.io.inputValue := io.input.bits.x
+    genX.io.xGreaterY  := x > y
 
-    // GCD-DAG:      Subtractor_f34dfd42 sub2 (
-    // GCD-DAG-NEXT:   .a (y),
-    // GCD-DAG-NEXT:   .b (x),
-    // GCD-DAG-NEXT:   .z (_sub2_z)
+    // GCD-DAG:      GenY_{{.*}} genY (
+    // GCD-DAG-NEXT:   .x (x),
+    // GCD-DAG-NEXT:   .y (y),
+    // GCD-DAG-NEXT:   .inputFire (_input_fire),
+    // GCD-DAG-NEXT:   .inputValue (input_bits_y),
+    // GCD-DAG-NEXT:   .xGreaterY (_genY_xGreaterY),
+    // GCD-DAG-NEXT:   .nextY (_genY_nextY)
     // GCD-DAG-NEXT: );
-    val sub2 = Subtractor.instantiate(SubtractorParameter(parameter.width))
-    sub2.io.a := y
-    sub2.io.b := x
+    val genY = GenY.instantiate(GenYParameter(parameter.width))
+    genY.io.x          := x
+    genY.io.y          := y
+    genY.io.inputFire  := io.input.fire
+    genY.io.inputValue := io.input.bits.y
+    genY.io.xGreaterY  := x > y
 
-    x := io.input.fire ? (
-      io.input.bits.x,
-      (x > y) ? (
-        sub1.io.z,
-        x
-      )
-    )
-
-    y := io.input.fire ? (
-      io.input.bits.y,
-      (x > y) ? (
-        y,
-        sub2.io.z
-      )
-    )
+    x := genX.io.nextX
+    y := genY.io.nextY
 
     startupFlag := io.input.fire ? (
       true.B,
