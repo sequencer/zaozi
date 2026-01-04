@@ -91,7 +91,7 @@ object SIntSpec extends TestSuite:
           io.bool.dontCare()
           io.bits.dontCare()
       Div.verilogTest(SIntSpecParameter(8))(
-        "assign sint = $signed($signed({a[7], a}) / $signed({b[7], b}));"
+        "assign sint = $unsigned($signed($signed({a[7], a}) / $signed({b[7], b})));"
       )
 
     test("%"):
@@ -103,7 +103,7 @@ object SIntSpec extends TestSuite:
           io.bool.dontCare()
           io.bits.dontCare()
       Mod.verilogTest(SIntSpecParameter(8))(
-        "wire [7:0] _GEN_0 = $signed($signed(a) % $signed(b));"
+        "wire [7:0] _GEN_0 = $unsigned($signed($signed(a) % $signed(b)));"
       )
 
     test("<"):
@@ -242,6 +242,6 @@ object SIntSpec extends TestSuite:
           io.bool.dontCare()
           io.bits.dontCare()
       ShiftRightUInt.verilogTest(SIntSpecParameter(8))(
-        "wire [7:0] _GEN_0 = $signed($signed(a) >>> c);",
+        "wire [7:0] _GEN_0 = $unsigned($signed($signed(a) >>> c));",
         "assign sint = {_GEN_0[7], _GEN_0};"
       )
