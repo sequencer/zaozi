@@ -162,24 +162,28 @@ trait AttributeApi:
     ):      Attribute
   extension (value:                 String)
     inline def getParamDeclAttribute(
-      name:        String,
-      tpe:         Type
+      name:        String
     )(
       using arena: Arena,
       context:     Context
     ):      Attribute
   extension (value:                 BigInt)
     inline def getParamDeclAttribute(
-      name:        String,
-      tpe:         Type
+      name:        String
     )(
       using arena: Arena,
       context:     Context
     ):      Attribute
   extension (value:                 Double)
     inline def getParamDeclAttribute(
-      name:        String,
-      tpe:         Type
+      name:        String
+    )(
+      using arena: Arena,
+      context:     Context
+    ):      Attribute
+  extension (value:                 Boolean)
+    inline def getParamDeclAttribute(
+      name:        String
     )(
       using arena: Arena,
       context:     Context
