@@ -211,8 +211,7 @@ trait LitModule extends Module {
     ) / "bin" / "lit"
   )
   def run(args: String*) = Task.Command(
-    // disable parallelism again to wait https://github.com/VirtusLab/scala-cli/pull/3846
-    os.proc(litBinary().toString(), litConfig().path, "-a", "-j 1")
+    os.proc(litBinary().toString(), litConfig().path, "-a")
       .call(Task.dest, stdout = os.ProcessOutput.Readlines(line => Task.ctx().log.info("[lit] " + line)))
   )
 }
