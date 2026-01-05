@@ -145,7 +145,7 @@ object TypeSpec extends TestSuite:
         test("Int"):
           smtTest(
             "(declare-const a (_ BitVec 32))",
-            "(assert (let ((tmp (bvashr a 1)))",
+            "(assert (let ((tmp (bvashr a #x00000001)))",
             "        (let ((tmp_0 (= tmp #x00000000)))",
             "        tmp_0)))"
           ):
@@ -156,19 +156,19 @@ object TypeSpec extends TestSuite:
         test("SInt"):
           smtTest(
             "(declare-const a (_ BitVec 32))",
-            "(assert (let ((tmp (bvashr a 1)))",
+            "(assert (let ((tmp (bvashr a #x00000001)))",
             "        (let ((tmp_0 (= tmp #x00000000)))",
             "        tmp_0)))"
           ):
             solver {
               val a = smtValue(BitVector(true, 32))
-              smtAssert(a +>> 1.S === 0.B(true, 32))
+              smtAssert(a +>> 1.B(true, 32) === 0.B(true, 32))
             }
       test(">>"):
         test("Int"):
           smtTest(
             "(declare-const a (_ BitVec 32))",
-            "(assert (let ((tmp (bvlshr a 1)))",
+            "(assert (let ((tmp (bvlshr a #x00000001)))",
             "        (let ((tmp_0 (= tmp #x00000000)))",
             "        tmp_0)))"
           ):
@@ -179,19 +179,19 @@ object TypeSpec extends TestSuite:
         test("SInt"):
           smtTest(
             "(declare-const a (_ BitVec 32))",
-            "(assert (let ((tmp (bvlshr a 1)))",
+            "(assert (let ((tmp (bvlshr a #x00000001)))",
             "        (let ((tmp_0 (= tmp #x00000000)))",
             "        tmp_0)))"
           ):
             solver {
               val a = smtValue(BitVector(true, 32))
-              smtAssert(a >> 1.S === 0.B(true, 32))
+              smtAssert(a >> 1.B(true, 32) === 0.B(true, 32))
             }
       test("<<"):
         test("Int"):
           smtTest(
             "(declare-const a (_ BitVec 32))",
-            "(assert (let ((tmp (bvshl a 1)))",
+            "(assert (let ((tmp (bvshl a #x00000001)))",
             "        (let ((tmp_0 (= tmp #x00000000)))",
             "        tmp_0)))"
           ):
@@ -202,13 +202,13 @@ object TypeSpec extends TestSuite:
         test("SInt"):
           smtTest(
             "(declare-const a (_ BitVec 32))",
-            "(assert (let ((tmp (bvshl a 1)))",
+            "(assert (let ((tmp (bvshl a #x00000001)))",
             "        (let ((tmp_0 (= tmp #x00000000)))",
             "        tmp_0)))"
           ):
             solver {
               val a = smtValue(BitVector(true, 32))
-              smtAssert(a << 1.S === 0.B(true, 32))
+              smtAssert(a << 1.B(true, 32) === 0.B(true, 32))
             }
       test("+"):
         smtTest(

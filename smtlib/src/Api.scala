@@ -253,10 +253,10 @@ trait TypeImpl:
 // type operation trait
 
 // bv type
-trait Ashr[D <: Data, RET <: Data, R <: Referable[D], THAT <: Referable[SInt]]:
+trait Ashr[D <: Data, RET <: Data, R <: Referable[D]]:
   extension (ref: R)
     def +>>(
-      that: THAT | Int
+      that: R | Int
     )(
       using Arena,
       Context,
@@ -265,10 +265,10 @@ trait Ashr[D <: Data, RET <: Data, R <: Referable[D], THAT <: Referable[SInt]]:
       sourcecode.Line,
       sourcecode.Name.Machine
     ): Ref[RET]
-trait Lshr[D <: Data, RET <: Data, R <: Referable[D], THAT <: Referable[SInt]]:
+trait Lshr[D <: Data, RET <: Data, R <: Referable[D]]:
   extension (ref: R)
     def >>(
-      that: THAT | Int
+      that: R | Int
     )(
       using Arena,
       Context,
@@ -277,10 +277,10 @@ trait Lshr[D <: Data, RET <: Data, R <: Referable[D], THAT <: Referable[SInt]]:
       sourcecode.Line,
       sourcecode.Name.Machine
     ): Ref[RET]
-trait Shl[D <: Data, RET <: Data, R <: Referable[D], THAT <: Referable[SInt]]:
+trait Shl[D <: Data, RET <: Data, R <: Referable[D]]:
   extension (ref: R)
     def <<(
-      that: THAT | Int
+      that: R | Int
     )(
       using Arena,
       Context,
@@ -596,10 +596,10 @@ trait ArrayApi[T <: Data, U <: Data, R <: Referable[Array[T, U]], S <: Referable
     with Update[T, U, R, S]
     with BroadCast[T, U, R, S]
 
-trait BitVectorApi[R <: Referable[BitVector], THAT <: Referable[SInt]]
-    extends Ashr[BitVector, BitVector, R, THAT]
-    with Lshr[BitVector, BitVector, R, THAT]
-    with Shl[BitVector, BitVector, R, THAT]
+trait BitVectorApi[R <: Referable[BitVector]]
+    extends Ashr[BitVector, BitVector, R]
+    with Lshr[BitVector, BitVector, R]
+    with Shl[BitVector, BitVector, R]
     with Add[BitVector, BitVector, R]
     with And[BitVector, BitVector, R]
     with Mul[BitVector, BitVector, R]
