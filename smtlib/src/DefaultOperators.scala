@@ -467,10 +467,10 @@ given [T <: Data, U <: Data, R <: Referable[Array[T, U]], S <: Referable[U]]: Ar
         val _operation: Operation   = op.operation
 end given
 
-given [R <: Referable[BitVector], THAT <: Referable[SInt]]: BitVectorApi[R, THAT] with
+given [R <: Referable[BitVector]]: BitVectorApi[R] with
   extension (ref: R)
     def +>>(
-      that: THAT | Int
+      that: R | Int
     )(
       using Arena,
       Context,
@@ -479,9 +479,10 @@ given [R <: Referable[BitVector], THAT <: Referable[SInt]]: BitVectorApi[R, THAT
       sourcecode.Line,
       sourcecode.Name.Machine
     ): Ref[BitVector] =
-      val op = that match
-        case that: Int             => summon[BVAShrApi].op(ref.refer, that.S.refer, locate)
-        case that: Referable[SInt] => summon[BVAShrApi].op(ref.refer, that.refer, locate)
+      val shiftAmount = that match
+        case that: Int                  => that.B(ref._tpe._isSigned, ref._tpe._width).refer
+        case that: Referable[BitVector] => that.refer
+      val op          = summon[BVAShrApi].op(ref.refer, shiftAmount, locate)
       op.operation.appendToBlock()
       new Ref[BitVector]:
         val _tpe:       BitVector = new BitVector:
@@ -490,7 +491,7 @@ given [R <: Referable[BitVector], THAT <: Referable[SInt]]: BitVectorApi[R, THAT
         val _operation: Operation = op.operation
 
     def >>(
-      that: THAT | Int
+      that: R | Int
     )(
       using Arena,
       Context,
@@ -499,9 +500,10 @@ given [R <: Referable[BitVector], THAT <: Referable[SInt]]: BitVectorApi[R, THAT
       sourcecode.Line,
       sourcecode.Name.Machine
     ): Ref[BitVector] =
-      val op = that match
-        case that: Int             => summon[BVLShrApi].op(ref.refer, that.S.refer, locate)
-        case that: Referable[SInt] => summon[BVLShrApi].op(ref.refer, that.refer, locate)
+      val shiftAmount = that match
+        case that: Int                  => that.B(ref._tpe._isSigned, ref._tpe._width).refer
+        case that: Referable[BitVector] => that.refer
+      val op          = summon[BVLShrApi].op(ref.refer, shiftAmount, locate)
       op.operation.appendToBlock()
       new Ref[BitVector]:
         val _tpe:       BitVector = new BitVector:
@@ -586,7 +588,7 @@ given [R <: Referable[BitVector], THAT <: Referable[SInt]]: BitVectorApi[R, THAT
         val _operation: Operation = op
 
     def <<(
-      that: THAT | Int
+      that: R | Int
     )(
       using Arena,
       Context,
@@ -595,9 +597,10 @@ given [R <: Referable[BitVector], THAT <: Referable[SInt]]: BitVectorApi[R, THAT
       sourcecode.Line,
       sourcecode.Name.Machine
     ): Ref[BitVector] =
-      val op = that match
-        case that: Int             => summon[BVShlApi].op(ref.refer, that.S.refer, locate)
-        case that: Referable[SInt] => summon[BVShlApi].op(ref.refer, that.refer, locate)
+      val shiftAmount = that match
+        case that: Int                  => that.B(ref._tpe._isSigned, ref._tpe._width).refer
+        case that: Referable[BitVector] => that.refer
+      val op          = summon[BVShlApi].op(ref.refer, shiftAmount, locate)
       op.operation.appendToBlock()
       new Ref[BitVector]:
         val _tpe:       BitVector = new BitVector:
