@@ -281,10 +281,10 @@ object Smoke extends TestSuite:
 
             test("Constant"):
               test("Signed"):
-                summon[ConstantApi].op(-BigInt("deadbeafdead", 16), 32, true, unknownLocation).operation.appendToBlock()
+                summon[ConstantApi].op(-BigInt("deadbeafdead", 16), 64, true, unknownLocation).operation.appendToBlock()
 
               test("Unsigned"):
-                summon[ConstantApi].op(BigInt("beafdeadbeaf", 16), 16, false, unknownLocation).operation.appendToBlock()
+                summon[ConstantApi].op(BigInt("beafdeadbeaf", 16), 64, false, unknownLocation).operation.appendToBlock()
 
             test("CvtPrim"):
               test("UInt"):

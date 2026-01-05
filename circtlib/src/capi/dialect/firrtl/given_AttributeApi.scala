@@ -29,11 +29,16 @@ given AttributeApi with
     )(
       using arena: Arena
     ): Attribute =
+      val widthInt = width.getOrElse(tpe.integerTypeGetWidth.toInt)
+      require(
+        widthInt >= bigInt.bitLength,
+        s"Provided width ${widthInt} is smaller than the bit length ${bigInt.bitLength} of the BigInt ${bigInt}"
+      )
       Attribute(
         firrtlAttrGetIntegerFromString(
           arena,
           tpe.segment,
-          width.getOrElse(tpe.integerTypeGetWidth.toInt),
+          widthInt,
           bigInt.toString(10).toStringRef.segment,
           10
         )

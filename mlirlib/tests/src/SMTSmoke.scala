@@ -45,7 +45,7 @@ object SMTSmoke extends TestSuite:
           val array0 = summon[DeclareFunApi].op("array0", location = unknownLocation, arrayType).result
           val bv0    = summon[BVConstantApi].op(0, 1, location = unknownLocation).result
           val bv1    = summon[BVConstantApi].op(1, 1, location = unknownLocation).result
-          val bv10   = summon[BVConstantApi].op(2, 1, location = unknownLocation).result
+          val bv10   = summon[BVConstantApi].op(2, 2, location = unknownLocation).result
 
           test("And"):
             summon[AndApi].op(Seq(bool0, bool1), unknownLocation).operation.appendToBlock()
