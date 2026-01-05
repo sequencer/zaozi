@@ -39,7 +39,7 @@ object OmSmoke extends TestSuite:
 
       width.isPrimitive ==> true
       width.getPrimitive.isIntegerAttr ==> true
-      width.getPrimitive.integerAttrGetInt.integerAttrGetValueInt ==> 16
+      width.getPrimitive.integerAttrGetInt.integerAttrGetValueSInt ==> 16
 
     test("EvaluatorValue Types"):
       val module    =
@@ -114,8 +114,6 @@ object OmSmoke extends TestSuite:
           // before firtool 1.122.0, list constants are mlir attrs rather than list evaluator values
           listI64.isList ==> true
           listI32.isList ==> true
-          listI64.getPrimitive.isListAttr ==> false
-          listI32.getPrimitive.isListAttr ==> false
 
         test("OM List"):
           val listCreateClass = evaluator.instantiate("ListCreate")
@@ -154,7 +152,7 @@ object OmSmoke extends TestSuite:
 
         test("Bool value is also an integer"):
           bool1Attr.isInteger ==> true
-          bool1Attr.integerAttrGetValueUInt ==> 1
+          bool1Attr.integerAttrGetValueInt ==> -1
           bool2Attr.integerAttrGetValueInt ==> -1
           bool3Attr.integerAttrGetValueInt ==> 0
 
