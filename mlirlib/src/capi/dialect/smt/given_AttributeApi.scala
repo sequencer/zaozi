@@ -32,7 +32,12 @@ given AttributeApi with
     )(
       using arena: Arena,
       context:     Context
-    ): Attribute = Attribute(mlirSMTAttrGetBitVector(arena, context.segment, value, width))
+    ): Attribute =
+      require(
+        width >= (if value == 0 then 1 else 32 - Integer.numberOfLeadingZeros(value)),
+        s"Width $width is insufficient to represent unsigned value $value"
+      )
+      Attribute(mlirSMTAttrGetBitVector(arena, context.segment, value, width))
   extension (attr:  Attribute) inline def isSMTAttribute: Boolean = mlirSMTAttrIsASMTAttribute(attr.segment)
 
   extension (str: String)
