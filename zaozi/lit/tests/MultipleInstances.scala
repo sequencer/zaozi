@@ -2,10 +2,11 @@
 // SPDX-FileCopyrightText: 2025 <liu@jiuyang.me>
 
 // DEFINE: %{test} = scala-cli --server=false --java-home=%JAVAHOME --extra-jars=%RUNCLASSPATH --scala-version=%SCALAVERSION -O="-experimental" --java-opt="--enable-native-access=ALL-UNNAMED" --java-opt="--enable-preview" --java-opt="-Djava.library.path=%JAVALIBRARYPATH" --main-class GCD %s --
-// RUN: %{test} config %t.json --width 32 --use-async-reset false
-// RUN: %{test} design %t.json
-// RUN: firld *.mlirbc --base-circuit GCD_35bf2066 --no-mangle | firtool --format=mlir | FileCheck %s --check-prefixes=GCD,SUB
-// RUN: rm %t.json *.mlirbc -f
+// RUN: rm -rf %t && mkdir -p %t && cd %t
+// RUN: %{test} config %t/config.json --width 32 --use-async-reset false
+// RUN: %{test} design %t/config.json
+// RUN: firld %t/*.mlirbc --base-circuit GCD_35bf2066 --no-mangle | firtool --format=mlir | FileCheck %s --check-prefixes=GCD,SUB
+// RUN: rm -rf %t
 
 import me.jiuyang.zaozi.*
 import me.jiuyang.zaozi.default.{*, given}
