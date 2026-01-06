@@ -20,4 +20,4 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: nix develop -c mill -i '__.testForked'
-      - run: nix develop -c mill -i 'zaozi.lit.tests.run'
+      - run: nix develop -c mill -i '__.lit.tests.run'
