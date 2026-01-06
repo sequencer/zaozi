@@ -2,10 +2,11 @@
 // SPDX-FileCopyrightText: 2025 <liu@jiuyang.me>
 
 // DEFINE: %{test} = scala-cli --server=false --java-home=%JAVAHOME --extra-jars=%RUNCLASSPATH --scala-version=%SCALAVERSION -O="-experimental" --java-opt="--enable-native-access=ALL-UNNAMED" --java-opt="--enable-preview" --java-opt="-Djava.library.path=%JAVALIBRARYPATH" --main-class Outer %s --
-// RUN: %{test} config %t.json --width 32
-// RUN: %{test} design %t.json
-// RUN: firtool Outer*.mlirbc --parse-only | FileCheck %s -check-prefix=MLIR
-// RUN: rm %t.json *.mlirbc -f
+// RUN: rm -rf %t && mkdir -p %t && cd %t
+// RUN: %{test} config %t/config.json --width 32
+// RUN: %{test} design %t/config.json
+// RUN: firtool %t/Outer*.mlirbc --parse-only | FileCheck %s -check-prefix=MLIR
+// RUN: rm -rf %t
 
 import me.jiuyang.zaozi.*
 import me.jiuyang.zaozi.default.{*, given}
