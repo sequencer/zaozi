@@ -2,10 +2,9 @@
 // SPDX-FileCopyrightText: 2025 Jiuyang Liu <liu@jiuyang.me>
 package me.jiuyang.zaozi.default
 
-import me.jiuyang.zaozi.VecApi
-import me.jiuyang.zaozi.InstanceContext
 import me.jiuyang.zaozi.reftpe.*
 import me.jiuyang.zaozi.valuetpe.*
+import me.jiuyang.zaozi.{InstanceContext, VecApi}
 
 import org.llvm.circt.scalalib.capi.dialect.firrtl.{given_FirrtlBundleFieldApi, given_TypeApi, FirrtlNameKind}
 import org.llvm.circt.scalalib.dialect.firrtl.operation.{NodeApi, SubaccessApi, SubindexApi, given}
@@ -35,6 +34,12 @@ given [E <: Data, V <: Vec[E], R <: Referable[V]]: VecApi[E, V, R] with
         val _tpe:       Bits      = new Bits:
           private[zaozi] val _width = nodeOp.operation.getResult(0).getType.getBitWidth(true).toInt
         val _operation: Operation = nodeOp.operation
+
+    def width(
+      using Arena,
+      Context
+    ) = ref.refer.getType.getBitWidth(true).toInt
+
     def bit(
       idx: Referable[UInt] | Int
     )(
