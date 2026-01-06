@@ -1,0 +1,66 @@
+// SPDX-License-Identifier: Apache-2.0
+// SPDX-FileCopyrightText: 2025 Jiuyang Liu <liu@jiuyang.me>
+package build.`zaozi-compiler-plugin`
+
+import mill._
+import mill.scalalib._
+import mill.scalalib.scalafmt._
+
+import build.{circtlib, v, zaozi, ZaoziPublishModule}
+import build.zaozi.testlib
+
+object `package` extends ScalaModule with ScalafmtModule with ZaoziPublishModule { m =>
+  def scalaVersion = Task(v.scala)
+
+  // Depend on scala3-compiler for ResearchPlugin APIs
+  def mvnDeps = Seq(
+    mvn"org.scala-lang::scala3-compiler:${v.scala}"
+  )
+
+  override def scalacOptions: T[Seq[String]] = Task(
+    super.scalacOptions() ++ Seq("-experimental")
+  )
+
+  // Include plugin.properties in resources
+  override def resources = Task.Sources {
+    moduleDir / "resources"
+  }
+
+  object tests extends ScalaTests with ScalafmtModule with mill.scalalib.TestModule.Utest {
+    def mvnDeps = Seq(build.v.utest)
+
+    // Depend on zaozi and testlib to test with real Bundle classes and generators
+    // Also explicitly include parent module m for access to BundleFieldRegistry
+    override def moduleDeps = super.moduleDeps ++ Seq(zaozi, testlib)
+
+    // Use the plugin in tests to verify it works
+    override def scalacPluginClasspath = Task {
+      super.scalacPluginClasspath() ++ m.runClasspath()
+    }
+
+    // Enable SemanticDB for testing with proper sourceroot
+    // Use the plugin JAR which contains both classes and plugin.properties
+    override def scalacOptions: T[Seq[String]] = Task {
+      val projectRoot = m.moduleDir / os.up
+      val pluginJar = m.jar().path
+      super.scalacOptions() ++ Seq(
+        "-Ysemanticdb",
+        s"-sourceroot:$projectRoot",
+        s"-Xplugin:$pluginJar"
+      )
+    }
+
+    // Need native library path for circt
+    override def forkArgs: T[Seq[String]] = Task(
+      super.forkArgs() ++ circtlib.forkArgs()
+    )
+
+    // Add plugin to semanticDbData compilation for Metals go-to-definition support
+    override def semanticDbEnablePluginScalacOptions = Task {
+      val pluginJar = m.jar().path
+      super.semanticDbEnablePluginScalacOptions() ++ Seq(
+        s"-Xplugin:$pluginJar"
+      )
+    }
+  }
+}
