@@ -5,7 +5,7 @@ package org.chipsalliance.rvdecoderdb.tests
 
 import org.chipsalliance.rvdecoderdb
 import utest.*
-import os.*
+import os.Path
 
 object rvdecoderdbTest extends TestSuite:
   val tests = Tests:
@@ -17,4 +17,4 @@ object rvdecoderdbTest extends TestSuite:
         )
       )
       val instTable:        Iterable[rvdecoderdb.Instruction] = rvdecoderdb.instructions(riscvOpcodesPath)
-      instTable.foreach(println)
+      instTable.size ==> 1078
