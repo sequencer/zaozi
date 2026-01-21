@@ -69,9 +69,7 @@ given ConstructorApi with
     Context,
     Block,
     sourcecode.File,
-    sourcecode.Line,
-    sourcecode.Name.Machine,
-    InstanceContext
+    sourcecode.Line
   ): When =
     val op0 = summon[WhenApi].op(cond.refer, locate)
     op0.operation.appendToBlock()
@@ -87,11 +85,7 @@ given ConstructorApi with
       body: (Arena, Context, Block) ?=> Unit
     )(
       using Arena,
-      Context,
-      sourcecode.File,
-      sourcecode.Line,
-      sourcecode.Name.Machine,
-      InstanceContext
+      Context
     ): Unit =
       given Block = when.elseBlock
       body
@@ -117,9 +111,7 @@ given ConstructorApi with
     Block,
     Seq[LayerTree],
     sourcecode.File,
-    sourcecode.Line,
-    sourcecode.Name.Machine,
-    InstanceContext
+    sourcecode.Line
   ): Unit =
     val op0 = summon[LayerBlockApi].op(summon[Seq[LayerTree]](layerName)._hierarchy.map(_._name), locate)
     op0.operation.appendToBlock()
@@ -209,7 +201,9 @@ given ConstructorApi with
     )(
       using Arena,
       Context,
-      Block
+      Block,
+      sourcecode.File,
+      sourcecode.Line
     ): Const[UInt] =
       val constOp = summon[ConstantApi].op(
         input = bigInt,
@@ -232,7 +226,9 @@ given ConstructorApi with
     )(
       using Arena,
       Context,
-      Block
+      Block,
+      sourcecode.File,
+      sourcecode.Line
     ): Const[Bits] =
       val constOp = summon[ConstantApi].op(
         input = bigInt,
@@ -255,7 +251,9 @@ given ConstructorApi with
     )(
       using Arena,
       Context,
-      Block
+      Block,
+      sourcecode.File,
+      sourcecode.Line
     ): Const[SInt] =
       val constOp = summon[ConstantApi].op(
         input = bigInt,
@@ -281,7 +279,9 @@ given ConstructorApi with
     def B(
       using Arena,
       Context,
-      Block
+      Block,
+      sourcecode.File,
+      sourcecode.Line
     ): Const[Bool] =
       val constOp = summon[ConstantApi].op(
         input = if (bool) 1 else 0,

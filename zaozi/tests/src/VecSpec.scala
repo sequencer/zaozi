@@ -5,7 +5,7 @@ package me.jiuyang.zaozitest
 import me.jiuyang.zaozi.*
 import me.jiuyang.zaozi.default.{*, given}
 import me.jiuyang.zaozi.reftpe.Interface
-import me.jiuyang.zaozi.testlib.*
+import me.jiuyang.testlib.*
 
 import org.llvm.mlir.scalalib.capi.ir.{given_ContextApi, Block, Context, ContextApi}
 

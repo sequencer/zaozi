@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2025 Jiuyang Liu <liu@jiuyang.me>
-package me.jiuyang.zaozi.stdlib
+package me.jiuyang.stdlib.default
 
 import mainargs.TokensReader
 import me.jiuyang.zaozi.*

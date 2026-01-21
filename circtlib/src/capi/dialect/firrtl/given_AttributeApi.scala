@@ -76,53 +76,71 @@ given AttributeApi with
     ): Attribute = Attribute(firrtlAttrGetNameKind(arena, context.segment, ref.toNative))
   extension (value:                 String)
     inline def getParamDeclAttribute(
-      name:        String,
-      tpe:         Type
+      name:        String
     )(
       using arena: Arena,
       context:     Context
     ): Attribute =
+      val attr = value.stringAttrGet
       Attribute(
         firrtlAttrGetParamDecl(
           arena,
           context.segment,
           name.identifierGet.segment,
-          tpe.segment,
-          value.stringAttrGet.segment
+          attr.getType.segment,
+          attr.segment
         )
       )
   extension (value:                 BigInt)
     inline def getParamDeclAttribute(
-      name:        String,
-      tpe:         Type
+      name:        String
     )(
       using arena: Arena,
       context:     Context
     ): Attribute =
+      // XXX: should we limit to unsigned?
+      val tpe = value.bitLength.integerTypeUnsignedGet
       Attribute(
         firrtlAttrGetParamDecl(
           arena,
           context.segment,
           name.identifierGet.segment,
           tpe.segment,
-          value.attrGetIntegerFromString(value.bitLength.integerTypeGet).segment
+          value.attrGetIntegerFromString(tpe).segment
         )
       )
   extension (value:                 Double)
     inline def getParamDeclAttribute(
-      name:        String,
-      tpe:         Type
+      name:        String
     )(
       using arena: Arena,
       context:     Context
     ): Attribute =
+      val tpe = summon[TypeApi].f64TypeGet
       Attribute(
         firrtlAttrGetParamDecl(
           arena,
           context.segment,
           name.identifierGet.segment,
           tpe.segment,
-          value.floatAttrDoubleGet(summon[TypeApi].f64TypeGet).segment
+          value.floatAttrDoubleGet(tpe).segment
+        )
+      )
+  extension (value:                 Boolean)
+    inline def getParamDeclAttribute(
+      name:        String
+    )(
+      using arena: Arena,
+      context:     Context
+    ): Attribute =
+      val attr = value.boolAttrGet
+      Attribute(
+        firrtlAttrGetParamDecl(
+          arena,
+          context.segment,
+          name.identifierGet.segment,
+          attr.getType.segment,
+          attr.segment
         )
       )
   extension (portDirections:        Seq[FirrtlDirection])
