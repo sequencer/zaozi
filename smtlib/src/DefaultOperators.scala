@@ -113,6 +113,23 @@ given ConstructorApi with
       val _tpe:       T         = rangeType
       val _operation: Operation = op.operation
 
+  def smtValue[T <: Data](
+    name:      String,
+    rangeType: T
+  )(
+    using Arena,
+    Context,
+    Block,
+    sourcecode.File,
+    sourcecode.Line,
+    sourcecode.Name
+  ): Ref[T] =
+    val op = summon[DeclareFunApi].op(name, locate, rangeType.toMlirType)
+    op.operation.appendToBlock()
+    new Ref[T]:
+      val _tpe:       T         = rangeType
+      val _operation: Operation = op.operation
+
   def smtFunc[T <: Data, U <: Data](
     domainTypes: Seq[T],
     rangeType:   U
@@ -131,8 +148,40 @@ given ConstructorApi with
       val _tpe:       SMTFunc[T, U] = tpe
       val _operation: Operation     = op.operation
 
-  def smtDistinct[T <: Data, D <: Referable[T]](
-    values: D*
+  def smtAnd[T <: Data, R <: Referable[T]](
+    values: R*
+  )(
+    using Arena,
+    Context,
+    Block,
+    sourcecode.File,
+    sourcecode.Line,
+    sourcecode.Name.Machine
+  ): Ref[Bool] =
+    val op = summon[AndApi].op(values.map(_.refer), locate)
+    op.operation.appendToBlock()
+    new Ref[Bool]:
+      val _tpe: Bool = new Object with Bool
+      val _operation = op.operation
+
+  def smtOr[T <: Data, R <: Referable[T]](
+    values: R*
+  )(
+    using Arena,
+    Context,
+    Block,
+    sourcecode.File,
+    sourcecode.Line,
+    sourcecode.Name.Machine
+  ): Ref[Bool] =
+    val op = summon[OrApi].op(values.map(_.refer), locate)
+    op.operation.appendToBlock()
+    new Ref[Bool]:
+      val _tpe: Bool = new Object with Bool
+      val _operation = op.operation
+
+  def smtDistinct[T <: Data, R <: Referable[T]](
+    values: R*
   )(
     using Arena,
     Context,

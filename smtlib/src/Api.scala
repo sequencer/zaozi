@@ -45,6 +45,18 @@ trait ConstructorApi:
     sourcecode.Name.Machine
   ): Ref[T]
 
+  def smtValue[T <: Data](
+    name:      String,
+    rangeType: T
+  )(
+    using Arena,
+    Context,
+    Block,
+    sourcecode.File,
+    sourcecode.Line,
+    sourcecode.Name
+  ): Ref[T]
+
   def smtFunc[T <: Data, U <: Data](
     domainTypes: Seq[T],
     rangeType:   U
@@ -58,8 +70,30 @@ trait ConstructorApi:
   ): Ref[SMTFunc[T, U]]
 
   // smt functions
-  def smtDistinct[T <: Data, D <: Referable[T]](
-    values: Seq[D]
+  def smtAnd[T <: Data, R <: Referable[T]](
+    values: R*
+  )(
+    using Arena,
+    Context,
+    Block,
+    sourcecode.File,
+    sourcecode.Line,
+    sourcecode.Name.Machine
+  ): Ref[Bool]
+
+  def smtOr[T <: Data, R <: Referable[T]](
+    values: R*
+  )(
+    using Arena,
+    Context,
+    Block,
+    sourcecode.File,
+    sourcecode.Line,
+    sourcecode.Name.Machine
+  ): Ref[Bool]
+
+  def smtDistinct[T <: Data, R <: Referable[T]](
+    values: R*
   )(
     using Arena,
     Context,
@@ -101,7 +135,7 @@ trait ConstructorApi:
   ): Unit
 
   def smtEq[R <: Referable[?]](
-    values: Seq[R]
+    values: R*
   )(
     using Arena,
     Context,
@@ -184,7 +218,7 @@ trait ConstructorApi:
   ): Unit
 
   def smtYield[T <: Data, R <: Referable[T]](
-    values: Seq[R]
+    values: R*
   )(
     using Arena,
     Context,
