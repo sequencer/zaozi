@@ -459,7 +459,6 @@ circtFirtoolOptionsCreateDefault                                        # header
 circtFirtoolOptionsDestroy                                              # header: $CIRCT_INSTALL_PATH/include/circt-c/Firtool/Firtool.h
 circtFirtoolOptionsSetAddMuxPragmas                                     # header: $CIRCT_INSTALL_PATH/include/circt-c/Firtool/Firtool.h
 circtFirtoolOptionsSetAddVivadoRAMAddressConflictSynthesisBugWorkaround # header: $CIRCT_INSTALL_PATH/include/circt-c/Firtool/Firtool.h
-circtFirtoolOptionsSetAllowAddingPortsOnPublic                          # header: $CIRCT_INSTALL_PATH/include/circt-c/Firtool/Firtool.h
 circtFirtoolOptionsSetBlackBoxRootPath                                  # header: $CIRCT_INSTALL_PATH/include/circt-c/Firtool/Firtool.h
 circtFirtoolOptionsSetBuildMode                                         # header: $CIRCT_INSTALL_PATH/include/circt-c/Firtool/Firtool.h
 circtFirtoolOptionsSetCkgEnableName                                     # header: $CIRCT_INSTALL_PATH/include/circt-c/Firtool/Firtool.h
@@ -487,6 +486,7 @@ circtFirtoolOptionsSetIgnoreReadEnableMem                               # header
 circtFirtoolOptionsSetLowerAnnotationsNoRefTypePorts                    # header: $CIRCT_INSTALL_PATH/include/circt-c/Firtool/Firtool.h
 circtFirtoolOptionsSetLowerMemories                                     # header: $CIRCT_INSTALL_PATH/include/circt-c/Firtool/Firtool.h
 circtFirtoolOptionsSetNoDedup                                           # header: $CIRCT_INSTALL_PATH/include/circt-c/Firtool/Firtool.h
+circtFirtoolOptionsSetNoViews                                           # header: $CIRCT_INSTALL_PATH/include/circt-c/Firtool/Firtool.h
 circtFirtoolOptionsSetOutputAnnotationFilename                          # header: $CIRCT_INSTALL_PATH/include/circt-c/Firtool/Firtool.h
 circtFirtoolOptionsSetOutputFilename                                    # header: $CIRCT_INSTALL_PATH/include/circt-c/Firtool/Firtool.h
 circtFirtoolOptionsSetPreserveAggregate                                 # header: $CIRCT_INSTALL_PATH/include/circt-c/Firtool/Firtool.h
@@ -517,6 +517,7 @@ mlirCreateCIRCTConversionConvertCombToSMT           # header: $CIRCT_INSTALL_PAT
 mlirCreateCIRCTConversionConvertCombToSynth         # header: $CIRCT_INSTALL_PATH/include/circt/Conversion/Conversion.capi.h.inc
 mlirCreateCIRCTConversionConvertDatapathToComb      # header: $CIRCT_INSTALL_PATH/include/circt/Conversion/Conversion.capi.h.inc
 mlirCreateCIRCTConversionConvertDatapathToSMT       # header: $CIRCT_INSTALL_PATH/include/circt/Conversion/Conversion.capi.h.inc
+mlirCreateCIRCTConversionConvertFSMToCore           # header: $CIRCT_INSTALL_PATH/include/circt/Conversion/Conversion.capi.h.inc
 mlirCreateCIRCTConversionConvertFSMToSV             # header: $CIRCT_INSTALL_PATH/include/circt/Conversion/Conversion.capi.h.inc
 mlirCreateCIRCTConversionConvertHWToBTOR2           # header: $CIRCT_INSTALL_PATH/include/circt/Conversion/Conversion.capi.h.inc
 mlirCreateCIRCTConversionConvertHWToLLVM            # header: $CIRCT_INSTALL_PATH/include/circt/Conversion/Conversion.capi.h.inc
@@ -563,6 +564,7 @@ mlirRegisterCIRCTConversionConvertCombToSMT         # header: $CIRCT_INSTALL_PAT
 mlirRegisterCIRCTConversionConvertCombToSynth       # header: $CIRCT_INSTALL_PATH/include/circt/Conversion/Conversion.capi.h.inc
 mlirRegisterCIRCTConversionConvertDatapathToComb    # header: $CIRCT_INSTALL_PATH/include/circt/Conversion/Conversion.capi.h.inc
 mlirRegisterCIRCTConversionConvertDatapathToSMT     # header: $CIRCT_INSTALL_PATH/include/circt/Conversion/Conversion.capi.h.inc
+mlirRegisterCIRCTConversionConvertFSMToCore         # header: $CIRCT_INSTALL_PATH/include/circt/Conversion/Conversion.capi.h.inc
 mlirRegisterCIRCTConversionConvertFSMToSV           # header: $CIRCT_INSTALL_PATH/include/circt/Conversion/Conversion.capi.h.inc
 mlirRegisterCIRCTConversionConvertHWToBTOR2         # header: $CIRCT_INSTALL_PATH/include/circt/Conversion/Conversion.capi.h.inc
 mlirRegisterCIRCTConversionConvertHWToLLVM          # header: $CIRCT_INSTALL_PATH/include/circt/Conversion/Conversion.capi.h.inc
