@@ -25,8 +25,10 @@ OUTPUT_BIN_PATH = PROJECT_ROOT / "out" / "test.bin"
 MILL_COMMAND = ["mill", "rvprobe.runMain", "me.jiuyang.rvprobe.agent.Test", str(OUTPUT_BIN_PATH)]
 
 # LLM Configuration from environment variables
-OPENAI_API_BASE = os.getenv("OPENAI_API_BASE", None)  # Optional custom API endpoint
-OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4o")  # Default model
+# Support both LLM_* and OPENAI_* for backward compatibility
+LLM_API_KEY = os.getenv("LLM_API_KEY") or os.getenv("OPENAI_API_KEY")
+LLM_API_BASE = os.getenv("LLM_API_BASE") or os.getenv("OPENAI_API_BASE")
+LLM_MODEL = os.getenv("LLM_MODEL") or os.getenv("OPENAI_MODEL", "gpt-4o")
 
 
 # ==================== State Definition ====================
@@ -150,9 +152,11 @@ Example output format:
 """
 
     # Call LLM
-    llm_kwargs = {"model": OPENAI_MODEL, "temperature": 0}
-    if OPENAI_API_BASE:
-        llm_kwargs["base_url"] = OPENAI_API_BASE
+    llm_kwargs = {"model": LLM_MODEL, "temperature": 0}
+    if LLM_API_BASE:
+        llm_kwargs["base_url"] = LLM_API_BASE
+    if LLM_API_KEY:
+        llm_kwargs["api_key"] = LLM_API_KEY
 
     llm = ChatOpenAI(**llm_kwargs)
     messages = [
