@@ -17,3 +17,5 @@ result*
 *.fst
 *.fsdb
 *.log
+
+rvprobe/agent/.env
