@@ -17,6 +17,14 @@ from langchain_openai import ChatOpenAI
 # Load environment variables from .env file
 load_dotenv()
 
+# Import RAG retriever
+try:
+    from rag import get_retriever
+    RAG_AVAILABLE = True
+except Exception as e:
+    print(f"⚠️ RAG system not available: {e}")
+    RAG_AVAILABLE = False
+
 # ==================== Configuration ====================
 MAX_RETRIES = 3
 PROJECT_ROOT = Path(__file__).parent.parent.parent  # zaozi root
@@ -39,7 +47,8 @@ class AgentState(TypedDict):
     error_log: str          # Compilation/execution errors
     retry_count: int        # Current retry attempt
     is_success: bool        # Whether execution succeeded
-    instructions: str       # Final instruction sequence output
+    instructions: str       # Final instruction sequence
+    retrieved_docs: str     # RAG retrieved documentation output
 
 
 # ==================== DSL API Documentation (Mock Retrieval) ====================
@@ -104,11 +113,28 @@ object test extends RVGenerator:
 # ==================== Node 1: Retrieve ====================
 def retrieve_node(state: AgentState) -> AgentState:
     """
-    Mock retrieval: returns DSL API documentation.
-    In production, this could query a vector database or documentation system.
+    Retrieve relevant DSL API documentation using RAG.
+    Falls back to static docs if RAG is unavailable.
     """
-    print("📚 [Retrieve] Loading DSL API documentation...")
-    return state  # DSL_API_DOCS is used directly in generate_node
+    print("📚 [Retrieve] Querying RAG system for relevant constraints...")
+
+    if RAG_AVAILABLE:
+        try:
+            retriever = get_retriever()
+            retrieved_docs = retriever.retrieve(state['user_input'], top_k=10)
+            state['retrieved_docs'] = retrieved_docs
+            # Count how many functions were retrieved (each starts with ###)
+            func_count = retrieved_docs.count('###')
+            print(f"📚 [Retrieve] Retrieved {func_count} constraint functions")
+        except Exception as e:
+            print(f"⚠️ RAG retrieval failed: {e}")
+            print("   Falling back to static documentation...")
+            state['retrieved_docs'] = DSL_API_DOCS
+    else:
+        print("⚠️ RAG not available, using static documentation")
+        state['retrieved_docs'] = DSL_API_DOCS
+
+    return state
 
 
 # ==================== Node 2: Generate ====================
@@ -121,7 +147,7 @@ def generate_node(state: AgentState) -> AgentState:
     # Build prompt with context
     system_prompt = f"""You are an expert in RISC-V instruction generation and Scala DSL.
 
-{DSL_API_DOCS}
+{state.get('retrieved_docs', DSL_API_DOCS)}
 
 Your task: Generate ONLY the Scala code for the constraints() method body based on user requirements.
 """

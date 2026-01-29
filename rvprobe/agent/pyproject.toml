@@ -5,12 +5,16 @@ description = "RVProbe Agent - Automated Verification Generator"
 authors = [
     {name = "Jianhao Ye", email = "Clo91eaf@qq.com"}
 ]
-requires-python = ">=3.10"
+requires-python = ">=3.10,<3.13"
 dependencies = [
     "langgraph>=0.2.0",
     "langchain>=0.3.0",
     "langchain-openai>=0.2.0",
     "python-dotenv>=1.0.0",
+    # RAG dependencies
+    "chromadb>=0.4.0",
+    "sentence-transformers>=2.2.0",
+    "torch>=2.0.0",
 ]
 
 [project.optional-dependencies]
