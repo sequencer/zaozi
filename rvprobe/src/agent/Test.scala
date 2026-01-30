@@ -16,7 +16,7 @@ import scala.util.control.NonFatal
     def constraints() =
       (0 until 3).foreach { i =>
         instruction(i, isAddi()) {
-          rdRange(1, 5)
+          rdRange(1, 5) & rs1Range(1, 5)
         }
       }
 

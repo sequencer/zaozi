@@ -34,9 +34,9 @@ MILL_COMMAND = ["mill", "rvprobe.runMain", "me.jiuyang.rvprobe.agent.Test", str(
 
 # LLM Configuration from environment variables
 # Support both LLM_* and OPENAI_* for backward compatibility
-LLM_API_KEY = os.getenv("LLM_API_KEY") or os.getenv("OPENAI_API_KEY")
-LLM_API_BASE = os.getenv("LLM_API_BASE") or os.getenv("OPENAI_API_BASE")
-LLM_MODEL = os.getenv("LLM_MODEL") or os.getenv("OPENAI_MODEL", "gpt-4o")
+LLM_API_KEY = os.getenv("LLM_API_KEY")
+LLM_API_BASE = os.getenv("LLM_API_BASE")
+LLM_MODEL = os.getenv("LLM_MODEL")
 
 
 # ==================== State Definition ====================
