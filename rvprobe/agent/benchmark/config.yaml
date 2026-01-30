@@ -1,0 +1,81 @@
+# Benchmark Configuration
+# ========================
+
+# LLM Settings
+llm_model: "gpt-4o"  # Options: gpt-4o, gpt-4-turbo, claude-3-opus, etc.
+llm_temperature: 0.0  # 0.0 for reproducibility, higher for creativity
+llm_max_tokens: 4000  # Maximum tokens per LLM response
+
+# Execution Settings
+timeout_seconds: 300  # Timeout per test case (5 minutes)
+max_retries: 3  # Maximum retries for Method A (agent with verification)
+
+# Cost Calculation (USD per 1M tokens)
+# Update these based on actual API pricing
+prompt_token_cost: 0.0025  # GPT-4o: $2.50 per 1M input tokens
+completion_token_cost: 0.010  # GPT-4o: $10.00 per 1M output tokens
+
+# Output Settings
+results_dir: "./benchmark_results"  # Directory for saving results
+save_raw_outputs: true  # Save full LLM outputs for debugging
+
+# Parallel Execution
+parallel_execution: false  # Set to true for parallel test execution
+max_workers: 4  # Number of parallel workers if parallel_execution is true
+
+# Statistical Validity
+num_repetitions: 1  # Number of times to run each test (3 for statistical analysis)
+
+# Method-Specific Settings
+method_a:
+  enabled: true
+  name: "Full Agent"
+  description: "RAG + LLM + DSL + Mill + Z3 + Auto-retry"
+
+method_b:
+  enabled: true
+  name: "Direct LLM"
+  variants:
+    - id: "no_docs"
+      description: "Pure LLM without documentation"
+      include_documentation: false
+    - id: "with_docs"
+      description: "LLM with constraint documentation"
+      include_documentation: true
+
+# Test Selection
+# Leave empty to run all tests, or specify test IDs
+selected_tests: []
+# Examples:
+# selected_tests: ["TC-S01", "TC-S02"]  # Run only simple tests
+# selected_tests: []  # Run all tests
+
+# Filter by difficulty
+# Options: "simple", "medium", "complex", or [] for all
+difficulty_filter: []
+# Examples:
+# difficulty_filter: ["simple"]  # Only simple tests
+# difficulty_filter: ["simple", "medium"]  # Simple and medium
+# difficulty_filter: []  # All difficulties
+
+# Logging
+log_level: "INFO"  # Options: DEBUG, INFO, WARNING, ERROR
+log_file: "./benchmark_results/benchmark.log"
+console_output: true  # Print progress to console
+
+# Visualization Settings
+visualization:
+  enabled: true
+  output_format: "png"  # Options: png, svg, pdf
+  dpi: 300  # Resolution for raster images
+  figure_size: [10, 6]  # Width, height in inches
+  style: "seaborn-v0_8-darkgrid"  # Matplotlib style
+
+# Report Settings
+report:
+  enabled: true
+  format: "markdown"  # Options: markdown, html
+  output_file: "./benchmark_results/REPORT.md"
+  include_detailed_analysis: true
+  include_failure_analysis: true
+  include_recommendations: true
