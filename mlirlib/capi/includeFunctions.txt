@@ -454,9 +454,11 @@ mlirLLVMFunctionTypeGetReturnType         # header: $MLIR_INSTALL_PATH/include/m
 mlirLLVMLinkageAttrGet                    # header: $MLIR_INSTALL_PATH/include/mlir-c/Dialect/LLVM.h
 mlirLLVMPointerTypeGet                    # header: $MLIR_INSTALL_PATH/include/mlir-c/Dialect/LLVM.h
 mlirLLVMPointerTypeGetAddressSpace        # header: $MLIR_INSTALL_PATH/include/mlir-c/Dialect/LLVM.h
+mlirLLVMPointerTypeGetTypeID              # header: $MLIR_INSTALL_PATH/include/mlir-c/Dialect/LLVM.h
 mlirLLVMStructTypeGetElementType          # header: $MLIR_INSTALL_PATH/include/mlir-c/Dialect/LLVM.h
 mlirLLVMStructTypeGetIdentifier           # header: $MLIR_INSTALL_PATH/include/mlir-c/Dialect/LLVM.h
 mlirLLVMStructTypeGetNumElementTypes      # header: $MLIR_INSTALL_PATH/include/mlir-c/Dialect/LLVM.h
+mlirLLVMStructTypeGetTypeID               # header: $MLIR_INSTALL_PATH/include/mlir-c/Dialect/LLVM.h
 mlirLLVMStructTypeIdentifiedGet           # header: $MLIR_INSTALL_PATH/include/mlir-c/Dialect/LLVM.h
 mlirLLVMStructTypeIdentifiedNewGet        # header: $MLIR_INSTALL_PATH/include/mlir-c/Dialect/LLVM.h
 mlirLLVMStructTypeIsLiteral               # header: $MLIR_INSTALL_PATH/include/mlir-c/Dialect/LLVM.h
@@ -633,6 +635,7 @@ mlirBlockAddArgument                          # header: $MLIR_INSTALL_PATH/inclu
 mlirBlockAppendOwnedOperation                 # header: $MLIR_INSTALL_PATH/include/mlir-c/IR.h
 mlirBlockArgumentGetArgNumber                 # header: $MLIR_INSTALL_PATH/include/mlir-c/IR.h
 mlirBlockArgumentGetOwner                     # header: $MLIR_INSTALL_PATH/include/mlir-c/IR.h
+mlirBlockArgumentSetLocation                  # header: $MLIR_INSTALL_PATH/include/mlir-c/IR.h
 mlirBlockArgumentSetType                      # header: $MLIR_INSTALL_PATH/include/mlir-c/IR.h
 mlirBlockCreate                               # header: $MLIR_INSTALL_PATH/include/mlir-c/IR.h
 mlirBlockDestroy                              # header: $MLIR_INSTALL_PATH/include/mlir-c/IR.h
