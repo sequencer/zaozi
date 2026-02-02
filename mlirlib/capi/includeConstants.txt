@@ -113,6 +113,12 @@ MlirWalkResultInterrupt                       # header: $MLIR_INSTALL_PATH/inclu
 MlirWalkResultSkip                            # header: $MLIR_INSTALL_PATH/include/mlir-c/IR.h
 MLIR_PASS_DISPLAY_MODE_LIST       # header: $MLIR_INSTALL_PATH/include/mlir-c/Pass.h
 MLIR_PASS_DISPLAY_MODE_PIPELINE   # header: $MLIR_INSTALL_PATH/include/mlir-c/Pass.h
+MLIR_GREEDY_REWRITE_STRICTNESS_ANY_OP                     # header: $MLIR_INSTALL_PATH/include/mlir-c/Rewrite.h
+MLIR_GREEDY_REWRITE_STRICTNESS_EXISTING_AND_NEW_OPS       # header: $MLIR_INSTALL_PATH/include/mlir-c/Rewrite.h
+MLIR_GREEDY_REWRITE_STRICTNESS_EXISTING_OPS               # header: $MLIR_INSTALL_PATH/include/mlir-c/Rewrite.h
+MLIR_GREEDY_SIMPLIFY_REGION_LEVEL_AGGRESSIVE              # header: $MLIR_INSTALL_PATH/include/mlir-c/Rewrite.h
+MLIR_GREEDY_SIMPLIFY_REGION_LEVEL_DISABLED                # header: $MLIR_INSTALL_PATH/include/mlir-c/Rewrite.h
+MLIR_GREEDY_SIMPLIFY_REGION_LEVEL_NORMAL                  # header: $MLIR_INSTALL_PATH/include/mlir-c/Rewrite.h
 MLIR_ENABLE_EXPENSIVE_PATTERN_API_CHECKS # header: $MLIR_INSTALL_PATH/include/mlir/Config/mlir-config.h
 MLIR_ENABLE_NVPTXCOMPILER                # header: $MLIR_INSTALL_PATH/include/mlir/Config/mlir-config.h
 MLIR_ENABLE_PDL_IN_PATTERNMATCH          # header: $MLIR_INSTALL_PATH/include/mlir/Config/mlir-config.h

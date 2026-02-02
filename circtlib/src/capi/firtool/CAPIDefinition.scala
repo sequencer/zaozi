@@ -85,11 +85,6 @@ trait FirtoolApi:
     )(
       using arena: Arena
     ): Unit
-    inline def setAllowAddingPortsOnPublic(
-      value:       Boolean
-    )(
-      using arena: Arena
-    ): Unit
     inline def setBlackBoxRootPath(
       value:       String
     )(

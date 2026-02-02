@@ -5,13 +5,31 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable-small";
-    nixpkgs4circt.url = "github:NixOS/nixpkgs/nixos-unstable-small";
+    circt-src = {
+      type = "github";
+      owner = "llvm";
+      repo = "circt";
+      ref = "main";
+      flake = false;
+    };
+    llvm-src = {
+      type = "github";
+      owner = "llvm";
+      repo = "llvm-project";
+      # from CIRCT submodule
+      rev = "b7c1a6f8b447fba6fff47d309eb7ba1bc22e8c53";
+      flake = false;
+    };
+    circt-nix = {
+      url = "github:unlsycn/circt-nix";
+      inputs = { nixpkgs.follows = "nixpkgs"; circt-src.follows = "circt-src"; llvm-submodule-src.follows = "llvm-src"; };
+    };
     flake-utils.url = "github:numtide/flake-utils";
     mill-ivy-fetcher.url = "github:Avimitin/mill-ivy-fetcher";
   };
 
-  outputs = inputs@{ self, nixpkgs, nixpkgs4circt, flake-utils, mill-ivy-fetcher }:
-    let overlay = (import ./nix/overlay.nix) { extraNixpkgsSrc = nixpkgs4circt; };
+  outputs = inputs@{ self, nixpkgs, flake-utils, mill-ivy-fetcher, circt-nix, ... }:
+    let overlay = (import ./nix/overlay.nix) { };
     in {
       # System-independent attr
       inherit inputs;
@@ -19,7 +37,7 @@
     } // flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = import nixpkgs {
-          overlays = [ overlay mill-ivy-fetcher.overlays.default ];
+          overlays = [ circt-nix.overlays.default overlay mill-ivy-fetcher.overlays.default ];
           inherit system;
         };
       in
