@@ -59,12 +59,14 @@
               LIT_INSTALL_PATH = lit;
               SCALA_CLI_INSTALL_PATH = scala-cli;
               RISCV_OPCODES_INSTALL_PATH = riscv-opcodes;
-              # pass to jextract
-              # Jextract splits the header class into multiple classes, which are combined via extending
-              # Due to https://github.com/scala/bug/issues/9272 we cannot access static fields in superclass headers, we work around this by not splitting the header
-              # https://github.com/openjdk/jextract/blob/8730fcf05c229d035b0db52ee6bd82622e9d03e9/src/main/java/org/openjdk/jextract/impl/ToplevelBuilder.java#L54
-              JAVA_TOOL_OPTIONS = "--enable-preview -Djextract.decls.per.header=65535";
             };
+          # pass to jextract
+          # Jextract splits the header class into multiple classes, which are combined via extending
+          # Due to https://github.com/scala/bug/issues/9272 we cannot access static fields in superclass headers, we work around this by not splitting the header
+          # https://github.com/openjdk/jextract/blob/8730fcf05c229d035b0db52ee6bd82622e9d03e9/src/main/java/org/openjdk/jextract/impl/ToplevelBuilder.java#L54
+          shellHook = ''
+            export JAVA_TOOL_OPTIONS="$JAVA_TOOL_OPTIONS --enable-preview -Djextract.decls.per.header=65535"
+          '';
         };
       });
 }
