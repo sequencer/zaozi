@@ -16,8 +16,7 @@ concurrency:
 jobs:
   check-format:
     name: "Check Scala Format"
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, nixos]
     steps:
       - uses: actions/checkout@v4
-      - uses: DeterminateSystems/nix-installer-action@main
       - run: nix develop -c mill -i '__.checkFormat'

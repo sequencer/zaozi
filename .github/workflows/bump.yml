@@ -9,12 +9,11 @@ jobs:
   bump-deps:
     name: "Bump CIRCT"
     if: ${{ !cancelled() }}
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, nixos]
     permissions:
       contents: write
     steps:
       - uses: actions/checkout@v4
-      - uses: DeterminateSystems/nix-installer-action@main
       - name: Bump circt
         run: |
           oldFirtool="$(nix build '.#circt' --no-link --print-out-paths)/bin/firtool"

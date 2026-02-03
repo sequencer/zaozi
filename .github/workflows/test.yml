@@ -16,9 +16,8 @@ concurrency:
 jobs:
   run-test:
     name: "Test all mill module"
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, nixos]
     steps:
       - uses: actions/checkout@v4
-      - uses: DeterminateSystems/nix-installer-action@main
       - run: nix develop -c mill -i '__.testForked'
       - run: nix develop -c mill -i 'zaozi.lit.tests.run'

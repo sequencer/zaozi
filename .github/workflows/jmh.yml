@@ -16,8 +16,7 @@ concurrency:
 jobs:
   run-jmh:
     name: "Run zaozi JMH benchmark"
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, nixos]
     steps:
       - uses: actions/checkout@v4
-      - uses: DeterminateSystems/nix-installer-action@main
       - run: nix develop -c bash -c "mill -i --disable-prompt zaozi.benchmark.runJmh 2>&1 | sed 's/^\[[0-9]*\] //' | grep -E '^Iteration|^Benchmark|^ZaoziBenchmark' > $GITHUB_STEP_SUMMARY"
