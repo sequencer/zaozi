@@ -59,26 +59,33 @@ object LayerSpec extends TestSuite:
       @generator
       object SimpleLayer
           extends Generator[LayerSpecParameter, LayerSpecLayers, LayerSpecIO, LayerSpecProbe]
-          with HasVerilogTest
-          with HasFirrtlTest:
+          with HasVerilogTest:
         def architecture(parameter: LayerSpecParameter) =
           val io    = summon[Interface[LayerSpecIO]]
           val probe = summon[Interface[LayerSpecProbe]]
           layer("A0"):
-            probe.a0 <== io.a0
+            // calculation to prevent optimization
+            val a0p = Wire(UInt(parameter.width.W))
+            a0p := (io.a0 + 1.U).asBits.tail(parameter.width).asUInt
+            probe.a0 <== a0p
             layer("A0B0"):
-              probe.a0b0 <== io.a0b0
+              val a0b0p = Wire(UInt(parameter.width.W))
+              a0b0p := (io.a0b0 - 1.U).asBits.tail(parameter.width).asUInt
+              probe.a0b0 <== a0b0p
               layer("A0B0C0"):
-                probe.a0b0c0 <== io.a0b0c0
+                val a0b0c0p = Wire(UInt(parameter.width.W))
+                a0b0c0p := (io.a0b0c0 * 3.U).asBits.tail(parameter.width).asUInt
+                probe.a0b0c0 <== a0b0c0p
             layer("A0B1"):
-              probe.a0b1 <== io.a0b1
+              val a0b1p = Wire(UInt(parameter.width.W))
+              a0b1p := (io.a0b1 << 1).asBits.tail(parameter.width).asUInt
+              probe.a0b1 <== a0b1p
 
       val parameter  = LayerSpecParameter(32)
       val moduleName = SimpleLayer.moduleName(parameter)
-      // FIXME: wait https://github.com/llvm/circt/pull/8093
-      // SimpleLayer.verilogTest(parameter)(
-      //   s"bind ${moduleName} ${moduleName}_A0_A0B1 a0_a0B1",
-      //   s"bind ${moduleName} ${moduleName}_A0_A0B0_A0B0C0 a0_a0B0_a0B0C0",
-      //   s"bind ${moduleName} ${moduleName}_A0_A0B0 a0_a0B0",
-      //   s"bind ${moduleName} ${moduleName}_A0 a0_0"
-      // )
+      SimpleLayer.verilogTest(parameter)(
+        s"bind ${moduleName} ${moduleName}_A0_A0B1 a0_a0B1",
+        s"bind ${moduleName} ${moduleName}_A0_A0B0_A0B0C0 a0_a0B0_a0B0C0",
+        s"bind ${moduleName} ${moduleName}_A0_A0B0 a0_a0B0",
+        s"bind ${moduleName} ${moduleName}_A0 a0_0"
+      )

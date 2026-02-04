@@ -446,6 +446,7 @@ trait ProbeDefine[D <: Data & CanProbe, P <: RWProbe[D] | RProbe[D], SRC <: Refe
       using Arena,
       Context,
       Block,
+      LayerTree,
       sourcecode.File,
       sourcecode.Line
     ): Unit
