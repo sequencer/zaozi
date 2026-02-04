@@ -22,22 +22,44 @@
     };
     circt-nix = {
       url = "github:unlsycn/circt-nix";
-      inputs = { nixpkgs.follows = "nixpkgs"; circt-src.follows = "circt-src"; llvm-submodule-src.follows = "llvm-src"; };
+      inputs = {
+        nixpkgs.follows = "nixpkgs";
+        circt-src.follows = "circt-src";
+        llvm-submodule-src.follows = "llvm-src";
+      };
     };
     flake-utils.url = "github:numtide/flake-utils";
     mill-ivy-fetcher.url = "github:Avimitin/mill-ivy-fetcher";
   };
 
-  outputs = inputs@{ self, nixpkgs, flake-utils, mill-ivy-fetcher, circt-nix, ... }:
-    let overlay = (import ./nix/overlay.nix) { };
-    in {
+  outputs =
+    inputs@{
+      self,
+      nixpkgs,
+      flake-utils,
+      mill-ivy-fetcher,
+      circt-nix,
+      ...
+    }:
+    let
+      overlay = import ./nix/overlay.nix;
+      local-overlay = import ./nix/local-overlay.nix;
+    in
+    {
       # System-independent attr
       inherit inputs;
       overlays.default = overlay;
-    } // flake-utils.lib.eachDefaultSystem (system:
+    }
+    // flake-utils.lib.eachDefaultSystem (
+      system:
       let
         pkgs = import nixpkgs {
-          overlays = [ circt-nix.overlays.default overlay mill-ivy-fetcher.overlays.default ];
+          overlays = [
+            circt-nix.overlays.default
+            overlay
+            local-overlay
+            mill-ivy-fetcher.overlays.default
+          ];
           inherit system;
         };
       in
@@ -51,15 +73,14 @@
         devShells.default = pkgs.mkShell {
           inputsFrom = [ pkgs.zaozi.zaozi-assembly ];
           nativeBuildInputs = with pkgs; [ nixd ];
-          env = with pkgs;
-            {
-              CIRCT_INSTALL_PATH = circt-install;
-              MLIR_INSTALL_PATH = mlir-install;
-              JEXTRACT_INSTALL_PATH = jextract-21;
-              LIT_INSTALL_PATH = lit;
-              SCALA_CLI_INSTALL_PATH = scala-cli;
-              RISCV_OPCODES_INSTALL_PATH = riscv-opcodes;
-            };
+          env = with pkgs; {
+            CIRCT_INSTALL_PATH = circt-install;
+            MLIR_INSTALL_PATH = mlir-install;
+            JEXTRACT_INSTALL_PATH = jextract-21;
+            LIT_INSTALL_PATH = lit;
+            SCALA_CLI_INSTALL_PATH = scala-cli;
+            RISCV_OPCODES_INSTALL_PATH = riscv-opcodes;
+          };
           # pass to jextract
           # Jextract splits the header class into multiple classes, which are combined via extending
           # Due to https://github.com/scala/bug/issues/9272 we cannot access static fields in superclass headers, we work around this by not splitting the header
@@ -68,5 +89,6 @@
             export JAVA_TOOL_OPTIONS="$JAVA_TOOL_OPTIONS --enable-preview -Djextract.decls.per.header=65535"
           '';
         };
-      });
+      }
+    );
 }
