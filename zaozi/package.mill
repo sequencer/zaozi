@@ -10,7 +10,7 @@ import contrib.jmh.JmhModule
 import os.Path
 
 import build.{circtlib, v, LitModule, ZaoziPublishModule}
-import build.zaozi.testlib
+import build.testlib
 
 object `package` extends ScalaModule with ScalafmtModule with ZaoziPublishModule { m =>
   def scalaVersion = Task(v.scala)

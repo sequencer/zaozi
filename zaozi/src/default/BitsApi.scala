@@ -2,21 +2,22 @@
 // SPDX-FileCopyrightText: 2025 Jiuyang Liu <liu@jiuyang.me>
 package me.jiuyang.zaozi.default
 
-import me.jiuyang.zaozi.BitsApi
-import me.jiuyang.zaozi.InstanceContext
 import me.jiuyang.zaozi.reftpe.*
 import me.jiuyang.zaozi.valuetpe.*
+import me.jiuyang.zaozi.{BitsApi, InstanceContext}
+
 import org.llvm.circt.scalalib.capi.dialect.firrtl.{given_FirrtlBundleFieldApi, given_TypeApi, FirrtlNameKind}
-import org.llvm.circt.scalalib.dialect.firrtl.operation.BitCast
-import org.llvm.circt.scalalib.dialect.firrtl.operation.{given_BitCastApi, BitCastApi}
-import org.llvm.circt.scalalib.dialect.firrtl.operation.ConnectApi
-import org.llvm.circt.scalalib.dialect.firrtl.operation.WireApi
+import org.llvm.circt.scalalib.dialect.firrtl.operation.given
 import org.llvm.circt.scalalib.dialect.firrtl.operation.{
+  given_BitCastApi,
   AndPrimApi,
   AndRPrimApi,
   AsSIntPrimApi,
+  BitCast,
+  BitCastApi,
   BitsPrimApi,
   CatPrimApi,
+  ConnectApi,
   DShlPrimApi,
   DShrPrimApi,
   EQPrimApi,
@@ -30,9 +31,9 @@ import org.llvm.circt.scalalib.dialect.firrtl.operation.{
   ShlPrimApi,
   ShrPrimApi,
   TailPrimApi,
+  WireApi,
   XorPrimApi,
-  XorRPrimApi,
-  given
+  XorRPrimApi
 }
 import org.llvm.mlir.scalalib.capi.ir.{Block, Context, LocationApi, Operation, given}
 
@@ -577,6 +578,11 @@ given [R <: Referable[Bits]]: BitsApi[R] with
       sourcecode.Name.Machine,
       InstanceContext
     ): Node[Bool] = bits(idx, idx).asBool
+
+    def width(
+      using Arena,
+      Context
+    ) = ref.refer.getType.getBitWidth(true).toInt
 
     // sugars
     def apply(

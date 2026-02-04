@@ -1,18 +1,26 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: 2025 Jiuyang Liu <liu@jiuyang.me>
 
-arcMemoryTypeGet            # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/Arc.h
-arcSimModelInstanceTypeGet  # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/Arc.h
-arcStateTypeGet             # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/Arc.h
-arcStateTypeGetType         # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/Arc.h
-arcStorageTypeGet           # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/Arc.h
-arcStorageTypeGetWithSize   # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/Arc.h
-arcTypeIsAMemory            # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/Arc.h
-arcTypeIsASimModelInstance  # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/Arc.h
-arcTypeIsAState             # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/Arc.h
-arcTypeIsAStorage           # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/Arc.h
-mlirGetDialectHandle__arc__ # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/Arc.h
-registerArcPasses           # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/Arc.h
+arcMemoryTypeGet                # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/Arc.h
+arcMemoryTypeGetAddressType     # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/Arc.h
+arcMemoryTypeGetNumWords        # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/Arc.h
+arcMemoryTypeGetStride          # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/Arc.h
+arcMemoryTypeGetWordType        # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/Arc.h
+arcSimModelInstanceTypeGet      # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/Arc.h
+arcSimModelInstanceTypeGetModel # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/Arc.h
+arcStateTypeGet                 # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/Arc.h
+arcStateTypeGetBitWidth         # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/Arc.h
+arcStateTypeGetByteWidth        # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/Arc.h
+arcStateTypeGetType             # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/Arc.h
+arcStorageTypeGet               # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/Arc.h
+arcStorageTypeGetSize           # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/Arc.h
+arcStorageTypeGetWithSize       # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/Arc.h
+arcTypeIsAMemory                # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/Arc.h
+arcTypeIsASimModelInstance      # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/Arc.h
+arcTypeIsAState                 # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/Arc.h
+arcTypeIsAStorage               # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/Arc.h
+mlirGetDialectHandle__arc__     # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/Arc.h
+registerArcPasses               # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/Arc.h
 chirrtlTypeGetCMemory           # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/CHIRRTL.h
 chirrtlTypeGetCMemoryPort       # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/CHIRRTL.h
 mlirGetDialectHandle__chirrtl__ # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/CHIRRTL.h
@@ -459,7 +467,6 @@ circtFirtoolOptionsCreateDefault                                        # header
 circtFirtoolOptionsDestroy                                              # header: $CIRCT_INSTALL_PATH/include/circt-c/Firtool/Firtool.h
 circtFirtoolOptionsSetAddMuxPragmas                                     # header: $CIRCT_INSTALL_PATH/include/circt-c/Firtool/Firtool.h
 circtFirtoolOptionsSetAddVivadoRAMAddressConflictSynthesisBugWorkaround # header: $CIRCT_INSTALL_PATH/include/circt-c/Firtool/Firtool.h
-circtFirtoolOptionsSetAllowAddingPortsOnPublic                          # header: $CIRCT_INSTALL_PATH/include/circt-c/Firtool/Firtool.h
 circtFirtoolOptionsSetBlackBoxRootPath                                  # header: $CIRCT_INSTALL_PATH/include/circt-c/Firtool/Firtool.h
 circtFirtoolOptionsSetBuildMode                                         # header: $CIRCT_INSTALL_PATH/include/circt-c/Firtool/Firtool.h
 circtFirtoolOptionsSetCkgEnableName                                     # header: $CIRCT_INSTALL_PATH/include/circt-c/Firtool/Firtool.h
@@ -475,6 +482,7 @@ circtFirtoolOptionsSetDisableLayerSink                                  # header
 circtFirtoolOptionsSetDisableOptimization                               # header: $CIRCT_INSTALL_PATH/include/circt-c/Firtool/Firtool.h
 circtFirtoolOptionsSetDisableRandom                                     # header: $CIRCT_INSTALL_PATH/include/circt-c/Firtool/Firtool.h
 circtFirtoolOptionsSetDisableUnknownAnnotations                         # header: $CIRCT_INSTALL_PATH/include/circt-c/Firtool/Firtool.h
+circtFirtoolOptionsSetDomainMode                                        # header: $CIRCT_INSTALL_PATH/include/circt-c/Firtool/Firtool.h
 circtFirtoolOptionsSetEmitSeparateAlwaysBlocks                          # header: $CIRCT_INSTALL_PATH/include/circt-c/Firtool/Firtool.h
 circtFirtoolOptionsSetEnableAnnotationWarning                           # header: $CIRCT_INSTALL_PATH/include/circt-c/Firtool/Firtool.h
 circtFirtoolOptionsSetEnableDebugInfo                                   # header: $CIRCT_INSTALL_PATH/include/circt-c/Firtool/Firtool.h
@@ -487,6 +495,7 @@ circtFirtoolOptionsSetIgnoreReadEnableMem                               # header
 circtFirtoolOptionsSetLowerAnnotationsNoRefTypePorts                    # header: $CIRCT_INSTALL_PATH/include/circt-c/Firtool/Firtool.h
 circtFirtoolOptionsSetLowerMemories                                     # header: $CIRCT_INSTALL_PATH/include/circt-c/Firtool/Firtool.h
 circtFirtoolOptionsSetNoDedup                                           # header: $CIRCT_INSTALL_PATH/include/circt-c/Firtool/Firtool.h
+circtFirtoolOptionsSetNoViews                                           # header: $CIRCT_INSTALL_PATH/include/circt-c/Firtool/Firtool.h
 circtFirtoolOptionsSetOutputAnnotationFilename                          # header: $CIRCT_INSTALL_PATH/include/circt-c/Firtool/Firtool.h
 circtFirtoolOptionsSetOutputFilename                                    # header: $CIRCT_INSTALL_PATH/include/circt-c/Firtool/Firtool.h
 circtFirtoolOptionsSetPreserveAggregate                                 # header: $CIRCT_INSTALL_PATH/include/circt-c/Firtool/Firtool.h
@@ -515,8 +524,10 @@ mlirCreateCIRCTConversionConvertCombToArith         # header: $CIRCT_INSTALL_PAT
 mlirCreateCIRCTConversionConvertCombToDatapath      # header: $CIRCT_INSTALL_PATH/include/circt/Conversion/Conversion.capi.h.inc
 mlirCreateCIRCTConversionConvertCombToSMT           # header: $CIRCT_INSTALL_PATH/include/circt/Conversion/Conversion.capi.h.inc
 mlirCreateCIRCTConversionConvertCombToSynth         # header: $CIRCT_INSTALL_PATH/include/circt/Conversion/Conversion.capi.h.inc
+mlirCreateCIRCTConversionConvertCoreToFSM           # header: $CIRCT_INSTALL_PATH/include/circt/Conversion/Conversion.capi.h.inc
 mlirCreateCIRCTConversionConvertDatapathToComb      # header: $CIRCT_INSTALL_PATH/include/circt/Conversion/Conversion.capi.h.inc
 mlirCreateCIRCTConversionConvertDatapathToSMT       # header: $CIRCT_INSTALL_PATH/include/circt/Conversion/Conversion.capi.h.inc
+mlirCreateCIRCTConversionConvertFSMToCore           # header: $CIRCT_INSTALL_PATH/include/circt/Conversion/Conversion.capi.h.inc
 mlirCreateCIRCTConversionConvertFSMToSV             # header: $CIRCT_INSTALL_PATH/include/circt/Conversion/Conversion.capi.h.inc
 mlirCreateCIRCTConversionConvertHWToBTOR2           # header: $CIRCT_INSTALL_PATH/include/circt/Conversion/Conversion.capi.h.inc
 mlirCreateCIRCTConversionConvertHWToLLVM            # header: $CIRCT_INSTALL_PATH/include/circt/Conversion/Conversion.capi.h.inc
@@ -561,8 +572,10 @@ mlirRegisterCIRCTConversionConvertCombToArith       # header: $CIRCT_INSTALL_PAT
 mlirRegisterCIRCTConversionConvertCombToDatapath    # header: $CIRCT_INSTALL_PATH/include/circt/Conversion/Conversion.capi.h.inc
 mlirRegisterCIRCTConversionConvertCombToSMT         # header: $CIRCT_INSTALL_PATH/include/circt/Conversion/Conversion.capi.h.inc
 mlirRegisterCIRCTConversionConvertCombToSynth       # header: $CIRCT_INSTALL_PATH/include/circt/Conversion/Conversion.capi.h.inc
+mlirRegisterCIRCTConversionConvertCoreToFSM         # header: $CIRCT_INSTALL_PATH/include/circt/Conversion/Conversion.capi.h.inc
 mlirRegisterCIRCTConversionConvertDatapathToComb    # header: $CIRCT_INSTALL_PATH/include/circt/Conversion/Conversion.capi.h.inc
 mlirRegisterCIRCTConversionConvertDatapathToSMT     # header: $CIRCT_INSTALL_PATH/include/circt/Conversion/Conversion.capi.h.inc
+mlirRegisterCIRCTConversionConvertFSMToCore         # header: $CIRCT_INSTALL_PATH/include/circt/Conversion/Conversion.capi.h.inc
 mlirRegisterCIRCTConversionConvertFSMToSV           # header: $CIRCT_INSTALL_PATH/include/circt/Conversion/Conversion.capi.h.inc
 mlirRegisterCIRCTConversionConvertHWToBTOR2         # header: $CIRCT_INSTALL_PATH/include/circt/Conversion/Conversion.capi.h.inc
 mlirRegisterCIRCTConversionConvertHWToLLVM          # header: $CIRCT_INSTALL_PATH/include/circt/Conversion/Conversion.capi.h.inc

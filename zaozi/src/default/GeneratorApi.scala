@@ -60,14 +60,13 @@ import org.llvm.mlir.scalalib.capi.ir.{
 }
 import org.llvm.mlir.scalalib.capi.pass.{given_PassManagerApi, PassManager}
 
+import java.io.ByteArrayOutputStream
 import java.lang.foreign.Arena
 import java.nio.file.StandardOpenOption.*
-import java.io.ByteArrayOutputStream
 
-export given_GeneratorApi.*
 export me.jiuyang.zaozi.magic.macros.generator
 
-given GeneratorApi with
+given GeneratorApi:
   extension [PARAM <: Parameter, L <: LayerInterface[PARAM], I <: HWInterface[PARAM], P <: DVInterface[PARAM, L]](
     generator: Generator[PARAM, L, I, P]
   )
@@ -163,70 +162,12 @@ given GeneratorApi with
       sourcecode.Name.Machine,
       InstanceContext
     ): Instance[I, P] =
-      val ioTpe       = generator.interface(parameter)
-      val probeTpe    = generator.probe(parameter)
-      val ioFields    = Seq.tabulate(ioTpe.toMlirType.getBundleNumFields.toInt)(ioTpe.toMlirType.getBundleFieldByIndex)
-      val probeFields =
-        Seq.tabulate(probeTpe.toMlirType.getBundleNumFields.toInt)(probeTpe.toMlirType.getBundleFieldByIndex)
-      // TODO: add layer symbol here? rather than from top to down searching?
-      val instanceOp  = summon[InstanceApi].op(
-        moduleName = generator.moduleName(parameter),
-        instanceName = valName,
-        nameKind = FirrtlNameKind.Interesting,
-        location = locate,
-        interface = ioFields ++ probeFields,
-        layers = generator.layers(parameter).nameHierarchy
+      BaseGeneratorHelper.createInstance(
+        generator.moduleName(parameter),
+        generator.interface(parameter),
+        generator.probe(parameter),
+        generator.layers(parameter)
       )
-      instanceOp.operation.appendToBlock()
-      val ioWire      = summon[WireApi].op(
-        s"${valName}_io",
-        summon[LocationApi].locationUnknownGet,
-        FirrtlNameKind.Droppable,
-        ioTpe.toMlirType
-      )
-      ioWire.operation.appendToBlock()
-      val probeWire   = summon[WireApi].op(
-        s"${valName}_probe",
-        summon[LocationApi].locationUnknownGet,
-        FirrtlNameKind.Droppable,
-        probeTpe.toMlirType
-      )
-      probeWire.operation.appendToBlock()
-
-      ioFields.zipWithIndex.foreach:    (field, idx) =>
-        val flip       = field.getIsFlip
-        val instanceIO = instanceOp.operation.getResult(idx)
-        val wireIO     = summon[SubfieldApi].op(
-          ioWire.result,
-          idx,
-          locate
-        )
-        wireIO.operation.appendToBlock()
-        val connect    =
-          if (flip) summon[ConnectApi].op(wireIO.result, instanceIO, locate)
-          else summon[ConnectApi].op(instanceIO, wireIO.result, locate)
-        connect.operation.appendToBlock()
-      probeFields.zipWithIndex.foreach: (field, idx) =>
-        val instanceIO = instanceOp.operation.getResult(ioFields.length + idx)
-        val wireProbe  = summon[OpenSubfieldApi].op(
-          probeWire.result,
-          idx,
-          locate
-        )
-        wireProbe.operation.appendToBlock()
-        val connect    = summon[RefDefineApi].op(wireProbe.result, instanceIO, locate)
-        connect.operation.appendToBlock()
-
-      new Instance[I, P]:
-        val _ioTpe     = ioTpe
-        val _probeTpe  = probeTpe
-        val _operation = instanceOp.operation
-        val _ioWire    = new Wire[I]:
-          private[zaozi] val _tpe       = ioTpe
-          private[zaozi] val _operation = ioWire.operation
-        val _probeWire = new Wire[P]:
-          private[zaozi] val _tpe       = probeTpe
-          private[zaozi] val _operation = probeWire.operation
 
     def dumpMlirbc(
       parameter: PARAM
@@ -234,21 +175,16 @@ given GeneratorApi with
       using Arena,
       Context
     ): Unit =
-      if !generator.elaboratedModules.contains(parameter) then
-        given MlirModule = summon[MlirModuleApi].moduleCreateEmpty(summon[LocationApi].locationUnknownGet)
-        given Circuit    = summon[CircuitApi].op(generator.moduleName(parameter))
-        summon[Circuit].appendToModule()
-        generator.module(parameter).appendToCircuit()
-        validateCircuit()
-
-        val mlirbcFile =
-          os.Path(
-            sys.env.getOrElse("ZAOZI_OUTDIR", ""),
-            os.pwd
-          ) / s"${generator.moduleName(parameter)}.mlirbc"
-        val out        = os.write.outputStream(mlirbcFile, openOptions = Seq(WRITE, CREATE, TRUNCATE_EXISTING))
-        summon[MlirModule].getOperation.writeBytecode(bc => out.write(bc))
-        generator.elaboratedModules.add(parameter)
+      BaseGeneratorHelper.dumpMlirbc(
+        generator.moduleName(parameter),
+        generator.elaboratedModules,
+        parameter,
+        (arena, context, circuit) =>
+          given Arena   = arena
+          given Context = context
+          given Circuit = circuit
+          generator.module(parameter).appendToCircuit()
+      )
 
     def instantiate(
       parameter: PARAM

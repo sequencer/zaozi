@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 // SPDX-FileCopyrightText: 2025 Jiuyang Liu <liu@jiuyang.me>
-package build.zaozi.stdlib
+package build.stdlib
 
 import mill._
 import mill.scalalib.TestModule.Utest
@@ -9,7 +9,7 @@ import mill.scalalib.scalafmt._
 import os.Path
 
 import build.{circtlib, decoder, v, zaozi, LitModule}
-import build.zaozi.testlib
+import build.testlib
 
 object `package` extends ScalaModule with ScalafmtModule { m =>
   def scalaVersion = Task(v.scala)

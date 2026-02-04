@@ -1,4 +1,5 @@
 import platform
+import os
 import lit.formats
 from lit.llvm import llvm_config
 from lit.llvm.subst import ToolSubst
@@ -16,3 +17,11 @@ config.substitutions = [
     ('%JAVALIBRARYPATH', ':'.join(config.java_library_path))
 ]
 config.test_source_root = os.path.dirname(__file__)
+
+# Pass through environment variables to allow configuration from the runner/CI
+env_vars_to_pass = [
+    "SCALA_CLI_HOME", "JAVA_OPTS"
+]
+for var in env_vars_to_pass:
+    if var in os.environ:
+        config.environment[var] = os.environ[var]

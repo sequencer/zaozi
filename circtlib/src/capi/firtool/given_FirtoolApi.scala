@@ -8,7 +8,6 @@ import org.llvm.circt.CAPI.{
   circtFirtoolOptionsDestroy,
   circtFirtoolOptionsSetAddMuxPragmas,
   circtFirtoolOptionsSetAddVivadoRAMAddressConflictSynthesisBugWorkaround,
-  circtFirtoolOptionsSetAllowAddingPortsOnPublic,
   circtFirtoolOptionsSetBlackBoxRootPath,
   circtFirtoolOptionsSetBuildMode,
   circtFirtoolOptionsSetCkgEnableName,
@@ -78,11 +77,6 @@ given FirtoolApi with
     )(
       using arena: Arena
     ): Unit = circtFirtoolOptionsSetAddVivadoRAMAddressConflictSynthesisBugWorkaround(firtoolOptions.segment, value)
-    inline def setAllowAddingPortsOnPublic(
-      value:       Boolean
-    )(
-      using arena: Arena
-    ): Unit = circtFirtoolOptionsSetAllowAddingPortsOnPublic(firtoolOptions.segment, value)
     inline def setBlackBoxRootPath(
       value:       String
     )(

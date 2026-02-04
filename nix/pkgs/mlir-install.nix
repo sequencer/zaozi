@@ -1,13 +1,14 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: 2024 Jiuyang Liu <liu@jiuyang.me>
 
-{ symlinkJoin, circt }:
+{ symlinkJoin, libllvm, mlir }:
 symlinkJoin {
   name = "mlir-install";
   paths = [
-    circt.llvm.lib
-    circt.llvm.dev
+    libllvm
+    mlir
+    mlir.dev
   ];
 
-  inherit (circt) meta;
+  inherit (mlir) meta;
 }

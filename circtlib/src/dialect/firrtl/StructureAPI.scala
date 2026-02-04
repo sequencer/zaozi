@@ -31,7 +31,28 @@ end CircuitApi
 class Class(val _operation: Operation)
 class ExtClass(val _operation: Operation)
 class ExtModule(val _operation: Operation)
+
+type VerilogParameterType = String | BigInt | Double | Boolean
 trait ExtModuleApi extends HasOperation[ExtModule]:
+  inline def op(
+    symbolName:       String,
+    moduleName:       String,
+    location:         Location,
+    firrtlConvention: FirrtlConvention,
+    interface:        Seq[(FirrtlBundleField, Location)],
+    layers:           Seq[Seq[String]],
+    verilogParameter: Map[String, VerilogParameterType]
+  )(
+    using Arena,
+    Context
+  ): ExtModule
+
+  extension (ref: ExtModule)
+    inline def appendToCircuit(
+    )(
+      using arena: Arena,
+      circuit:     Circuit
+    ): Unit
 end ExtModuleApi
 
 class IntModule(val _operation: Operation)

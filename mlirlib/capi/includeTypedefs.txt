@@ -7,6 +7,6 @@ MlirSparseTensorLevelType                   # header: $MLIR_INSTALL_PATH/include
 MlirOperationWalkCallback                      # header: $MLIR_INSTALL_PATH/include/mlir-c/IR.h
 MlirShapedTypeComponentsCallback                # header: $MLIR_INSTALL_PATH/include/mlir-c/Interfaces.h
 MlirTypesCallback                               # header: $MLIR_INSTALL_PATH/include/mlir-c/Interfaces.h
-MlirPDLConstraintFunction                       # header: $MLIR_INSTALL_PATH/include/mlir-c/Rewrite.h
-MlirPDLRewriteFunction                          # header: $MLIR_INSTALL_PATH/include/mlir-c/Rewrite.h
+MlirPDLConstraintFunction                                  # header: $MLIR_INSTALL_PATH/include/mlir-c/Rewrite.h
+MlirPDLRewriteFunction                                     # header: $MLIR_INSTALL_PATH/include/mlir-c/Rewrite.h
 MlirStringCallback                 # header: $MLIR_INSTALL_PATH/include/mlir-c/Support.h

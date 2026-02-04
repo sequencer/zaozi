@@ -38,6 +38,10 @@ CIRCT_FIRTOOL_BUILD_MODE_RELEASE                                        # header
 CIRCT_FIRTOOL_COMPANION_MODE_BIND                                       # header: $CIRCT_INSTALL_PATH/include/circt-c/Firtool/Firtool.h
 CIRCT_FIRTOOL_COMPANION_MODE_DROP                                       # header: $CIRCT_INSTALL_PATH/include/circt-c/Firtool/Firtool.h
 CIRCT_FIRTOOL_COMPANION_MODE_INSTANTIATE                                # header: $CIRCT_INSTALL_PATH/include/circt-c/Firtool/Firtool.h
+CIRCT_FIRTOOL_DOMAIN_MODE_CHECK                                         # header: $CIRCT_INSTALL_PATH/include/circt-c/Firtool/Firtool.h
+CIRCT_FIRTOOL_DOMAIN_MODE_DISABLE                                       # header: $CIRCT_INSTALL_PATH/include/circt-c/Firtool/Firtool.h
+CIRCT_FIRTOOL_DOMAIN_MODE_INFER                                         # header: $CIRCT_INSTALL_PATH/include/circt-c/Firtool/Firtool.h
+CIRCT_FIRTOOL_DOMAIN_MODE_INFER_ALL                                     # header: $CIRCT_INSTALL_PATH/include/circt-c/Firtool/Firtool.h
 CIRCT_FIRTOOL_PRESERVE_AGGREGATE_MODE_ALL                               # header: $CIRCT_INSTALL_PATH/include/circt-c/Firtool/Firtool.h
 CIRCT_FIRTOOL_PRESERVE_AGGREGATE_MODE_NONE                              # header: $CIRCT_INSTALL_PATH/include/circt-c/Firtool/Firtool.h
 CIRCT_FIRTOOL_PRESERVE_AGGREGATE_MODE_ONE_DIM_VEC                       # header: $CIRCT_INSTALL_PATH/include/circt-c/Firtool/Firtool.h

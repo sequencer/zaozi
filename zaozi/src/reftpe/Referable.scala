@@ -13,6 +13,10 @@ import scala.language.dynamics
 
 trait Referable[T <: Data] extends Dynamic:
   private[zaozi] val _tpe: T
+
+  // Ideally, we can get all attribute from MLIR but the Scala type itself
+  def getType = _tpe
+
   def refer(
     using Arena,
     TypeImpl
