@@ -80,7 +80,7 @@ object BaseGeneratorHelper:
       nameKind = FirrtlNameKind.Interesting,
       location = locate,
       interface = ioFields ++ probeFields,
-      layers = layers.nameHierarchy
+      layers = layers.nameHierarchies
     )
     instanceOp.operation.appendToBlock()
     val ioWire      = summon[WireApi].op(

@@ -89,7 +89,7 @@ given GeneratorApi:
         unknownLocation,
         FirrtlConvention.Scalarized,
         bfs.map(i => (i, unknownLocation)), // TODO: record location for Bundle?
-        generator.layers(parameter).nameHierarchy
+        generator.layers(parameter).nameHierarchies
       )
       given Block           = module.block
       val ioWire            = summon[WireApi].op(
