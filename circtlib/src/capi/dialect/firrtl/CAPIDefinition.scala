@@ -220,6 +220,7 @@ end AttributeApi
   * firrtlTypeGetMaskType
   * firrtlTypeGetPath
   * firrtlTypeGetRef
+  * firrtlTypeGetColoredRef
   * firrtlTypeGetReset
   * firrtlTypeGetSInt
   * firrtlTypeGetString
@@ -323,12 +324,18 @@ trait TypeApi:
   ):                                                                                Type
   extension (tpe:                Type)
     inline def getRef(
-      forceable:   Boolean,
-      layer:       Seq[String]
+      forceable:   Boolean
     )(
       using arena: Arena,
       context:     Context
-    ):                                                                              Type
+    ): Type
+    inline def getRef(
+      forceable:   Boolean,
+      layers:      Seq[String]
+    )(
+      using arena: Arena,
+      context:     Context
+    ): Type
   inline def getReset(
     using arena: Arena,
     context:     Context
