@@ -15,6 +15,7 @@ import org.llvm.circt.CAPI.{
   firrtlTypeGetBundleNumFields,
   firrtlTypeGetClass,
   firrtlTypeGetClock,
+  firrtlTypeGetColoredRef,
   firrtlTypeGetConstType,
   firrtlTypeGetDouble,
   firrtlTypeGetInteger,
@@ -50,7 +51,7 @@ import org.llvm.circt.CAPI.{
   firrtlTypeIsConst
 }
 import org.llvm.mlir.scalalib.capi.support.{*, given}
-import org.llvm.mlir.scalalib.capi.ir.{Context, DialectHandle, Type, given}
+import org.llvm.mlir.scalalib.capi.ir.{Attribute, Context, DialectHandle, Type, given}
 
 import java.lang.foreign.Arena
 
@@ -144,15 +145,26 @@ given TypeApi with
   ): Type = Type(firrtlTypeGetPath(arena, context.segment))
   extension (tpe:                      Type)
     inline def getRef(
-      forceable:   Boolean,
-      layer:       Seq[String]
+      forceable:   Boolean
     )(
       using arena: Arena,
       context:     Context
     ): Type =
-      // wait for [[https://github.com/llvm/circt/pull/8093]]
-      // Type(firrtlTypeGetRef(arena, tpe.segment, forceable, layer.reverse.last.symbolRefAttrGet(layer.drop(1).map(_.flatSymbolRefAttrGet)).segment))
       Type(firrtlTypeGetRef(arena, tpe.segment, forceable))
+    inline def getRef(
+      forceable:   Boolean,
+      layers:      Seq[String]
+    )(
+      using arena: Arena,
+      context:     Context
+    ): Type =
+      val layersAttr =
+        if (layers.isEmpty) throw new IllegalArgumentException("Layer sequence cannot be empty")
+        else
+          layers match
+            case Seq(root)    => root.flatSymbolRefAttrGet
+            case root +: rest => root.symbolRefAttrGet(rest.map(_.flatSymbolRefAttrGet))
+      Type(firrtlTypeGetColoredRef(arena, tpe.segment, forceable, layersAttr.segment))
   inline def getReset(
     using arena: Arena,
     context:     Context
