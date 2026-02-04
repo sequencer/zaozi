@@ -92,19 +92,27 @@ given ConstructorApi with
 
   extension (layer: LayerTree)
     def apply(name: String): LayerTree =
-      layer._children(name)
+      layer.children(name)
 
   extension (layers: Seq[LayerTree])
     def apply(name: String): LayerTree =
       layers
-        .find(_._name == name)
+        .find(_.name == name)
         .getOrElse(
-          throw new Exception(s"No valid layer named: \"${name}\" found in ${layers.map(_._name).mkString(",")}")
+          throw new Exception(s"No valid layer named: \"${name}\" found in ${layers.map(_.name).mkString(",")}")
         )
 
   def layer(
     layerName: String
-  )(body:      (Arena, Context, Block, Seq[LayerTree]) ?=> Unit
+  )(body:      (
+      Arena,
+      Context,
+      Block,
+      LayerTree,      // Current Layer
+      Seq[LayerTree], // Children Layers
+      sourcecode.File,
+      sourcecode.Line
+    ) ?=> Unit
   )(
     using Arena,
     Context,
@@ -113,13 +121,16 @@ given ConstructorApi with
     sourcecode.File,
     sourcecode.Line
   ): Unit =
-    val op0 = summon[LayerBlockApi].op(summon[Seq[LayerTree]](layerName)._hierarchy.map(_._name), locate)
+    val op0 = summon[LayerBlockApi].op(summon[Seq[LayerTree]](layerName).nameHierarchy, locate)
     op0.operation.appendToBlock()
     body(
       using summon[Arena],
       summon[Context],
       op0.block,
-      summon[Seq[LayerTree]](layerName)._children
+      summon[Seq[LayerTree]](layerName),
+      summon[Seq[LayerTree]](layerName).children,
+      summon[sourcecode.File],
+      summon[sourcecode.Line]
     )
 
   def Wire[T <: Data](
