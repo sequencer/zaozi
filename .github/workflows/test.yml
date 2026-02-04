@@ -20,4 +20,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: nix develop -c mill -i '__.testForked'
-      - run: nix develop -c mill -i '__.lit.tests.run'
+      - run: |
+          export SCALA_CLI_HOME=$(mktemp -d)
+          export JAVA_OPTS="$JAVA_TOOL_OPTIONS -Duser.home=$(mktemp -d)"
+          nix develop -c mill -i '__.lit.tests.run'
