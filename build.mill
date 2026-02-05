@@ -10,11 +10,24 @@ import mill.scalalib.TestModule.Utest
 import mill.scalalib._
 import mill.scalalib.publish._
 import mill.scalalib.scalafmt._
+import mill.javalib.{CoursierModule, JvmWorkerModule}
 import contrib.jmh.JmhModule
 import os.Path
 
+// Custom JvmWorkerModule for Mill bootstrap with NIGHTLY Scala
+// See: https://docs.scala-lang.org/overviews/core/nightlies.html
+object CustomJvmWorkerModule extends JvmWorkerModule with CoursierModule {
+  override def repositories = super.repositories() ++ Seq(
+    "https://repo.scala-lang.org/artifactory/maven-nightlies"
+  )
+}
+
 object v {
-  val scala      = "3.6.2"
+  // Using NIGHTLY for ResearchPlugin support in zaozi-compiler-plugin
+  // Using 3.6.x to get SemanticDB-first behavior in Metals (3.7.0+ uses compiler-first)
+  // See https://github.com/scalameta/metals/blob/c73e1d6b181eb94346ce30de4f267e9787befaf9/metals/src/main/scala/scala/meta/internal/metals/DefinitionProvider.scala#L145
+  // Find versions at: https://repo1.maven.org/maven2/org/scala-lang/scala3-compiler_3/
+  val scala      = "3.6.4-RC1-bin-20250114-312c89a-NIGHTLY"
   val mainargs   = mvn"com.lihaoyi::mainargs:0.7.6"
   val oslib      = mvn"com.lihaoyi::os-lib:0.11.3"
   val upickle    = mvn"com.lihaoyi::upickle:4.0.2"
@@ -25,8 +38,13 @@ object v {
   val jmh        = "1.35"
 }
 
-trait ZaoziPublishModule extends PublishModule {
+trait ZaoziPublishModule extends PublishModule with CoursierModule {
   def publishVersion: mill.T[String] = "0.0.1-SNAPSHOT"
+
+  // Include NIGHTLY repository for dependency resolution
+  override def repositories = super.repositories() ++ Seq(
+    "https://repo.scala-lang.org/artifactory/maven-nightlies"
+  )
 
   def pomSettings = Task(
     PomSettings(
