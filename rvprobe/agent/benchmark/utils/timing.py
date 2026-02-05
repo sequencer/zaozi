@@ -12,6 +12,12 @@ class Timer:
     Simple timer for measuring elapsed time.
 
     Usage:
+        # As context manager
+        with Timer() as timer:
+            # ... do work ...
+        elapsed = timer.elapsed
+
+        # Or manual mode
         timer = Timer()
         timer.start()
         # ... do work ...
@@ -22,6 +28,16 @@ class Timer:
         self.start_time = None
         self.end_time = None
         self.elapsed = 0.0
+
+    def __enter__(self):
+        """Enter context manager."""
+        self.start()
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        """Exit context manager."""
+        self.stop()
+        return False
 
     def start(self):
         """Start the timer."""

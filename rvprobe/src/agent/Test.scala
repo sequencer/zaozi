@@ -14,9 +14,9 @@ import scala.util.control.NonFatal
   object test extends RVGenerator:
     val sets          = isRV64GC()
     def constraints() =
-      (0 until 3).foreach { i =>
+      (0 until 10).foreach { i =>
         instruction(i, isAddi()) {
-          rdRange(1, 5) & rs1Range(1, 5)
+          rdRange(1, 10) & rs1Range(1, 32)
         }
       }
 
