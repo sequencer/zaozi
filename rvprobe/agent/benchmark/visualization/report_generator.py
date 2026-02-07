@@ -24,12 +24,8 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../.
 from benchmark.test_suite.schemas import RunResult, Difficulty
 from benchmark.test_suite.test_cases import get_all_test_cases
 
-try:
-    import numpy as np
-    NUMPY_AVAILABLE = True
-except ImportError:
-    print("⚠️ Warning: numpy not available. Statistical analysis will be limited.")
-    NUMPY_AVAILABLE = False
+import numpy as np
+NUMPY_AVAILABLE = True
 
 
 class ReportGenerator:

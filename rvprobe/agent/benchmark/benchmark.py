@@ -582,9 +582,12 @@ def load_config_from_yaml(config_path: str) -> BenchmarkConfig:
         with open(config_path, 'r') as f:
             config_dict = yaml.safe_load(f)
         
+        # Read llm_model from environment variable LLM_MODEL, not from config.yaml
+        llm_model = os.getenv('LLM_MODEL', os.getenv('OPENAI_MODEL', 'gpt-4o'))
+        
         # Convert to BenchmarkConfig
         return BenchmarkConfig(
-            llm_model=config_dict.get('llm_model', 'gpt-4o'),
+            llm_model=llm_model,
             llm_temperature=config_dict.get('llm_temperature', 0.0),
             llm_max_tokens=config_dict.get('llm_max_tokens', 4000),
             timeout_seconds=config_dict.get('timeout_seconds', 300),

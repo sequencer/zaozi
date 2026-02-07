@@ -17,25 +17,17 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../.
 from benchmark.test_suite.schemas import RunResult, Difficulty
 
 # Try to import plotting libraries
-try:
-    import matplotlib
-    matplotlib.use('Agg')  # Non-interactive backend for server environments
-    import matplotlib.pyplot as plt
-    import matplotlib.patches as mpatches
-    from matplotlib.gridspec import GridSpec
-    import numpy as np
-    MATPLOTLIB_AVAILABLE = True
-except ImportError:
-    print("⚠️ Warning: matplotlib not available. Install with: uv pip install matplotlib")
-    MATPLOTLIB_AVAILABLE = False
+import matplotlib
+import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
+from matplotlib.gridspec import GridSpec
+import numpy as np
+import pandas as pd
 
-try:
-    import pandas as pd
-    PANDAS_AVAILABLE = True
-except ImportError:
-    print("⚠️ Warning: pandas not available. Install with: uv pip install pandas")
-    PANDAS_AVAILABLE = False
 
+matplotlib.use('Agg')  # Non-interactive backend for server environments
+MATPLOTLIB_AVAILABLE = True
+PANDAS_AVAILABLE = True
 
 class BenchmarkVisualizer:
     """

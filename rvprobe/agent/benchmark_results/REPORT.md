@@ -1,9 +1,9 @@
 # RVProbe Agent Benchmark Report
 
-**Generated**: 2026-02-05 17:28:35
+**Generated**: 2026-02-07 16:34:33
 
 **Configuration:**
-- Model: gpt-4o
+- Model: Qwen/Qwen2.5-Coder-32B-Instruct
 - Temperature: 0.0
 - Timeout: 300s
 - Total Results: 2
@@ -25,26 +25,26 @@
 ### Agent
 
 - **Overall Success Rate**: 0/1 (0.0%)
-- **Average Execution Time**: 12.940s
+- **Average Execution Time**: 9.595s
 - **Total API Cost**: $0.0000
 - **Average Correctness Score**: 0.000
 - **Average Retry Count**: 3.00
 
 ### Direct Llm No Docs
 
-- **Overall Success Rate**: 0/1 (0.0%)
-- **Average Execution Time**: 0.035s
+- **Overall Success Rate**: 1/1 (100.0%)
+- **Average Execution Time**: 1.748s
 - **Total API Cost**: $0.0000
-- **Average Correctness Score**: 0.000
+- **Average Correctness Score**: 1.000
 
 ## Method Comparison
 
 | Metric | Agent | Direct Llm No Docs | Winner |
 |--------|--------|--------|--------|
-| Success Rate (%) | 0.0 | 0.0 | **Agent** |
-| Avg Time (s) | 12.940 | 0.035 | **Direct Llm No Docs** |
+| Success Rate (%) | 0.0 | 100.0 | **Direct Llm No Docs** |
+| Avg Time (s) | 9.595 | 1.748 | **Direct Llm No Docs** |
 | Total Cost ($) | $0.0000 | $0.0000 | **Agent** |
-| Avg Correctness | 0.000 | 0.000 | **Agent** |
+| Avg Correctness | 0.000 | 1.000 | **Direct Llm No Docs** |
 
 ## Results by Difficulty Level
 
@@ -52,8 +52,8 @@
 
 | Method | Success Rate | Avg Time (s) | Avg Correctness |
 |--------|--------------|--------------|-----------------|
-| Agent | 0.0% (0/1) | 12.940 | 0.000 |
-| Direct Llm No Docs | 0.0% (0/1) | 0.035 | 0.000 |
+| Agent | 0.0% (0/1) | 9.595 | 0.000 |
+| Direct Llm No Docs | 100.0% (1/1) | 1.748 | 1.000 |
 
 ## Performance Analysis
 
@@ -61,11 +61,11 @@
 
 **Execution Time Statistics:**
 
-- Mean: 12.940s
-- Median (P50): 12.940s
-- P95: 12.940s
-- P99: 12.940s
-- Range: [12.940s, 12.940s]
+- Mean: 9.595s
+- Median (P50): 9.595s
+- P95: 9.595s
+- P99: 9.595s
+- Range: [9.595s, 9.595s]
 - Std Dev: 0.000s
 
 **Correctness Score Statistics:**
@@ -78,18 +78,18 @@
 
 **Execution Time Statistics:**
 
-- Mean: 0.035s
-- Median (P50): 0.035s
-- P95: 0.035s
-- P99: 0.035s
-- Range: [0.035s, 0.035s]
+- Mean: 1.748s
+- Median (P50): 1.748s
+- P95: 1.748s
+- P99: 1.748s
+- Range: [1.748s, 1.748s]
 - Std Dev: 0.000s
 
 **Correctness Score Statistics:**
 
-- Mean: 0.000
-- Median: 0.000
-- Range: [0.000, 0.000]
+- Mean: 1.000
+- Median: 1.000
+- Range: [1.000, 1.000]
 
 ## Failure Analysis
 
@@ -107,33 +107,25 @@
 
 ### Direct Llm No Docs
 
-**Total Failures**: 1/1 (100.0%)
-
-**Failure Modes:**
-
-- Llm Error: 1 (100.0%)
-
-**Failed Test Cases:**
-
-- `TC-S01` (simple) - llm_error
+✓ No failures recorded
 
 ## Recommendations
 
 ### When to Use Each Method
 
-**For Maximum Accuracy**: Use **Agent**
-- Success rate: 0.0%
-- Average correctness: 0.000
+**For Maximum Accuracy**: Use **Direct Llm No Docs**
+- Success rate: 100.0%
+- Average correctness: 1.000
 
 **For Fastest Execution**: Use **Direct Llm No Docs**
-- Average time: 0.035s
+- Average time: 1.748s
 
 **For Lowest Cost**: Use **Agent**
 - Total cost: $0.0000
 
 ### General Recommendations
 
-- Direct Llm No Docs is 366.7× faster, making it suitable for time-sensitive applications
+- Direct Llm No Docs is 5.5× faster, making it suitable for time-sensitive applications
 - Consider using faster method for simple cases and verified method for complex constraints
 - Implement timeout mechanisms for production use
 - Monitor API costs in production environments

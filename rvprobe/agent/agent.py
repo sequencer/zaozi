@@ -30,7 +30,7 @@ MAX_RETRIES = 3
 PROJECT_ROOT = Path(__file__).parent.parent.parent  # zaozi root
 TEST_FILE_PATH = PROJECT_ROOT / "rvprobe" / "src" / "agent" / "Test.scala"
 OUTPUT_BIN_PATH = PROJECT_ROOT / "out" / "test.bin"
-MILL_COMMAND = ["mill", "rvprobe.runMain", "me.jiuyang.rvprobe.agent.Test", str(OUTPUT_BIN_PATH)]
+MILL_COMMAND = ["nix", "develop", ".", "-c", "mill", "rvprobe.runMain", "me.jiuyang.rvprobe.agent.Test", str(OUTPUT_BIN_PATH)]
 
 # LLM Configuration from environment variables
 # Support both LLM_* and OPENAI_* for backward compatibility
@@ -230,7 +230,7 @@ import me.jiuyang.rvprobe.constraints.*
 import java.nio.file.{{Files, Paths}}
 import scala.util.control.NonFatal
 
-// Run with: mill rvprobe.runMain me.jiuyang.rvprobe.agent.Test out/test.bin
+// Run with: nix develop . -c mill rvprobe.runMain me.jiuyang.rvprobe.agent.Test out/test.bin
 @main def Test(outputPath: String): Unit =
   object test extends RVGenerator:
     val sets          = isRV64GC()

@@ -2,7 +2,8 @@
 # ========================
 
 # LLM Settings
-llm_model: "gpt-4o"  # Options: gpt-4o, gpt-4-turbo, claude-3-opus, etc.
+# Model name is read from LLM_MODEL in .env file
+# llm_model is not used - configure via .env only
 llm_temperature: 0.0  # 0.0 for reproducibility, higher for creativity
 llm_max_tokens: 4000  # Maximum tokens per LLM response
 
