@@ -51,7 +51,7 @@ class AgentState(TypedDict):
     retrieved_docs: str     # RAG retrieved documentation output
 
 
-# ==================== DSL API Documentation (Mock Retrieval) ====================
+# ==================== DSL API Documentation (Fallback) ====================
 DSL_API_DOCS = """
 # RVProbe Scala DSL API Reference
 
@@ -70,25 +70,82 @@ instruction(index, opcodeConstraint) {
 }
 ```
 
-## Opcode Constraints (Examples)
-- `isAddi()` - ADDI instruction
-- `isSlliRV64I()` - SLLI instruction (RV64I)
-- `isAddw()` - ADDW instruction
-- `isSub()` - SUB instruction
-- `isLui()` - LUI instruction
-- `isBeq()` - BEQ instruction
-- `isLw()` - LW instruction
-- `isSw()` - SW instruction
+## Opcode Constraints
 
-## Argument Constraints
+### Arithmetic (I-type, immediate)
+- `isAddi()` - ADDI instruction (rd, rs1, imm12)
+- `isAddiw()` - ADDIW instruction (rd, rs1, imm12)
+- `isSlti()` - SLTI instruction (rd, rs1, imm12)
+- `isSltiu()` - SLTIU instruction (rd, rs1, imm12)
+- `isAndi()` - ANDI instruction (rd, rs1, imm12)
+- `isOri()` - ORI instruction (rd, rs1, imm12)
+- `isXori()` - XORI instruction (rd, rs1, imm12)
+
+### Arithmetic (R-type, register-register)
+- `isAdd()` - ADD instruction (rd, rs1, rs2)
+- `isAddw()` - ADDW instruction (rd, rs1, rs2)
+- `isSub()` - SUB instruction (rd, rs1, rs2)
+- `isSubw()` - SUBW instruction (rd, rs1, rs2)
+- `isAnd()` - AND instruction (rd, rs1, rs2)
+- `isOr()` - OR instruction (rd, rs1, rs2)
+- `isXor()` - XOR instruction (rd, rs1, rs2)
+- `isSlt()` - SLT instruction (rd, rs1, rs2)
+- `isSltu()` - SLTU instruction (rd, rs1, rs2)
+
+### Shift Instructions
+- `isSlliRV64I()` - SLLI for RV64I (rd, rs1, shamtd) - 6-bit shift amount
+- `isSrliRV64I()` - SRLI for RV64I (rd, rs1, shamtd) - 6-bit shift amount
+- `isSraiRV64I()` - SRAI for RV64I (rd, rs1, shamtd) - 6-bit shift amount
+- `isSlliRV32I()` - SLLI for RV32I (rd, rs1, shamtw) - 5-bit shift amount
+- `isSrliRV32I()` - SRLI for RV32I (rd, rs1, shamtw) - 5-bit shift amount
+- `isSraiRV32I()` - SRAI for RV32I (rd, rs1, shamtw) - 5-bit shift amount
+- `isSlliw()` - SLLIW (rd, rs1, shamtw)
+- `isSrliw()` - SRLIW (rd, rs1, shamtw)
+- `isSraiw()` - SRAIW (rd, rs1, shamtw)
+- `isSll()` - SLL register shift (rd, rs1, rs2)
+- `isSrl()` - SRL register shift (rd, rs1, rs2)
+- `isSra()` - SRA register shift (rd, rs1, rs2)
+
+IMPORTANT: There is NO `isSlli()` or `isSrli()` or `isSrai()` function!
+Use `isSlliRV64I()` for 64-bit or `isSlliRV32I()` for 32-bit.
+
+### Branch Instructions
+- `isBeq()` - BEQ instruction (rs1, rs2)
+- `isBne()` - BNE instruction (rs1, rs2)
+- `isBlt()` - BLT instruction (rs1, rs2)
+- `isBge()` - BGE instruction (rs1, rs2)
+- `isBltu()` - BLTU instruction (rs1, rs2)
+- `isBgeu()` - BGEU instruction (rs1, rs2)
+
+### Memory Instructions
+- `isLw()` - LW instruction (rd, rs1, imm12)
+- `isLd()` - LD instruction (rd, rs1, imm12)
+- `isSw()` - SW instruction (rs1, rs2)
+- `isSd()` - SD instruction (rs1, rs2)
+- `isLui()` - LUI instruction (rd, imm20)
+
+## Argument Constraints (Range Functions)
+
+### Register Ranges
 - `rdRange(min, max)` - Destination register range
 - `rs1Range(min, max)` - Source register 1 range
 - `rs2Range(min, max)` - Source register 2 range
-- `immRange(min, max)` - Immediate value range
 
-Constraints can be combined with `&` (logical AND):
+### Immediate Ranges
+- `imm12Range(min, max)` - 12-bit immediate value range (for ADDI, LW, etc.)
+- `imm20Range(min, max)` - 20-bit immediate (for LUI, AUIPC)
+
+### Shift Amount Ranges
+- `shamtwRange(min, max)` - 5-bit shift amount (for RV32I shifts, SLLIW/SRLIW)
+- `shamtdRange(min, max)` - 6-bit shift amount (for RV64I shifts)
+
+IMPORTANT: There is NO `shamtRange()` or `immRange()` function!
+Use `shamtwRange()` for 32-bit shifts, `shamtdRange()` for 64-bit shifts,
+and `imm12Range()` for 12-bit immediates.
+
+Constraints are combined with `&` (logical AND):
 ```scala
-rdRange(1, 32) & rs1Range(1, 32) & immRange(-2048, 2047)
+rdRange(1, 32) & rs1Range(1, 32) & imm12Range(-2048, 2047)
 ```
 
 ## Instruction Sets
@@ -96,17 +153,47 @@ rdRange(1, 32) & rs1Range(1, 32) & immRange(-2048, 2047)
 - `isRV64G()` - RV64 base with IMAFD
 - `isRV32I()` - RV32 base integer
 
-## Example
+## Examples
+
+### ADDI with immediate constraint
 ```scala
-object test extends RVGenerator:
-  val sets = isRV64GC()
-  def constraints() =
-    (0 until 10).foreach { i =>
-      instruction(i, isAddi()) {
-        rdRange(1, 16) & rs1Range(1, 16) & immRange(0, 100)
-      }
-    }
+(0 until 10).foreach { i =>
+  instruction(i, isAddi()) {
+    rdRange(1, 16) & rs1Range(1, 16) & imm12Range(0, 100)
+  }
+}
 ```
+
+### SLLI with shift amount constraint (RV64I)
+```scala
+(0 until 5).foreach { i =>
+  instruction(i, isSlliRV64I()) {
+    rdRange(1, 32) & rs1Range(1, 32) & shamtdRange(0, 31)
+  }
+}
+```
+
+### Mixed instruction types
+```scala
+(0 until 10).foreach { i =>
+  instruction(i, isAddi()) {
+    rdRange(1, 32) & rs1Range(1, 32) & imm12Range(-100, 100)
+  }
+}
+(10 until 20).foreach { i =>
+  instruction(i, isSlliRV64I()) {
+    rdRange(1, 32) & rs1Range(1, 32) & shamtdRange(0, 31)
+  }
+}
+(20 until 30).foreach { i =>
+  instruction(i, isXor()) {
+    rdRange(1, 32) & rs1Range(1, 32) & rs2Range(1, 32)
+  }
+}
+```
+
+Do NOT use Scala standard library features like Array.fill(), var, val inside
+instruction() blocks. The constraint DSL only accepts range constraints combined with &.
 """
 
 

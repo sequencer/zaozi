@@ -28,6 +28,13 @@ from dataclasses import asdict
 # Add project paths
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
+# Load .env file early so os.getenv picks up LLM_MODEL, LLM_API_KEY, etc.
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass
+
 # Import from benchmark modules
 from benchmark.test_suite.schemas import (
     TestCase, RunResult, BenchmarkConfig, 
@@ -602,10 +609,12 @@ def load_config_from_yaml(config_path: str) -> BenchmarkConfig:
         )
     except FileNotFoundError:
         print(f"Config file not found: {config_path}, using defaults")
-        return BenchmarkConfig()
+        llm_model = os.getenv('LLM_MODEL', os.getenv('OPENAI_MODEL', 'gpt-4o'))
+        return BenchmarkConfig(llm_model=llm_model)
     except Exception as e:
         print(f"Error loading config: {e}, using defaults")
-        return BenchmarkConfig()
+        llm_model = os.getenv('LLM_MODEL', os.getenv('OPENAI_MODEL', 'gpt-4o'))
+        return BenchmarkConfig(llm_model=llm_model)
 
 
 def main():

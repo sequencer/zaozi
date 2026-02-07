@@ -1,12 +1,12 @@
 # RVProbe Agent Benchmark Report
 
-**Generated**: 2026-02-07 16:34:33
+**Generated**: 2026-02-07 18:03:57
 
 **Configuration:**
 - Model: Qwen/Qwen2.5-Coder-32B-Instruct
 - Temperature: 0.0
 - Timeout: 300s
-- Total Results: 2
+- Total Results: 30
 
 ## Table of Contents
 
@@ -24,27 +24,27 @@
 
 ### Agent
 
-- **Overall Success Rate**: 0/1 (0.0%)
-- **Average Execution Time**: 9.595s
+- **Overall Success Rate**: 13/15 (86.7%)
+- **Average Execution Time**: 10.265s
 - **Total API Cost**: $0.0000
-- **Average Correctness Score**: 0.000
-- **Average Retry Count**: 3.00
+- **Average Correctness Score**: 0.867
+- **Average Retry Count**: 1.13
 
 ### Direct Llm No Docs
 
-- **Overall Success Rate**: 1/1 (100.0%)
-- **Average Execution Time**: 1.748s
-- **Total API Cost**: $0.0000
-- **Average Correctness Score**: 1.000
+- **Overall Success Rate**: 15/15 (100.0%)
+- **Average Execution Time**: 17.195s
+- **Total API Cost**: $0.0002
+- **Average Correctness Score**: 0.949
 
 ## Method Comparison
 
 | Metric | Agent | Direct Llm No Docs | Winner |
 |--------|--------|--------|--------|
-| Success Rate (%) | 0.0 | 100.0 | **Direct Llm No Docs** |
-| Avg Time (s) | 9.595 | 1.748 | **Direct Llm No Docs** |
-| Total Cost ($) | $0.0000 | $0.0000 | **Agent** |
-| Avg Correctness | 0.000 | 1.000 | **Direct Llm No Docs** |
+| Success Rate (%) | 86.7 | 100.0 | **Direct Llm No Docs** |
+| Avg Time (s) | 10.265 | 17.195 | **Agent** |
+| Total Cost ($) | $0.0000 | $0.0002 | **Agent** |
+| Avg Correctness | 0.867 | 0.949 | **Direct Llm No Docs** |
 
 ## Results by Difficulty Level
 
@@ -52,8 +52,22 @@
 
 | Method | Success Rate | Avg Time (s) | Avg Correctness |
 |--------|--------------|--------------|-----------------|
-| Agent | 0.0% (0/1) | 9.595 | 0.000 |
-| Direct Llm No Docs | 100.0% (1/1) | 1.748 | 1.000 |
+| Agent | 100.0% (5/5) | 8.911 | 1.000 |
+| Direct Llm No Docs | 100.0% (5/5) | 2.302 | 1.000 |
+
+### Medium Tests
+
+| Method | Success Rate | Avg Time (s) | Avg Correctness |
+|--------|--------------|--------------|-----------------|
+| Agent | 100.0% (5/5) | 7.760 | 1.000 |
+| Direct Llm No Docs | 100.0% (5/5) | 12.820 | 1.000 |
+
+### Complex Tests
+
+| Method | Success Rate | Avg Time (s) | Avg Correctness |
+|--------|--------------|--------------|-----------------|
+| Agent | 60.0% (3/5) | 14.123 | 0.600 |
+| Direct Llm No Docs | 100.0% (5/5) | 36.465 | 0.847 |
 
 ## Performance Analysis
 
@@ -61,49 +75,101 @@
 
 **Execution Time Statistics:**
 
-- Mean: 9.595s
-- Median (P50): 9.595s
-- P95: 9.595s
-- P99: 9.595s
-- Range: [9.595s, 9.595s]
-- Std Dev: 0.000s
+- Mean: 10.265s
+- Median (P50): 8.381s
+- P95: 18.691s
+- P99: 21.808s
+- Range: [6.382s, 22.587s]
+- Std Dev: 4.507s
 
 **Correctness Score Statistics:**
 
-- Mean: 0.000
-- Median: 0.000
-- Range: [0.000, 0.000]
+- Mean: 0.867
+- Median: 1.000
+- Range: [0.000, 1.000]
 
 ### Direct Llm No Docs
 
 **Execution Time Statistics:**
 
-- Mean: 1.748s
-- Median (P50): 1.748s
-- P95: 1.748s
-- P99: 1.748s
-- Range: [1.748s, 1.748s]
-- Std Dev: 0.000s
+- Mean: 17.195s
+- Median (P50): 9.513s
+- P95: 57.712s
+- P99: 57.983s
+- Range: [1.579s, 58.050s]
+- Std Dev: 18.423s
 
 **Correctness Score Statistics:**
 
-- Mean: 1.000
+- Mean: 0.949
 - Median: 1.000
-- Range: [1.000, 1.000]
+- Range: [0.538, 1.000]
 
 ## Failure Analysis
 
 ### Agent
 
-**Total Failures**: 1/1 (100.0%)
+**Total Failures**: 2/15 (13.3%)
 
 **Failure Modes:**
 
-- Compilation Error: 1 (100.0%)
+- Compilation Error: 1 (50.0%)
+- Llm Error: 1 (50.0%)
 
 **Failed Test Cases:**
 
-- `TC-S01` (simple) - compilation_error
+- `TC-C04` (complex) - compilation_error
+- `TC-C05` (complex) - llm_error
+
+**Detailed Failure Cases:**
+
+#### TC-C04 - Generate approximately 100 add-like instructions (ADDI, ADD, ADDW) with fuzzy count specification
+
+- **Expected Count**: 100
+- **Instruction Types**: addi, add, addw
+- **Failure Mode**: compilation_error
+- **Retry Count**: 3
+
+**Generated DSL Code:**
+
+```scala
+(0 until 100).foreach { i =>
+  val opcode = i % 3 match {
+    case 0 => isAddi()
+    case 1 => isAdd()
+    case 2 => isAddw()
+  }
+  instruction(i, opcode) {
+    rdRange(1, 32) & rs1Range(1, 32) & (if (opcode == isAddi()) imm12Range(-100, 100) else rs2Range(1, 32))
+  }
+}
+```
+
+**Compilation Error:**
+
+```
+[300] [error] -- [E172] Type Error: /home/clo91eaf/Project/zaozi/rvprobe/src/agent/Test.scala:19:28 
+[300] [error] 19 |          case 0 => isAddi()
+[300] [error]    |                            ^
+[300] [error]    |No given instance of type me.jiuyang.rvprobe.constraints.Index was found for parameter x$4 of method isAddi in package me.jiuyang.rvprobe.constraints
+[300] [error] -- [E172] Type Error: /home/clo91eaf/Project/zaozi/rvprobe/src/agent/Test.scala:20:27 
+[300] [error] 20 |          case 1 => isAdd()
+[300] [error]    |                           ^
+[300] [error]    |No given instance of type me.jiuyang.rvprobe.constraints.Index was found for parameter x$4 of method isAdd in package me.jiuyang.rvprobe.constraints
+[300] [error] -- [E172] Type Error: /home/clo91eaf/Project/zaozi/rvprobe/src/agent/Test.scala:21:28 
+[300] [error] 21 |          case 2 => isAddw()
+... (truncated)
+```
+
+---
+
+#### TC-C05 - Generate 500 mixed instructions (all types) as a stress test for maximum volume
+
+- **Expected Count**: 500
+- **Instruction Types**: addi, add, addw, sub, subw...
+- **Failure Mode**: llm_error
+- **Retry Count**: 0
+---
 
 ### Direct Llm No Docs
 
@@ -115,17 +181,16 @@
 
 **For Maximum Accuracy**: Use **Direct Llm No Docs**
 - Success rate: 100.0%
-- Average correctness: 1.000
+- Average correctness: 0.949
 
-**For Fastest Execution**: Use **Direct Llm No Docs**
-- Average time: 1.748s
+**For Fastest Execution**: Use **Agent**
+- Average time: 10.265s
 
 **For Lowest Cost**: Use **Agent**
 - Total cost: $0.0000
 
 ### General Recommendations
 
-- Direct Llm No Docs is 5.5× faster, making it suitable for time-sensitive applications
 - Consider using faster method for simple cases and verified method for complex constraints
 - Implement timeout mechanisms for production use
 - Monitor API costs in production environments

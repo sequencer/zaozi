@@ -307,7 +307,10 @@ class ReportGenerator:
             failure_modes = defaultdict(int)
             for r in failed:
                 if r.robustness:
-                    mode = r.robustness.failure_mode.value or 'unknown'
+                    mode = r.robustness.failure_mode
+                    if hasattr(mode, 'value'):
+                        mode = mode.value
+                    mode = mode or 'unknown'
                     failure_modes[mode] += 1
             
             if failure_modes:
@@ -322,13 +325,75 @@ class ReportGenerator:
             for r in failed[:10]:  # Show up to 10
                 test_case = self.test_cases.get(r.test_id)
                 difficulty = test_case.difficulty.value if test_case else 'unknown'
-                mode = r.robustness.failure_mode.value if r.robustness else 'unknown'
+                mode = r.robustness.failure_mode
+                if hasattr(mode, 'value'):
+                    mode = mode.value
+                mode = mode or 'unknown'
                 lines.append(f"- `{r.test_id}` ({difficulty}) - {mode}")
             
             if len(failed) > 10:
                 lines.append(f"- ... and {len(failed) - 10} more")
             
             lines.append("")
+            
+            # Show detailed failure information with generated code
+            if 'agent' in method.lower() and failed:
+                lines.append("**Detailed Failure Cases:**\n")
+                for r in failed[:5]:  # Show detailed info for up to 5 failures
+                    test_case = self.test_cases.get(r.test_id)
+                    lines.append(f"#### {r.test_id} - {test_case.description if test_case else 'N/A'}\n")
+                    
+                    # Test case parameters
+                    if test_case:
+                        lines.append(f"- **Expected Count**: {test_case.expected_count}")
+                        lines.append(f"- **Instruction Types**: {', '.join(test_case.instruction_types[:5])}{'...' if len(test_case.instruction_types) > 5 else ''}")
+                        if test_case.register_constraints:
+                            lines.append(f"- **Register Constraints**: {test_case.register_constraints}")
+                        if test_case.immediate_constraints:
+                            lines.append(f"- **Immediate Constraints**: {test_case.immediate_constraints}")
+                    
+                    # Failure information
+                    if r.robustness:
+                        failure_mode = r.robustness.failure_mode
+                        if hasattr(failure_mode, 'value'):
+                            failure_mode = failure_mode.value
+                        lines.append(f"- **Failure Mode**: {failure_mode}")
+                        lines.append(f"- **Retry Count**: {r.efficiency.retry_count if r.efficiency else 0}")
+                    
+                    # Show generated DSL code if available
+                    if hasattr(r, 'metadata') and r.metadata and 'dsl_code' in r.metadata:
+                        dsl_code = r.metadata['dsl_code']
+                        if dsl_code:
+                            lines.append("\n**Generated DSL Code:**\n")
+                            lines.append("```scala")
+                            lines.append(dsl_code)
+                            lines.append("```\n")
+                    
+                    # Show error log excerpt if available
+                    if hasattr(r, 'error_log') and r.error_log:
+                        # Extract compilation error from log
+                        error_lines = r.error_log.split('\n')
+                        error_section = []
+                        in_error = False
+                        for line in error_lines:
+                            if '[error]' in line.lower():
+                                in_error = True
+                                error_section.append(line)
+                            elif in_error:
+                                if line.strip() and not line.startswith('['):
+                                    error_section.append(line)
+                                elif line.startswith('[') and '[error]' not in line.lower():
+                                    break
+                        
+                        if error_section:
+                            lines.append("**Compilation Error:**\n")
+                            lines.append("```")
+                            lines.append('\n'.join(error_section[:10]))  # First 10 error lines
+                            if len(error_section) > 10:
+                                lines.append("... (truncated)")
+                            lines.append("```\n")
+                    
+                    lines.append("---\n")
         
         return "\n".join(lines)
     

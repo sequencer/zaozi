@@ -11,6 +11,7 @@ from typing import List
 import torch
 
 from extract_docs import main as extract_functions, ConstraintFunction
+from constraint_patterns import get_all_patterns
 from config import (
     CHROMA_DB_PATH,
     COLLECTION_NAME,
@@ -119,6 +120,51 @@ class IndexManager:
 
         return collection
 
+    def add_patterns(self, collection):
+        """Add constraint pattern documents to an existing collection."""
+        patterns = get_all_patterns()
+        if not patterns:
+            print("⚠️  No constraint patterns found.")
+            return
+
+        print(f"📝 Adding {len(patterns)} constraint pattern documents...")
+
+        ids = []
+        documents = []
+        embeddings = []
+        metadatas = []
+
+        for pat in patterns:
+            doc_id = pat["id"]
+            # Build a rich text for embedding that includes description, content, and example
+            content = f"{pat['description']}\n\n{pat['content']}\n\nExample:\n{pat['example_usage']}"
+
+            ids.append(doc_id)
+            documents.append(content)
+
+            embedding = self.embedder.encode(content, convert_to_tensor=False)
+            embeddings.append(embedding.tolist())
+
+            metadatas.append({
+                "category": pat["category"],          # "pattern"
+                "subcategory": pat.get("subcategory", ""),
+                "return_type": "",
+                "description": pat["description"],
+                "example_usage": pat["example_usage"],
+                "signature": "",
+                "source_line": 0,
+                "related_functions": "",
+            })
+
+        collection.add(
+            ids=ids,
+            embeddings=embeddings,
+            documents=documents,
+            metadatas=metadatas
+        )
+
+        print(f"✅ Added {len(ids)} pattern documents")
+
     def query_test(self, query: str, n_results: int = 5):
         """Test query against the index."""
 
@@ -177,23 +223,29 @@ def main():
     # Step 2: Create ChromaDB index
     print("\n💾 Step 2: Creating ChromaDB index")
     manager = IndexManager()
-    manager.create_index(functions, force_recreate=True)
+    collection = manager.create_index(functions, force_recreate=True)
 
-    # Step 3: Get statistics
+    # Step 3: Add constraint patterns to the same collection
+    print("\n📝 Step 3: Adding constraint pattern documents")
+    manager.add_patterns(collection)
+
+    # Step 4: Get statistics
     manager.get_stats()
 
-    # Step 4: Run test queries
-    print("\n🧪 Step 3: Running test queries")
+    # Step 5: Run test queries
+    print("\n🧪 Step 5: Running test queries")
     test_queries = [
         "Generate ADDI instructions with register constraints",
         "SLLI instruction for RV64I",
         "Constrain destination register to range 1-16",
         "Load word instruction with immediate offset",
+        "RAW data dependency chain",
+        "How to mix different instruction types",
         "生成ADDI指令",  # Chinese test
     ]
 
     for query in test_queries:
-        manager.query_test(query, n_results=3)
+        manager.query_test(query, n_results=5)
 
     print("\n✅ Indexing complete!")
 

@@ -242,10 +242,22 @@ instruction(0, someOpcode()) {{
 
     def _generate_instruction_example(self, func_name: str) -> str:
         inst_name = func_name.replace("is", "")
-        # Infer common fields
+        # Infer common fields - include ALL fields with proper range values
         fields = self._find_related_fields(func_name)
         if fields:
-            field_constraints = " & ".join([f"{f}Range(1, 32)" for f in fields[:2]])
+            parts = []
+            for f in fields:
+                if f.startswith("imm12") or f.startswith("bimm12"):
+                    parts.append(f"{f}Range(-2048, 2047)")
+                elif f.startswith("imm20"):
+                    parts.append(f"{f}Range(0, 1048576)")
+                elif f.startswith("shamtw"):
+                    parts.append(f"{f}Range(0, 32)")
+                elif f.startswith("shamtd"):
+                    parts.append(f"{f}Range(0, 64)")
+                else:
+                    parts.append(f"{f}Range(1, 32)")
+            field_constraints = " & ".join(parts)
         else:
             field_constraints = "/* argument constraints */"
 
@@ -257,19 +269,43 @@ instruction(0, someOpcode()) {{
         """Infer common register/immediate fields for an instruction."""
         inst = func_name.lower()
 
-        # Common patterns
-        if "addi" in inst or "andi" in inst or "ori" in inst or "xori" in inst:
-            return ["rd", "rs1", "imm12"]
-        elif "add" in inst or "sub" in inst or "and" in inst or "or" in inst or "xor" in inst:
-            return ["rd", "rs1", "rs2"]
+        # Exact matches first (order matters: check more specific patterns before general ones)
+        # RV64I word-width shift instructions use shamtw
+        if "slliw" in inst or "srliw" in inst or "sraiw" in inst:
+            return ["rd", "rs1", "shamtw"]
+        # RV64I shift instructions use shamtd (6-bit shift amount for 64-bit)
+        elif "sllirv64i" in inst or "srlirv64i" in inst or "srairv64i" in inst:
+            return ["rd", "rs1", "shamtd"]
+        # RV32I shift instructions use shamtw (5-bit shift amount for 32-bit)
+        elif "sllirv32i" in inst or "srlirv32i" in inst or "srairv32i" in inst:
+            return ["rd", "rs1", "shamtw"]
+        # Generic shift (fallback to shamtw)
         elif "slli" in inst or "srli" in inst or "srai" in inst:
             return ["rd", "rs1", "shamtw"]
-        elif "beq" in inst or "bne" in inst or "blt" in inst or "bge" in inst:
-            return ["rs1", "rs2", "bimm12"]
-        elif "lw" in inst or "ld" in inst or "lb" in inst:
+        # Immediate arithmetic
+        elif "addi" in inst or "andi" in inst or "ori" in inst or "xori" in inst or "slti" in inst:
             return ["rd", "rs1", "imm12"]
-        elif "sw" in inst or "sd" in inst or "sb" in inst:
-            return ["rs1", "rs2", "imm12"]
+        # Register-register arithmetic and logic
+        elif "add" in inst or "sub" in inst or "and" in inst or "or" in inst or "xor" in inst or "slt" in inst or "sll" in inst or "srl" in inst or "sra" in inst:
+            return ["rd", "rs1", "rs2"]
+        # Branch instructions
+        elif "beq" in inst or "bne" in inst or "blt" in inst or "bge" in inst:
+            return ["rs1", "rs2", "bimm12hi", "bimm12lo"]
+        # Load instructions
+        elif "lw" in inst or "ld" in inst or "lb" in inst or "lh" in inst or "lbu" in inst or "lhu" in inst or "lwu" in inst:
+            return ["rd", "rs1", "imm12"]
+        # Store instructions
+        elif "sw" in inst or "sd" in inst or "sb" in inst or "sh" in inst:
+            return ["rs1", "rs2", "imm12hi", "imm12lo"]
+        # LUI/AUIPC
+        elif "lui" in inst or "auipc" in inst:
+            return ["rd", "imm20"]
+        # JAL
+        elif "jal" in inst and "jalr" not in inst:
+            return ["rd", "jimm20"]
+        # JALR
+        elif "jalr" in inst:
+            return ["rd", "rs1", "imm12"]
         else:
             return ["rd", "rs1"]  # Default
 
