@@ -6,7 +6,7 @@ from typing import List, Dict
 from sentence_transformers import SentenceTransformer
 import chromadb
 
-from config import (
+from .config import (
     CHROMA_DB_PATH,
     COLLECTION_NAME,
     EMBEDDING_MODEL,

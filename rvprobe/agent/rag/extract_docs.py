@@ -9,7 +9,7 @@ from typing import List, Dict, Optional
 from dataclasses import dataclass, asdict
 from pathlib import Path
 
-from config import SCALA_SOURCE_PATH, CATEGORIES
+from .config import SCALA_SOURCE_PATH, CATEGORIES
 
 
 @dataclass

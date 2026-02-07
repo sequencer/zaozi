@@ -3,7 +3,7 @@
 from pathlib import Path
 
 # Paths
-PROJECT_ROOT = Path(__file__).parent.parent.parent
+PROJECT_ROOT = Path(__file__).parent.parent.parent.parent
 SCALA_SOURCE_PATH = PROJECT_ROOT / "rvprobe" / "src" / "constraints" / "RVConstraints.scala"
 CHROMA_DB_PATH = Path(__file__).parent / "chroma_db"
 MODEL_CACHE_PATH = Path(__file__).parent / "models"

@@ -10,9 +10,9 @@ from sentence_transformers import SentenceTransformer
 from typing import List
 import torch
 
-from extract_docs import main as extract_functions, ConstraintFunction
-from constraint_patterns import get_all_patterns
-from config import (
+from .extract_docs import main as extract_functions, ConstraintFunction
+from .constraint_patterns import get_all_patterns
+from .config import (
     CHROMA_DB_PATH,
     COLLECTION_NAME,
     EMBEDDING_MODEL,

@@ -14,41 +14,14 @@ import scala.util.control.NonFatal
   object test extends RVGenerator:
     val sets          = isRV64GC()
     def constraints() =
-      val totalInstructions = 500
-      val perType = totalInstructions / 5
-
-      // Type 1: ADDI (indices 0-99)
-      (0 until perType).foreach { i =>
-        instruction(i, isAddi()) {
-          rdRange(1, 32) & rs1Range(1, 32) & imm12Range(-2048, 2047)
+      (0 until 100).foreach { i =>
+        val opcode: Index ?=> InstConstraint = i % 3 match {
+          case 0 => isAddi()
+          case 1 => isAdd()
+          case 2 => isAddw()
         }
-      }
-
-      // Type 2: ADD (indices 100-199)
-      (perType until 2 * perType).foreach { i =>
-        instruction(i, isAdd()) {
-          rdRange(1, 32) & rs1Range(1, 32) & rs2Range(1, 32)
-        }
-      }
-
-      // Type 3: SLLI (indices 200-299)
-      (2 * perType until 3 * perType).foreach { i =>
-        instruction(i, isSlliRV64I()) {
-          rdRange(1, 32) & rs1Range(1, 32) & shamtdRange(0, 31)
-        }
-      }
-
-      // Type 4: XOR (indices 300-399)
-      (3 * perType until 4 * perType).foreach { i =>
-        instruction(i, isXor()) {
-          rdRange(1, 32) & rs1Range(1, 32) & rs2Range(1, 32)
-        }
-      }
-
-      // Type 5: MAXU (indices 400-499)
-      (4 * perType until 5 * perType).foreach { i =>
-        instruction(i, isMaxu()) {
-          rdRange(1, 32) & rs1Range(1, 32) & rs2Range(1, 32)
+        instruction(i, opcode) {
+          rdRange(1, 32) & rs1Range(1, 32) & (if (i % 3 == 0) imm12Range(-100, 100) else rs2Range(1, 32))
         }
       }
 

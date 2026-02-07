@@ -19,5 +19,5 @@ result*
 *.log
 
 rvprobe/agent/.env
-rvprobe/agent/chroma_db/
-rvprobe/agent/models/
+rvprobe/agent/rag/chroma_db/
+rvprobe/agent/rag/models/
