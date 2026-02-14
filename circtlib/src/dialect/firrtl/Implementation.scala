@@ -1612,22 +1612,6 @@ given RefSendApi with
         inferredResultsTypes = Some(1)
       )
     )
-  def op(
-    ref:         Value,
-    layer:       Seq[String],
-    location:    Location
-  )(
-    using arena: Arena,
-    context:     Context
-  ): RefSend =
-    RefSend(
-      summon[OperationApi].operationCreate(
-        name = "firrtl.ref.send",
-        location = location,
-        operands = Seq(ref),
-        resultsTypes = Some(Seq(ref.getType.getRef(false, layer)))
-      )
-    )
   extension (ref: RefSend)
     def operation: Operation = ref._operation
     def result(

@@ -104,6 +104,7 @@ firrtlTypeGetBundleFieldIndex      # header: $CIRCT_INSTALL_PATH/include/circt-c
 firrtlTypeGetBundleNumFields       # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/FIRRTL.h
 firrtlTypeGetClass                 # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/FIRRTL.h
 firrtlTypeGetClock                 # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/FIRRTL.h
+firrtlTypeGetColoredRef            # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/FIRRTL.h
 firrtlTypeGetConstType             # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/FIRRTL.h
 firrtlTypeGetDouble                # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/FIRRTL.h
 firrtlTypeGetInteger               # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/FIRRTL.h

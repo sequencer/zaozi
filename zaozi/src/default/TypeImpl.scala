@@ -290,7 +290,7 @@ given TypeImpl with
       Context,
       TypeImpl
     ): Type =
-      ref._baseType.toMlirType.getRef(false, ref._color._hierarchy.map(_._name))
+      ref._baseType.toMlirType.getRef(false, ref._color.nameHierarchy)
 
   extension (ref: RWProbe[?])
     def toMlirTypeImpl(
@@ -298,7 +298,7 @@ given TypeImpl with
       Context,
       TypeImpl
     ): Type =
-      ref._baseType.toMlirType.getRef(true, ref._color._hierarchy.map(_._name))
+      ref._baseType.toMlirType.getRef(true, ref._color.nameHierarchy)
 
   extension (ref: Vec[?])
     def elementType: Data = ref._elementType

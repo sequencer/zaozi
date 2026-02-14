@@ -5,7 +5,7 @@
 // RUN: rm -rf %t && mkdir -p %t && cd %t
 // RUN: %{test} config %t/config.json --width 32
 // RUN: %{test} design %t/config.json
-// RUN: firtool %t/Outer*.mlirbc --parse-only | FileCheck %s -check-prefix=MLIR
+// RUN: firld %t/*.mlirbc --base-circuit Outer_e4dbbef1 | firtool -format=mlir | FileCheck %s
 // RUN: rm -rf %t
 
 import me.jiuyang.zaozi.*
@@ -50,9 +50,13 @@ class InnerIO(parameter: InnerParameter) extends HWBundle(parameter):
   val a0b1   = Flipped(UInt(parameter.width.W))
 
 class InnerProbe(parameter: InnerParameter) extends DVBundle[InnerParameter, InnerLayers](parameter):
+  // CHECK-DAG: `define ref_Inner_7b2bb635_a0 a0_0.a0p_probe
   val a0     = ProbeRead(UInt(parameter.width.W), layers("A0"))
+  // CHECK-DAG: `define ref_Inner_7b2bb635_a0b0 a0_a0B0.a0b0p_probe
   val a0b0   = ProbeRead(UInt(parameter.width.W), layers("A0")("A0B0"))
+  // CHECK-DAG: `define ref_Inner_7b2bb635_a0b0c0 a0_a0B0_a0B0C0.a0b0c0p_probe
   val a0b0c0 = ProbeRead(UInt(parameter.width.W), layers("A0")("A0B0")("A0B0C0"))
+  // CHECK-DAG: `define ref_Inner_7b2bb635_a0b1 a0_a0B1.a0b1p_probe
   val a0b1   = ProbeRead(UInt(parameter.width.W), layers("A0")("A0B1"))
 
 @generator
@@ -61,13 +65,25 @@ object Inner extends Generator[InnerParameter, InnerLayers, InnerIO, InnerProbe]
     val io    = summon[Interface[InnerIO]]
     val probe = summon[Interface[InnerProbe]]
     layer("A0"):
-      probe.a0 <== io.a0
+      // CHECK-DAG: bind Inner_7b2bb635 Inner_7b2bb635_A0 a0_0 ();
+      val a0p = Wire(UInt(parameter.width.W))
+      a0p := (io.a0 + 1.U).asBits.tail(parameter.width).asUInt
+      probe.a0 <== a0p
       layer("A0B0"):
-        probe.a0b0 <== io.a0b0
+        // CHECK-DAG: bind Inner_7b2bb635 Inner_7b2bb635_A0_A0B0 a0_a0B0 ();
+        val a0b0p = Wire(UInt(parameter.width.W))
+        a0b0p := (io.a0b0 - 1.U).asBits.tail(parameter.width).asUInt
+        probe.a0b0 <== a0b0p
         layer("A0B0C0"):
-          probe.a0b0c0 <== io.a0b0c0
+          // CHECK-DAG: bind Inner_7b2bb635 Inner_7b2bb635_A0_A0B0_A0B0C0 a0_a0B0_a0B0C0 ();
+          val a0b0c0p = Wire(UInt(parameter.width.W))
+          a0b0c0p := (io.a0b0c0 * 3.U).asBits.tail(parameter.width).asUInt
+          probe.a0b0c0 <== a0b0c0p
       layer("A0B1"):
-        probe.a0b1 <== io.a0b1
+        // CHECK-DAG: bind Inner_7b2bb635 Inner_7b2bb635_A0_A0B1 a0_a0B1 ();
+        val a0b1p = Wire(UInt(parameter.width.W))
+        a0b1p := (io.a0b1 << 1).asBits.tail(parameter.width).asUInt
+        probe.a0b1 <== a0b1p
 
 case class OuterParameter(width: Int) extends Parameter
 given upickle.default.ReadWriter[OuterParameter] = upickle.default.macroRW
@@ -81,7 +97,15 @@ class OuterIO(parameter: OuterParameter) extends HWBundle(parameter):
   val a0b0c0 = Flipped(UInt(parameter.width.W))
   val a0b1   = Flipped(UInt(parameter.width.W))
 
-class OuterProbe(parameter: OuterParameter) extends DVBundle[OuterParameter, OuterLayers](parameter)
+class OuterProbe(parameter: OuterParameter) extends DVBundle[OuterParameter, OuterLayers](parameter):
+  // CHECK-DAG: `define ref_Outer_e4dbbef1_a0 a0_0.a0_val_probe
+  val a0     = ProbeRead(UInt(parameter.width.W), layers("A0"))
+  // CHECK-DAG: `define ref_Outer_e4dbbef1_a0b0 a0_a0B0.a0b0_val_probe
+  val a0b0   = ProbeRead(UInt(parameter.width.W), layers("A0")("A0B0"))
+  // CHECK-DAG: `define ref_Outer_e4dbbef1_a0b0c0 a0_a0B0_a0B0C0.a0b0c0_val_probe
+  val a0b0c0 = ProbeRead(UInt(parameter.width.W), layers("A0")("A0B0")("A0B0C0"))
+  // CHECK-DAG: `define ref_Outer_e4dbbef1_a0b1 a0_a0B1.a0b1_val_probe
+  val a0b1   = ProbeRead(UInt(parameter.width.W), layers("A0")("A0B1"))
 
 @generator
 object Outer extends Generator[OuterParameter, OuterLayers, OuterIO, OuterProbe]:
@@ -89,11 +113,29 @@ object Outer extends Generator[OuterParameter, OuterLayers, OuterIO, OuterProbe]
     val io    = summon[Interface[OuterIO]]
     val probe = summon[Interface[OuterProbe]]
 
-    // MLIR: %inner_a0, %inner_a0b0, %inner_a0b0c0, %inner_a0b1, %inner_a0_0, %inner_a0b0_1, %inner_a0b0c0_2, %inner_a0b1_3 = firrtl.instance inner interesting_name {layers = [@A0::@A0B0::@A0B0C0, @A0::@A0B0::@A0B0C1, @A0::@A0B1, @A0::@A0B2, @A1]} @Inner_7b2bb635(in a0: !firrtl.uint<32>, in a0b0: !firrtl.uint<32>, in a0b0c0: !firrtl.uint<32>, in a0b1: !firrtl.uint<32>, out a0: !firrtl.probe<uint<32>>, out a0b0: !firrtl.probe<uint<32>>, out a0b0c0: !firrtl.probe<uint<32>>, out a0b1: !firrtl.probe<uint<32>>)
     val inner = Inner.instantiate(InnerParameter(parameter.width))
     inner.io.a0     := io.a0
     inner.io.a0b0   := io.a0b0
     inner.io.a0b0c0 := io.a0b0c0
     inner.io.a0b1   := io.a0b1
 
-    // TODO: add probe to probe define?
+    layer("A0"):
+      // CHECK-DAG: bind Outer_e4dbbef1 Outer_e4dbbef1_A0 a0_0 ();
+      val a0_val = Wire(UInt(parameter.width.W))
+      a0_val <== inner.probe.a0
+      probe.a0 <== a0_val
+      layer("A0B0"):
+        // CHECK-DAG: bind Outer_e4dbbef1 Outer_e4dbbef1_A0_A0B0 a0_a0B0 ();
+        val a0b0_val = Wire(UInt(parameter.width.W))
+        a0b0_val <== inner.probe.a0b0
+        probe.a0b0 <== a0b0_val
+        layer("A0B0C0"):
+          // CHECK-DAG: bind Outer_e4dbbef1 Outer_e4dbbef1_A0_A0B0_A0B0C0 a0_a0B0_a0B0C0 ();
+          val a0b0c0_val = Wire(UInt(parameter.width.W))
+          a0b0c0_val <== inner.probe.a0b0c0
+          probe.a0b0c0 <== a0b0c0_val
+      layer("A0B1"):
+        // CHECK-DAG: bind Outer_e4dbbef1 Outer_e4dbbef1_A0_A0B1 a0_a0B1 ();
+        val a0b1_val = Wire(UInt(parameter.width.W))
+        a0b1_val <== inner.probe.a0b1
+        probe.a0b1 <== a0b1_val

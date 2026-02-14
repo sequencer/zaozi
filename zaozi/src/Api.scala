@@ -2,6 +2,7 @@
 // SPDX-FileCopyrightText: 2025 Jiuyang Liu <liu@jiuyang.me>
 package me.jiuyang.zaozi
 
+import scala.annotation.targetName
 import scala.util.chaining.*
 
 import me.jiuyang.zaozi.magic.macros.summonLayersImpl
@@ -16,36 +17,37 @@ import java.lang.foreign.Arena
 /** Rebuild the [[Layer]] with each [[Layer]] contains the entire tree. */
 trait LayerTree:
   layer =>
-  def _name:      String
-  def _children:  Seq[LayerTree]
-  def _parent:    Option[LayerTree] = None
-  def _hierarchy: Seq[LayerTree]    =
-    _parent match
-      case Some(p) => p._hierarchy :+ this
+  def name:      String
+  def children:  Seq[LayerTree]
+  def parent:    Option[LayerTree] = None
+  def hierarchy: Seq[LayerTree]    =
+    parent match
+      case Some(p) => p.hierarchy :+ this
       case None    => Seq(this)
-  def _dfs:       Seq[LayerTree]    =
-    this +: _children.flatMap(_._dfs)
-  def _rebuild:   LayerTree         =
-    def rebuildLayer(oldLayer: LayerTree, parent: Option[LayerTree]): LayerTree =
+  def _dfs:      Seq[LayerTree]    =
+    this +: children.flatMap(_._dfs)
+  def _rebuild:  LayerTree         =
+    def rebuildLayer(_oldLayer: LayerTree, _parent: Option[LayerTree]): LayerTree =
       new LayerTree:
-        override def _name:     String            = oldLayer._name
-        override def _children: Seq[LayerTree]    =
-          oldLayer._children.map(child => rebuildLayer(child, Some(this)))
-        override def _parent:   Option[LayerTree] = parent
+        override def name:     String            = _oldLayer.name
+        override def children: Seq[LayerTree]    =
+          _oldLayer.children.map(child => rebuildLayer(child, Some(this)))
+        override def parent:   Option[LayerTree] = _parent
     rebuildLayer(this, None)
 
 /** Serializable Layer definition. */
 case class Layer(name: String, children: Seq[Layer] = Seq.empty):
+  layer =>
   def toLayerTree: LayerTree =
     new LayerTree:
-      la =>
-      def _name:     String         = name
-      def _children: Seq[LayerTree] = children.map(_.toLayerTree)
+      def name:     String         = layer.name
+      def children: Seq[LayerTree] = layer.children.map(_.toLayerTree)
     ._rebuild
 extension (layers: Seq[Layer]) def toLayerTrees: Seq[LayerTree]   = layers.map(_.toLayerTree)
+extension (layer:  LayerTree) def nameHierarchy = layer.hierarchy.map(_.name)
 extension (layers: Seq[LayerTree])
-  def nameHierarchy:                             Seq[Seq[String]] =
-    layers.flatMap(_._dfs).filter(_._children.isEmpty).map(_._hierarchy.map(_._name))
+  def nameHierarchies:                           Seq[Seq[String]] =
+    layers.flatMap(_._dfs).filter(_.children.isEmpty).map(_.nameHierarchy)
 
 abstract class Parameter                                    extends Product
 abstract class LayerInterface[P <: Parameter](parameter: P) extends Seq[LayerTree]:
@@ -437,14 +439,41 @@ trait AsVec[D <: Data, R <: Referable[D]]:
       InstanceContext
     ): Node[Vec[E]]
 
-trait ProbeDefine[D <: Data & CanProbe, P <: RWProbe[D] | RProbe[D], SRC <: Referable[D], SINK <: Referable[P]]:
-  extension (ref: SINK)
+trait ProbeConnect[D <: Data & CanProbe, P <: RWProbe[D] | RProbe[D], DATA <: Referable[D], PROBE <: Referable[P]]:
+  extension (ref: PROBE)
+    @targetName("send")
     def <==(
-      that: SRC
+      that: DATA
     )(
       using Arena,
       Context,
       Block,
+      LayerTree,
+      sourcecode.File,
+      sourcecode.Line
+    ): Unit
+
+    @targetName("define")
+    def <==(
+      that: PROBE
+    )(
+      using Arena,
+      Context,
+      Block,
+      LayerTree,
+      sourcecode.File,
+      sourcecode.Line
+    ): Unit
+
+  extension (ref: DATA)
+    @targetName("resolve")
+    def <==(
+      that: PROBE
+    )(
+      using Arena,
+      Context,
+      Block,
+      LayerTree,
       sourcecode.File,
       sourcecode.Line
     ): Unit

@@ -106,7 +106,7 @@ given VerilogWrapperApi:
         unknownLocation,
         FirrtlConvention.Scalarized,
         bfs.map(i => (i, unknownLocation)), // TODO: record location for Bundle?
-        wrapper.layers(parameter).nameHierarchy,
+        wrapper.layers(parameter).nameHierarchies,
         paramsMap
       )
       extmodule
