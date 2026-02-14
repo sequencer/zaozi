@@ -2,6 +2,7 @@
 // SPDX-FileCopyrightText: 2025 Jiuyang Liu <liu@jiuyang.me>
 package me.jiuyang.zaozi
 
+import scala.annotation.targetName
 import scala.util.chaining.*
 
 import me.jiuyang.zaozi.magic.macros.summonLayersImpl
@@ -438,10 +439,36 @@ trait AsVec[D <: Data, R <: Referable[D]]:
       InstanceContext
     ): Node[Vec[E]]
 
-trait ProbeDefine[D <: Data & CanProbe, P <: RWProbe[D] | RProbe[D], SRC <: Referable[D], SINK <: Referable[P]]:
-  extension (ref: SINK)
+trait ProbeConnect[D <: Data & CanProbe, P <: RWProbe[D] | RProbe[D], DATA <: Referable[D], PROBE <: Referable[P]]:
+  extension (ref: PROBE)
+    @targetName("send")
     def <==(
-      that: SRC
+      that: DATA
+    )(
+      using Arena,
+      Context,
+      Block,
+      LayerTree,
+      sourcecode.File,
+      sourcecode.Line
+    ): Unit
+
+    @targetName("define")
+    def <==(
+      that: PROBE
+    )(
+      using Arena,
+      Context,
+      Block,
+      LayerTree,
+      sourcecode.File,
+      sourcecode.Line
+    ): Unit
+
+  extension (ref: DATA)
+    @targetName("resolve")
+    def <==(
+      that: PROBE
     )(
       using Arena,
       Context,
