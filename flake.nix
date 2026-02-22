@@ -5,11 +5,18 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable-small";
+    # circt-src = {
+    #   type = "github";
+    #   owner = "llvm";
+    #   repo = "circt";
+    #   ref = "main";
+    #   flake = false;
+    # };
     circt-src = {
       type = "github";
-      owner = "llvm";
+      owner = "unlsycn";
       repo = "circt";
-      ref = "main";
+      ref = "layer-linking";
       flake = false;
     };
     llvm-src = {
@@ -74,8 +81,10 @@
           inputsFrom = [ pkgs.zaozi.zaozi-assembly ];
           nativeBuildInputs = with pkgs; [ nixd ];
           env = with pkgs; {
-            CIRCT_INSTALL_PATH = circt-install;
-            MLIR_INSTALL_PATH = mlir-install;
+            # CIRCT_INSTALL_PATH = circt-install;
+            CIRCT_INSTALL_PATH = "/tmp/circt-install";
+            # MLIR_INSTALL_PATH = mlir-install;
+            MLIR_INSTALL_PATH = "/tmp/mlir-install";
             JEXTRACT_INSTALL_PATH = jextract-21;
             LIT_INSTALL_PATH = lit;
             SCALA_CLI_INSTALL_PATH = scala-cli;

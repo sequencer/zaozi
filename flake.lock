@@ -32,16 +32,16 @@
     "circt-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1770207218,
-        "narHash": "sha256-Kaux657HmLvLawqe3had+glLUs07P9b9a8EFj8SvLVM=",
-        "owner": "llvm",
+        "lastModified": 1771484413,
+        "narHash": "sha256-vA8QUMXUOED4cW1Bd+C/6B1fSb3393Hw9U4KujYVdVs=",
+        "owner": "unlsycn",
         "repo": "circt",
-        "rev": "2c5f3f320890292388aed7a8efb453166fd420ef",
+        "rev": "56f880ff0b7a1f8ac7e5bcf70317c89d97d8cd61",
         "type": "github"
       },
       "original": {
-        "owner": "llvm",
-        "ref": "main",
+        "owner": "unlsycn",
+        "ref": "layer-linking",
         "repo": "circt",
         "type": "github"
       }
