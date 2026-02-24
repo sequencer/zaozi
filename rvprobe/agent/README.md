@@ -73,10 +73,10 @@ graph TD
 
 ```bash
 # 简单示例
-python agent.py "Generate 10 ADDI instructions with rd in range 1-10"
+uv run python agent.py "Generate 10 ADDI instructions with rd in range 1-10"
 
 # 复杂约束示例 (Agent 会检索相关 Pattern)
-python agent.py "Generate 50 instructions mixing ADDI and SUB with Read-After-Write (RAW) data dependencies"
+uv run python agent.py "Generate 50 instructions mixing ADDI and SUB with Read-After-Write (RAW) data dependencies"
 ```
 
 ### Python API 调用
@@ -117,14 +117,15 @@ python -m benchmark.benchmark
 ```
 rvprobe/agent/
 ├── agent.py               # 主程序入口 & LangGraph 定义
-├── rag.py                 # RAG 检索引擎 & 向量库管理
-├── indexer.py             # 文档索引构建工具
+├── rag/                   # RAG 子系统 (检索增强)
+│   ├── retriever.py       # RAG 检索引擎 & 向量库管理
+│   ├── indexer.py         # 文档索引构建工具
+│   ├── chroma_db/         # 向量数据库存储 (自动生成)
+│   └── models/            # 本地 Embedding 模型缓存
 ├── benchmark/             # Benchmark 评测框架
 │   ├── test_suite/        # 测试用例定义 (TC-Sxx, TC-Mxx, TC-Cxx)
 │   ├── runners/           # 执行器实现 (AgentRunner vs DirectRunner)
 │   └── analysis/          # 结果分析与报告生成
-├── chromadb/              # 向量数据库存储 (自动生成)
-├── models/                # 本地 Embedding 模型缓存
 └── requirements.txt       # 项目依赖
 ```
 
@@ -138,3 +139,24 @@ rvprobe/agent/
 
 3.  **确定性与随机性的平衡**:
     Agent 生成的是**约束**而非**指令**。这意味着 LLM 只需要描述"规则"（例如寄存器范围），具体指令的随机化（Randomization）和合法化（Legalization）交给底层的 `rvprobe` 求解器完成，这种分工大大降低了 LLM 的幻觉风险。
+
+## 测试用例类型
+
+
+| ID | 难度 | 类别 | 描述 | 预期指令数 | 关键约束 |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **TC-S01** | Simple | Arithmetic | 生成 **10** 条 `ADDI` 指令，其中 `rd` 在 **1-10** 范围内 | 10 | `rd`: [1, 10] |
+| **TC-S02** | Simple | Arithmetic | 生成 **20** 条 `ADDI` 指令，`rd` 和 `rs1` 在 **1-31** 范围内，立即数在 **-100 到 100** 之间 | 20 | `rd`, `rs1`: [1, 31]<br>Imm: [-100, 100] |
+| **TC-S03** | Simple | Shift | 生成 **15** 条 `SLLI` 指令，移位量在 **0-10** 范围内 | 15 | `shamt`: [0, 10] |
+| **TC-S04** | Simple | Memory | 生成 **10** 条 `LW` 指令，`rs1` 在 **2-10** 范围内 | 10 | `rs1`: [2, 10] |
+| **TC-S05** | Simple | Branch | 生成 **8** 条 `BEQ` 指令，`rs1` 和 `rs2` 在 **1-15** 范围内 | 8 | `rs1`, `rs2`: [1, 15] |
+| **TC-M01** | Medium | Mixed Arithmetic | 生成 **50** 条混合算术指令：25 条 `ADDI` 和 25 条 `ADDW` | 50 | 混合两种指令类型 |
+| **TC-M02** | Medium | Arithmetic | 生成 **100** 条 `ADDI` 指令，`rd` 在 **1-5**，`rs1` 在 **10-20** (寄存器分区) | 100 | `rd`: [1, 5]<br>`rs1`: [10, 20] |
+| **TC-M03** | Medium | Mixed Arithmetic | 生成 **60** 条混合指令 (ADDI/SLTI/ANDI)，立即数在 **0-255** 之间 | 60 | Imm: [0, 255] |
+| **TC-M04** | Medium | Memory | 生成 **40** 条内存指令：20 条 `LW` 和 20 条 `SW` | 40 | Load/Store 混合 |
+| **TC-M05** | Medium | Mixed Shift/Logic | 生成 **75** 条混合移位和逻辑指令 (SLLI/SRLI/XOR) | 75 | 逻辑与移位操作混合 |
+| **TC-C01** | Complex | Arithmetic | 生成 **200** 条 `ADDI`，严格约束：`rd`, `rs1` 在 **1-8**，立即数在 **-50 到 50** | 200 | 大量指令 + 严格参数范围 |
+| **TC-C02** | Complex | Arithmetic | 生成 **50** 条 `ADDI`，具有连续的 **RAW (读后写) 依赖**：每条指令的 `rs1` 应匹配上一条的 `rd` | 50 | 跨指令约束 (依赖链) |
+| **TC-C03** | Complex | Highly Mixed | 生成 **150** 条高度混合指令：50 算术, 40 逻辑, 30 移位, 30 分支 | 150 | 多类型混合分布 |
+| **TC-C04** | Complex | Arithmetic | 生成约 **100** 条加法类指令 (ADDI, ADD, ADDW)，包含模糊的计数描述 | 100 | 模糊指令类型和数量 |
+| **TC-C05** | Complex | Stress Test | 生成 **500** 条混合指令 (所有类型) 作为压力测试 | 500 | 最大规模 + 全类型覆盖 |

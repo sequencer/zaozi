@@ -14,14 +14,17 @@ import scala.util.control.NonFatal
   object test extends RVGenerator:
     val sets          = isRV64GC()
     def constraints() =
-      (0 until 100).foreach { i =>
-        val opcode: Index ?=> InstConstraint = i % 3 match {
-          case 0 => isAddi()
-          case 1 => isAdd()
-          case 2 => isAddw()
-        }
-        instruction(i, opcode) {
-          rdRange(1, 32) & rs1Range(1, 32) & (if (i % 3 == 0) imm12Range(-100, 100) else rs2Range(1, 32))
+      (0 until 50).foreach { i =>
+        val regDst = (i % 30) + 1   // rd cycles through 1-30
+        val regSrc = if (i == 0) 1 else ((i - 1) % 30) + 1  // rs1 = previous rd
+        if (i % 2 == 0) {
+          instruction(i, isAddi()) {
+            rdRange(regDst, regDst + 1) & rs1Range(regSrc, regSrc + 1) & imm12Range(-10, 10)
+          }
+        } else {
+          instruction(i, isSub()) {
+            rdRange(regDst, regDst + 1) & rs1Range(regSrc, regSrc + 1) & rs2Range(1, 32)
+          }
         }
       }
 
