@@ -59,6 +59,24 @@ difficulty_filter: []
 # difficulty_filter: ["simple", "medium"]  # Simple and medium
 # difficulty_filter: []  # All difficulties
 
+# XiangShan Difftest Settings
+difftest:
+  enabled: true
+  # Path to the generated test binary (zaozi output)
+  test_bin: "/home/clo91eaf/Project/zaozi/out/test.bin"
+  # nexus-am test directory (workload build target)
+  nexus_am_test_dir: "/home/clo91eaf/Project/xs-env/nexus-am/tests/rvprobetest"
+  # nexus-am make arch target
+  nexus_am_arch: "riscv64-xs"
+  # XiangShan emulator binary
+  emu_bin: "/home/clo91eaf/Project/xs-env/XiangShan/build/emu"
+  # Built workload binary produced by nexus-am (relative to nexus_am_test_dir)
+  workload_bin: "build/rvprobetest-riscv64-xs.bin"
+  # NEMU interpreter SO for co-simulation
+  diff_so: "/home/clo91eaf/Project/xs-env/XiangShan/ready-to-run/riscv64-nemu-interpreter-so"
+  # Where to redirect emu stderr log
+  emu_log: "/tmp/xs_difftest.log"
+
 # Logging
 log_level: "INFO"  # Options: DEBUG, INFO, WARNING, ERROR
 log_file: "./benchmark_results/benchmark.log"
