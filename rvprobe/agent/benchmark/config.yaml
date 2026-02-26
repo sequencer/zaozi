@@ -76,6 +76,10 @@ difftest:
   diff_so: "/home/clo91eaf/Project/xs-env/XiangShan/ready-to-run/riscv64-nemu-interpreter-so"
   # Where to redirect emu stderr log
   emu_log: "/tmp/xs_difftest.log"
+  # AM_HOME required by nexus-am Makefile.app
+  am_home: "/home/clo91eaf/Project/xs-env/nexus-am"
+  # nix develop flake path for building nexus-am workload (empty string = no nix develop)
+  nix_develop_dir: "/home/clo91eaf/Project/xs-env"
 
 # Logging
 log_level: "INFO"  # Options: DEBUG, INFO, WARNING, ERROR

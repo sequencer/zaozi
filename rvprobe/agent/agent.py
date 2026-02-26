@@ -52,6 +52,8 @@ def _load_difftest_config() -> Dict[str, Any]:
         "workload_bin": "build/rvprobetest-riscv64-xs.bin",
         "diff_so": "/home/clo91eaf/Project/xs-env/XiangShan/ready-to-run/riscv64-nemu-interpreter-so",
         "emu_log": "/tmp/xs_difftest.log",
+        "am_home": "/home/clo91eaf/Project/xs-env/nexus-am",
+        "nix_develop_dir": "/home/clo91eaf/Project/xs-env",
     }
     if YAML_AVAILABLE and _CONFIG_FILE.exists():
         with open(_CONFIG_FILE) as f:
@@ -516,12 +518,20 @@ def difftest_node(state: AgentState, cfg: Dict[str, Any] | None = None) -> Agent
             return state
 
         # --- Step 2: make ARCH=<arch> inside nexus_am_test_dir ---
+        am_home = cfg["am_home"]
+        nix_develop_dir = cfg.get("nix_develop_dir", "")
+        make_env = {**os.environ, "AM_HOME": am_home}
+        if nix_develop_dir:
+            make_cmd = ["nix", "develop", nix_develop_dir, "-c", "make", f"ARCH={arch}"]
+        else:
+            make_cmd = ["make", f"ARCH={arch}"]
         try:
-            _log(f"\n--- Step 2: make ARCH={arch} (cwd={nexus_dir}) ---")
-            print(f"  [2/3] Building nexus-am workload (make ARCH={arch})")
+            _log(f"\n--- Step 2: {' '.join(make_cmd)} (cwd={nexus_dir}, AM_HOME={am_home}) ---")
+            print(f"  [2/3] Building nexus-am workload ({' '.join(make_cmd)})")
             result = subprocess.run(
-                ["make", f"ARCH={arch}"],
+                make_cmd,
                 cwd=str(nexus_dir),
+                env=make_env,
                 capture_output=True,
                 text=True,
                 timeout=120,
