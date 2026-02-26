@@ -1,104 +1,82 @@
-# Benchmark Configuration
-# ========================
+# RVProbe Agent Configuration
+# ============================
 
-# LLM Settings
-# Model name is read from LLM_MODEL in .env file
-# llm_model is not used - configure via .env only
-llm_temperature: 0.0  # 0.0 for reproducibility, higher for creativity
-llm_max_tokens: 4000  # Maximum tokens per LLM response
+# ── Agent ────────────────────────────────────────────────────────────────────
+agent:
+  # LLM (model name is read from LLM_MODEL in .env; API key/base from LLM_API_KEY/LLM_API_BASE)
+  llm_temperature: 0.0      # 0.0 for reproducibility, higher for creativity
+  llm_max_tokens: 4000      # Maximum tokens per LLM response
+  max_retries: 3            # Max auto-retry attempts on compile/SMT failure
+  timeout_seconds: 60       # Timeout for Mill execution (seconds)
 
-# Execution Settings
-timeout_seconds: 300  # Timeout per test case (5 minutes)
-max_retries: 3  # Maximum retries for Method A (agent with verification)
-
-# Cost Calculation (USD per 1M tokens)
-# Update these based on actual API pricing
-prompt_token_cost: 0.0025  # GPT-4o: $2.50 per 1M input tokens
-completion_token_cost: 0.010  # GPT-4o: $10.00 per 1M output tokens
-
-# Output Settings
-results_dir: "./benchmark_results"  # Directory for saving results
-save_raw_outputs: true  # Save full LLM outputs for debugging
-
-# Parallel Execution
-parallel_execution: false  # Set to true for parallel test execution
-max_workers: 4  # Number of parallel workers if parallel_execution is true
-
-# Statistical Validity
-num_repetitions: 1  # Number of times to run each test (3 for statistical analysis)
-
-# Method-Specific Settings
-method_a:
-  enabled: true
-  name: "Full Agent"
-  description: "RAG + LLM + DSL + Mill + Z3 + Auto-retry"
-
-method_b:
-  enabled: true
-  name: "Direct LLM"
-  variants:
-    - id: "no_docs"
-      description: "Pure LLM without documentation"
-      include_documentation: false
-    - id: "with_docs"
-      description: "LLM with constraint documentation"
-      include_documentation: true
-
-# Test Selection
-# Leave empty to run all tests, or specify test IDs
-selected_tests: []
-# Examples:
-# selected_tests: ["TC-S01", "TC-S02"]  # Run only simple tests
-# selected_tests: []  # Run all tests
-
-# Filter by difficulty
-# Options: "simple", "medium", "complex", or [] for all
-difficulty_filter: []
-# Examples:
-# difficulty_filter: ["simple"]  # Only simple tests
-# difficulty_filter: ["simple", "medium"]  # Simple and medium
-# difficulty_filter: []  # All difficulties
-
-# XiangShan Difftest Settings
+# ── XiangShan Difftest ───────────────────────────────────────────────────────
 difftest:
-  enabled: true
-  # Path to the generated test binary (zaozi output)
-  test_bin: "/home/clo91eaf/Project/zaozi/out/test.bin"
-  # nexus-am test directory (workload build target)
+  # Paths
+  test_bin:        "/home/clo91eaf/Project/zaozi/out/test.bin"
+  nexus_am_home:   "/home/clo91eaf/Project/xs-env/nexus-am"
   nexus_am_test_dir: "/home/clo91eaf/Project/xs-env/nexus-am/tests/rvprobetest"
-  # nexus-am make arch target
-  nexus_am_arch: "riscv64-xs"
-  # XiangShan emulator binary
-  emu_bin: "/home/clo91eaf/Project/xs-env/XiangShan/build/emu"
-  # Built workload binary produced by nexus-am (relative to nexus_am_test_dir)
-  workload_bin: "build/rvprobetest-riscv64-xs.bin"
-  # NEMU interpreter SO for co-simulation
-  diff_so: "/home/clo91eaf/Project/xs-env/XiangShan/ready-to-run/riscv64-nemu-interpreter-so"
-  # Where to redirect emu stderr log
-  emu_log: "/tmp/xs_difftest.log"
-  # AM_HOME required by nexus-am Makefile.app
-  am_home: "/home/clo91eaf/Project/xs-env/nexus-am"
-  # nix develop flake path for building nexus-am workload (empty string = no nix develop)
+  nexus_am_arch:   "riscv64-xs"
+  workload_bin:    "build/rvprobetest-riscv64-xs.bin"   # relative to nexus_am_test_dir
+  emu_bin:         "/home/clo91eaf/Project/xs-env/XiangShan/build/emu"
+  diff_so:         "/home/clo91eaf/Project/xs-env/XiangShan/ready-to-run/riscv64-nemu-interpreter-so"
+  # nix develop flake dir used to wrap the make command (empty string = run make directly)
   nix_develop_dir: "/home/clo91eaf/Project/xs-env"
+  # Emulator log file
+  emu_log:         "/tmp/xs_difftest.log"
 
-# Logging
-log_level: "INFO"  # Options: DEBUG, INFO, WARNING, ERROR
-log_file: "./benchmark_results/benchmark.log"
-console_output: true  # Print progress to console
+# ── Benchmark ────────────────────────────────────────────────────────────────
+benchmark:
+  # Test selection (leave empty to run all)
+  selected_tests: []      # e.g. ["TC-S01", "TC-S02"]
+  difficulty_filter: []   # e.g. ["simple", "medium"]  (empty = all)
 
-# Visualization Settings
-visualization:
-  enabled: true
-  output_format: "png"  # Options: png, svg, pdf
-  dpi: 300  # Resolution for raster images
-  figure_size: [10, 6]  # Width, height in inches
-  style: "seaborn-v0_8-darkgrid"  # Matplotlib style
+  # Parallel execution
+  parallel_execution: false
+  max_workers: 4
 
-# Report Settings
-report:
-  enabled: true
-  format: "markdown"  # Options: markdown, html
-  output_file: "./benchmark_results/REPORT.md"
-  include_detailed_analysis: true
-  include_failure_analysis: true
-  include_recommendations: true
+  # Statistical validity
+  num_repetitions: 1      # Increase to 3 for statistical analysis
+
+  # Cost tracking (USD per 1M tokens)
+  prompt_token_cost: 0.0025     # $2.50 / 1M input tokens
+  completion_token_cost: 0.010  # $10.00 / 1M output tokens
+
+  # Methods
+  method_a:
+    enabled: true
+    name: "Full Agent"
+    description: "RAG + LLM + DSL + Mill + Z3 + Auto-retry"
+
+  method_b:
+    enabled: true
+    name: "Direct LLM"
+    variants:
+      - id: "no_docs"
+        description: "Pure LLM without documentation"
+        include_documentation: false
+      - id: "with_docs"
+        description: "LLM with constraint documentation"
+        include_documentation: true
+
+# ── Output ───────────────────────────────────────────────────────────────────
+output:
+  results_dir: "./benchmark_results"
+  save_raw_outputs: true        # Save full LLM outputs for debugging
+  log_level: "INFO"             # DEBUG | INFO | WARNING | ERROR
+  log_file: "./benchmark_results/benchmark.log"
+  console_output: true
+
+  visualization:
+    enabled: true
+    output_format: "png"        # png | svg | pdf
+    dpi: 300
+    figure_size: [10, 6]
+    style: "seaborn-v0_8-darkgrid"
+
+  report:
+    enabled: true
+    format: "markdown"          # markdown | html
+    output_file: "./benchmark_results/REPORT.md"
+    include_detailed_analysis: true
+    include_failure_analysis: true
+    include_recommendations: true

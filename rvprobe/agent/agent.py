@@ -46,13 +46,13 @@ def _load_difftest_config() -> Dict[str, Any]:
     defaults = {
         "enabled": False,
         "test_bin": str(OUTPUT_BIN_PATH),
+        "nexus_am_home": "/home/clo91eaf/Project/xs-env/nexus-am",
         "nexus_am_test_dir": "/home/clo91eaf/Project/xs-env/nexus-am/tests/rvprobetest",
         "nexus_am_arch": "riscv64-xs",
         "emu_bin": "/home/clo91eaf/Project/xs-env/XiangShan/build/emu",
         "workload_bin": "build/rvprobetest-riscv64-xs.bin",
         "diff_so": "/home/clo91eaf/Project/xs-env/XiangShan/ready-to-run/riscv64-nemu-interpreter-so",
         "emu_log": "/tmp/xs_difftest.log",
-        "am_home": "/home/clo91eaf/Project/xs-env/nexus-am",
         "nix_develop_dir": "/home/clo91eaf/Project/xs-env",
     }
     if YAML_AVAILABLE and _CONFIG_FILE.exists():
@@ -518,15 +518,15 @@ def difftest_node(state: AgentState, cfg: Dict[str, Any] | None = None) -> Agent
             return state
 
         # --- Step 2: make ARCH=<arch> inside nexus_am_test_dir ---
-        am_home = cfg["am_home"]
+        nexus_am_home = cfg["nexus_am_home"]
         nix_develop_dir = cfg.get("nix_develop_dir", "")
-        make_env = {**os.environ, "AM_HOME": am_home}
+        make_env = {**os.environ, "AM_HOME": nexus_am_home}
         if nix_develop_dir:
             make_cmd = ["nix", "develop", nix_develop_dir, "-c", "make", f"ARCH={arch}"]
         else:
             make_cmd = ["make", f"ARCH={arch}"]
         try:
-            _log(f"\n--- Step 2: {' '.join(make_cmd)} (cwd={nexus_dir}, AM_HOME={am_home}) ---")
+            _log(f"\n--- Step 2: {' '.join(make_cmd)} (AM_HOME={nexus_am_home}) ---")
             print(f"  [2/3] Building nexus-am workload ({' '.join(make_cmd)})")
             result = subprocess.run(
                 make_cmd,
@@ -716,52 +716,36 @@ if __name__ == "__main__":
         prog="agent.py",
         description="RVProbe Agent - Automated Verification Generator",
     )
-    subparsers = parser.add_subparsers(dest="command", metavar="COMMAND")
-
-    # --- subcommand: run ---
-    run_parser = subparsers.add_parser(
-        "run",
-        help="Generate RISC-V instructions from a natural language description",
-    )
-    run_parser.add_argument(
+    parser.add_argument(
         "request",
-        nargs="+",
-        help='Natural language constraint description, e.g. "Generate 20 ADDI instructions"',
+        nargs="*",
+        help='Natural language constraint description (required unless --only-difftest)',
     )
-    run_parser.add_argument(
-        "--no-difftest",
+    parser.add_argument(
+        "--difftest",
         action="store_true",
-        help="Skip the XiangShan difftest step even if enabled in config",
+        help="Run agent flow then XiangShan difftest",
     )
-
-    # --- subcommand: difftest ---
-    difftest_parser = subparsers.add_parser(
-        "difftest",
-        help="Run XiangShan difftest on an already-generated test.bin (skips LLM generation)",
+    parser.add_argument(
+        "--only-difftest",
+        action="store_true",
+        help="Skip LLM generation, run difftest on existing test.bin only",
     )
-    difftest_parser.add_argument(
+    parser.add_argument(
         "--test-bin",
         metavar="PATH",
         default=None,
-        help=f"Override path to test.bin (default: value in config.yaml, currently {DIFFTEST_CFG.get('test_bin')})",
+        help=f"Override test.bin path for --only-difftest (default: {DIFFTEST_CFG.get('test_bin')})",
     )
 
     args = parser.parse_args()
 
-    # Default to 'run' with a demo request when called with no arguments
-    if args.command is None:
-        parser.print_help()
-        sys.exit(0)
-
-    # Build the final config: config.yaml defaults <- CLI overrides (CLI wins)
-    def _build_cfg(**cli_overrides) -> Dict[str, Any]:
-        merged = dict(DIFFTEST_CFG)          # copy of yaml defaults
-        merged.update({k: v for k, v in cli_overrides.items() if v is not None})
-        return merged
-
-    if args.command == "difftest":
-        final_cfg = _build_cfg(test_bin=args.test_bin)
-
+    if args.only_difftest:
+        # Only difftest, no LLM
+        final_cfg = dict(DIFFTEST_CFG)
+        final_cfg["enabled"] = True
+        if args.test_bin:
+            final_cfg["test_bin"] = args.test_bin
         _state = AgentState(
             user_input="", dsl_code="", error_log="",
             retry_count=0, is_success=True, instructions="",
@@ -780,9 +764,9 @@ if __name__ == "__main__":
         print(f"{'='*60}\n")
         sys.exit(0 if _result['difftest_passed'] else 1)
 
-    if args.command == "run":
-        # --no-difftest overrides config.yaml's enabled flag
-        final_cfg = _build_cfg(enabled=False if args.no_difftest else None)
-        # Temporarily apply to module-level cfg so run_agent -> difftest_node picks it up
-        DIFFTEST_CFG.update(final_cfg)
-        run_agent(" ".join(args.request))
+    # Agent flow (with or without difftest)
+    if not args.request:
+        parser.error("a request string is required unless --only-difftest is specified")
+
+    DIFFTEST_CFG["enabled"] = args.difftest
+    run_agent(" ".join(args.request))
