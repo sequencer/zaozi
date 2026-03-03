@@ -8,6 +8,9 @@
 // RUN: firld %t/*.mlirbc --base-circuit Outer_e4dbbef1 | firtool -format=mlir | FileCheck %s
 // RUN: rm -rf %t
 
+// XFAIL: *
+// https://github.com/llvm/circt/issues/9817
+
 import me.jiuyang.zaozi.*
 import me.jiuyang.zaozi.default.{*, given}
 import me.jiuyang.zaozi.reftpe.*
