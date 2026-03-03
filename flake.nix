@@ -69,6 +69,8 @@
         packages = {
           default = pkgs.zaozi.zaozi-assembly;
           zaozi-assembly = pkgs.zaozi.zaozi-assembly;
+          mlir-install = pkgs.mlir-install;
+          circt-install = pkgs.circt-install;
         };
         devShells.default = pkgs.mkShell {
           inputsFrom = [ pkgs.zaozi.zaozi-assembly ];
