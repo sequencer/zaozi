@@ -111,7 +111,7 @@ object RecordSpec extends TestSuite:
           .getMessage() ==> "o not found in ArrayBuffer(a, b)"
       AccessValName.compileErrorTest(RecordSpecParameter(2, 32))
 
-    test("Record as Interface"):
+    test("Record as Interface") - xfail("https://github.com/llvm/circt/issues/9817"):
       @generator
       object RecordAsInterface
           extends Generator[RecordSpecParameter, RecordSpecLayers, RecordAsIO, RecordAsProbe]

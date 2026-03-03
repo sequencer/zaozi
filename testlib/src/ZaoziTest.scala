@@ -162,3 +162,13 @@ trait HasCompileErrorTest:
 
     summon[Context].destroy()
     summon[Arena].close()
+
+def xfail(reason: String)(body: => Any): Unit =
+  val unexpectedlyPassed =
+    try
+      body
+      true
+    catch case _: Throwable => false
+
+  if unexpectedlyPassed then
+    throw new AssertionError(s"XFAIL unexpectedly passed. Please remove xfail marker. Reason: $reason")
