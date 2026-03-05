@@ -3,20 +3,7 @@
 final: prev:
 
 {
-  mill =
-    let
-      jre = final.jdk21;
-    in
-    (prev.mill.override { inherit jre; }).overrideAttrs rec {
-      version = "1.0.0";
-      src = final.fetchurl {
-        url = "https://repo1.maven.org/maven2/com/lihaoyi/mill-dist/${version}/mill-dist-${version}.exe";
-        hash = "sha256-pgkwME2xs4ezfWS1HGFS2uPIqqvECTOAILWmCqci2Aw=";
-      };
-      propagatedBuildInputs = with prev; [ which ];
-      doInstallCheck = false;
-      passthru = { inherit jre; };
-    };
+  mill = prev.millVersions.mill_1_1_2;
 
   jextract-21 =
     (prev.jextract-21.override { llvmPackages = final.llvmPackages_20; }).overrideAttrs

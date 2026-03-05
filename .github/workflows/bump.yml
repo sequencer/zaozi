@@ -41,7 +41,7 @@ jobs:
           echo "Updating hash $oldHash to $newHash"
           sed -i "s|$oldHash|$newHash|" nix/zaozi/zaozi.nix
       - name: Regenerate CAPI includes
-        run: nix develop -c mill -i '__.dumpIncludes'
+        run: nix develop -c mill --no-daemon '__.dumpIncludes'
       - name: Commit changes
         env:
           GITHUB_TOKEN: ${{ secrets.PR_PAT }}

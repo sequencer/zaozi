@@ -69,7 +69,7 @@ let
     shellHook = ''
       ${mill-ivy-env-shell-hook}
 
-      mill -i mill.bsp.BSP/install
+      mill --no-daemon mill.bsp.BSP/install
       # other commands
     '';
 
@@ -83,7 +83,7 @@ let
 
     # FIXME: wait https://github.com/com-lihaoyi/mill/pull/5521
     buildPhase = ''
-      mill -i --offline '__.assembly'
+      mill --no-daemon --offline '__.assembly'
     '';
 
     installPhase = ''

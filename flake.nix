@@ -56,6 +56,7 @@
         pkgs = import nixpkgs {
           overlays = [
             circt-nix.overlays.default
+            mill-ivy-fetcher.overlays.mill-overlay
             overlay
             local-overlay
             mill-ivy-fetcher.overlays.default
