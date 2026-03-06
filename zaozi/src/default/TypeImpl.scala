@@ -344,7 +344,7 @@ given TypeImpl with
           val openSubfieldOp = summon[OpenSubfieldApi]
             .op(
               input = refer,
-              fieldIndex = ref.toMlirType.getBundleFieldIndex(field._name),
+              fieldIndex = refer.getType.getBundleFieldIndex(field._name),
               location = locate
             )
           openSubfieldOp.operation.appendToBlock()
@@ -387,7 +387,7 @@ given TypeImpl with
           val subfieldOp = summon[SubfieldApi]
             .op(
               input = refer,
-              fieldIndex = ref.toMlirType.getBundleFieldIndex(field._name),
+              fieldIndex = refer.getType.getBundleFieldIndex(field._name),
               location = locate
             )
           subfieldOp.operation.appendToBlock()
@@ -416,7 +416,7 @@ given TypeImpl with
           val openSubfieldOp = summon[OpenSubfieldApi]
             .op(
               input = refer,
-              fieldIndex = ref.toMlirType.getBundleFieldIndex(field._name),
+              fieldIndex = refer.getType.getBundleFieldIndex(field._name),
               location = locate
             )
           openSubfieldOp.operation.appendToBlock()
@@ -446,7 +446,7 @@ given TypeImpl with
           val subfieldOp = summon[SubfieldApi]
             .op(
               input = refer,
-              fieldIndex = ref.toMlirType.getBundleFieldIndex(field._name),
+              fieldIndex = refer.getType.getBundleFieldIndex(field._name),
               location = locate
             )
           subfieldOp.operation.appendToBlock()

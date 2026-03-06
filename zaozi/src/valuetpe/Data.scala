@@ -10,8 +10,11 @@ import org.llvm.mlir.scalalib.capi.ir.{Context, Type}
 import java.lang.foreign.Arena
 
 trait Data:
-  // TODO: this method is lazy hence we need to maintain several fields such as _width in Scala
-  //       consider changing it a constructor thus we can only keep a pointer to the MLIR operation
+  // toMlirType is called lazily when constructing MLIR operations.
+  // This design requires maintaining type metadata (e.g., _width) in Scala objects.
+  // These fields should ONLY be accessed in toMlirTypeImpl for MLIR Type construction.
+  // To query type information from existing operations, use methods like ref.width
+  // which retrieve data directly from MLIR instead of the cached Scala fields.
   def toMlirType(
     using Arena,
     Context,
