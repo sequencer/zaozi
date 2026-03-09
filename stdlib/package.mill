@@ -8,10 +8,10 @@ import mill.scalalib._
 import mill.scalalib.scalafmt._
 import os.Path
 
-import build.{circtlib, decoder, v, zaozi, LitModule}
+import build.{circtlib, decoder, v, zaozi, LitModule, ZaoziPublishModule}
 import build.testlib
 
-object `package` extends ScalaModule with ScalafmtModule { m =>
+object `package` extends ScalaModule with ScalafmtModule with ZaoziPublishModule { m =>
   def scalaVersion = Task(v.scala)
   def moduleDeps   = Seq(zaozi, decoder)
 
