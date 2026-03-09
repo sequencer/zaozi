@@ -190,7 +190,7 @@ def referableApplyCall[T <: me.jiuyang.zaozi.valuetpe.Data: Type](
             .unique(
               Ref(Symbol.requiredModule("me.jiuyang.zaozi.default.given_VecApi_E_V_R"))
                 .appliedToTypes(List(eType, vType, rType)),
-              "bit"
+              "ref"
             )
             .appliedTo(fieldValueTerm)
             .appliedTo(idx)
