@@ -40,7 +40,7 @@ given [E <: Data, V <: Vec[E], R <: Referable[V]]: VecApi[E, V, R] with
       Context
     ) = ref.refer.getType.getBitWidth(true).toInt
 
-    def bit(
+    def ref(
       idx: Referable[UInt] | Int
     )(
       using Arena,
@@ -50,25 +50,19 @@ given [E <: Data, V <: Vec[E], R <: Referable[V]]: VecApi[E, V, R] with
       sourcecode.Line,
       sourcecode.Name.Machine,
       InstanceContext
-    ): Node[E] =
-      val nodeOp = summon[NodeApi].op(
-        name = valName,
-        location = locate,
-        nameKind = FirrtlNameKind.Interesting,
-        input = idx match
-          case that: Referable[UInt] =>
-            val op0 = summon[SubaccessApi].op(ref.refer, that.refer, locate)
-            op0.operation.appendToBlock()
-            op0.result
-          case that: Int             =>
-            val op0 = summon[SubindexApi].op(ref.refer, that, locate)
-            op0.operation.appendToBlock()
-            op0.result
-      )
-      nodeOp.operation.appendToBlock()
-      new Node[E]:
+    ): Ref[E] =
+      val refOp = idx match
+        case that: Referable[UInt] =>
+          val op0 = summon[SubaccessApi].op(ref.refer, that.refer, locate)
+          op0.operation.appendToBlock()
+          op0.operation
+        case that: Int             =>
+          val op0 = summon[SubindexApi].op(ref.refer, that, locate)
+          op0.operation.appendToBlock()
+          op0.operation
+      new Ref[E]:
         val _tpe:       E         = ref._tpe._elementType
-        val _operation: Operation = nodeOp.operation
+        val _operation: Operation = refOp
 
     // sugars
     def apply(
@@ -81,6 +75,6 @@ given [E <: Data, V <: Vec[E], R <: Referable[V]]: VecApi[E, V, R] with
       sourcecode.Line,
       sourcecode.Name.Machine,
       InstanceContext
-    ): Node[E] = bit(idx)
+    ): Ref[E] = ref.ref(idx)
 
 end given

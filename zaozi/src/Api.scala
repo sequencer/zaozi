@@ -950,7 +950,7 @@ trait RecordApi[T <: Record | ProbeRecord, R <: Referable[T]] extends AsBits[T, 
 
 trait VecApi[E <: Data, V <: Vec[E], R <: Referable[V]]
     extends AsBits[V, R]
-    with ExtractElement[V, E, R, Referable[UInt] | Int]
+    with RefElement[V, E, R, Referable[UInt] | Int]
     with GetWidth[V, R]
 
 trait ClockApi[R <: Referable[Clock]]

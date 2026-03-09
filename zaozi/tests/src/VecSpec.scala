@@ -31,22 +31,25 @@ object VecSpec extends TestSuite:
   val tests = Tests:
     test("Assign"):
       @generator
-      object Assign extends Generator[VecSpecParameter, VecSpecLayers, VecSpecIO, VecSpecProbe] with HasFirrtlTest:
+      object Assign extends Generator[VecSpecParameter, VecSpecLayers, VecSpecIO, VecSpecProbe] with HasVerilogTest:
         def architecture(parameter: VecSpecParameter) =
           val io = summon[Interface[VecSpecIO]]
           io.b := io.a
           io.out.dontCare()
-      Assign.firrtlTest(VecSpecParameter(8, 4))(
-        "connect io.b, io.a"
+      Assign.verilogTest(VecSpecParameter(8, 4))(
+        "assign b_0 = a_0",
+        "assign b_1 = a_1",
+        "assign b_2 = a_2",
+        "assign b_3 = a_3"
       )
     test("AsBits"):
       @generator
-      object Assign extends Generator[VecSpecParameter, VecSpecLayers, VecSpecIO, VecSpecProbe] with HasVerilogTest:
+      object AsBits extends Generator[VecSpecParameter, VecSpecLayers, VecSpecIO, VecSpecProbe] with HasVerilogTest:
         def architecture(parameter: VecSpecParameter) =
           val io = summon[Interface[VecSpecIO]]
           io.b := io.a.asBits.asVec(Bits(parameter.width.W))
           io.out.dontCare()
-      Assign.verilogTest(VecSpecParameter(8, 4))(
+      AsBits.verilogTest(VecSpecParameter(8, 4))(
         "assign b_0 = a_0",
         "assign b_1 = a_1",
         "assign b_2 = a_2",
@@ -60,9 +63,9 @@ object VecSpec extends TestSuite:
         def architecture(parameter: VecSpecParameter) =
           val io = summon[Interface[VecSpecIO]]
           io.b.dontCare()
-          io.out := io.a.bit(io.idx)
+          io.out := io.a.ref(io.idx)
       DynamicIndex.firrtlTest(VecSpecParameter(8, 4))(
-        "node _GEN_0 = io.a[io.idx]"
+        "connect io.out, io.a[io.idx]"
       )
 
     test("Dynamic index apply"):
@@ -75,44 +78,46 @@ object VecSpec extends TestSuite:
           io.b.dontCare()
           io.out := io.a(io.idx)
       DynamicIndexApply.firrtlTest(VecSpecParameter(8, 4))(
-        "node _GEN_0 = io.a[io.idx]"
+        "connect io.out, io.a[io.idx]"
       )
 
     test("Static index"):
       @generator
-      object StaticIndex extends Generator[VecSpecParameter, VecSpecLayers, VecSpecIO, VecSpecProbe] with HasFirrtlTest:
+      object StaticIndex
+          extends Generator[VecSpecParameter, VecSpecLayers, VecSpecIO, VecSpecProbe]
+          with HasVerilogTest:
         def architecture(parameter: VecSpecParameter) =
           val io = summon[Interface[VecSpecIO]]
           io.b.dontCare()
-          io.out := io.a.bit(3)
-      StaticIndex.firrtlTest(VecSpecParameter(8, 4))(
-        "node _GEN_0 = io.a[3]"
+          io.out := io.a.ref(3)
+      StaticIndex.verilogTest(VecSpecParameter(8, 4))(
+        "assign out = a_3"
       )
 
     test("Static index apply"):
       @generator
       object StaticIndexApply
           extends Generator[VecSpecParameter, VecSpecLayers, VecSpecIO, VecSpecProbe]
-          with HasFirrtlTest:
+          with HasVerilogTest:
         def architecture(parameter: VecSpecParameter) =
           val io = summon[Interface[VecSpecIO]]
           io.b.dontCare()
           io.out := io.a(3)
-      StaticIndexApply.firrtlTest(VecSpecParameter(8, 4))(
-        "node _GEN_0 = io.a[3]"
+      StaticIndexApply.verilogTest(VecSpecParameter(8, 4))(
+        "assign out = a_3"
       )
 
     test("Named static index apply"):
       @generator
       object NamedStaticIndexApply
           extends Generator[VecSpecParameter, VecSpecLayers, VecSpecIO, VecSpecProbe]
-          with HasFirrtlTest:
+          with HasVerilogTest:
         def architecture(parameter: VecSpecParameter) =
           val io = summon[Interface[VecSpecIO]]
           io.b.dontCare()
           io.out := io.a(idx = 3)
-      NamedStaticIndexApply.firrtlTest(VecSpecParameter(8, 4))(
-        "node _GEN_0 = io.a[3]"
+      NamedStaticIndexApply.verilogTest(VecSpecParameter(8, 4))(
+        "assign out = a_3"
       )
 
     test("Apply with incorrect named argument"):
@@ -127,6 +132,34 @@ object VecSpec extends TestSuite:
             "Unexpected named arguments invalid_name"
           )
       IncorrectNamedArgument.compileErrorTest(VecSpecParameter(8, 4))
+
+    test("Static index assign"):
+      @generator
+      object StaticIndexAssign
+          extends Generator[VecSpecParameter, VecSpecLayers, VecSpecIO, VecSpecProbe]
+          with HasVerilogTest:
+        def architecture(parameter: VecSpecParameter) =
+          val io = summon[Interface[VecSpecIO]]
+          io.b.dontCare()
+          io.out.dontCare()
+          io.b(2) := io.a(2)
+      StaticIndexAssign.verilogTest(VecSpecParameter(8, 4))(
+        "assign b_2 = a_2"
+      )
+
+    test("Dynamic index assign"):
+      @generator
+      object DynamicIndexAssign
+          extends Generator[VecSpecParameter, VecSpecLayers, VecSpecIO, VecSpecProbe]
+          with HasFirrtlTest:
+        def architecture(parameter: VecSpecParameter) =
+          val io = summon[Interface[VecSpecIO]]
+          io.b.dontCare()
+          io.out.dontCare()
+          io.b(io.idx) := io.a(io.idx)
+      DynamicIndexAssign.firrtlTest(VecSpecParameter(8, 4))(
+        "connect io.b[io.idx], io.a[io.idx]"
+      )
 
     test("Apply with incorrect number of arguments"):
       @generator
