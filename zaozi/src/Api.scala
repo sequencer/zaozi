@@ -875,6 +875,12 @@ trait GetWidth[D <: Data, R <: Referable[D]]:
       using Arena,
       Context
     ): Int
+trait GetLength[E <: Data, V <: Vec[E], R <: Referable[V]]:
+  extension (ref: R)
+    def length(
+      using Arena,
+      Context
+    ): Int
 
 trait BitsApi[R <: Referable[Bits]]
     extends AsSInt[Bits, R]
@@ -952,6 +958,7 @@ trait VecApi[E <: Data, V <: Vec[E], R <: Referable[V]]
     extends AsBits[V, R]
     with RefElement[V, E, R, Referable[UInt] | Int]
     with GetWidth[V, R]
+    with GetLength[E, V, R]
 
 trait ClockApi[R <: Referable[Clock]]
 
