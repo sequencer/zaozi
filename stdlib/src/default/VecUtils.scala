@@ -27,3 +27,19 @@ given VecUtilsApi with
       new IndexedSeq[Ref[E]]:
         def length:          Int    = ref.length
         def apply(idx: Int): Ref[E] = ref.ref(idx)
+
+  extension [E <: Data](seq: Seq[Ref[E]])
+    def toVec(
+      using Arena,
+      Context,
+      Block,
+      sourcecode.File,
+      sourcecode.Line,
+      sourcecode.Name.Machine,
+      InstanceContext,
+      ConstructorApi
+    ): Wire[Vec[E]] =
+      val vecWire = Wire(Vec(seq.length, seq.head.getType))
+      seq.zipWithIndex.foreach: (e, i) =>
+        vecWire(i) := e
+      vecWire

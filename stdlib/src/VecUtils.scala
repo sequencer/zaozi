@@ -24,3 +24,15 @@ trait VecUtilsApi:
       InstanceContext,
       VecApi[E, V, R]
     ): IndexedSeq[Ref[E]]
+
+  extension [E <: Data](seq: Seq[Ref[E]])
+    def toVec(
+      using Arena,
+      Context,
+      Block,
+      sourcecode.File,
+      sourcecode.Line,
+      sourcecode.Name.Machine,
+      InstanceContext,
+      ConstructorApi
+    ): Wire[Vec[E]]
