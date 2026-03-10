@@ -307,6 +307,17 @@ trait ConstructorApi:
     sourcecode.Name.Machine,
     InstanceContext
   ):   Reg[T]
+  def Node[T <: Data](
+    ref: Referable[T]
+  )(
+    using Arena,
+    Context,
+    Block,
+    sourcecode.File,
+    sourcecode.Line,
+    sourcecode.Name.Machine,
+    InstanceContext
+  ):   Node[T]
   extension (bigInt: BigInt)
     def U(
       width: Width
