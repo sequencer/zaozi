@@ -40,6 +40,11 @@ given [E <: Data, V <: Vec[E], R <: Referable[V]]: VecApi[E, V, R] with
       Context
     ) = ref.refer.getType.getBitWidth(true).toInt
 
+    def length(
+      using Arena,
+      Context
+    ) = ref.refer.getType.getVectorElementNum.toInt
+
     def ref(
       idx: Referable[UInt] | Int
     )(
