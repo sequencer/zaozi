@@ -91,3 +91,20 @@ object VecUtilsSpec extends TestSuite:
           whenOpenIdx >= 0 && whenCloseIdx >= 0
           && idx0Line > whenOpenIdx && idx0Line < whenCloseIdx
           && idx1Line > whenCloseIdx
+
+    test("toVec"):
+      test("reverse toVec"):
+        @generator
+        object ReverseToVec
+            extends Generator[VecUtilsSpecParameter, VecUtilsSpecLayers, VecUtilsSpecIO, VecUtilsSpecProbe]
+            with HasVerilogTest:
+          def architecture(parameter: VecUtilsSpecParameter) =
+            val io = summon[Interface[VecUtilsSpecIO]]
+            io.out.dontCare()
+            io.b := io.a.toSeq.reverse.toVec
+        ReverseToVec.verilogTest(VecUtilsSpecParameter(8, 4))(
+          "assign b_0 = a_3",
+          "assign b_1 = a_2",
+          "assign b_2 = a_1",
+          "assign b_3 = a_0"
+        )
