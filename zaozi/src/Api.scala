@@ -477,7 +477,7 @@ trait ProbeConnect[D <: Data & CanProbe, P <: RWProbe[D] | RProbe[D], DATA <: Re
       sourcecode.File,
       sourcecode.Line
     ): Unit
-trait MonoConnect[D <: Data, SRC <: Referable[D], SINK <: Referable[D]]:
+trait MonoConnect[D <: Data, SRC <: Referable[D], SINK <: Writable[D]]:
   extension (ref: SINK)
     def :=(
       that: SRC

@@ -101,10 +101,10 @@ object GCD extends Generator[GCDParameter, GCDLayers, GCDIO, GCDProbe]:
     given Ref[Clock] = io.clock
     given Ref[Reset] = io.reset
 
-    val x:           Referable[UInt] = Reg(UInt(parameter.width.W))
-    val y:           Referable[UInt] = RegInit(0.U(parameter.width.W))
-    val startupFlag: Referable[Bool] = RegInit(false.B)
-    val busy:        Referable[Bool] = y =/= 0.U
+    val x           = Reg(UInt(parameter.width.W))
+    val y           = RegInit(0.U(parameter.width.W))
+    val startupFlag = RegInit(false.B)
+    val busy        = y =/= 0.U
 
     io.input.ready   := !busy
     io.output.bits.z := x

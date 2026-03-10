@@ -31,6 +31,8 @@ trait Referable[T <: Data] extends Dynamic:
     referableApplyDynamicNamed('this, 'name, 'args)
   }
 
+trait Writable[T <: Data] extends Referable[T]
+
 trait HasOperation:
   def operation(
     using TypeImpl
