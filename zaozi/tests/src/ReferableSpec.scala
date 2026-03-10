@@ -102,3 +102,30 @@ object ReferableSpec extends TestSuite:
       RegisterWithASyncReset.verilogTest(ReferableSpecParameter(8))(
         "always @(posedge asyncDomain_clock or posedge asyncDomain_reset) begin"
       )
+
+    test("Const cannot be assigned"):
+      @generator
+      object ConstCannotBeAssigned
+          extends Generator[ReferableSpecParameter, ReferableSpecLayers, ReferableSpecIO, ReferableSpecProbe]
+          with HasCompileErrorTest:
+        def architecture(parameter: ReferableSpecParameter) =
+          val io = summon[Interface[ReferableSpecIO]]
+          compileError("""val c = 0.U(8.W); c := 0.U(8.W)""").check(
+            "",
+            "Type parameter T must be a subtype of DynamicSubfield"
+          )
+      ConstCannotBeAssigned.compileErrorTest(ReferableSpecParameter(8))
+
+    test("Node cannot be assigned"):
+      @generator
+      object NodeCannotBeAssigned
+          extends Generator[ReferableSpecParameter, ReferableSpecLayers, ReferableSpecIO, ReferableSpecProbe]
+          with HasCompileErrorTest:
+        def architecture(parameter: ReferableSpecParameter) =
+          val io           = summon[Interface[ReferableSpecIO]]
+          given Ref[Clock] = io.syncDomain.clock
+          compileError("""val n = io.passthrough.i + io.passthrough.i; n := io.passthrough.i""").check(
+            "",
+            "Type parameter T must be a subtype of DynamicSubfield"
+          )
+      NodeCannotBeAssigned.compileErrorTest(ReferableSpecParameter(8))
