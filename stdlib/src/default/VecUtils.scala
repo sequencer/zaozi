@@ -28,7 +28,7 @@ given VecUtilsApi with
         def length:          Int    = ref.length
         def apply(idx: Int): Ref[E] = ref.ref(idx)
 
-  extension [E <: Data](seq: Seq[Ref[E]])
+  extension [E <: Data](seq: Seq[Referable[E]])
     def toVec(
       using Arena,
       Context,
@@ -38,8 +38,9 @@ given VecUtilsApi with
       sourcecode.Name.Machine,
       InstanceContext,
       ConstructorApi
-    ): Wire[Vec[E]] =
+    ): Node[Vec[E]] =
+      if seq.isEmpty then throw new IllegalArgumentException("toVec requires a non-empty Seq")
       val vecWire = Wire(Vec(seq.length, seq.head.getType))
       seq.zipWithIndex.foreach: (e, i) =>
         vecWire(i) := e
-      vecWire
+      Node(vecWire)

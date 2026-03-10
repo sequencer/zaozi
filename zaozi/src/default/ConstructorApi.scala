@@ -20,6 +20,7 @@ import org.llvm.circt.scalalib.dialect.firrtl.operation.{
   InstanceApi,
   LayerBlockApi,
   ModuleApi,
+  NodeApi,
   OpenSubfieldApi,
   RefDefineApi,
   RegApi,
@@ -205,6 +206,28 @@ given ConstructorApi with
     new Reg[T]:
       val _tpe:       T         = input._tpe
       val _operation: Operation = regResetOp.operation
+
+  def Node[T <: Data](
+    ref: Referable[T]
+  )(
+    using Arena,
+    Context,
+    Block,
+    sourcecode.File,
+    sourcecode.Line,
+    sourcecode.Name.Machine,
+    InstanceContext
+  ): Node[T] =
+    val nodeOp = summon[NodeApi].op(
+      name = valName,
+      location = locate,
+      nameKind = FirrtlNameKind.Interesting,
+      input = ref.refer
+    )
+    nodeOp.operation.appendToBlock()
+    new Node[T]:
+      val _tpe:       T         = ref._tpe
+      val _operation: Operation = nodeOp.operation
 
   extension (bigInt: BigInt)
     def U(

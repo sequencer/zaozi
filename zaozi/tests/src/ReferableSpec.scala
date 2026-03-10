@@ -103,6 +103,19 @@ object ReferableSpec extends TestSuite:
         "always @(posedge asyncDomain_clock or posedge asyncDomain_reset) begin"
       )
 
+    test("Node constructor"):
+      @generator
+      object NodeConstructor
+          extends Generator[ReferableSpecParameter, ReferableSpecLayers, ReferableSpecIO, ReferableSpecProbe]
+          with HasVerilogTest:
+        def architecture(parameter: ReferableSpecParameter) =
+          val io    = summon[Interface[ReferableSpecIO]]
+          val node0 = Node(io.passthrough.i)
+          io.passthrough.o := node0
+      NodeConstructor.verilogTest(ReferableSpecParameter(8))(
+        "assign passthrough_o = passthrough_i;"
+      )
+
     test("Const cannot be assigned"):
       @generator
       object ConstCannotBeAssigned
