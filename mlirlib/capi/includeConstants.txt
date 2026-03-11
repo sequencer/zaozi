@@ -113,6 +113,9 @@ MlirWalkResultInterrupt                       # header: $MLIR_INSTALL_PATH/inclu
 MlirWalkResultSkip                            # header: $MLIR_INSTALL_PATH/include/mlir-c/IR.h
 MLIR_PASS_DISPLAY_MODE_LIST       # header: $MLIR_INSTALL_PATH/include/mlir-c/Pass.h
 MLIR_PASS_DISPLAY_MODE_PIPELINE   # header: $MLIR_INSTALL_PATH/include/mlir-c/Pass.h
+MLIR_DIALECT_CONVERSION_FOLDING_MODE_AFTER_PATTERNS       # header: $MLIR_INSTALL_PATH/include/mlir-c/Rewrite.h
+MLIR_DIALECT_CONVERSION_FOLDING_MODE_BEFORE_PATTERNS      # header: $MLIR_INSTALL_PATH/include/mlir-c/Rewrite.h
+MLIR_DIALECT_CONVERSION_FOLDING_MODE_NEVER                # header: $MLIR_INSTALL_PATH/include/mlir-c/Rewrite.h
 MLIR_GREEDY_REWRITE_STRICTNESS_ANY_OP                     # header: $MLIR_INSTALL_PATH/include/mlir-c/Rewrite.h
 MLIR_GREEDY_REWRITE_STRICTNESS_EXISTING_AND_NEW_OPS       # header: $MLIR_INSTALL_PATH/include/mlir-c/Rewrite.h
 MLIR_GREEDY_REWRITE_STRICTNESS_EXISTING_OPS               # header: $MLIR_INSTALL_PATH/include/mlir-c/Rewrite.h
