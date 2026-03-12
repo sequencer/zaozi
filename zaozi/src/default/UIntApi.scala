@@ -4,7 +4,7 @@ package me.jiuyang.zaozi.default
 
 import me.jiuyang.zaozi.reftpe.*
 import me.jiuyang.zaozi.valuetpe.*
-import me.jiuyang.zaozi.{InstanceContext, UIntApi}
+import me.jiuyang.zaozi.{InstanceContext, TypeImpl, UIntApi}
 
 import org.llvm.circt.scalalib.capi.dialect.firrtl.{given_FirrtlBundleFieldApi, given_TypeApi, FirrtlNameKind}
 import org.llvm.circt.scalalib.dialect.firrtl.operation.{
@@ -40,7 +40,7 @@ given [R <: Referable[UInt]]: UIntApi[R] with
       sourcecode.Line,
       sourcecode.Name.Machine,
       InstanceContext
-    ): Node[Bits] =
+    ): Propagated[R, Bits] =
       val nodeOp = summon[NodeApi].op(
         name = valName,
         location = locate,
@@ -48,10 +48,9 @@ given [R <: Referable[UInt]]: UIntApi[R] with
         input = ref.refer
       )
       nodeOp.operation.appendToBlock()
-      new Node[Bits]:
-        val _tpe:       Bits      = new Bits:
-          private[zaozi] val _width = nodeOp.operation.getResult(0).getType.getBitWidth(true).toInt
-        val _operation: Operation = nodeOp.operation
+      val tpe    = new Bits:
+        private[zaozi] val _width = nodeOp.operation.getResult(0).getType.getBitWidth(true).toInt
+      constPropagate[R, Bits](ref, tpe, nodeOp.operation)
 
     def width(
       using Arena,

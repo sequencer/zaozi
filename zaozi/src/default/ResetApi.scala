@@ -23,7 +23,7 @@ given [R <: Referable[Reset]]: ResetApi[R] with
       sourcecode.Line,
       sourcecode.Name.Machine,
       InstanceContext
-    ): Node[Bool] =
+    ): Propagated[R, Bool] =
       val asUIntOp = summon[AsUIntPrimApi].op(ref.refer, locate)
       asUIntOp.operation.appendToBlock()
       val nodeOp   = summon[NodeApi].op(
@@ -33,7 +33,5 @@ given [R <: Referable[Reset]]: ResetApi[R] with
         input = asUIntOp.operation.getResult(0)
       )
       nodeOp.operation.appendToBlock()
-      new Node[Bool]:
-        val _tpe:       Bool      = new Object with Bool
-        val _operation: Operation = nodeOp.operation
+      constPropagate[R, Bool](ref, new Object with Bool, nodeOp.operation)
 end given
