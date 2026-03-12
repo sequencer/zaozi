@@ -64,7 +64,7 @@ given [R <: Referable[Bool]]: BoolApi[R] with
       nodeOp.operation.appendToBlock()
       val tpe    = new Object with Bits:
         private[zaozi] val _width = nodeOp.operation.getResult(0).getType.getBitWidth(true).toInt
-      constPropagate[R, Bits](ref, tpe, nodeOp.operation)
+      propagate[R, Bits](ref, tpe, nodeOp.operation)
 
     def width(
       using Arena,
