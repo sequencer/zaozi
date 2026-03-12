@@ -16,7 +16,7 @@ type HardwareDataType              = _BaseHardwareDataType | Vec[_BaseHardwareDa
   Vec[Vec[Vec[_BaseHardwareDataType]]]
 
 trait TypeUtilsApi:
-  extension [D <: HardwareDataType](ref: Referable[D])
+  extension [D <: HardwareDataType, R <: Referable[D]](ref: R)
     inline def asBits(
       using Arena,
       Context,
@@ -25,11 +25,11 @@ trait TypeUtilsApi:
       sourcecode.Line,
       sourcecode.Name.Machine,
       InstanceContext
-    ): Node[Bits]
+    ): Propagated[R, Bits]
 
-  extension (ref: Referable[Bits])
-    inline def asTypeOf[D <: HardwareDataType, R <: Referable[D]](
-      that: R
+  extension [R <: Referable[Bits]](ref: R)
+    inline def asTypeOf[D <: HardwareDataType](
+      tpe: D
     )(
       using Arena,
       Context,
@@ -38,4 +38,16 @@ trait TypeUtilsApi:
       sourcecode.Line,
       sourcecode.Name.Machine,
       InstanceContext
-    ): Node[D]
+    ): Propagated[R, D]
+
+    inline def asTypeOf[D <: HardwareDataType, TREF <: Referable[D]](
+      that: TREF
+    )(
+      using Arena,
+      Context,
+      Block,
+      sourcecode.File,
+      sourcecode.Line,
+      sourcecode.Name.Machine,
+      InstanceContext
+    ): Propagated[R, D]

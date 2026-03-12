@@ -13,7 +13,7 @@ import org.llvm.mlir.scalalib.capi.ir.{Block, Context}
 import java.lang.foreign.Arena
 
 given TypeUtilsApi with
-  extension [D <: HardwareDataType](ref: Referable[D])
+  extension [D <: HardwareDataType, R <: Referable[D]](ref: R)
     inline def asBits(
       using Arena,
       Context,
@@ -22,7 +22,7 @@ given TypeUtilsApi with
       sourcecode.Line,
       sourcecode.Name.Machine,
       InstanceContext
-    ): Node[Bits] = ref.getType match
+    ): Propagated[R, Bits] = (ref.getType match
       case _: Bool   => given_BoolApi_R.asBits(ref.asInstanceOf[Referable[Bool]])
       case _: Bundle => given_BundleApi_T_R.asBits(ref.asInstanceOf[Referable[Bundle]])
       case _: Record => given_RecordApi_T_R.asBits(ref.asInstanceOf[Referable[Record]])
@@ -33,10 +33,11 @@ given TypeUtilsApi with
           // we don't care about the type parameter of Vec here
           ref.asInstanceOf[Referable[Vec[Bool]]]
         )
+    ).asInstanceOf[Propagated[R, Bits]]
 
-  extension (ref: Referable[Bits])
-    inline def asTypeOf[D <: HardwareDataType, R <: Referable[D]](
-      that: R
+  extension [R <: Referable[Bits]](ref: R)
+    inline def asTypeOf[D <: HardwareDataType](
+      tpe: D
     )(
       using Arena,
       Context,
@@ -45,12 +46,25 @@ given TypeUtilsApi with
       sourcecode.Line,
       sourcecode.Name.Machine,
       InstanceContext
-    ): Node[D] = that.getType match
-      case _: Bool   => ref.asBool.asInstanceOf[Node[D]]
-      case x: Bundle => ref.asBundle[Bundle](x).asInstanceOf[Node[D]]
-      case x: Record => ref.asRecord[Record](x).asInstanceOf[Node[D]]
-      case _: SInt   => ref.asSInt.asInstanceOf[Node[D]]
-      case _: UInt   => ref.asUInt.asInstanceOf[Node[D]]
-      case x: Vec[?] => ref.asVec(x.getElementType).asInstanceOf[Node[D]]
+    ): Propagated[R, D] = (tpe match
+      case _: Bool   => ref.asBool
+      case x: Bundle => ref.asBundle[Bundle](x)
+      case x: Record => ref.asRecord[Record](x)
+      case _: SInt   => ref.asSInt
+      case _: UInt   => ref.asUInt
+      case x: Vec[?] => ref.asVec(x.getElementType)
+    ).asInstanceOf[Propagated[R, D]]
+
+    inline def asTypeOf[D <: HardwareDataType, TREF <: Referable[D]](
+      that: TREF
+    )(
+      using Arena,
+      Context,
+      Block,
+      sourcecode.File,
+      sourcecode.Line,
+      sourcecode.Name.Machine,
+      InstanceContext
+    ): Propagated[R, D] = ref.asTypeOf(that.getType)
 
 end given

@@ -37,7 +37,7 @@ object PLADecoder extends Generator[DecoderParameter, DecoderLayers, DecoderIO, 
           .flatten
         if (andMatrixInput.nonEmpty)
           t.toString -> andMatrixInput.reduce(_ & _)
-        else t.toString -> true.B
+        else t.toString -> Node(true.B)
       .toMap
     val orMatrixOutputs           =
       Seq
@@ -47,7 +47,7 @@ object PLADecoder extends Generator[DecoderParameter, DecoderLayers, DecoderIO, 
               or.mask.testBit(i) && or.value.testBit(i)
             .map: (inputTerm, _) =>
               andMatrixOutputs(inputTerm.toString)
-          if (andMatrixLines.isEmpty) false.B
+          if (andMatrixLines.isEmpty) Node(false.B)
           else andMatrixLines.reduce(_ | _)
         .reverse
         .map(_.asBits)
