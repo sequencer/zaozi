@@ -36,7 +36,7 @@ given TypeUtilsApi with
     ).asInstanceOf[Propagated[R, Bits]]
 
   extension [R <: Referable[Bits]](ref: R)
-    inline def asTypeOf[D <: HardwareDataType](
+    inline def asType[D <: HardwareDataType](
       tpe: D
     )(
       using Arena,
@@ -54,17 +54,5 @@ given TypeUtilsApi with
       case _: UInt   => ref.asUInt
       case x: Vec[?] => ref.asVec(x.getElementType)
     ).asInstanceOf[Propagated[R, D]]
-
-    inline def asTypeOf[D <: HardwareDataType, TREF <: Referable[D]](
-      that: TREF
-    )(
-      using Arena,
-      Context,
-      Block,
-      sourcecode.File,
-      sourcecode.Line,
-      sourcecode.Name.Machine,
-      InstanceContext
-    ): Propagated[R, D] = ref.asTypeOf(that.getType)
 
 end given
