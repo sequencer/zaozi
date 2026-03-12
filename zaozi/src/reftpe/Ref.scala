@@ -8,7 +8,7 @@ import org.llvm.mlir.scalalib.capi.ir.{Operation, Value}
 
 import java.lang.foreign.Arena
 
-trait Ref[T <: Data] extends Writable[T] with HasOperation:
+abstract class Ref[T <: Data] extends Writable[T] with HasOperation:
   private[zaozi] val _tpe:       T
   private[zaozi] val _operation: Operation
 
