@@ -33,5 +33,5 @@ given [R <: Referable[Reset]]: ResetApi[R] with
         input = asUIntOp.operation.getResult(0)
       )
       nodeOp.operation.appendToBlock()
-      constPropagate[R, Bool](ref, new Object with Bool, nodeOp.operation)
+      propagate[R, Bool](ref, new Object with Bool, nodeOp.operation)
 end given

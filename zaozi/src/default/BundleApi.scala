@@ -33,7 +33,7 @@ given [T <: Bundle | ProbeBundle, R <: Referable[T]]: BundleApi[T, R] with
       bitcastOp.operation.appendToBlock()
       val tpe       = new Bits:
         private[zaozi] val _width = bitcastOp.operation.getResult(0).getType.getBitWidth(true).toInt
-      constPropagate[R, Bits](ref, tpe, bitcastOp.operation)
+      propagate[R, Bits](ref, tpe, bitcastOp.operation)
 
     def width(
       using Arena,

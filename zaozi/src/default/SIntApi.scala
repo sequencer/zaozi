@@ -53,7 +53,7 @@ given [R <: Referable[SInt]]: SIntApi[R] with
       nodeOp.operation.appendToBlock()
       val tpe    = new Bits:
         private[zaozi] val _width = op0.result.getType.getBitWidth(true).toInt
-      constPropagate[R, Bits](ref, tpe, nodeOp.operation)
+      propagate[R, Bits](ref, tpe, nodeOp.operation)
 
     def width(
       using Arena,

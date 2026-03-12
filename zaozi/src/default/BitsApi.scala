@@ -61,7 +61,7 @@ given [R <: Referable[Bits]]: BitsApi[R] with
       nodeOp.operation.appendToBlock()
       val tpe    = new SInt:
         private[zaozi] val _width = op0.result.getType.getBitWidth(true).toInt
-      constPropagate[R, SInt](ref, tpe, nodeOp.operation)
+      propagate[R, SInt](ref, tpe, nodeOp.operation)
     def asUInt(
       using Arena,
       Context,
@@ -80,7 +80,7 @@ given [R <: Referable[Bits]]: BitsApi[R] with
       nodeOp.operation.appendToBlock()
       val tpe    = new UInt:
         private[zaozi] val _width = nodeOp.operation.getResult(0).getType.getBitWidth(true).toInt
-      constPropagate[R, UInt](ref, tpe, nodeOp.operation)
+      propagate[R, UInt](ref, tpe, nodeOp.operation)
     def asBool(
       using Arena,
       Context,
@@ -102,7 +102,7 @@ given [R <: Referable[Bits]]: BitsApi[R] with
         s"Cannot convert ${summon[sourcecode.Name.Machine]}: Bits(${width}) to Bool"
       )
       nodeOp.operation.appendToBlock()
-      constPropagate[R, Bool](ref, new Object with Bool, nodeOp.operation)
+      propagate[R, Bool](ref, new Object with Bool, nodeOp.operation)
     def asBundle[T <: Bundle](
       tpe: T
     )(
@@ -120,7 +120,7 @@ given [R <: Referable[Bits]]: BitsApi[R] with
         location = locate
       )
       bitcastOp.operation.appendToBlock()
-      constPropagate[R, T](ref, tpe, bitcastOp.operation)
+      propagate[R, T](ref, tpe, bitcastOp.operation)
     def asRecord[T <: Record](
       tpe: T
     )(
@@ -138,7 +138,7 @@ given [R <: Referable[Bits]]: BitsApi[R] with
         location = locate
       )
       bitcastOp.operation.appendToBlock()
-      constPropagate[R, T](ref, tpe, bitcastOp.operation)
+      propagate[R, T](ref, tpe, bitcastOp.operation)
     def asVec[E <: Data](
       tpe: E
     )(
@@ -164,7 +164,7 @@ given [R <: Referable[Bits]]: BitsApi[R] with
         location = locate
       )
       bitcastOp.operation.appendToBlock()
-      constPropagate[R, Vec[E]](ref, Vec[E](count, tpe), bitcastOp.operation)
+      propagate[R, Vec[E]](ref, Vec[E](count, tpe), bitcastOp.operation)
     def unary_~(
       using Arena,
       Context,
