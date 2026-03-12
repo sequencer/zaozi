@@ -8,7 +8,7 @@ import org.llvm.mlir.scalalib.capi.ir.{Operation, Value}
 
 import java.lang.foreign.Arena
 
-trait Interface[T <: HWInterface[?] | DVInterface[?, ?]] extends Writable[T] with HasOperation:
+abstract class Interface[T <: HWInterface[?] | DVInterface[?, ?]] extends Writable[T] with HasOperation:
   private[zaozi] val _tpe:       T
   private[zaozi] val _operation: Operation
   def operation(

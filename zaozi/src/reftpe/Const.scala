@@ -8,7 +8,7 @@ import org.llvm.mlir.scalalib.capi.ir.{Operation, Value}
 
 import java.lang.foreign.Arena
 
-trait Const[T <: Data] extends Referable[T] with HasOperation:
+abstract class Const[T <: Data] extends Referable[T] with HasOperation:
   private[zaozi] val _tpe:       T
   private[zaozi] val _operation: Operation
 
