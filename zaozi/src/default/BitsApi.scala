@@ -49,7 +49,7 @@ given [R <: Referable[Bits]]: BitsApi[R] with
       sourcecode.Line,
       sourcecode.Name.Machine,
       InstanceContext
-    ): Node[SInt] =
+    ): Propagated[R, SInt] =
       val op0    = summon[AsSIntPrimApi].op(ref.refer, locate)
       op0.operation.appendToBlock()
       val nodeOp = summon[NodeApi].op(
@@ -59,10 +59,9 @@ given [R <: Referable[Bits]]: BitsApi[R] with
         input = op0.result
       )
       nodeOp.operation.appendToBlock()
-      new Node[SInt]:
-        val _tpe:       SInt      = new SInt:
-          private[zaozi] val _width = op0.result.getType.getBitWidth(true).toInt
-        val _operation: Operation = nodeOp.operation
+      val tpe    = new SInt:
+        private[zaozi] val _width = op0.result.getType.getBitWidth(true).toInt
+      constPropagate[R, SInt](ref, tpe, nodeOp.operation)
     def asUInt(
       using Arena,
       Context,
@@ -71,7 +70,7 @@ given [R <: Referable[Bits]]: BitsApi[R] with
       sourcecode.Line,
       sourcecode.Name.Machine,
       InstanceContext
-    ): Node[UInt] =
+    ): Propagated[R, UInt] =
       val nodeOp = summon[NodeApi].op(
         name = valName,
         location = locate,
@@ -79,10 +78,9 @@ given [R <: Referable[Bits]]: BitsApi[R] with
         input = ref.refer
       )
       nodeOp.operation.appendToBlock()
-      new Node[UInt]:
-        val _tpe:       UInt      = new UInt:
-          private[zaozi] val _width = nodeOp.operation.getResult(0).getType.getBitWidth(true).toInt
-        val _operation: Operation = nodeOp.operation
+      val tpe    = new UInt:
+        private[zaozi] val _width = nodeOp.operation.getResult(0).getType.getBitWidth(true).toInt
+      constPropagate[R, UInt](ref, tpe, nodeOp.operation)
     def asBool(
       using Arena,
       Context,
@@ -91,7 +89,7 @@ given [R <: Referable[Bits]]: BitsApi[R] with
       sourcecode.Line,
       sourcecode.Name.Machine,
       InstanceContext
-    ): Node[Bool] =
+    ): Propagated[R, Bool] =
       val nodeOp = summon[NodeApi].op(
         name = valName,
         location = locate,
@@ -104,9 +102,7 @@ given [R <: Referable[Bits]]: BitsApi[R] with
         s"Cannot convert ${summon[sourcecode.Name.Machine]}: Bits(${width}) to Bool"
       )
       nodeOp.operation.appendToBlock()
-      new Node[Bool]:
-        val _tpe:       Bool      = new Object with Bool
-        val _operation: Operation = nodeOp.operation
+      constPropagate[R, Bool](ref, new Object with Bool, nodeOp.operation)
     def asBundle[T <: Bundle](
       tpe: T
     )(
@@ -117,16 +113,14 @@ given [R <: Referable[Bits]]: BitsApi[R] with
       sourcecode.Line,
       sourcecode.Name.Machine,
       InstanceContext
-    ): Node[T] =
+    ): Propagated[R, T] =
       val bitcastOp = summon[BitCastApi].op(
         input = ref.refer,
         tpe = tpe.toMlirType,
         location = locate
       )
       bitcastOp.operation.appendToBlock()
-      new Node[T]:
-        val _tpe:       T         = tpe
-        val _operation: Operation = bitcastOp.operation
+      constPropagate[R, T](ref, tpe, bitcastOp.operation)
     def asRecord[T <: Record](
       tpe: T
     )(
@@ -137,16 +131,14 @@ given [R <: Referable[Bits]]: BitsApi[R] with
       sourcecode.Line,
       sourcecode.Name.Machine,
       InstanceContext
-    ): Node[T] =
+    ): Propagated[R, T] =
       val bitcastOp = summon[BitCastApi].op(
         input = ref.refer,
         tpe = tpe.toMlirType,
         location = locate
       )
       bitcastOp.operation.appendToBlock()
-      new Node[T]:
-        val _tpe:       T         = tpe
-        val _operation: Operation = bitcastOp.operation
+      constPropagate[R, T](ref, tpe, bitcastOp.operation)
     def asVec[E <: Data](
       tpe: E
     )(
@@ -157,7 +149,7 @@ given [R <: Referable[Bits]]: BitsApi[R] with
       sourcecode.Line,
       sourcecode.Name.Machine,
       InstanceContext
-    ): Node[Vec[E]] =
+    ): Propagated[R, Vec[E]] =
       val srcWidth  = ref.refer.getType.getBitWidth(true).toInt
       val dstWidth  = tpe.toMlirType.getBitWidth(true).toInt
       require(
@@ -172,9 +164,7 @@ given [R <: Referable[Bits]]: BitsApi[R] with
         location = locate
       )
       bitcastOp.operation.appendToBlock()
-      new Node[Vec[E]]:
-        val _tpe:       Vec[E]    = Vec[E](count, tpe)
-        val _operation: Operation = bitcastOp.operation
+      constPropagate[R, Vec[E]](ref, Vec[E](count, tpe), bitcastOp.operation)
     def unary_~(
       using Arena,
       Context,

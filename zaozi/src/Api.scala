@@ -373,7 +373,7 @@ trait AsBits[D <: Data, R <: Referable[D]]:
       sourcecode.Line,
       sourcecode.Name.Machine,
       InstanceContext
-    ): Node[Bits]
+    ): Propagated[R, Bits]
 trait AsBool[D <: Data, R <: Referable[D]]:
   extension (ref: R)
     def asBool(
@@ -384,7 +384,7 @@ trait AsBool[D <: Data, R <: Referable[D]]:
       sourcecode.Line,
       sourcecode.Name.Machine,
       InstanceContext
-    ): Node[Bool]
+    ): Propagated[R, Bool]
 trait AsSInt[D <: Data, R <: Referable[D]]:
   extension (ref: R)
     def asSInt(
@@ -395,7 +395,7 @@ trait AsSInt[D <: Data, R <: Referable[D]]:
       sourcecode.Line,
       sourcecode.Name.Machine,
       InstanceContext
-    ): Node[SInt]
+    ): Propagated[R, SInt]
 trait AsUInt[D <: Data, R <: Referable[D]]:
   extension (ref: R)
     def asUInt(
@@ -406,7 +406,7 @@ trait AsUInt[D <: Data, R <: Referable[D]]:
       sourcecode.Line,
       sourcecode.Name.Machine,
       InstanceContext
-    ): Node[UInt]
+    ): Propagated[R, UInt]
 
 trait AsBundle[D <: Data, R <: Referable[D]]:
   extension (ref: R)
@@ -420,7 +420,7 @@ trait AsBundle[D <: Data, R <: Referable[D]]:
       sourcecode.Line,
       sourcecode.Name.Machine,
       InstanceContext
-    ): Node[T]
+    ): Propagated[R, T]
 
 trait AsRecord[D <: Data, R <: Referable[D]]:
   extension (ref: R)
@@ -434,7 +434,7 @@ trait AsRecord[D <: Data, R <: Referable[D]]:
       sourcecode.Line,
       sourcecode.Name.Machine,
       InstanceContext
-    ): Node[T]
+    ): Propagated[R, T]
 
 trait AsVec[D <: Data, R <: Referable[D]]:
   extension (ref: R)
@@ -448,7 +448,7 @@ trait AsVec[D <: Data, R <: Referable[D]]:
       sourcecode.Line,
       sourcecode.Name.Machine,
       InstanceContext
-    ): Node[Vec[E]]
+    ): Propagated[R, Vec[E]]
 
 trait ProbeConnect[D <: Data & CanProbe, P <: RWProbe[D] | RProbe[D], DATA <: Referable[D], PROBE <: Referable[P]]:
   extension (ref: PROBE)

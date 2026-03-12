@@ -22,17 +22,16 @@ given [E <: Data, V <: Vec[E], R <: Referable[V]]: VecApi[E, V, R] with
       sourcecode.Line,
       sourcecode.Name.Machine,
       InstanceContext
-    ): Node[Bits] =
+    ): Propagated[R, Bits] =
       val bitcastOp = summon[BitCastApi].op(
         input = ref.refer,
         tpe = Bits(ref.refer.getType.getBitWidth(true).toInt.W).toMlirType,
         location = locate
       )
       bitcastOp.operation.appendToBlock()
-      new Node[Bits]:
-        val _tpe:       Bits      = new Bits:
-          private[zaozi] val _width = bitcastOp.operation.getResult(0).getType.getBitWidth(true).toInt
-        val _operation: Operation = bitcastOp.operation
+      val tpe       = new Bits:
+        private[zaozi] val _width = bitcastOp.operation.getResult(0).getType.getBitWidth(true).toInt
+      constPropagate[R, Bits](ref, tpe, bitcastOp.operation)
 
     def width(
       using Arena,

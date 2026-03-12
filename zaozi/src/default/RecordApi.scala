@@ -5,7 +5,7 @@ package me.jiuyang.zaozi.default
 import me.jiuyang.zaozi.*
 import me.jiuyang.zaozi.default.{*, given}
 import me.jiuyang.zaozi.magic.UntypedDynamicSubfield
-import me.jiuyang.zaozi.reftpe.{Node, Ref, Referable}
+import me.jiuyang.zaozi.reftpe.{Const, Node, Propagated, Ref, Referable}
 import me.jiuyang.zaozi.valuetpe.{Bits, Data, ProbeRecord, Record}
 
 import org.llvm.circt.scalalib.capi.dialect.firrtl.{*, given}
@@ -24,17 +24,16 @@ given [T <: Record | ProbeRecord, R <: Referable[T]]: RecordApi[T, R] with
       sourcecode.Line,
       sourcecode.Name.Machine,
       InstanceContext
-    ): Node[Bits] =
+    ): Propagated[R, Bits] =
       val bitcastOp = summon[BitCastApi].op(
         input = ref.refer,
         tpe = Bits(ref.refer.getType.getBitWidth(true).toInt.W).toMlirType,
         location = locate
       )
       bitcastOp.operation.appendToBlock()
-      new Node[Bits]:
-        val _tpe:       Bits      = new Bits:
-          private[zaozi] val _width = bitcastOp.operation.getResult(0).getType.getBitWidth(true).toInt
-        val _operation: Operation = bitcastOp.operation
+      val tpe       = new Bits:
+        private[zaozi] val _width = bitcastOp.operation.getResult(0).getType.getBitWidth(true).toInt
+      constPropagate[R, Bits](ref, tpe, bitcastOp.operation)
 
     def width(
       using Arena,

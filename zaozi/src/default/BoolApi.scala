@@ -54,7 +54,7 @@ given [R <: Referable[Bool]]: BoolApi[R] with
       sourcecode.Line,
       sourcecode.Name.Machine,
       InstanceContext
-    ): Node[Bits] =
+    ): Propagated[R, Bits] =
       val nodeOp = summon[NodeApi].op(
         name = valName,
         location = locate,
@@ -62,10 +62,9 @@ given [R <: Referable[Bool]]: BoolApi[R] with
         input = ref.refer
       )
       nodeOp.operation.appendToBlock()
-      new Node[Bits]:
-        val _tpe:       Bits      = new Object with Bits:
-          private[zaozi] val _width = nodeOp.operation.getResult(0).getType.getBitWidth(true).toInt
-        val _operation: Operation = nodeOp.operation
+      val tpe    = new Object with Bits:
+        private[zaozi] val _width = nodeOp.operation.getResult(0).getType.getBitWidth(true).toInt
+      constPropagate[R, Bits](ref, tpe, nodeOp.operation)
 
     def width(
       using Arena,

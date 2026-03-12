@@ -11,6 +11,11 @@ import org.llvm.mlir.scalalib.capi.ir.{Block, Context, Operation, Type, Value}
 import java.lang.foreign.Arena
 import scala.language.dynamics
 
+// TODO: consider propagating Const through arithmetic operators (e.g. Const[UInt] + Const[UInt] => Const[UInt])
+type Propagated[R <: Referable[?], RET <: Data] = R match
+  case Const[?] => Const[RET]
+  case _        => Node[RET]
+
 trait Referable[T <: Data] extends Dynamic:
   private[zaozi] val _tpe: T
 
