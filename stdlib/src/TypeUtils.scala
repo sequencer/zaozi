@@ -28,20 +28,8 @@ trait TypeUtilsApi:
     ): Propagated[R, Bits]
 
   extension [R <: Referable[Bits]](ref: R)
-    inline def asTypeOf[D <: HardwareDataType](
+    inline def asType[D <: HardwareDataType](
       tpe: D
-    )(
-      using Arena,
-      Context,
-      Block,
-      sourcecode.File,
-      sourcecode.Line,
-      sourcecode.Name.Machine,
-      InstanceContext
-    ): Propagated[R, D]
-
-    inline def asTypeOf[D <: HardwareDataType, TREF <: Referable[D]](
-      that: TREF
     )(
       using Arena,
       Context,

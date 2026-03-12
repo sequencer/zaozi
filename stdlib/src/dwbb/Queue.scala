@@ -103,7 +103,7 @@ given QueueImpl with
     )
     val io      = Wire(new QueueIO(parameter))
     val dataIn  = io.enq.bits.asBits
-    val dataOut = fifo.io.data_out.asTypeOf(io.deq.bits)
+    val dataOut = fifo.io.data_out.asType(io.deq.bits.getType)
 
     fifo.io.clk    := io.clock
     fifo.io.rst_n  := !(io.reset.asBool)

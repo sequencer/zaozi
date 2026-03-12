@@ -96,54 +96,54 @@ object TypeUtilSpec extends TestSuite:
           io.outBool.dontCare()
       BundleAsBits.verilogTest(TypeUtilParameter(8))("assign outBits")
 
-    test("Bits.asTypeOf(UInt)"):
+    test("Bits.asType(UInt)"):
       @generator
       object BitsAsTypeOfUInt
           extends Generator[TypeUtilParameter, TypeUtilLayers, TypeUtilIO, TypeUtilProbe]
           with HasVerilogTest:
         def architecture(parameter: TypeUtilParameter) =
           val io = summon[Interface[TypeUtilIO]]
-          io.out := io.inBits.asTypeOf(UInt(parameter.width.W))
+          io.out := io.inBits.asType(UInt(parameter.width.W))
           io.outSInt.dontCare()
           io.outBits.dontCare()
           io.outBool.dontCare()
       BitsAsTypeOfUInt.verilogTest(TypeUtilParameter(8))("assign out")
 
-    test("Bits.asTypeOf(SInt)"):
+    test("Bits.asType(SInt)"):
       @generator
       object BitsAsTypeOfSInt
           extends Generator[TypeUtilParameter, TypeUtilLayers, TypeUtilIO, TypeUtilProbe]
           with HasVerilogTest:
         def architecture(parameter: TypeUtilParameter) =
           val io = summon[Interface[TypeUtilIO]]
-          io.outSInt := io.inBits.asTypeOf(SInt(parameter.width.W))
+          io.outSInt := io.inBits.asType(SInt(parameter.width.W))
           io.out.dontCare()
           io.outBits.dontCare()
           io.outBool.dontCare()
       BitsAsTypeOfSInt.verilogTest(TypeUtilParameter(8))("assign outSInt")
 
-    test("Bits.asTypeOf(Bool)"):
+    test("Bits.asType(Bool)"):
       @generator
       object BitsAsTypeOfBool
           extends Generator[TypeUtilParameter, TypeUtilLayers, TypeUtilIO, TypeUtilProbe]
           with HasVerilogTest:
         def architecture(parameter: TypeUtilParameter) =
           val io     = summon[Interface[TypeUtilIO]]
-          val result = io.inBits.bits(0, 0).asTypeOf(Bool())
+          val result = io.inBits.bits(0, 0).asType(Bool())
           io.outBool := result
           io.out.dontCare()
           io.outSInt.dontCare()
           io.outBits.dontCare()
       BitsAsTypeOfBool.verilogTest(TypeUtilParameter(8))("assign outBool")
 
-    test("Bits.asTypeOf(Bundle)"):
+    test("Bits.asType(Bundle)"):
       @generator
       object BitsAsTypeOfBundle
           extends Generator[TypeUtilParameter, TypeUtilLayers, TypeUtilIO, TypeUtilProbe]
           with HasVerilogTest:
         def architecture(parameter: TypeUtilParameter) =
           val io     = summon[Interface[TypeUtilIO]]
-          val bundle = io.inBits.asTypeOf(new SimpleBundle4x2)
+          val bundle = io.inBits.asType(new SimpleBundle4x2)
           val wire   = Wire(new SimpleBundle4x2)
           wire.x     := bundle.x
           wire.y     := bundle.y
@@ -153,18 +153,18 @@ object TypeUtilSpec extends TestSuite:
           io.outBool.dontCare()
       BitsAsTypeOfBundle.verilogTest(TypeUtilParameter(8))("assign outBits")
 
-    test("Bits.asTypeOf(that) infers type from reference"):
+    test("Bits.asType(ref.getType)"):
       @generator
-      object BitsAsTypeOfRef
+      object BitsAsTypeFromRef
           extends Generator[TypeUtilParameter, TypeUtilLayers, TypeUtilIO, TypeUtilProbe]
           with HasVerilogTest:
         def architecture(parameter: TypeUtilParameter) =
           val io = summon[Interface[TypeUtilIO]]
-          io.out := io.inBits.asTypeOf(io.inUInt)
+          io.out := io.inBits.asType(io.inUInt.getType)
           io.outSInt.dontCare()
           io.outBits.dontCare()
           io.outBool.dontCare()
-      BitsAsTypeOfRef.verilogTest(TypeUtilParameter(8))("assign out")
+      BitsAsTypeFromRef.verilogTest(TypeUtilParameter(8))("assign out")
 
     test("Const[UInt].asBits returns Const[Bits]"):
       @generator
@@ -187,7 +187,7 @@ object TypeUtilSpec extends TestSuite:
         "if (syncDomain_reset)"
       )
 
-    test("Const[Bits].asTypeOf(UInt) returns Const[UInt]"):
+    test("Const[Bits].asType(UInt) returns Const[UInt]"):
       @generator
       object ConstAsTypeOfUInt
           extends Generator[TypeUtilParameter, TypeUtilLayers, TypeUtilIO, TypeUtilProbe]
@@ -196,7 +196,7 @@ object TypeUtilSpec extends TestSuite:
           val io           = summon[Interface[TypeUtilIO]]
           given Ref[Clock] = io.syncDomain.clock
           given Ref[Reset] = io.syncDomain.reset
-          val constUInt: Const[UInt] = 0.B(parameter.width.W).asTypeOf(UInt(parameter.width.W))
+          val constUInt: Const[UInt] = 0.B(parameter.width.W).asType(UInt(parameter.width.W))
           val reg = RegInit(constUInt)
           io.out := reg
           reg    := io.inUInt
@@ -208,7 +208,7 @@ object TypeUtilSpec extends TestSuite:
         "if (syncDomain_reset)"
       )
 
-    test("Const[UInt].asBits.asTypeOf(SInt) chain"):
+    test("Const[UInt].asBits.asType(SInt) chain"):
       @generator
       object ConstChain
           extends Generator[TypeUtilParameter, TypeUtilLayers, TypeUtilIO, TypeUtilProbe]
@@ -217,7 +217,7 @@ object TypeUtilSpec extends TestSuite:
           val io           = summon[Interface[TypeUtilIO]]
           given Ref[Clock] = io.syncDomain.clock
           given Ref[Reset] = io.syncDomain.reset
-          val reg          = RegInit(0.U(parameter.width.W).asBits.asTypeOf(SInt(parameter.width.W)))
+          val reg          = RegInit(0.U(parameter.width.W).asBits.asType(SInt(parameter.width.W)))
           io.outSInt := reg
           reg        := io.inSInt
           io.out.dontCare()
@@ -228,14 +228,14 @@ object TypeUtilSpec extends TestSuite:
         "if (syncDomain_reset)"
       )
 
-    test("Const[Bits].asTypeOf(Bundle) returns Const[Bundle]"):
+    test("Const[Bits].asType(Bundle) returns Const[Bundle]"):
       @generator
       object ConstAsTypeOfBundle
           extends Generator[TypeUtilParameter, TypeUtilLayers, TypeUtilIO, TypeUtilProbe]
           with HasVerilogTest:
         def architecture(parameter: TypeUtilParameter) =
           val io = summon[Interface[TypeUtilIO]]
-          val bundleConst: Const[SimpleBundle4x2] = 0.B(8.W).asTypeOf(new SimpleBundle4x2)
+          val bundleConst: Const[SimpleBundle4x2] = 0.B(8.W).asType(new SimpleBundle4x2)
           val wire = Wire(new SimpleBundle4x2)
           wire.x     := bundleConst.x
           wire.y     := bundleConst.y
