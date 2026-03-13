@@ -22,7 +22,6 @@ import org.llvm.circt.CAPI.{
   mlirRegisterCIRCTConversionExportSplitVerilog,
   mlirRegisterCIRCTConversionExportVerilog,
   mlirRegisterCIRCTConversionHWArithToHW,
-  mlirRegisterCIRCTConversionHWLowerInstanceChoices,
   mlirRegisterCIRCTConversionHandshakeRemoveBlock,
   mlirRegisterCIRCTConversionHandshakeToDC,
   mlirRegisterCIRCTConversionHandshakeToHW,
@@ -65,7 +64,6 @@ given ConversionRegisterApi with
   def exportSplitVerilog:       Unit = mlirRegisterCIRCTConversionExportSplitVerilog()
   def exportVerilog:            Unit = mlirRegisterCIRCTConversionExportVerilog()
   def hwArithToHW:              Unit = mlirRegisterCIRCTConversionHWArithToHW()
-  def hwLowerInstanceChoices:   Unit = mlirRegisterCIRCTConversionHWLowerInstanceChoices()
   def handshakeRemoveBlock:     Unit = mlirRegisterCIRCTConversionHandshakeRemoveBlock()
   def handshakeToDC:            Unit = mlirRegisterCIRCTConversionHandshakeToDC()
   def handshakeToHW:            Unit = mlirRegisterCIRCTConversionHandshakeToHW()

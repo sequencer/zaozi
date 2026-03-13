@@ -26,11 +26,7 @@ import org.llvm.circt.CAPI.{
   circtFirtoolOptionsSetEmitSeparateAlwaysBlocks,
   circtFirtoolOptionsSetEnableAnnotationWarning,
   circtFirtoolOptionsSetEnableDebugInfo,
-  circtFirtoolOptionsSetEtcDisableInstanceExtraction,
-  circtFirtoolOptionsSetEtcDisableModuleInlining,
-  circtFirtoolOptionsSetEtcDisableRegisterExtraction,
   circtFirtoolOptionsSetExportModuleHierarchy,
-  circtFirtoolOptionsSetExtractTestCode,
   circtFirtoolOptionsSetIgnoreReadEnableMem,
   circtFirtoolOptionsSetLowerAnnotationsNoRefTypePorts,
   circtFirtoolOptionsSetLowerMemories,
@@ -167,31 +163,11 @@ given FirtoolApi with
     )(
       using arena: Arena
     ): Unit = circtFirtoolOptionsSetEnableDebugInfo(firtoolOptions.segment, value)
-    inline def setEtcDisableInstanceExtraction(
-      value:       Boolean
-    )(
-      using arena: Arena
-    ): Unit = circtFirtoolOptionsSetEtcDisableInstanceExtraction(firtoolOptions.segment, value)
-    inline def setEtcDisableModuleInlining(
-      value:       Boolean
-    )(
-      using arena: Arena
-    ): Unit = circtFirtoolOptionsSetEtcDisableModuleInlining(firtoolOptions.segment, value)
-    inline def setEtcDisableRegisterExtraction(
-      value:       Boolean
-    )(
-      using arena: Arena
-    ): Unit = circtFirtoolOptionsSetEtcDisableRegisterExtraction(firtoolOptions.segment, value)
     inline def setExportModuleHierarchy(
       value:       Boolean
     )(
       using arena: Arena
     ): Unit = circtFirtoolOptionsSetExportModuleHierarchy(firtoolOptions.segment, value)
-    inline def setExtractTestCode(
-      value:       Boolean
-    )(
-      using arena: Arena
-    ): Unit = circtFirtoolOptionsSetExtractTestCode(firtoolOptions.segment, value)
     inline def setIgnoreReadEnableMem(
       value:       Boolean
     )(

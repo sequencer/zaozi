@@ -22,7 +22,6 @@ import org.llvm.circt.CAPI.{
   mlirCreateCIRCTConversionExportSplitVerilog,
   mlirCreateCIRCTConversionExportVerilog,
   mlirCreateCIRCTConversionHWArithToHW,
-  mlirCreateCIRCTConversionHWLowerInstanceChoices,
   mlirCreateCIRCTConversionHandshakeRemoveBlock,
   mlirCreateCIRCTConversionHandshakeToDC,
   mlirCreateCIRCTConversionHandshakeToHW,
@@ -105,9 +104,6 @@ given ConversionCreateApi with
   def hwArithToHW(
     using arena: Arena
   ): Pass = Pass(mlirCreateCIRCTConversionHWArithToHW(arena))
-  def hwLowerInstanceChoices(
-    using arena: Arena
-  ): Pass = Pass(mlirCreateCIRCTConversionHWLowerInstanceChoices(arena))
   def handshakeRemoveBlock(
     using arena: Arena
   ): Pass = Pass(mlirCreateCIRCTConversionHandshakeRemoveBlock(arena))
