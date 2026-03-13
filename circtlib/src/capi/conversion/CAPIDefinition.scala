@@ -64,9 +64,6 @@ trait ConversionCreateApi:
   def hwArithToHW(
     using arena: Arena
   ): Pass
-  def hwLowerInstanceChoices(
-    using arena: Arena
-  ): Pass
   def handshakeRemoveBlock(
     using arena: Arena
   ): Pass
@@ -146,7 +143,6 @@ trait ConversionRegisterApi:
   def exportSplitVerilog:       Unit
   def exportVerilog:            Unit
   def hwArithToHW:              Unit
-  def hwLowerInstanceChoices:   Unit
   def handshakeRemoveBlock:     Unit
   def handshakeToDC:            Unit
   def handshakeToHW:            Unit

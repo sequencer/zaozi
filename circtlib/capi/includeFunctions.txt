@@ -294,11 +294,13 @@ omEvaluatorObjectGetType          # header: $CIRCT_INSTALL_PATH/include/circt-c/
 omEvaluatorObjectIsEq             # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/OM.h
 omEvaluatorObjectIsNull           # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/OM.h
 omEvaluatorPathGetAsString        # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/OM.h
+omEvaluatorUnknownGet             # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/OM.h
 omEvaluatorValueFromPrimitive     # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/OM.h
 omEvaluatorValueGetContext        # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/OM.h
 omEvaluatorValueGetLoc            # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/OM.h
 omEvaluatorValueGetPrimitive      # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/OM.h
 omEvaluatorValueGetReferenceValue # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/OM.h
+omEvaluatorValueGetType           # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/OM.h
 omEvaluatorValueIsABasePath       # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/OM.h
 omEvaluatorValueIsAList           # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/OM.h
 omEvaluatorValueIsAObject         # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/OM.h
@@ -306,6 +308,7 @@ omEvaluatorValueIsAPath           # header: $CIRCT_INSTALL_PATH/include/circt-c/
 omEvaluatorValueIsAPrimitive      # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/OM.h
 omEvaluatorValueIsAReference      # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/OM.h
 omEvaluatorValueIsNull            # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/OM.h
+omEvaluatorValueIsUnknown         # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/OM.h
 omFrozenBasePathTypeGetTypeID     # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/OM.h
 omFrozenPathTypeGetTypeID         # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/OM.h
 omIntegerAttrGet                  # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/OM.h
@@ -333,7 +336,9 @@ rtgArrayTypeGetElementType                  # header: $CIRCT_INSTALL_PATH/includ
 rtgAttrIsAAnyContextAttr                    # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/RTG.h
 rtgAttrIsADefaultContextAttr                # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/RTG.h
 rtgAttrIsAImmediate                         # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/RTG.h
+rtgAttrIsALabel                             # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/RTG.h
 rtgAttrIsALabelVisibilityAttr               # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/RTG.h
+rtgAttrIsAMap                               # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/RTG.h
 rtgAttrIsAVirtualRegisterConfig             # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/RTG.h
 rtgBagTypeGet                               # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/RTG.h
 rtgBagTypeGetElementType                    # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/RTG.h
@@ -344,9 +349,16 @@ rtgImmediateAttrGetValue                    # header: $CIRCT_INSTALL_PATH/includ
 rtgImmediateAttrGetWidth                    # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/RTG.h
 rtgImmediateTypeGet                         # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/RTG.h
 rtgImmediateTypeGetWidth                    # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/RTG.h
+rtgLabelAttrGet                             # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/RTG.h
+rtgLabelAttrGetName                         # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/RTG.h
 rtgLabelTypeGet                             # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/RTG.h
 rtgLabelVisibilityAttrGet                   # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/RTG.h
 rtgLabelVisibilityAttrGetValue              # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/RTG.h
+rtgMapAttrGet                               # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/RTG.h
+rtgMapAttrLookup                            # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/RTG.h
+rtgMapTypeGet                               # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/RTG.h
+rtgMapTypeGetKeyType                        # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/RTG.h
+rtgMapTypeGetValueType                      # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/RTG.h
 rtgMemoryBlockTypeGet                       # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/RTG.h
 rtgMemoryBlockTypeGetAddressWidth           # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/RTG.h
 rtgMemoryTypeGet                            # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/RTG.h
@@ -357,6 +369,7 @@ rtgSequenceTypeGetElement                   # header: $CIRCT_INSTALL_PATH/includ
 rtgSequenceTypeGetNumElements               # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/RTG.h
 rtgSetTypeGet                               # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/RTG.h
 rtgSetTypeGetElementType                    # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/RTG.h
+rtgStringTypeGet                            # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/RTG.h
 rtgTupleTypeGet                             # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/RTG.h
 rtgTupleTypeGetFieldType                    # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/RTG.h
 rtgTypeGetNumFields                         # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/RTG.h
@@ -365,11 +378,13 @@ rtgTypeIsABag                               # header: $CIRCT_INSTALL_PATH/includ
 rtgTypeIsADict                              # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/RTG.h
 rtgTypeIsAImmediate                         # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/RTG.h
 rtgTypeIsALabel                             # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/RTG.h
+rtgTypeIsAMap                               # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/RTG.h
 rtgTypeIsAMemory                            # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/RTG.h
 rtgTypeIsAMemoryBlock                       # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/RTG.h
 rtgTypeIsARandomizedSequence                # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/RTG.h
 rtgTypeIsASequence                          # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/RTG.h
 rtgTypeIsASet                               # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/RTG.h
+rtgTypeIsAString                            # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/RTG.h
 rtgTypeIsATuple                             # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/RTG.h
 rtgVirtualRegisterConfigAttrGet             # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/RTG.h
 rtgVirtualRegisterConfigAttrGetNumRegisters # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/RTG.h
@@ -384,6 +399,7 @@ rtgtestAttrIsARegA4             # header: $CIRCT_INSTALL_PATH/include/circt-c/Di
 rtgtestAttrIsARegA5             # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/RTGTest.h
 rtgtestAttrIsARegA6             # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/RTGTest.h
 rtgtestAttrIsARegA7             # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/RTGTest.h
+rtgtestAttrIsARegF0             # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/RTGTest.h
 rtgtestAttrIsARegGp             # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/RTGTest.h
 rtgtestAttrIsARegRa             # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/RTGTest.h
 rtgtestAttrIsARegS0             # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/RTGTest.h
@@ -411,6 +427,7 @@ rtgtestAttrIsARegZero           # header: $CIRCT_INSTALL_PATH/include/circt-c/Di
 rtgtestCPUAttrGet               # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/RTGTest.h
 rtgtestCPUAttrGetId             # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/RTGTest.h
 rtgtestCPUTypeGet               # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/RTGTest.h
+rtgtestFloatRegisterTypeGet     # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/RTGTest.h
 rtgtestIntegerRegisterTypeGet   # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/RTGTest.h
 rtgtestRegA0AttrGet             # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/RTGTest.h
 rtgtestRegA1AttrGet             # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/RTGTest.h
@@ -420,6 +437,7 @@ rtgtestRegA4AttrGet             # header: $CIRCT_INSTALL_PATH/include/circt-c/Di
 rtgtestRegA5AttrGet             # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/RTGTest.h
 rtgtestRegA6AttrGet             # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/RTGTest.h
 rtgtestRegA7AttrGet             # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/RTGTest.h
+rtgtestRegF0AttrGet             # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/RTGTest.h
 rtgtestRegGpAttrGet             # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/RTGTest.h
 rtgtestRegRaAttrGet             # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/RTGTest.h
 rtgtestRegS0AttrGet             # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/RTGTest.h
@@ -445,6 +463,7 @@ rtgtestRegT6AttrGet             # header: $CIRCT_INSTALL_PATH/include/circt-c/Di
 rtgtestRegTpAttrGet             # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/RTGTest.h
 rtgtestRegZeroAttrGet           # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/RTGTest.h
 rtgtestTypeIsACPU               # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/RTGTest.h
+rtgtestTypeIsAFloatRegister     # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/RTGTest.h
 rtgtestTypeIsAIntegerRegister   # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/RTGTest.h
 mlirGetDialectHandle__sv__        # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/SV.h
 registerSVPasses                  # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/SV.h
@@ -456,9 +475,20 @@ svSVAttributeAttrGetName          # header: $CIRCT_INSTALL_PATH/include/circt-c/
 mlirGetDialectHandle__seq__  # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/Seq.h
 registerSeqPasses            # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/Seq.h
 seqClockTypeGet              # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/Seq.h
+seqFirMemTypeGet             # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/Seq.h
+seqFirMemTypeGetDepth        # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/Seq.h
+seqFirMemTypeGetMaskWidth    # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/Seq.h
+seqFirMemTypeGetWidth        # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/Seq.h
+seqFirMemTypeHasMask         # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/Seq.h
+seqHLMemTypeGet              # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/Seq.h
+seqHLMemTypeGetElementType   # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/Seq.h
+seqHLMemTypeGetRank          # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/Seq.h
+seqHLMemTypeGetShape         # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/Seq.h
 seqImmutableTypeGet          # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/Seq.h
 seqImmutableTypeGetInnerType # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/Seq.h
 seqTypeIsAClock              # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/Seq.h
+seqTypeIsAFirMem             # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/Seq.h
+seqTypeIsAHLMem              # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/Seq.h
 seqTypeIsAImmutable          # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/Seq.h
 mlirGetDialectHandle__verif__ # header: $CIRCT_INSTALL_PATH/include/circt-c/Dialect/Verif.h
 mlirExportFIRRTL # header: $CIRCT_INSTALL_PATH/include/circt-c/ExportFIRRTL.h
@@ -487,11 +517,7 @@ circtFirtoolOptionsSetDomainMode                                        # header
 circtFirtoolOptionsSetEmitSeparateAlwaysBlocks                          # header: $CIRCT_INSTALL_PATH/include/circt-c/Firtool/Firtool.h
 circtFirtoolOptionsSetEnableAnnotationWarning                           # header: $CIRCT_INSTALL_PATH/include/circt-c/Firtool/Firtool.h
 circtFirtoolOptionsSetEnableDebugInfo                                   # header: $CIRCT_INSTALL_PATH/include/circt-c/Firtool/Firtool.h
-circtFirtoolOptionsSetEtcDisableInstanceExtraction                      # header: $CIRCT_INSTALL_PATH/include/circt-c/Firtool/Firtool.h
-circtFirtoolOptionsSetEtcDisableModuleInlining                          # header: $CIRCT_INSTALL_PATH/include/circt-c/Firtool/Firtool.h
-circtFirtoolOptionsSetEtcDisableRegisterExtraction                      # header: $CIRCT_INSTALL_PATH/include/circt-c/Firtool/Firtool.h
 circtFirtoolOptionsSetExportModuleHierarchy                             # header: $CIRCT_INSTALL_PATH/include/circt-c/Firtool/Firtool.h
-circtFirtoolOptionsSetExtractTestCode                                   # header: $CIRCT_INSTALL_PATH/include/circt-c/Firtool/Firtool.h
 circtFirtoolOptionsSetIgnoreReadEnableMem                               # header: $CIRCT_INSTALL_PATH/include/circt-c/Firtool/Firtool.h
 circtFirtoolOptionsSetLowerAnnotationsNoRefTypePorts                    # header: $CIRCT_INSTALL_PATH/include/circt-c/Firtool/Firtool.h
 circtFirtoolOptionsSetLowerMemories                                     # header: $CIRCT_INSTALL_PATH/include/circt-c/Firtool/Firtool.h
@@ -529,6 +555,7 @@ mlirCreateCIRCTConversionConvertCoreToFSM           # header: $CIRCT_INSTALL_PAT
 mlirCreateCIRCTConversionConvertDatapathToComb      # header: $CIRCT_INSTALL_PATH/include/circt/Conversion/Conversion.capi.h.inc
 mlirCreateCIRCTConversionConvertDatapathToSMT       # header: $CIRCT_INSTALL_PATH/include/circt/Conversion/Conversion.capi.h.inc
 mlirCreateCIRCTConversionConvertFSMToCore           # header: $CIRCT_INSTALL_PATH/include/circt/Conversion/Conversion.capi.h.inc
+mlirCreateCIRCTConversionConvertFSMToSMT            # header: $CIRCT_INSTALL_PATH/include/circt/Conversion/Conversion.capi.h.inc
 mlirCreateCIRCTConversionConvertFSMToSV             # header: $CIRCT_INSTALL_PATH/include/circt/Conversion/Conversion.capi.h.inc
 mlirCreateCIRCTConversionConvertHWToBTOR2           # header: $CIRCT_INSTALL_PATH/include/circt/Conversion/Conversion.capi.h.inc
 mlirCreateCIRCTConversionConvertHWToLLVM            # header: $CIRCT_INSTALL_PATH/include/circt/Conversion/Conversion.capi.h.inc
@@ -543,7 +570,6 @@ mlirCreateCIRCTConversionDCToHW                     # header: $CIRCT_INSTALL_PAT
 mlirCreateCIRCTConversionExportSplitVerilog         # header: $CIRCT_INSTALL_PATH/include/circt/Conversion/Conversion.capi.h.inc
 mlirCreateCIRCTConversionExportVerilog              # header: $CIRCT_INSTALL_PATH/include/circt/Conversion/Conversion.capi.h.inc
 mlirCreateCIRCTConversionHWArithToHW                # header: $CIRCT_INSTALL_PATH/include/circt/Conversion/Conversion.capi.h.inc
-mlirCreateCIRCTConversionHWLowerInstanceChoices     # header: $CIRCT_INSTALL_PATH/include/circt/Conversion/Conversion.capi.h.inc
 mlirCreateCIRCTConversionHandshakeRemoveBlock       # header: $CIRCT_INSTALL_PATH/include/circt/Conversion/Conversion.capi.h.inc
 mlirCreateCIRCTConversionHandshakeToDC              # header: $CIRCT_INSTALL_PATH/include/circt/Conversion/Conversion.capi.h.inc
 mlirCreateCIRCTConversionHandshakeToHW              # header: $CIRCT_INSTALL_PATH/include/circt/Conversion/Conversion.capi.h.inc
@@ -577,6 +603,7 @@ mlirRegisterCIRCTConversionConvertCoreToFSM         # header: $CIRCT_INSTALL_PAT
 mlirRegisterCIRCTConversionConvertDatapathToComb    # header: $CIRCT_INSTALL_PATH/include/circt/Conversion/Conversion.capi.h.inc
 mlirRegisterCIRCTConversionConvertDatapathToSMT     # header: $CIRCT_INSTALL_PATH/include/circt/Conversion/Conversion.capi.h.inc
 mlirRegisterCIRCTConversionConvertFSMToCore         # header: $CIRCT_INSTALL_PATH/include/circt/Conversion/Conversion.capi.h.inc
+mlirRegisterCIRCTConversionConvertFSMToSMT          # header: $CIRCT_INSTALL_PATH/include/circt/Conversion/Conversion.capi.h.inc
 mlirRegisterCIRCTConversionConvertFSMToSV           # header: $CIRCT_INSTALL_PATH/include/circt/Conversion/Conversion.capi.h.inc
 mlirRegisterCIRCTConversionConvertHWToBTOR2         # header: $CIRCT_INSTALL_PATH/include/circt/Conversion/Conversion.capi.h.inc
 mlirRegisterCIRCTConversionConvertHWToLLVM          # header: $CIRCT_INSTALL_PATH/include/circt/Conversion/Conversion.capi.h.inc
@@ -591,7 +618,6 @@ mlirRegisterCIRCTConversionDCToHW                   # header: $CIRCT_INSTALL_PAT
 mlirRegisterCIRCTConversionExportSplitVerilog       # header: $CIRCT_INSTALL_PATH/include/circt/Conversion/Conversion.capi.h.inc
 mlirRegisterCIRCTConversionExportVerilog            # header: $CIRCT_INSTALL_PATH/include/circt/Conversion/Conversion.capi.h.inc
 mlirRegisterCIRCTConversionHWArithToHW              # header: $CIRCT_INSTALL_PATH/include/circt/Conversion/Conversion.capi.h.inc
-mlirRegisterCIRCTConversionHWLowerInstanceChoices   # header: $CIRCT_INSTALL_PATH/include/circt/Conversion/Conversion.capi.h.inc
 mlirRegisterCIRCTConversionHandshakeRemoveBlock     # header: $CIRCT_INSTALL_PATH/include/circt/Conversion/Conversion.capi.h.inc
 mlirRegisterCIRCTConversionHandshakeToDC            # header: $CIRCT_INSTALL_PATH/include/circt/Conversion/Conversion.capi.h.inc
 mlirRegisterCIRCTConversionHandshakeToHW            # header: $CIRCT_INSTALL_PATH/include/circt/Conversion/Conversion.capi.h.inc

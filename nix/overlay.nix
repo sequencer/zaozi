@@ -3,7 +3,6 @@
 final: prev:
 
 {
-  # XXX: should handle in circt-nix?
   mlir = prev.llvmPackages_circt.mlir.override { buildSharedLibs = true; };
   libllvm = prev.llvmPackages_circt.libllvm.override { buildSharedLibs = true; };
   circt = prev.circt.override {

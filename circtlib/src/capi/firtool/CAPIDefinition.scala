@@ -175,27 +175,7 @@ trait FirtoolApi:
     )(
       using arena: Arena
     ): Unit
-    inline def setEtcDisableInstanceExtraction(
-      value:       Boolean
-    )(
-      using arena: Arena
-    ): Unit
-    inline def setEtcDisableModuleInlining(
-      value:       Boolean
-    )(
-      using arena: Arena
-    ): Unit
-    inline def setEtcDisableRegisterExtraction(
-      value:       Boolean
-    )(
-      using arena: Arena
-    ): Unit
     inline def setExportModuleHierarchy(
-      value:       Boolean
-    )(
-      using arena: Arena
-    ): Unit
-    inline def setExtractTestCode(
       value:       Boolean
     )(
       using arena: Arena
