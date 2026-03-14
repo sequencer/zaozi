@@ -96,8 +96,8 @@ extension (evaluatorValue: OMEvaluatorValue)
         case string if string.isString       => OMString(string.stringAttrGetValue)
         // match bool before integer since a bool is also an integer
         case bool if bool.isBool             => OMBool(bool.boolAttrGetValue)
-        case int if int.isInteger            => OMInt(int.integerAttrGetValueInt)
-        case omInt if omInt.isIntegerAttr    => OMInt(omInt.integerAttrGetInt.integerAttrGetValueInt)
+        case int if int.isInteger            => OMInt(int.integerAttrGetValueSInt)
+        case omInt if omInt.isIntegerAttr    => OMInt(omInt.integerAttrGetInt.integerAttrGetValueSInt)
         // since firtool 1.22.0 there should be no longer list attrs but we still support it for backward compatibility
         case listAttr if listAttr.isListAttr =>
           OMList(
